@@ -48,8 +48,9 @@ function CheckoutForm() {
 
   const handleOrder = async () => {
     // Sepet boşsa uyarı ver
+    const cart = []; // Geçici olarak boş array
     if (cart.length === 0) {
-      setOrderMessage("Sepetiniz boş.");
+      setMessage("Sepetiniz boş.");
       return;
     }
     // Ödeme sayfasına yönlendir
