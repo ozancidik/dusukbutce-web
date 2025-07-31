@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export default function NotificationsPage() {
   // Bildirimler örnek
-  const notifications = [];
+  const notifications: any[] = [];
   return (
     <div style={{ maxWidth: 500, margin: "40px auto", padding: 32, background: '#f8fafc', borderRadius: 16, boxShadow: '0 4px 32px #0001', fontFamily: 'sans-serif' }}>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 24 }}>
