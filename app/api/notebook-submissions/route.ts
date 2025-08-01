@@ -1,79 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
+import connectDB from '../../../lib/mongodb';
+import ProductSubmission from '../../../models/ProductSubmission';
 
 export async function POST(request: NextRequest) {
   try {
-    const formData = await request.json();
+    await connectDB();
     
-    // Form verilerini doğrula
-    if (!formData.brand || !formData.model) {
-      return NextResponse.json(
-        { error: 'Marka ve model alanları zorunludur' },
-        { status: 400 }
-      );
-    }
-
-    // Resimleri base64 formatında kaydet
-    const processedImages = [];
-    if (formData.images && Array.isArray(formData.images)) {
-      for (const imageData of formData.images) {
-        if (imageData && imageData.startsWith('data:image')) {
-          // Base64 formatındaki resmi kaydet
-          processedImages.push({
-            name: `image_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.jpg`,
-            data: imageData,
-            uploadedAt: new Date().toISOString()
-          });
-        }
-      }
-    }
-
-    // Veritabanına kaydet
-    const submission = {
-      id: Date.now(),
-      ...formData,
-      images: processedImages, // Base64 formatında resimler
-      createdAt: new Date().toISOString(),
-      status: 'pending'
-    };
-
-    // Dosyaya kaydet
-    const dataPath = path.join(process.cwd(), 'data', 'submissions.json');
+    const body = await request.json();
     
-    // data klasörü yoksa oluştur
-    if (!fs.existsSync(path.dirname(dataPath))) {
-      fs.mkdirSync(path.dirname(dataPath), { recursive: true });
-    }
-
-    // Mevcut verileri oku
-    let submissions = [];
-    if (fs.existsSync(dataPath)) {
-      submissions = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
-    }
-
-    // Yeni submission'ı ekle
-    submissions.push(submission);
-    fs.writeFileSync(dataPath, JSON.stringify(submissions, null, 2));
-
-    console.log('Yeni notebook submission:', {
-      ...submission,
-      images: `${processedImages.length} resim yüklendi`
+    // Create submission with category
+    const submission = new ProductSubmission({
+      ...body,
+      category: 'notebook'
     });
-
-    return NextResponse.json(
-      { 
-        success: true, 
-        message: 'Form başarıyla gönderildi!',
-        submissionId: submission.id
-      },
-      { status: 201 }
-    );
-
+    
+    await submission.save();
+    
+    return NextResponse.json({ 
+      success: true, 
+      message: 'Notebook submission saved successfully',
+      id: submission._id 
+    });
   } catch (error) {
-    console.error('API Error:', error);
+    console.error('Error saving notebook submission:', error);
     return NextResponse.json(
-      { error: 'Sunucu hatası oluştu' },
+      { success: false, message: 'Failed to save submission' },
       { status: 500 }
     );
   }
@@ -81,20 +32,20 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
   try {
-    // Tüm submission'ları getir
-    const dataPath = path.join(process.cwd(), 'data', 'submissions.json');
+    await connectDB();
     
-    if (!fs.existsSync(dataPath)) {
-      return NextResponse.json({ submissions: [] });
-    }
-
-    const submissions = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
-    return NextResponse.json({ submissions });
-
+    const submissions = await ProductSubmission.find({ 
+      category: 'notebook' 
+    }).sort({ createdAt: -1 });
+    
+    return NextResponse.json({ 
+      success: true, 
+      submissions 
+    });
   } catch (error) {
-    console.error('API Error:', error);
+    console.error('Error fetching notebook submissions:', error);
     return NextResponse.json(
-      { error: 'Sunucu hatası oluştu' },
+      { success: false, message: 'Failed to fetch submissions' },
       { status: 500 }
     );
   }

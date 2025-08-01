@@ -3,25 +3,29 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 interface Submission {
-  id: number;
+  _id: string;
+  category: string;
   brand: string;
   model: string;
-  processor: string;
-  graphicsCard: string;
-  wattValue: string;
-  ram: string;
-  storage: string;
-  refreshRate: string;
+  processor?: string;
+  graphicsCard?: string;
+  wattValue?: string;
+  ram?: string;
+  storage?: string;
+  refreshRate?: string;
+  screenSize?: string;
+  batteryHealth?: string;
   cosmeticCondition: string;
+  screenStatus?: string;
+  deadPixelCount?: string;
   hasBox: boolean;
   hasInvoice: boolean;
+  invoiceDate?: string;
+  quantity: number;
   createdAt: string;
   status: string;
-  images: Array<{
-    name: string;
-    data: string;
-    uploadedAt: string;
-  }> | string[]; // Eski format için string array desteği
+  adminNotes?: string;
+  images: string[]; // Base64 encoded images
 }
 
 export default function AdminPage() {
@@ -174,7 +178,7 @@ export default function AdminPage() {
           gap: isMobile ? '16px' : '24px'
         }}>
           {submissions.map((submission) => (
-            <div key={submission.id} style={{
+            <div key={submission._id} style={{
               background: 'white',
               borderRadius: '12px',
               padding: isMobile ? '16px' : '24px',
@@ -401,7 +405,7 @@ export default function AdminPage() {
                           background: '#f9fafb'
                         }}>
                           <img
-                            src={image.data}
+                            src={image}
                             alt={`Ürün resmi ${imgIndex + 1}`}
                             style={{
                               width: '100%',
@@ -416,7 +420,7 @@ export default function AdminPage() {
                               modal.onclick = () => document.body.removeChild(modal);
                               
                               const img = document.createElement('img');
-                              img.src = image.data;
+                              img.src = image;
                               img.style.cssText = 'max-width: 90%; max-height: 90%; object-fit: contain; border-radius: 8px;';
                               img.onclick = (e) => e.stopPropagation();
                               
