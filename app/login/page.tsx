@@ -38,10 +38,10 @@ export default function LoginPage() {
       style={{
         minHeight: "100vh",
         display: "flex",
-        alignItems: "center",
+        alignItems: "flex-start",
         justifyContent: "center",
         background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%)",
-        padding: "20px",
+        padding: "80px 20px 20px 20px",
       }}
     >
       <div
