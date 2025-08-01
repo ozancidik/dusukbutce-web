@@ -1,77 +1,217 @@
 "use client";
-import { useState } from "react";
-import { loadStripe } from "@stripe/stripe-js";
-import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import React, { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-const stripePromise = loadStripe("pk_test_..."); // Stripe dashboard'dan test public key
-
-function CheckoutForm() {
-  const stripe = useStripe();
-  const elements = useElements();
-  const [message, setMessage] = useState("");
+export default function LoginPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!stripe || !elements) return;
+    setIsLoading(true);
+    setError("");
 
-    // Backend'den bir PaymentIntent oluşturulmalı (ör. /api/create-payment-intent)
-    const res = await fetch("http://localhost:3000/create-payment-intent", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ amount: 10000 }), // örnek: 100 TL
-    });
-    const { clientSecret } = await res.json();
-
-    const result = await stripe.confirmCardPayment(clientSecret, {
-      payment_method: {
-        card: elements.getElement(CardElement)!
+    try {
+      // Burada gerçek login API'si çağrılacak
+      // Şimdilik basit bir kontrol yapalım
+      if (email && password) {
+        // Başarılı giriş simülasyonu
+        localStorage.setItem("userLoggedIn", "true");
+        localStorage.setItem("userEmail", email);
+        router.push("/"); // Anasayfaya yönlendir
+      } else {
+        setError("Email ve şifre gereklidir.");
       }
-    });
-
-    if (result.error) {
-      setMessage(result.error.message || "Ödeme başarısız.");
-    } else if (result.paymentIntent?.status === "succeeded") {
-      setMessage("Ödeme başarılı!");
-      // Ödeme başarılı olduktan sonra sipariş oluştur
-      const orderRes = await fetch("http://localhost:3000/create-order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ paymentIntentId: result.paymentIntent.id }),
-      });
-      const { orderId } = await orderRes.json();
-      setMessage(`Sipariş başarıyla oluşturuldu. Sipariş ID: ${orderId}`);
-      router.push("/orders"); // Siparişler sayfasına yönlendir
+    } catch (err) {
+      setError("Giriş yapılırken bir hata oluştu.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleOrder = async () => {
-    // Sepet boşsa uyarı ver
-    const cart = []; // Geçici olarak boş array
-    if (cart.length === 0) {
-      setMessage("Sepetiniz boş.");
-      return;
-    }
-    // Ödeme sayfasına yönlendir
-    router.push("/payment-stripe"); // veya "/payment-iyzico"
-  };
-
   return (
-    <form onSubmit={handleSubmit} style={{ maxWidth: 400, margin: "auto", padding: 24 }}>
-      <CardElement options={{ style: { base: { fontSize: "18px" } } }} />
-      <button type="submit" disabled={!stripe} style={{ marginTop: 16, padding: 12, width: "100%" }}>
-        Ödemeyi Tamamla
-      </button>
-      {message && <div style={{ marginTop: 16 }}>{message}</div>}
-    </form>
-  );
-}
+    <div
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%)",
+        padding: "20px",
+      }}
+    >
+      <div
+        style={{
+          background: "white",
+          padding: "40px",
+          borderRadius: "16px",
+          boxShadow: "0 4px 32px rgba(0, 0, 0, 0.1)",
+          width: "100%",
+          maxWidth: "400px",
+        }}
+      >
+        <div style={{ textAlign: "center", marginBottom: "32px" }}>
+          <h1 style={{ color: "#2563eb", fontSize: "28px", fontWeight: "700", margin: "0 0 8px 0" }}>
+            Giriş Yap
+          </h1>
+          <p style={{ color: "#64748b", margin: 0 }}>
+            Hesabınıza giriş yapın
+          </p>
+        </div>
 
-export default function PaymentPage() {
-  return (
-    <Elements stripe={stripePromise}>
-      <CheckoutForm />
-    </Elements>
+        <form onSubmit={handleSubmit}>
+          <div style={{ marginBottom: "20px" }}>
+            <label
+              htmlFor="email"
+              style={{
+                display: "block",
+                marginBottom: "8px",
+                color: "#374151",
+                fontWeight: "600",
+                fontSize: "14px",
+              }}
+            >
+              Email
+            </label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              style={{
+                width: "100%",
+                padding: "12px 16px",
+                border: "2px solid #e2e8f0",
+                borderRadius: "8px",
+                fontSize: "16px",
+                boxSizing: "border-box",
+                transition: "border-color 0.2s",
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = "#2563eb";
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = "#e2e8f0";
+              }}
+            />
+          </div>
+
+          <div style={{ marginBottom: "24px" }}>
+            <label
+              htmlFor="password"
+              style={{
+                display: "block",
+                marginBottom: "8px",
+                color: "#374151",
+                fontWeight: "600",
+                fontSize: "14px",
+              }}
+            >
+              Şifre
+            </label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              style={{
+                width: "100%",
+                padding: "12px 16px",
+                border: "2px solid #e2e8f0",
+                borderRadius: "8px",
+                fontSize: "16px",
+                boxSizing: "border-box",
+                transition: "border-color 0.2s",
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = "#2563eb";
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = "#e2e8f0";
+              }}
+            />
+          </div>
+
+          {error && (
+            <div
+              style={{
+                background: "#fef2f2",
+                color: "#dc2626",
+                padding: "12px",
+                borderRadius: "8px",
+                marginBottom: "20px",
+                fontSize: "14px",
+                border: "1px solid #fecaca",
+              }}
+            >
+              {error}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={isLoading}
+            style={{
+              width: "100%",
+              padding: "14px",
+              background: "#2563eb",
+              color: "white",
+              border: "none",
+              borderRadius: "8px",
+              fontSize: "16px",
+              fontWeight: "600",
+              cursor: isLoading ? "not-allowed" : "pointer",
+              opacity: isLoading ? 0.7 : 1,
+              transition: "background 0.2s",
+            }}
+            onMouseEnter={(e) => {
+              if (!isLoading) {
+                e.currentTarget.style.background = "#1d4ed8";
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isLoading) {
+                e.currentTarget.style.background = "#2563eb";
+              }
+            }}
+          >
+            {isLoading ? "Giriş yapılıyor..." : "Giriş Yap"}
+          </button>
+        </form>
+
+        <div style={{ textAlign: "center", marginTop: "24px" }}>
+          <p style={{ color: "#64748b", margin: "0 0 16px 0" }}>
+            Hesabınız yok mu?{" "}
+            <Link
+              href="/register"
+              style={{
+                color: "#2563eb",
+                textDecoration: "none",
+                fontWeight: "600",
+              }}
+            >
+              Kayıt olun
+            </Link>
+          </p>
+          
+          <Link
+            href="/forgot-password"
+            style={{
+              color: "#64748b",
+              textDecoration: "none",
+              fontSize: "14px",
+            }}
+          >
+            Şifremi unuttum
+          </Link>
+        </div>
+      </div>
+    </div>
   );
 } 
