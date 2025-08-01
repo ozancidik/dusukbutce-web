@@ -219,13 +219,25 @@ export default function HomePage() {
         marginBottom: "24px",
         textAlign: "center"
       }}>
-        <Image 
-          src="/logo.png" 
-          alt="Logo" 
-          width={isMobile ? 120 : 160} 
-          height={isMobile ? 45 : 60} 
-          style={{ objectFit: "contain" }} 
-        />
+        <Link href="/" style={{ textDecoration: "none" }}>
+          <Image 
+            src="/logo.png" 
+            alt="Logo" 
+            width={isMobile ? 120 : 160} 
+            height={isMobile ? 45 : 60} 
+            style={{ 
+              objectFit: "contain",
+              cursor: "pointer",
+              transition: "transform 0.2s",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "scale(1.05)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "scale(1)";
+            }}
+          />
+        </Link>
         <h1 style={{ 
           margin: isMobile ? "12px 0 0 0" : "16px 0 0 0", 
           color: "#2563eb",
