@@ -67,6 +67,10 @@ export default function HomePage() {
   const [isMobile, setIsMobile] = useState(false);
   const [searchResults, setSearchResults] = useState<Array<{name: string, path: string, keywords: string[]}>>([]);
   const [showResults, setShowResults] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [currentX, setCurrentX] = useState(0);
+  const [dragOffset, setDragOffset] = useState(0);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -76,15 +80,18 @@ export default function HomePage() {
     checkMobile();
     window.addEventListener('resize', checkMobile);
     
+    // Sadece kullanıcı etkileşimde bulunmadığında otomatik geçiş
     const timer = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % sliderItems.length);
+      if (!isDragging) {
+        setCurrent((prev) => (prev + 1) % sliderItems.length);
+      }
     }, 3000);
     
     return () => {
       clearInterval(timer);
       window.removeEventListener('resize', checkMobile);
     };
-  }, []);
+  }, [isDragging]);
 
   // Arama fonksiyonu
   const handleSearch = (searchTerm: string) => {
@@ -115,6 +122,73 @@ export default function HomePage() {
   // Arama sonuçlarını kapat
   const closeSearchResults = () => {
     setShowResults(false);
+  };
+
+  // Slider fonksiyonları
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    setStartX(e.clientX);
+    setCurrentX(e.clientX);
+    setDragOffset(0);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    setCurrentX(e.clientX);
+    setDragOffset(e.clientX - startX);
+  };
+
+  const handleMouseUp = () => {
+    if (!isDragging) return;
+    setIsDragging(false);
+    
+    const threshold = 50; // Minimum kaydırma mesafesi
+    if (Math.abs(dragOffset) > threshold) {
+      if (dragOffset > 0) {
+        // Sağa kaydırma - önceki slide
+        setCurrent((prev) => (prev - 1 + sliderItems.length) % sliderItems.length);
+      } else {
+        // Sola kaydırma - sonraki slide
+        setCurrent((prev) => (prev + 1) % sliderItems.length);
+      }
+    }
+    setDragOffset(0);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setIsDragging(true);
+    setStartX(e.touches[0].clientX);
+    setCurrentX(e.touches[0].clientX);
+    setDragOffset(0);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging) return;
+    setCurrentX(e.touches[0].clientX);
+    setDragOffset(e.touches[0].clientX - startX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!isDragging) return;
+    setIsDragging(false);
+    
+    const threshold = 30; // Mobil için daha küçük threshold
+    if (Math.abs(dragOffset) > threshold) {
+      if (dragOffset > 0) {
+        // Sağa kaydırma - önceki slide
+        setCurrent((prev) => (prev - 1 + sliderItems.length) % sliderItems.length);
+      } else {
+        // Sola kaydırma - sonraki slide
+        setCurrent((prev) => (prev + 1) % sliderItems.length);
+      }
+    }
+    setDragOffset(0);
+  };
+
+  // Slider'ı sıfırla
+  const resetSlider = () => {
+    setDragOffset(0);
+    setIsDragging(false);
   };
 
   return (
@@ -331,6 +405,13 @@ export default function HomePage() {
         maxWidth: isMobile ? "320px" : "400px",
       }}>
         <div
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={resetSlider}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
           style={{
             width: "100%",
             height: isMobile ? "280px" : "320px",
@@ -339,28 +420,48 @@ export default function HomePage() {
             borderRadius: isMobile ? "12px" : "16px",
             boxShadow: "0 4px 24px #0002",
             background: "#fff",
+            cursor: isDragging ? "grabbing" : "grab",
+            userSelect: "none",
+            touchAction: "pan-y",
           }}
         >
-          {sliderItems.map((item, idx) => (
-            <div
-              key={item.title}
-              style={{
-                position: "absolute",
-                top: 0,
-                left: idx === current ? 0 : "100%",
-                width: "100%",
-                height: "100%",
-                opacity: idx === current ? 1 : 0,
-                transition: "all 0.6s cubic-bezier(.4,0,.2,1)",
-                zIndex: idx === current ? 2 : 1,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                background: "#fff",
-                padding: isMobile ? "16px" : "20px",
-              }}
-            >
+          {sliderItems.map((item, idx) => {
+            const isActive = idx === current;
+            const isNext = idx === (current + 1) % sliderItems.length;
+            const isPrev = idx === (current - 1 + sliderItems.length) % sliderItems.length;
+            
+            let transform = "translateX(100%)";
+            if (isActive) {
+              transform = `translateX(${dragOffset}px)`;
+            } else if (isNext) {
+              transform = "translateX(100%)";
+            } else if (isPrev) {
+              transform = "translateX(-100%)";
+            } else {
+              transform = "translateX(100%)";
+            }
+
+            return (
+              <div
+                key={item.title}
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "100%",
+                  opacity: isActive ? 1 : 0,
+                  transform: transform,
+                  transition: isDragging ? "none" : "all 0.6s cubic-bezier(.4,0,.2,1)",
+                  zIndex: isActive ? 2 : 1,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  background: "#fff",
+                  padding: isMobile ? "16px" : "20px",
+                }}
+              >
               <img
                 src={item.img}
                 alt={item.title}
@@ -388,8 +489,72 @@ export default function HomePage() {
                 {item.price}
               </div>
             </div>
-          ))}
+          );
+        })}
         </div>
+        
+        {/* Slider ok butonları */}
+        <button
+          onClick={() => setCurrent((prev) => (prev - 1 + sliderItems.length) % sliderItems.length)}
+          style={{
+            position: "absolute",
+            left: isMobile ? "-40px" : "-50px",
+            top: "50%",
+            transform: "translateY(-50%)",
+            background: "rgba(37, 99, 235, 0.8)",
+            color: "white",
+            border: "none",
+            borderRadius: "50%",
+            width: isMobile ? "32px" : "40px",
+            height: isMobile ? "32px" : "40px",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: isMobile ? "16px" : "20px",
+            zIndex: 10,
+            transition: "background 0.2s",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "rgba(37, 99, 235, 1)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "rgba(37, 99, 235, 0.8)";
+          }}
+        >
+          ‹
+        </button>
+        
+        <button
+          onClick={() => setCurrent((prev) => (prev + 1) % sliderItems.length)}
+          style={{
+            position: "absolute",
+            right: isMobile ? "-40px" : "-50px",
+            top: "50%",
+            transform: "translateY(-50%)",
+            background: "rgba(37, 99, 235, 0.8)",
+            color: "white",
+            border: "none",
+            borderRadius: "50%",
+            width: isMobile ? "32px" : "40px",
+            height: isMobile ? "32px" : "40px",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: isMobile ? "16px" : "20px",
+            zIndex: 10,
+            transition: "background 0.2s",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "rgba(37, 99, 235, 1)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "rgba(37, 99, 235, 0.8)";
+          }}
+        >
+          ›
+        </button>
       </div>
 
       {/* Slider altı noktalar */}
