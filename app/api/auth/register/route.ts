@@ -5,43 +5,40 @@ import bcrypt from 'bcryptjs';
 
 export async function POST(request: NextRequest) {
   try {
+    await connectDB();
+    
     const { email, password, name, phone, address } = await request.json();
     
-    // Geçici test modu - MongoDB bağlantısı olmadan
     console.log('Register attempt:', { email, name, phone });
     
-    // Basit validasyon
-    if (!email || !password || !name) {
+    // Email kontrolü
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
       return NextResponse.json(
-        { success: false, message: 'Email, şifre ve isim gereklidir' },
+        { success: false, message: 'Bu email adresi zaten kayıtlı' },
         { status: 400 }
       );
     }
     
-    // Email format kontrolü
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { success: false, message: 'Geçerli bir email adresi giriniz' },
-        { status: 400 }
-      );
-    }
+    // Şifreyi hash'le
+    const hashedPassword = await bcrypt.hash(password, 12);
     
-    // Şifre uzunluk kontrolü
-    if (password.length < 6) {
-      return NextResponse.json(
-        { success: false, message: 'Şifre en az 6 karakter olmalıdır' },
-        { status: 400 }
-      );
-    }
-    
-    // Başarılı kayıt simülasyonu
-    return NextResponse.json({ 
-      success: true, 
-      message: 'Kayıt başarılı! (Test modu)',
-      userId: 'test-user-id'
+    // Yeni kullanıcı oluştur
+    const user = new User({
+      email,
+      password: hashedPassword,
+      name,
+      phone,
+      address
     });
     
+    await user.save();
+    
+    return NextResponse.json({ 
+      success: true, 
+      message: 'Kullanıcı başarıyla kayıt oldu',
+      userId: user._id 
+    });
   } catch (error) {
     console.error('Error registering user:', error);
     return NextResponse.json(
