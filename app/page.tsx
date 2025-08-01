@@ -14,24 +14,7 @@ const navLinks = [
   { href: "/notifications", label: "Bildirimler" },
 ];
 
-// Arama kategorileri
-const searchCategories = [
-  { name: "Dizüstü (Notebook)", path: "/bize-sat/notebook", keywords: ["laptop", "notebook", "dizüstü", "bilgisayar", "asus", "lenovo", "hp", "dell", "acer"] },
-  { name: "Masaüstü (Kasa)", path: "/bize-sat/desktop", keywords: ["masaüstü", "kasa", "desktop", "pc", "bilgisayar", "gaming", "oyun"] },
-  { name: "Ekran Kartı", path: "/bize-sat/graphics-card", keywords: ["ekran kartı", "gpu", "nvidia", "amd", "rtx", "gtx", "radeon", "graphics"] },
-  { name: "İşlemci", path: "/bize-sat/processor", keywords: ["işlemci", "cpu", "intel", "amd", "ryzen", "core", "processor"] },
-  { name: "RAM", path: "/bize-sat/ram", keywords: ["ram", "bellek", "memory", "ddr4", "ddr5", "8gb", "16gb", "32gb"] },
-  { name: "SSD", path: "/bize-sat/ssd", keywords: ["ssd", "disk", "hdd", "depolama", "storage", "nvme", "sata"] },
-  { name: "Soğutucu", path: "/bize-sat/cooler", keywords: ["soğutucu", "cooler", "fan", "ısı", "thermal", "cpu cooler"] },
-  { name: "Boş Kasa", path: "/bize-sat/case", keywords: ["kasa", "case", "atx", "itx", "mid tower", "full tower"] },
-  { name: "Monitör", path: "/bize-sat/monitor", keywords: ["monitör", "monitor", "ekran", "display", "ips", "tn", "va", "144hz", "4k"] },
-  { name: "Klavye", path: "/bize-sat/keyboard", keywords: ["klavye", "keyboard", "mekanik", "mechanical", "rgb", "gaming"] },
-  { name: "Mouse", path: "/bize-sat/mouse", keywords: ["mouse", "fare", "gaming", "wireless", "kablosuz", "rgb"] },
-  { name: "Tablet", path: "/bize-sat/tablet", keywords: ["tablet", "ipad", "samsung", "huawei", "android", "ios"] },
-  { name: "Kulaklık", path: "/bize-sat/headphones", keywords: ["kulaklık", "headphone", "headset", "gaming", "bluetooth", "kablosuz"] },
-  { name: "Ses Sistemi", path: "/bize-sat/audio-system", keywords: ["ses sistemi", "speaker", "hoparlör", "subwoofer", "audio", "sound"] },
-  { name: "Oyuncu Direksiyonu", path: "/bize-sat/gaming-wheel", keywords: ["direksiyon", "steering wheel", "gaming", "racing", "simulator"] },
-];
+
 
 const sliderItems = [
   {
@@ -63,10 +46,7 @@ const sliderItems = [
 
 export default function HomePage() {
   const [current, setCurrent] = useState(0);
-  const [search, setSearch] = useState("");
   const [isMobile, setIsMobile] = useState(false);
-  const [searchResults, setSearchResults] = useState<Array<{name: string, path: string, keywords: string[]}>>([]);
-  const [showResults, setShowResults] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [currentX, setCurrentX] = useState(0);
@@ -93,36 +73,7 @@ export default function HomePage() {
     };
   }, [isDragging]);
 
-  // Arama fonksiyonu
-  const handleSearch = (searchTerm: string) => {
-    if (!searchTerm.trim()) {
-      setSearchResults([]);
-      setShowResults(false);
-      return;
-    }
 
-    const results = searchCategories.filter(category => {
-      const searchLower = searchTerm.toLowerCase();
-      return category.name.toLowerCase().includes(searchLower) ||
-             category.keywords.some(keyword => 
-               keyword.toLowerCase().includes(searchLower)
-             );
-    });
-
-    setSearchResults(results);
-    setShowResults(true);
-  };
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearch(value);
-    handleSearch(value);
-  };
-
-  // Arama sonuçlarını kapat
-  const closeSearchResults = () => {
-    setShowResults(false);
-  };
 
   // Slider fonksiyonları
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -193,7 +144,6 @@ export default function HomePage() {
 
   return (
     <div
-      onClick={closeSearchResults}
       style={{
         width: "100%",
         maxWidth: "1600px",
@@ -211,142 +161,29 @@ export default function HomePage() {
         justifyContent: "center",
       }}
     >
-      {/* Logo ve başlık */}
+      {/* Ana başlık */}
       <div style={{ 
         display: "flex", 
         flexDirection: "column", 
         alignItems: "center", 
-        marginBottom: "24px",
+        marginBottom: "32px",
         textAlign: "center"
       }}>
-        <Link href="/" style={{ textDecoration: "none" }}>
-          <Image 
-            src="/logo.png" 
-            alt="Logo" 
-            width={isMobile ? 120 : 160} 
-            height={isMobile ? 45 : 60} 
-            style={{ 
-              objectFit: "contain",
-              cursor: "pointer",
-              transition: "transform 0.2s",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = "scale(1.05)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "scale(1)";
-            }}
-          />
-        </Link>
         <h1 style={{ 
-          margin: isMobile ? "12px 0 0 0" : "16px 0 0 0", 
+          margin: 0, 
           color: "#2563eb",
-          fontSize: isMobile ? "20px" : "28px",
+          fontSize: isMobile ? "24px" : "32px",
+          fontWeight: "700",
         }}>
           Düşük Bütçe, Yüksek Performans
         </h1>
         <p style={{ 
           color: "#64748b", 
-          marginTop: "8px",
-          fontSize: isMobile ? "14px" : "16px",
+          marginTop: "12px",
+          fontSize: isMobile ? "16px" : "18px",
         }}>
           En uygun fiyatlı ürünleri keşfet!
         </p>
-      </div>
-
-      {/* Search alanı */}
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          marginBottom: "24px",
-          gap: isMobile ? "12px" : "8px",
-          width: "100%",
-          maxWidth: "400px",
-          position: "relative",
-        }}
-      >
-        <input
-          type="text"
-          placeholder="Ürün, kategori veya marka ara..."
-          value={search}
-          onChange={handleSearchChange}
-          style={{
-            padding: isMobile ? "14px" : "12px",
-            borderRadius: "8px",
-            border: "1px solid #cbd5e1",
-            width: "100%",
-            fontSize: "16px",
-            boxShadow: "0 1px 4px #0001",
-          }}
-        />
-        
-        {/* Arama sonuçları */}
-        {showResults && searchResults.length > 0 && (
-          <div
-            style={{
-              position: "absolute",
-              top: "100%",
-              left: 0,
-              right: 0,
-              background: "white",
-              borderRadius: "8px",
-              border: "1px solid #cbd5e1",
-              boxShadow: "0 4px 16px #0002",
-              zIndex: 1000,
-              maxHeight: "300px",
-              overflowY: "auto",
-            }}
-          >
-            {searchResults.map((result, index) => (
-              <Link key={index} href={result.path}>
-                <div
-                  style={{
-                    padding: "12px 16px",
-                    borderBottom: index < searchResults.length - 1 ? "1px solid #e2e8f0" : "none",
-                    cursor: "pointer",
-                    transition: "background 0.2s",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "#f8fafc";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = "white";
-                  }}
-                >
-                  <div style={{ fontWeight: "600", color: "#2563eb", marginBottom: "4px" }}>
-                    {result.name}
-                  </div>
-                  <div style={{ fontSize: "12px", color: "#64748b" }}>
-                    {result.keywords.slice(0, 3).join(", ")}...
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        )}
-        
-        {showResults && searchResults.length === 0 && search.trim() && (
-          <div
-            style={{
-              position: "absolute",
-              top: "100%",
-              left: 0,
-              right: 0,
-              background: "white",
-              borderRadius: "8px",
-              border: "1px solid #cbd5e1",
-              boxShadow: "0 4px 16px #0002",
-              zIndex: 1000,
-              padding: "16px",
-              textAlign: "center",
-              color: "#64748b",
-            }}
-          >
-            Sonuç bulunamadı
-          </div>
-        )}
       </div>
 
       {/* BİZE SAT butonu */}
