@@ -16,14 +16,30 @@ export default function RegisterPage() {
     e.preventDefault();
     setError('');
     setSuccess('');
-    const res = await fetch('http://localhost:3000/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
-    });
-    const data = await res.json();
-    if (res.ok) setSuccess('Kayıt başarılı! Lütfen e-postanızı kontrol edin.');
-    else setError(data.error || 'Bir hata oluştu.');
+    
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: form.fullName,
+          email: form.email,
+          password: form.password,
+          phone: form.cep_telefonu
+        }),
+      });
+      
+      const data = await res.json();
+      
+      if (data.success) {
+        setSuccess('Kayıt başarılı! Giriş yapabilirsiniz.');
+        setForm({ fullName: '', email: '', password: '', cep_telefonu: '' });
+      } else {
+        setError(data.message || 'Bir hata oluştu.');
+      }
+    } catch (error) {
+      setError('Bağlantı hatası oluştu.');
+    }
   };
 
   return (

@@ -16,18 +16,32 @@ export default function LoginPage() {
     setError("");
 
     try {
-      // Burada gerçek login API'si çağrılacak
-      // Şimdilik basit bir kontrol yapalım
-      if (email && password) {
-        // Başarılı giriş simülasyonu
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      
+      const data = await res.json();
+      
+      if (data.success) {
+        // Kullanıcı bilgilerini localStorage'a kaydet
         localStorage.setItem("userLoggedIn", "true");
-        localStorage.setItem("userEmail", email);
+        localStorage.setItem("userEmail", data.user.email);
+        localStorage.setItem("userName", data.user.name);
+        localStorage.setItem("userId", data.user.id);
+        
+        if (data.user.isAdmin) {
+          localStorage.setItem("adminLoggedIn", "true");
+          localStorage.setItem("adminEmail", data.user.email);
+        }
+        
         router.push("/"); // Anasayfaya yönlendir
       } else {
-        setError("Email ve şifre gereklidir.");
+        setError(data.message || "Giriş yapılırken bir hata oluştu.");
       }
     } catch (err) {
-      setError("Giriş yapılırken bir hata oluştu.");
+      setError("Bağlantı hatası oluştu.");
     } finally {
       setIsLoading(false);
     }
