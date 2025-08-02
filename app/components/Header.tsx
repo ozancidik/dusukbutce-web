@@ -27,6 +27,8 @@ export default function Header() {
   const [search, setSearch] = useState("");
   const [searchResults, setSearchResults] = useState<Array<{name: string, path: string, keywords: string[]}>>([]);
   const [showResults, setShowResults] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userName, setUserName] = useState("");
 
   useEffect(() => {
     const checkMobile = () => {
@@ -38,6 +40,26 @@ export default function Header() {
     
     return () => {
       window.removeEventListener('resize', checkMobile);
+    };
+  }, []);
+
+  // Kullanıcı giriş durumunu kontrol et
+  useEffect(() => {
+    const checkLoginStatus = () => {
+      const userLoggedIn = localStorage.getItem("userLoggedIn");
+      const userName = localStorage.getItem("userName");
+      
+      setIsLoggedIn(userLoggedIn === "true");
+      setUserName(userName || "");
+    };
+
+    checkLoginStatus();
+    
+    // localStorage değişikliklerini dinle
+    window.addEventListener('storage', checkLoginStatus);
+    
+    return () => {
+      window.removeEventListener('storage', checkLoginStatus);
     };
   }, []);
 
@@ -209,34 +231,64 @@ export default function Header() {
               width: "100%",
             }}
           >
-            {/* Giriş Yap Butonu */}
-            <Link href="/login" style={{ textDecoration: "none" }}>
-              <button
-                style={{
-                  background: "transparent",
-                  color: "white",
-                  border: "1px solid rgba(255, 255, 255, 0.3)",
-                  borderRadius: "6px",
-                  padding: "8px 16px",
-                  fontWeight: "600",
-                  cursor: "pointer",
-                  fontSize: "14px",
-                  transition: "all 0.2s",
-                  whiteSpace: "nowrap",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "6px",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "transparent";
-                }}
-              >
-                👤 Giriş Yap
-              </button>
-            </Link>
+            {/* Giriş Yap / Kullanıcı Profili Butonu */}
+            {isLoggedIn ? (
+              <Link href="/profile" style={{ textDecoration: "none" }}>
+                <button
+                  style={{
+                    background: "#10b981",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "6px",
+                    padding: "8px 16px",
+                    fontWeight: "600",
+                    cursor: "pointer",
+                    fontSize: "14px",
+                    transition: "all 0.2s",
+                    whiteSpace: "nowrap",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "6px",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = "#059669";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = "#10b981";
+                  }}
+                >
+                  👤 {userName || "Profil"}
+                </button>
+              </Link>
+            ) : (
+              <Link href="/login" style={{ textDecoration: "none" }}>
+                <button
+                  style={{
+                    background: "transparent",
+                    color: "white",
+                    border: "1px solid rgba(255, 255, 255, 0.3)",
+                    borderRadius: "6px",
+                    padding: "8px 16px",
+                    fontWeight: "600",
+                    cursor: "pointer",
+                    fontSize: "14px",
+                    transition: "all 0.2s",
+                    whiteSpace: "nowrap",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "6px",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = "transparent";
+                  }}
+                >
+                  👤 Giriş Yap
+                </button>
+              </Link>
+            )}
 
             {/* Sepet Butonu */}
             <Link href="/cart" style={{ textDecoration: "none" }}>
@@ -279,36 +331,66 @@ export default function Header() {
             flexShrink: 0,
           }}
         >
-          {/* Giriş Yap */}
-          <Link href="/login" style={{ textDecoration: "none" }}>
-            <button
-              style={{
-                background: "transparent",
-                color: "white",
-                border: "1px solid rgba(255, 255, 255, 0.3)",
-                borderRadius: "6px",
-                padding: isMobile ? "6px 8px" : "10px 16px",
-                fontWeight: "600",
-                cursor: "pointer",
-                fontSize: isMobile ? "12px" : "14px",
-                transition: "all 0.2s",
-                whiteSpace: "nowrap",
-                display: "flex",
-                alignItems: "center",
-                gap: isMobile ? "4px" : "6px",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)";
-                e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.5)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = "transparent";
-                e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.3)";
-              }}
-            >
-              👤 Giriş Yap
-            </button>
-          </Link>
+          {/* Giriş Yap / Kullanıcı Profili */}
+          {isLoggedIn ? (
+            <Link href="/profile" style={{ textDecoration: "none" }}>
+              <button
+                style={{
+                  background: "#10b981",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "6px",
+                  padding: isMobile ? "6px 8px" : "10px 16px",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  fontSize: isMobile ? "12px" : "14px",
+                  transition: "all 0.2s",
+                  whiteSpace: "nowrap",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: isMobile ? "4px" : "6px",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "#059669";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "#10b981";
+                }}
+              >
+                👤 {userName || "Profil"}
+              </button>
+            </Link>
+          ) : (
+            <Link href="/login" style={{ textDecoration: "none" }}>
+              <button
+                style={{
+                  background: "transparent",
+                  color: "white",
+                  border: "1px solid rgba(255, 255, 255, 0.3)",
+                  borderRadius: "6px",
+                  padding: isMobile ? "6px 8px" : "10px 16px",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  fontSize: isMobile ? "12px" : "14px",
+                  transition: "all 0.2s",
+                  whiteSpace: "nowrap",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: isMobile ? "4px" : "6px",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)";
+                  e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.5)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "transparent";
+                  e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.3)";
+                }}
+              >
+                👤 Giriş Yap
+              </button>
+            </Link>
+          )}
 
           {/* Sepet */}
           <Link href="/cart" style={{ textDecoration: "none" }}>
