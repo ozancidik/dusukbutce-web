@@ -86,44 +86,54 @@ export default function Header() {
     >
       <div
         style={{
-          maxWidth: "1400px",
+          maxWidth: "1600px",
           margin: "0 auto",
           padding: isMobile ? "12px 16px" : "16px 24px",
           display: "flex",
-          alignItems: "center",
+          flexDirection: isMobile ? "column" : "row",
+          alignItems: isMobile ? "stretch" : "center",
           justifyContent: "space-between",
           gap: isMobile ? "12px" : "24px",
         }}
       >
-        {/* Logo */}
-        <Link href="/" style={{ textDecoration: "none", flexShrink: 0 }}>
-          <Image 
-            src="/logo.png" 
-            alt="Düşük Bütçe" 
-            width={isMobile ? 100 : 120} 
-            height={isMobile ? 38 : 45} 
-            style={{ 
-              objectFit: "contain",
-              cursor: "pointer",
-              transition: "transform 0.2s",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = "scale(1.05)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "scale(1)";
-            }}
-          />
-        </Link>
-
-        {/* Arama Bar */}
+        {/* Üst Satır - Logo ve Arama Bar */}
         <div
           style={{
-            flex: 1,
-            maxWidth: isMobile ? "200px" : "400px",
-            position: "relative",
+            display: "flex",
+            alignItems: "center",
+            gap: isMobile ? "12px" : "24px",
+            width: "100%",
           }}
         >
+          {/* Logo */}
+          <Link href="/" style={{ textDecoration: "none", flexShrink: 0 }}>
+            <Image 
+              src="/logo.png" 
+              alt="Düşük Bütçe" 
+              width={isMobile ? 100 : 120} 
+              height={isMobile ? 38 : 45} 
+              style={{ 
+                objectFit: "contain",
+                cursor: "pointer",
+                transition: "transform 0.2s",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "scale(1.05)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "scale(1)";
+              }}
+            />
+          </Link>
+
+          {/* Arama Bar */}
+          <div
+            style={{
+              flex: 1,
+              maxWidth: isMobile ? "none" : "1200px",
+              position: "relative",
+            }}
+          >
           <input
             type="text"
             placeholder="Ürün, kategori veya marka ara..."
@@ -186,13 +196,86 @@ export default function Header() {
             </div>
           )}
         </div>
+        </div>
 
-        {/* Sağ taraftaki butonlar */}
+        {/* Alt Satır - Butonlar (sadece mobilde görünür) */}
+        {isMobile && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "12px",
+              width: "100%",
+            }}
+          >
+            {/* Giriş Yap Butonu */}
+            <Link href="/login" style={{ textDecoration: "none" }}>
+              <button
+                style={{
+                  background: "transparent",
+                  color: "white",
+                  border: "1px solid rgba(255, 255, 255, 0.3)",
+                  borderRadius: "6px",
+                  padding: "8px 16px",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                  transition: "all 0.2s",
+                  whiteSpace: "nowrap",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "transparent";
+                }}
+              >
+                👤 Giriş Yap
+              </button>
+            </Link>
+
+            {/* Sepet Butonu */}
+            <Link href="/cart" style={{ textDecoration: "none" }}>
+              <button
+                style={{
+                  background: "#2563eb",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "6px",
+                  padding: "8px 16px",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                  transition: "background 0.2s",
+                  whiteSpace: "nowrap",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "#1d4ed8";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "#2563eb";
+                }}
+              >
+                🛒 Sepet
+              </button>
+            </Link>
+          </div>
+        )}
+
+        {/* Sağ taraftaki butonlar (sadece desktop'ta görünür) */}
+        {!isMobile && (
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            gap: isMobile ? "8px" : "16px",
+            gap: isMobile ? "6px" : "16px",
             flexShrink: 0,
           }}
         >
@@ -204,15 +287,15 @@ export default function Header() {
                 color: "white",
                 border: "1px solid rgba(255, 255, 255, 0.3)",
                 borderRadius: "6px",
-                padding: isMobile ? "8px 12px" : "10px 16px",
+                padding: isMobile ? "6px 8px" : "10px 16px",
                 fontWeight: "600",
                 cursor: "pointer",
-                fontSize: isMobile ? "13px" : "14px",
+                fontSize: isMobile ? "12px" : "14px",
                 transition: "all 0.2s",
                 whiteSpace: "nowrap",
                 display: "flex",
                 alignItems: "center",
-                gap: "6px",
+                gap: isMobile ? "4px" : "6px",
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)";
@@ -235,15 +318,15 @@ export default function Header() {
                 color: "white",
                 border: "none",
                 borderRadius: "6px",
-                padding: isMobile ? "8px 12px" : "10px 16px",
+                padding: isMobile ? "6px 8px" : "10px 16px",
                 fontWeight: "600",
                 cursor: "pointer",
-                fontSize: isMobile ? "13px" : "14px",
+                fontSize: isMobile ? "12px" : "14px",
                 transition: "background 0.2s",
                 whiteSpace: "nowrap",
                 display: "flex",
                 alignItems: "center",
-                gap: "6px",
+                gap: isMobile ? "4px" : "6px",
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = "#1d4ed8";
@@ -256,6 +339,7 @@ export default function Header() {
             </button>
           </Link>
         </div>
+        )}
       </div>
     </header>
   );

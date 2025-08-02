@@ -166,16 +166,25 @@ export default function HomePage() {
         display: "flex", 
         flexDirection: "column", 
         alignItems: "center", 
+        marginTop: isMobile ? "20px" : "0",
         marginBottom: "32px",
         textAlign: "center"
       }}>
         <h1 style={{ 
           margin: 0, 
           color: "#2563eb",
-          fontSize: isMobile ? "24px" : "32px",
+          fontSize: isMobile ? "20px" : "32px",
           fontWeight: "700",
+          lineHeight: isMobile ? "1.2" : "1.1",
         }}>
-          Düşük Bütçe, Yüksek Performans
+          {isMobile ? (
+            <>
+              <div>Düşük Bütçe,</div>
+              <div>Yüksek Performans</div>
+            </>
+          ) : (
+            "Düşük Bütçe, Yüksek Performans"
+          )}
         </h1>
         <p style={{ 
           color: "#64748b", 
