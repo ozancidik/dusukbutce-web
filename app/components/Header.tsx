@@ -210,6 +210,9 @@ export default function Header() {
                 fontSize: isMobile ? "13px" : "14px",
                 transition: "all 0.2s",
                 whiteSpace: "nowrap",
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)";
@@ -220,7 +223,7 @@ export default function Header() {
                 e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.3)";
               }}
             >
-              Giriş Yap
+              👤 Giriş Yap
             </button>
           </Link>
 
