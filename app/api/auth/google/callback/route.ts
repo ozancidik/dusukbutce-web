@@ -55,13 +55,17 @@ export async function GET(request: NextRequest) {
         client_secret: process.env.GOOGLE_CLIENT_SECRET || 'your-google-client-secret',
         code: code,
         grant_type: 'authorization_code',
-        redirect_uri: process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3000/api/auth/google/callback',
+        redirect_uri: 'https://dusukbutce.com/api/auth/google/callback',
       }),
     });
 
     const tokenData = await tokenResponse.json();
+    
+    console.log('Token Response:', tokenData);
+    console.log('Response Status:', tokenResponse.status);
 
     if (!tokenData.access_token) {
+      console.error('Token Error Details:', tokenData);
       throw new Error('Access token alınamadı');
     }
 
