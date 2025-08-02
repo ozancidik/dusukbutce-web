@@ -61,11 +61,15 @@ export async function GET(request: NextRequest) {
 
     const tokenData = await tokenResponse.json();
     
-    console.log('Token Response:', tokenData);
+    console.log('Token Response:', JSON.stringify(tokenData, null, 2));
     console.log('Response Status:', tokenResponse.status);
+    console.log('Response Headers:', Object.fromEntries(tokenResponse.headers.entries()));
 
     if (!tokenData.access_token) {
-      console.error('Token Error Details:', tokenData);
+      console.error('Token Error Details:', JSON.stringify(tokenData, null, 2));
+      console.error('Client ID:', process.env.GOOGLE_CLIENT_ID);
+      console.error('Client Secret:', process.env.GOOGLE_CLIENT_SECRET ? '***' : 'MISSING');
+      console.error('Redirect URI:', 'https://dusukbutce.com/api/auth/google/callback');
       throw new Error('Access token alınamadı');
     }
 
