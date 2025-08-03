@@ -27,10 +27,12 @@ export default function LoginPage() {
       
       if (data.success) {
         // Kullanıcı bilgilerini localStorage'a kaydet
+        const loginTime = Date.now();
         localStorage.setItem("userLoggedIn", "true");
         localStorage.setItem("userEmail", data.user.email);
         localStorage.setItem("userName", data.user.name);
         localStorage.setItem("userId", data.user.id);
+        localStorage.setItem("loginTime", loginTime.toString());
         
         if (data.user.isAdmin) {
           localStorage.setItem("adminLoggedIn", "true");
@@ -72,10 +74,12 @@ export default function LoginPage() {
         
         if (event.data.type === 'GOOGLE_LOGIN_SUCCESS') {
           const userData = event.data.user;
+          const loginTime = Date.now();
           localStorage.setItem("userLoggedIn", "true");
           localStorage.setItem("userEmail", userData.email);
           localStorage.setItem("userName", userData.name);
           localStorage.setItem("userId", userData.id);
+          localStorage.setItem("loginTime", loginTime.toString());
           
           if (userData.isAdmin) {
             localStorage.setItem("adminLoggedIn", "true");

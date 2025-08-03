@@ -48,17 +48,40 @@ export default function Header() {
     const checkLoginStatus = () => {
       const userLoggedIn = localStorage.getItem("userLoggedIn");
       const userName = localStorage.getItem("userName");
+      const loginTime = localStorage.getItem("loginTime");
       
-      setIsLoggedIn(userLoggedIn === "true");
-      setUserName(userName || "");
+      // Timeout kontrolü (20 dakika = 1200000 ms)
+      const TIMEOUT_DURATION = 20 * 60 * 1000; // 20 dakika
+      const isExpired = loginTime && (Date.now() - parseInt(loginTime)) > TIMEOUT_DURATION;
+      
+      if (isExpired) {
+        // Session süresi dolmuş, logout yap
+        localStorage.removeItem("userLoggedIn");
+        localStorage.removeItem("userEmail");
+        localStorage.removeItem("userName");
+        localStorage.removeItem("userId");
+        localStorage.removeItem("loginTime");
+        localStorage.removeItem("adminLoggedIn");
+        localStorage.removeItem("adminEmail");
+        
+        setIsLoggedIn(false);
+        setUserName("");
+      } else {
+        setIsLoggedIn(userLoggedIn === "true");
+        setUserName(userName || "");
+      }
     };
 
     checkLoginStatus();
+    
+    // Her dakika kontrol et
+    const interval = setInterval(checkLoginStatus, 60000);
     
     // localStorage değişikliklerini dinle
     window.addEventListener('storage', checkLoginStatus);
     
     return () => {
+      clearInterval(interval);
       window.removeEventListener('storage', checkLoginStatus);
     };
   }, []);
