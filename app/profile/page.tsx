@@ -29,6 +29,7 @@ export default function ProfilePage() {
       id: localStorage.getItem('userId'),
       email: localStorage.getItem('userEmail'),
       name: localStorage.getItem('userName'),
+      phone: localStorage.getItem('userPhone') || '',
       isAdmin: localStorage.getItem('adminLoggedIn') === 'true'
     };
 
@@ -49,6 +50,64 @@ export default function ProfilePage() {
     setMessage('');
   };
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    
+    if (name === 'firstName' || name === 'lastName') {
+      // Sadece Türkçe harfler, boşluk ve tire (-) karakterine izin ver
+      const nameRegex = /^[a-zA-ZğüşıöçĞÜŞİÖÇ\s-]*$/;
+      
+      // 20 karakter sınırı (her alan için)
+      if (value.length <= 20 && (nameRegex.test(value) || value === '')) {
+        setEditForm({ ...editForm, [name]: value });
+      }
+    } else if (name === 'email') {
+      // Email için sadece geçerli karakterlere izin ver
+      const emailRegex = /^[a-zA-Z0-9@._-]*$/;
+      if (emailRegex.test(value) || value === '') {
+        setEditForm({ ...editForm, [name]: value.toLowerCase() });
+      }
+    } else if (name === 'phone') {
+      // Sadece rakam, parantez ve boşluk karakterlerine izin ver
+      const phoneRegex = /^[0-9\s\(\)]*$/;
+      if (phoneRegex.test(value)) {
+        // Sadece rakamları al
+        let digits = value.replace(/\s/g, '').replace(/[\(\)]/g, '');
+        
+        // Maksimum 10 rakam (alan kodu + 7 rakam)
+        digits = digits.substring(0, 10);
+        
+        let formattedValue = '';
+        
+        if (digits.length > 0) {
+          // İlk rakam 5 olmalı
+          if (digits.length > 0 && digits[0] !== '5') {
+            return; // 5 ile başlamıyorsa güncelleme yapma
+          }
+          
+          // (5xx) xxx xx xx formatına çevir
+          formattedValue = '(' + digits.substring(0, 3);
+          
+          if (digits.length > 3) {
+            formattedValue += ') ' + digits.substring(3, 6);
+          }
+          
+          if (digits.length > 6) {
+            formattedValue += ' ' + digits.substring(6, 8);
+          }
+          
+          if (digits.length > 8) {
+            formattedValue += ' ' + digits.substring(8, 10);
+          }
+        }
+        
+        setEditForm({ ...editForm, [name]: formattedValue });
+      }
+    } else {
+      setEditForm({ ...editForm, [name]: value });
+    }
+  };
+
   const handleCancel = () => {
     setIsEditing(false);
     const nameParts = userInfo.name?.split(' ') || ['', ''];
@@ -61,6 +120,71 @@ export default function ProfilePage() {
   };
 
   const handleSave = async () => {
+    setMessage('');
+    setMessageType('error');
+
+    // Ad validasyonu
+    const nameRegex = /^[a-zA-ZğüşıöçĞÜŞİÖÇ\s-]+$/;
+    if (!nameRegex.test(editForm.firstName.trim())) {
+      setMessage('Ad sadece harf, boşluk ve tire (-) içerebilir.');
+      return;
+    }
+    
+    if (editForm.firstName.trim().length < 2) {
+      setMessage('Ad en az 2 karakter olmalıdır.');
+      return;
+    }
+    
+    if (editForm.firstName.trim().length > 20) {
+      setMessage('Ad en fazla 20 karakter olabilir.');
+      return;
+    }
+    
+    // Soyad validasyonu
+    if (!nameRegex.test(editForm.lastName.trim())) {
+      setMessage('Soyad sadece harf, boşluk ve tire (-) içerebilir.');
+      return;
+    }
+    
+    if (editForm.lastName.trim().length < 2) {
+      setMessage('Soyad en az 2 karakter olmalıdır.');
+      return;
+    }
+    
+    if (editForm.lastName.trim().length > 20) {
+      setMessage('Soyad en fazla 20 karakter olabilir.');
+      return;
+    }
+    
+    // Email validasyonu
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(editForm.email.trim())) {
+      setMessage('Geçerli bir email adresi giriniz.');
+      return;
+    }
+    
+    // Email uzunluk kontrolü
+    if (editForm.email.trim().length > 100) {
+      setMessage('Email adresi çok uzun.');
+      return;
+    }
+    
+    // Telefon validasyonu - (5xx) xxx xx xx formatı
+    if (editForm.phone.trim()) {
+      const phoneRegex = /^\([0-9]{3}\)\s[0-9]{3}\s[0-9]{2}\s[0-9]{2}$/;
+      if (!phoneRegex.test(editForm.phone)) {
+        setMessage('Geçerli bir telefon numarası giriniz. Örn: (555) 123 45 67');
+        return;
+      }
+      
+      // Alan kodu 5 ile başlamalı
+      const areaCode = editForm.phone.substring(1, 4); // Parantez içindeki 3 rakam
+      if (!areaCode.startsWith('5')) {
+        setMessage('Telefon numarası 5 ile başlamalıdır. Örn: (555) 123 45 67');
+        return;
+      }
+    }
+
     try {
       // API'ye güncelleme gönder
       const response = await fetch('/api/auth/update-profile', {
@@ -71,27 +195,32 @@ export default function ProfilePage() {
           firstName: editForm.firstName,
           lastName: editForm.lastName,
           email: editForm.email,
-          phone: editForm.phone
+          phone: editForm.phone ? '0' + editForm.phone.replace(/\s/g, '').replace(/[\(\)]/g, '') : ''
         })
       });
 
       if (response.ok) {
+        const data = await response.json();
+        
         // localStorage'ı güncelle
         const newName = `${editForm.firstName} ${editForm.lastName}`.trim();
         localStorage.setItem('userName', newName);
         localStorage.setItem('userEmail', editForm.email);
+        localStorage.setItem('userPhone', editForm.phone);
         
         setUserInfo({
           ...userInfo,
           name: newName,
-          email: editForm.email
+          email: editForm.email,
+          phone: editForm.phone
         });
         
         setIsEditing(false);
         setMessage('Profil başarıyla güncellendi!');
         setMessageType('success');
       } else {
-        setMessage('Güncelleme sırasında bir hata oluştu.');
+        const data = await response.json();
+        setMessage(data.message || 'Güncelleme sırasında bir hata oluştu.');
         setMessageType('error');
       }
     } catch (error) {
@@ -221,35 +350,37 @@ export default function ProfilePage() {
                     <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500', color: '#374151' }}>
                       Ad
                     </label>
-                    <input
-                      type="text"
-                      value={editForm.firstName}
-                      onChange={(e) => setEditForm({...editForm, firstName: e.target.value})}
-                      style={{
-                        width: '100%',
-                        padding: '12px',
-                        borderRadius: '8px',
-                        border: '1px solid #d1d5db',
-                        fontSize: '16px'
-                      }}
-                    />
+                                         <input
+                       type="text"
+                       name="firstName"
+                       value={editForm.firstName}
+                       onChange={handleChange}
+                       style={{
+                         width: '100%',
+                         padding: '12px',
+                         borderRadius: '8px',
+                         border: '1px solid #d1d5db',
+                         fontSize: '16px'
+                       }}
+                     />
                   </div>
                   <div>
                     <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500', color: '#374151' }}>
                       Soyad
                     </label>
-                    <input
-                      type="text"
-                      value={editForm.lastName}
-                      onChange={(e) => setEditForm({...editForm, lastName: e.target.value})}
-                      style={{
-                        width: '100%',
-                        padding: '12px',
-                        borderRadius: '8px',
-                        border: '1px solid #d1d5db',
-                        fontSize: '16px'
-                      }}
-                    />
+                                         <input
+                       type="text"
+                       name="lastName"
+                       value={editForm.lastName}
+                       onChange={handleChange}
+                       style={{
+                         width: '100%',
+                         padding: '12px',
+                         borderRadius: '8px',
+                         border: '1px solid #d1d5db',
+                         fontSize: '16px'
+                       }}
+                     />
                   </div>
                 </div>
 
@@ -257,37 +388,39 @@ export default function ProfilePage() {
                   <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500', color: '#374151' }}>
                     E-posta
                   </label>
-                  <input
-                    type="email"
-                    value={editForm.email}
-                    onChange={(e) => setEditForm({...editForm, email: e.target.value})}
-                    style={{
-                      width: '100%',
-                      padding: '12px',
-                      borderRadius: '8px',
-                      border: '1px solid #d1d5db',
-                      fontSize: '16px'
-                    }}
-                  />
+                                     <input
+                     type="email"
+                     name="email"
+                     value={editForm.email}
+                     onChange={handleChange}
+                     style={{
+                       width: '100%',
+                       padding: '12px',
+                       borderRadius: '8px',
+                       border: '1px solid #d1d5db',
+                       fontSize: '16px'
+                     }}
+                   />
                 </div>
 
                 <div style={{ marginBottom: '24px' }}>
                   <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500', color: '#374151' }}>
                     Telefon
                   </label>
-                  <input
-                    type="tel"
-                    value={editForm.phone}
-                    onChange={(e) => setEditForm({...editForm, phone: e.target.value})}
-                    placeholder="0 (5XX) XXX XX XX"
-                    style={{
-                      width: '100%',
-                      padding: '12px',
-                      borderRadius: '8px',
-                      border: '1px solid #d1d5db',
-                      fontSize: '16px'
-                    }}
-                  />
+                                     <input
+                     type="tel"
+                     name="phone"
+                     value={editForm.phone}
+                     onChange={handleChange}
+                     placeholder="(5XX) XXX XX XX"
+                     style={{
+                       width: '100%',
+                       padding: '12px',
+                       borderRadius: '8px',
+                       border: '1px solid #d1d5db',
+                       fontSize: '16px'
+                     }}
+                   />
                 </div>
 
                 {message && (
@@ -364,14 +497,31 @@ export default function ProfilePage() {
 
                 <div style={{ display: 'grid', gap: '16px' }}>
                   <div style={{ 
-                    padding: '16px', 
-                    background: '#f8fafc', 
-                    borderRadius: '8px',
-                    border: '1px solid #e2e8f0'
+                    display: 'grid', 
+                    gridTemplateColumns: '1fr 1fr', 
+                    gap: '16px' 
                   }}>
-                    <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '4px' }}>Ad Soyad</div>
-                    <div style={{ fontSize: '16px', color: '#1e293b', fontWeight: '500' }}>
-                      {userInfo.name || 'Belirtilmemiş'}
+                    <div style={{ 
+                      padding: '16px', 
+                      background: '#f8fafc', 
+                      borderRadius: '8px',
+                      border: '1px solid #e2e8f0'
+                    }}>
+                      <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '4px' }}>Ad</div>
+                      <div style={{ fontSize: '16px', color: '#1e293b', fontWeight: '500' }}>
+                        {userInfo.name?.split(' ')[0] || 'Belirtilmemiş'}
+                      </div>
+                    </div>
+                    <div style={{ 
+                      padding: '16px', 
+                      background: '#f8fafc', 
+                      borderRadius: '8px',
+                      border: '1px solid #e2e8f0'
+                    }}>
+                      <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '4px' }}>Soyad</div>
+                      <div style={{ fontSize: '16px', color: '#1e293b', fontWeight: '500' }}>
+                        {userInfo.name?.split(' ').slice(1).join(' ') || 'Belirtilmemiş'}
+                      </div>
                     </div>
                   </div>
 
@@ -393,9 +543,9 @@ export default function ProfilePage() {
                     borderRadius: '8px',
                     border: '1px solid #e2e8f0'
                   }}>
-                    <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '4px' }}>Kullanıcı ID</div>
-                    <div style={{ fontSize: '16px', color: '#1e293b', fontWeight: '500', fontFamily: 'monospace' }}>
-                      {userInfo.id || 'Belirtilmemiş'}
+                    <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '4px' }}>Cep Telefonu</div>
+                    <div style={{ fontSize: '16px', color: '#1e293b', fontWeight: '500' }}>
+                      {userInfo.phone ? userInfo.phone : 'Belirtilmemiş'}
                     </div>
                   </div>
                 </div>
