@@ -33,6 +33,10 @@ const userSchema = new mongoose.Schema({
   lastLogin: { 
     type: Date 
   },
+  updatedAt: { 
+    type: Date, 
+    default: Date.now 
+  },
   isActive: { 
     type: Boolean, 
     default: true 
