@@ -59,6 +59,15 @@ export default function AdminPage() {
   const handleLogout = () => {
     localStorage.removeItem('adminLoggedIn');
     localStorage.removeItem('adminEmail');
+    localStorage.removeItem('userLoggedIn');
+    localStorage.removeItem('userEmail');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('loginTime');
+    
+    // Header'a logout mesajı gönder
+    window.dispatchEvent(new CustomEvent('logout'));
+    
     router.push('/admin/login');
   };
 

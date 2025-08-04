@@ -61,7 +61,7 @@ export default function BizeSatPage() {
           marginBottom: isMobile ? '32px' : '48px',
           fontWeight: 'bold'
         }}>
-          Bize Sat
+          Ne satmak istiyorsun?
         </h1>
 
         <div style={{

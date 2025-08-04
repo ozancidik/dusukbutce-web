@@ -239,6 +239,9 @@ export default function ProfilePage() {
     localStorage.removeItem('adminLoggedIn');
     localStorage.removeItem('adminEmail');
     
+    // Header'a logout mesajı gönder
+    window.dispatchEvent(new CustomEvent('logout'));
+    
     router.push('/');
   };
 

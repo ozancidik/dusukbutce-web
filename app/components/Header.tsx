@@ -74,15 +74,39 @@ export default function Header() {
 
     checkLoginStatus();
     
-    // Her dakika kontrol et
-    const interval = setInterval(checkLoginStatus, 60000);
+    // Her 2 saniyede bir kontrol et (Google OAuth için)
+    const interval = setInterval(checkLoginStatus, 2000);
     
     // localStorage değişikliklerini dinle
     window.addEventListener('storage', checkLoginStatus);
     
+    // Google OAuth callback mesajlarını dinle
+    const handleMessage = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) return;
+      
+      if (event.data.type === 'GOOGLE_LOGIN_SUCCESS') {
+        // Hemen state'i güncelle
+        setIsLoggedIn(true);
+        setUserName(event.data.user.name || "");
+      }
+    };
+
+    // Logout mesajlarını dinle
+    const handleLogoutMessage = () => {
+      setIsLoggedIn(false);
+      setUserName("");
+    };
+
+    // Custom logout event listener
+    window.addEventListener('logout', handleLogoutMessage);
+
+    window.addEventListener('message', handleMessage);
+    
     return () => {
       clearInterval(interval);
       window.removeEventListener('storage', checkLoginStatus);
+      window.removeEventListener('message', handleMessage);
+      window.removeEventListener('logout', handleLogoutMessage);
     };
   }, []);
 
@@ -328,8 +352,8 @@ export default function Header() {
                   transition: "background 0.2s",
                   whiteSpace: "nowrap",
                   display: "flex",
-                  alignItems: "center",
-                  gap: "6px",
+                    alignItems: "center",
+                    gap: "6px",
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.background = "#1d4ed8";
@@ -401,14 +425,12 @@ export default function Header() {
                   alignItems: "center",
                   gap: isMobile ? "4px" : "6px",
                 }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)";
-                  e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.5)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "transparent";
-                  e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.3)";
-                }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = "transparent";
+                  }}
               >
                 👤 Giriş Yap
               </button>
