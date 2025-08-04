@@ -6,7 +6,7 @@ export async function GET(request: NextRequest) {
     `client_id=${process.env.FACEBOOK_APP_ID || 'your-facebook-app-id'}&` +
     `redirect_uri=${encodeURIComponent(process.env.FACEBOOK_REDIRECT_URI || 'http://localhost:3000/api/auth/facebook/callback')}&` +
     `response_type=code&` +
-    `scope=${encodeURIComponent('email public_profile')}&` +
+    `scope=${encodeURIComponent('public_profile')}&` +
     `state=${Math.random().toString(36).substr(2, 9)}`;
 
   return NextResponse.redirect(facebookAuthUrl);

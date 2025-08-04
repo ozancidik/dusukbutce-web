@@ -66,24 +66,23 @@ export async function GET(request: NextRequest) {
     }
 
     // Facebook'dan kullanıcı bilgilerini al
-    const userResponse = await fetch(`https://graph.facebook.com/v18.0/me?fields=id,name,email&access_token=${tokenData.access_token}`);
+    const userResponse = await fetch(`https://graph.facebook.com/v18.0/me?fields=id,name&access_token=${tokenData.access_token}`);
 
     const userData = await userResponse.json();
 
-    if (!userData.email) {
-      throw new Error('Email bilgisi alınamadı');
-    }
+    // Email bilgisi olmayabilir, geçici email oluştur
+    const tempEmail = `fb_${userData.id}@dusukbutce.com`;
 
-    // MongoDB'ye bağlan
+    // MongoDB'ye bağlan (cache ile)
     await connectDB();
 
-    // Kullanıcıyı bul veya oluştur
-    let user = await User.findOne({ email: userData.email });
+    // Kullanıcıyı bul veya oluştur (cache kullan)
+    let user = await User.findOne({ email: tempEmail }).cache(300); // 5 dakika cache
 
     if (!user) {
       // Yeni kullanıcı oluştur
       user = new User({
-        email: userData.email,
+        email: tempEmail,
         name: userData.name,
         password: 'facebook-oauth-' + Math.random().toString(36).substr(2, 9), // Geçici şifre
         isAdmin: false,
