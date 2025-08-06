@@ -50,7 +50,7 @@ export function middleware(request: NextRequest) {
   });
 
   // Rate limiting için basit kontrol
-  const ip = request.headers.get('x-forwarded-for') || 'unknown';
+  const ip = (request.headers.get('x-forwarded-for') || '').split(',')[0].trim() || 'unknown';
   const userAgent = request.headers.get('user-agent') || '';
   
   // DEBUG: IP adresini ve diğer bilgileri logla
