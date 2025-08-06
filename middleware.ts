@@ -83,7 +83,7 @@ export function middleware(request: NextRequest) {
         { status: 403 }
       );
     }
-    console.log(`✅ Admin panel erişim izni - IP: ${ip}, Path: ${pathname} - ${new Date().toISOString()} - PROD DEPLOY`);
+    console.log(`✅ Admin panel erişim izni - IP: ${ip}, Path: ${pathname} - ${new Date().toISOString()} - FINAL FIX`);
   }
 
   return response;
