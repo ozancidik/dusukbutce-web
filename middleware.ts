@@ -75,7 +75,15 @@ export function middleware(request: NextRequest) {
 
   // Admin panel IP kısıtlaması (sadece sayfa route'ları için, API değil)
   const pathname = request.nextUrl.pathname;
-  if ((pathname.startsWith('/admin') || pathname.startsWith('/admin-users')) && !pathname.startsWith('/api/')) {
+  
+  // API endpoint'lerini tamamen muaf tut
+  if (pathname.startsWith('/api/')) {
+    console.log(`🔓 API endpoint muaf tutuldu - IP: ${ip}, Path: ${pathname}`);
+    return response;
+  }
+  
+  // Sadece admin sayfaları için IP kontrolü
+  if (pathname.startsWith('/admin') || pathname.startsWith('/admin-users')) {
     if (!isIPAllowed(ip)) {
       console.log(`🚫 Admin panel erişim engellendi - IP: ${ip}, Path: ${pathname}`);
       return NextResponse.json(
