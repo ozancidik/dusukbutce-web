@@ -44,6 +44,13 @@ function ipToLong(ip: string): number {
 
 export function middleware(request: NextRequest) {
   const response = NextResponse.next();
+  const pathname = request.nextUrl.pathname;
+
+  // API endpoint'lerini EN ERKEN muaf tut
+  if (pathname.startsWith('/api/')) {
+    console.log(`🔓 API endpoint EN ERKEN muaf tutuldu - Path: ${pathname}`);
+    return response;
+  }
 
   // Güvenlik headers ekle
   Object.entries(securityHeaders).forEach(([key, value]) => {
@@ -55,7 +62,7 @@ export function middleware(request: NextRequest) {
   const userAgent = request.headers.get('user-agent') || '';
   
   // DEBUG: IP adresini ve diğer bilgileri logla
-  console.log('DEBUG IP:', ip, 'User-Agent:', userAgent, 'Path:', request.nextUrl.pathname, new Date().toISOString());
+  console.log('DEBUG IP:', ip, 'User-Agent:', userAgent, 'Path:', pathname, new Date().toISOString());
   
   // Bot koruması
   if (userAgent.includes('bot') || userAgent.includes('crawler')) {
@@ -75,13 +82,6 @@ export function middleware(request: NextRequest) {
   }
 
   // Admin panel IP kısıtlaması (sadece sayfa route'ları için, API değil)
-  const pathname = request.nextUrl.pathname;
-  
-  // API endpoint'lerini tamamen muaf tut
-  if (pathname.startsWith('/api/')) {
-    console.log(`🔓 API endpoint muaf tutuldu - IP: ${ip}, Path: ${pathname}`);
-    return response;
-  }
   
   // Sadece admin sayfaları için IP kontrolü
   if (pathname.startsWith('/admin') || pathname.startsWith('/admin-users')) {
