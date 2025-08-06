@@ -52,6 +52,9 @@ export function middleware(request: NextRequest) {
   const ip = request.headers.get('x-forwarded-for') || 'unknown';
   const userAgent = request.headers.get('user-agent') || '';
   
+  // DEBUG: IP adresini ve diğer bilgileri logla
+  console.log('DEBUG IP:', ip, 'User-Agent:', userAgent, 'Path:', request.nextUrl.pathname, new Date().toISOString());
+  
   // Bot koruması
   if (userAgent.includes('bot') || userAgent.includes('crawler')) {
     return NextResponse.json(
