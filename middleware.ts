@@ -6,6 +6,7 @@ import { securityHeaders } from './lib/security';
 const ALLOWED_IPS = [
   '127.0.0.1',        // Localhost
   '::1',              // IPv6 localhost
+  '212.154.23.66',    // Kullanıcının IP adresi
   // Buraya kendi IP adresinizi ekleyin
   // Örnek: '192.168.1.100',
   // Örnek: '203.0.113.0/24', // IP aralığı
