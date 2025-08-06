@@ -73,6 +73,8 @@ export default function HomePage() {
     };
   }, [isDragging]);
 
+  // iPhone SE için özel kontrol
+  const isIPhoneSE = isMobile && window.innerWidth === 375 && window.innerHeight === 667;
 
 
   // Slider fonksiyonları
@@ -143,49 +145,73 @@ export default function HomePage() {
   };
 
   return (
-    <div
-      style={{
-        width: "100%",
-        maxWidth: "1600px",
-        minWidth: "320px",
-        minHeight: "90vh",
-        margin: isMobile ? "10px auto" : "20px auto",
-        padding: isMobile ? "12px" : "16px",
-        fontFamily: "sans-serif",
-        background: "linear-gradient(180deg, #f8fafc 0%, #e2e8f0 25%, #cbd5e1 50%, #94a3b8 75%, #64748b 100%)",
-        borderRadius: isMobile ? "12px" : "16px",
-        boxShadow: "0 4px 32px #0001",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      {/* Ana başlık */}
-      <div style={{ 
-        display: "flex", 
-        flexDirection: "column", 
-        alignItems: "center", 
-        marginTop: isMobile ? "20px" : "0",
-        marginBottom: "32px",
-        textAlign: "center"
-      }}>
-        <h1 style={{ 
-          margin: 0, 
-          color: "#2563eb",
-          fontSize: isMobile ? "20px" : "32px",
-          fontWeight: "700",
-          lineHeight: isMobile ? "1.2" : "1.1",
+    <div style={{ backgroundColor: "#f0f4f8", minHeight: "100vh" }}>
+      
+      {/* Ana İçerik */}
+      <div
+        style={{
+          width: "100%",
+          maxWidth: "1600px",
+          minWidth: "320px",
+          minHeight: isIPhoneSE ? "100vh" : "90vh",
+          margin: isIPhoneSE ? "0 auto" : (isMobile ? "10px auto" : "20px auto"),
+          padding: isIPhoneSE ? "0" : (isMobile ? "12px" : "16px"),
+          fontFamily: "sans-serif",
+          background: isIPhoneSE ? "transparent" : "linear-gradient(180deg, #f8fafc 0%, #e2e8f0 25%, #cbd5e1 50%, #94a3b8 75%, #64748b 100%)",
+          borderRadius: isIPhoneSE ? "0" : (isMobile ? "12px" : "16px"),
+          boxShadow: isIPhoneSE ? "none" : "0 4px 32px #0001",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: isIPhoneSE ? "flex-start" : "center"
+        }}
+      >
+        {/* Ana başlık */}
+        <div style={{ 
+          display: "flex", 
+          flexDirection: "column", 
+          alignItems: "center", 
+          marginTop: isIPhoneSE ? "0" : (isMobile ? "20px" : "0"),
+          marginBottom: isIPhoneSE ? "0" : "32px",
+          textAlign: "center",
+          position: "relative",
+          zIndex: 9999,
+          backgroundColor: isIPhoneSE ? "transparent" : (isMobile ? "rgba(255,255,255,0.9)" : "transparent"),
+          padding: isIPhoneSE ? "0" : (isMobile ? "10px" : "0"),
+          borderRadius: isIPhoneSE ? "0" : (isMobile ? "8px" : "0"),
+          width: isIPhoneSE ? "100%" : "auto",
+          border: isIPhoneSE ? "none" : "none",
+          boxShadow: isIPhoneSE ? "none" : "none"
         }}>
-          {isMobile ? (
-            <>
-              <div>Düşük Bütçe,</div>
-              <div>Yüksek Performans</div>
-            </>
-          ) : (
-            "Düşük Bütçe, Yüksek Performans"
+          
+          {!isIPhoneSE && (
+            <h1 style={{ 
+              margin: 0, 
+              color: "#2563eb",
+              fontSize: isMobile ? "20px" : "32px",
+              fontWeight: "700",
+              lineHeight: isMobile ? "1.2" : "1.1",
+              position: "relative",
+              zIndex: 9999,
+              textShadow: "0 1px 2px rgba(0,0,0,0.1)",
+              backgroundColor: isMobile ? "rgba(255,255,255,0.8)" : "transparent",
+              padding: isMobile ? "5px 10px" : "0",
+              borderRadius: isMobile ? "4px" : "0",
+              border: isMobile ? "1px solid #2563eb" : "none",
+              marginTop: "0",
+              marginBottom: "0",
+              width: "auto"
+            }}>
+              {isMobile ? (
+                <>
+                  <div>Düşük Bütçe,</div>
+                  <div>Yüksek Performans</div>
+                </>
+              ) : (
+                "Düşük Bütçe, Yüksek Performans"
+              )}
+            </h1>
           )}
-        </h1>
         <p style={{ 
           color: "#64748b", 
           marginTop: "12px",
@@ -448,6 +474,7 @@ export default function HomePage() {
       }}>
         © {new Date().getFullYear()} Düşük Bütçe. Tüm hakları saklıdır.
       </footer>
+    </div>
     </div>
   );
 }

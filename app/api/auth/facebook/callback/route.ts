@@ -76,8 +76,8 @@ export async function GET(request: NextRequest) {
     // MongoDB'ye bağlan (cache ile)
     await connectDB();
 
-    // Kullanıcıyı bul veya oluştur (cache kullan)
-    let user = await User.findOne({ email: tempEmail }).cache(300); // 5 dakika cache
+    // Kullanıcıyı bul veya oluştur
+    let user = await User.findOne({ email: tempEmail });
 
     if (!user) {
       // Yeni kullanıcı oluştur

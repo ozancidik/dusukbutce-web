@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import Search from "./Search";
 
 // Arama kategorileri
 const searchCategories = [
@@ -203,68 +204,8 @@ export default function Header() {
               position: "relative",
             }}
           >
-          <input
-            type="text"
-            placeholder="Ürün, kategori veya marka ara..."
-            value={search}
-            onChange={handleSearchChange}
-            style={{
-              width: "100%",
-              padding: isMobile ? "8px 12px" : "12px 16px",
-              borderRadius: "8px",
-              border: "1px solid #cbd5e1",
-              fontSize: isMobile ? "14px" : "16px",
-              background: "white",
-              boxShadow: "0 1px 4px rgba(0, 0, 0, 0.1)",
-            }}
-          />
-          
-          {/* Arama sonuçları */}
-          {showResults && searchResults.length > 0 && (
-            <div
-              style={{
-                position: "absolute",
-                top: "100%",
-                left: 0,
-                right: 0,
-                background: "white",
-                borderRadius: "8px",
-                border: "1px solid #cbd5e1",
-                boxShadow: "0 4px 16px rgba(0, 0, 0, 0.15)",
-                zIndex: 1001,
-                maxHeight: "300px",
-                overflowY: "auto",
-                marginTop: "4px",
-              }}
-            >
-              {searchResults.map((result, index) => (
-                <Link key={index} href={result.path}>
-                  <div
-                    style={{
-                      padding: "12px 16px",
-                      borderBottom: index < searchResults.length - 1 ? "1px solid #e2e8f0" : "none",
-                      cursor: "pointer",
-                      transition: "background 0.2s",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = "#f8fafc";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = "white";
-                    }}
-                  >
-                    <div style={{ fontWeight: "600", color: "#2563eb", marginBottom: "4px" }}>
-                      {result.name}
-                    </div>
-                    <div style={{ fontSize: "12px", color: "#64748b" }}>
-                      {result.keywords.slice(0, 3).join(", ")}...
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
+            <Search />
+          </div>
         </div>
 
         {/* Alt Satır - Butonlar (sadece mobilde görünür) */}
