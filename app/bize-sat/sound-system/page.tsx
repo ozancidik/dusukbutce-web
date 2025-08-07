@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
-export default function RAMPage() {
+export default function SoundSystemPage() {
   const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -10,11 +10,9 @@ export default function RAMPage() {
   const [formData, setFormData] = useState({
     brand: '',
     model: '',
-    capacity: '',
-    speed: '',
     type: '',
-    latency: '',
-    voltage: '',
+    power: '',
+    connectivity: '',
     description: '',
     cosmeticCondition: 'İyi',
     hasBox: false,
@@ -86,7 +84,7 @@ export default function RAMPage() {
         },
         body: JSON.stringify({
           ...formData,
-          category: 'ram'
+          category: 'sound-system'
         }),
       });
 
@@ -95,11 +93,9 @@ export default function RAMPage() {
         setFormData({
           brand: '',
           model: '',
-          capacity: '',
-          speed: '',
           type: '',
-          latency: '',
-          voltage: '',
+          power: '',
+          connectivity: '',
           description: '',
           cosmeticCondition: 'İyi',
           hasBox: false,
@@ -144,14 +140,14 @@ export default function RAMPage() {
             color: '#1f2937',
             margin: '0 0 8px 0'
           }}>
-            RAM Sat
+            Ses Sistemi Sat
           </h1>
           <p style={{
             fontSize: isMobile ? '14px' : '16px',
             color: '#6b7280',
             margin: 0
           }}>
-            RAM'inizi satın, en iyi fiyatı alın
+            Ses sisteminizi satın, en iyi fiyatı alın
           </p>
         </div>
 
@@ -174,7 +170,7 @@ export default function RAMPage() {
               alignItems: 'center',
               gap: '8px'
             }}>
-              💾 Temel Bilgiler
+              🔊 Temel Bilgiler
             </h2>
             <div style={{
               display: 'grid',
@@ -196,7 +192,7 @@ export default function RAMPage() {
                   required
                   value={formData.brand}
                   onChange={(e) => handleInputChange('brand', e.target.value)}
-                  placeholder="Örn: Corsair, G.Skill, Kingston"
+                  placeholder="Örn: JBL, Bose, Harman Kardon"
                   style={{
                     width: '100%',
                     padding: '12px',
@@ -225,84 +221,7 @@ export default function RAMPage() {
                   required
                   value={formData.model}
                   onChange={(e) => handleInputChange('model', e.target.value)}
-                  placeholder="Örn: Vengeance, Trident Z"
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    outline: 'none',
-                    transition: 'border-color 0.2s'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Teknik Özellikler */}
-          <div style={{ marginBottom: '32px' }}>
-            <h2 style={{
-              fontSize: isMobile ? '18px' : '20px',
-              fontWeight: '600',
-              color: '#374151',
-              margin: '0 0 20px 0',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px'
-            }}>
-              ⚙️ Teknik Özellikler
-            </h2>
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
-              gap: '16px'
-            }}>
-              <div>
-                <label style={{
-                  display: 'block',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  color: '#374151',
-                  marginBottom: '6px'
-                }}>
-                  Kapasite
-                </label>
-                <input
-                  type="text"
-                  value={formData.capacity}
-                  onChange={(e) => handleInputChange('capacity', e.target.value)}
-                  placeholder="Örn: 8GB, 16GB, 32GB"
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    outline: 'none',
-                    transition: 'border-color 0.2s'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-                />
-              </div>
-              <div>
-                <label style={{
-                  display: 'block',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  color: '#374151',
-                  marginBottom: '6px'
-                }}>
-                  Hız
-                </label>
-                <input
-                  type="text"
-                  value={formData.speed}
-                  onChange={(e) => handleInputChange('speed', e.target.value)}
-                  placeholder="Örn: 3200MHz, 3600MHz"
+                  placeholder="Örn: Charge 5, SoundLink, Onyx"
                   style={{
                     width: '100%',
                     padding: '12px',
@@ -330,7 +249,7 @@ export default function RAMPage() {
                   type="text"
                   value={formData.type}
                   onChange={(e) => handleInputChange('type', e.target.value)}
-                  placeholder="Örn: DDR4, DDR5"
+                  placeholder="Örn: Bluetooth Speaker, Soundbar, 2.1"
                   style={{
                     width: '100%',
                     padding: '12px',
@@ -352,13 +271,13 @@ export default function RAMPage() {
                   color: '#374151',
                   marginBottom: '6px'
                 }}>
-                  Gecikme
+                  Güç
                 </label>
                 <input
                   type="text"
-                  value={formData.latency}
-                  onChange={(e) => handleInputChange('latency', e.target.value)}
-                  placeholder="Örn: CL16, CL18"
+                  value={formData.power}
+                  onChange={(e) => handleInputChange('power', e.target.value)}
+                  placeholder="Örn: 20W, 50W, 100W"
                   style={{
                     width: '100%',
                     padding: '12px',
@@ -380,13 +299,13 @@ export default function RAMPage() {
                   color: '#374151',
                   marginBottom: '6px'
                 }}>
-                  Voltaj
+                  Bağlantı Tipi
                 </label>
                 <input
                   type="text"
-                  value={formData.voltage}
-                  onChange={(e) => handleInputChange('voltage', e.target.value)}
-                  placeholder="Örn: 1.35V"
+                  value={formData.connectivity}
+                  onChange={(e) => handleInputChange('connectivity', e.target.value)}
+                  placeholder="Örn: Bluetooth, AUX, HDMI"
                   style={{
                     width: '100%',
                     padding: '12px',
@@ -755,7 +674,7 @@ export default function RAMPage() {
               margin: '0 0 24px 0',
               lineHeight: '1.5'
             }}>
-              RAM'iniz için teklif talebiniz alındı. En kısa sürede size ulaşacağız.
+              Ses sisteminiz için teklif talebiniz alındı. En kısa sürede size ulaşacağız.
             </p>
             <button
               onClick={() => setShowSuccessModal(false)}

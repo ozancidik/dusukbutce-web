@@ -146,8 +146,7 @@ export default function Header() {
     <header
       onClick={closeSearchResults}
       style={{
-        position: "sticky",
-        top: 0,
+        position: "static",
         zIndex: 1000,
         background: "linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%)",
         boxShadow: "0 2px 20px rgba(0, 0, 0, 0.1)",
@@ -221,33 +220,62 @@ export default function Header() {
           >
             {/* Giriş Yap / Kullanıcı Profili Butonu */}
             {isLoggedIn ? (
-              <Link href="/profile" style={{ textDecoration: "none" }}>
-                <button
-                  style={{
-                    background: "#10b981",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "6px",
-                    padding: "8px 16px",
-                    fontWeight: "600",
-                    cursor: "pointer",
-                    fontSize: "14px",
-                    transition: "all 0.2s",
-                    whiteSpace: "nowrap",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "6px",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "#059669";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = "#10b981";
-                  }}
-                >
-                  👤 {userName || "Profil"}
-                </button>
-              </Link>
+              <>
+                <Link href="/tekliflerim" style={{ textDecoration: "none" }}>
+                  <button
+                    style={{
+                      background: "#f59e0b",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "6px",
+                      padding: "8px 16px",
+                      fontWeight: "600",
+                      cursor: "pointer",
+                      fontSize: "14px",
+                      transition: "all 0.2s",
+                      whiteSpace: "nowrap",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = "#d97706";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = "#f59e0b";
+                    }}
+                  >
+                    💰 Tekliflerim
+                  </button>
+                </Link>
+                <Link href="/profile" style={{ textDecoration: "none" }}>
+                  <button
+                    style={{
+                      background: "#10b981",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "6px",
+                      padding: "8px 16px",
+                      fontWeight: "600",
+                      cursor: "pointer",
+                      fontSize: "14px",
+                      transition: "all 0.2s",
+                      whiteSpace: "nowrap",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = "#059669";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = "#10b981";
+                    }}
+                  >
+                    👤 {userName || "Profil"}
+                  </button>
+                </Link>
+              </>
             ) : (
               <Link href="/login" style={{ textDecoration: "none" }}>
                 <button
@@ -277,6 +305,35 @@ export default function Header() {
                 </button>
               </Link>
             )}
+
+            {/* İlanlar Butonu */}
+            <Link href="/listings" style={{ textDecoration: "none" }}>
+              <button
+                style={{
+                  background: "#059669",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "6px",
+                  padding: "8px 16px",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                  transition: "background 0.2s",
+                  whiteSpace: "nowrap",
+                  display: "flex",
+                    alignItems: "center",
+                    gap: "6px",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "#047857";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "#059669";
+                }}
+              >
+                📋 İlanlar
+              </button>
+            </Link>
 
             {/* Sepet Butonu */}
             <Link href="/cart" style={{ textDecoration: "none" }}>
@@ -321,33 +378,62 @@ export default function Header() {
         >
           {/* Giriş Yap / Kullanıcı Profili */}
           {isLoggedIn ? (
-            <Link href="/profile" style={{ textDecoration: "none" }}>
-              <button
-                style={{
-                  background: "#10b981",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "6px",
-                  padding: isMobile ? "6px 8px" : "10px 16px",
-                  fontWeight: "600",
-                  cursor: "pointer",
-                  fontSize: isMobile ? "12px" : "14px",
-                  transition: "all 0.2s",
-                  whiteSpace: "nowrap",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: isMobile ? "4px" : "6px",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "#059669";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "#10b981";
-                }}
-              >
-                👤 {userName || "Profil"}
-              </button>
-            </Link>
+            <>
+              <Link href="/tekliflerim" style={{ textDecoration: "none" }}>
+                <button
+                  style={{
+                    background: "#f59e0b",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "6px",
+                    padding: isMobile ? "6px 8px" : "10px 16px",
+                    fontWeight: "600",
+                    cursor: "pointer",
+                    fontSize: isMobile ? "12px" : "14px",
+                    transition: "all 0.2s",
+                    whiteSpace: "nowrap",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: isMobile ? "4px" : "6px",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = "#d97706";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = "#f59e0b";
+                  }}
+                >
+                  💰 Tekliflerim
+                </button>
+              </Link>
+              <Link href="/profile" style={{ textDecoration: "none" }}>
+                <button
+                  style={{
+                    background: "#10b981",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "6px",
+                    padding: isMobile ? "6px 8px" : "10px 16px",
+                    fontWeight: "600",
+                    cursor: "pointer",
+                    fontSize: isMobile ? "12px" : "14px",
+                    transition: "all 0.2s",
+                    whiteSpace: "nowrap",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: isMobile ? "4px" : "6px",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = "#059669";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = "#10b981";
+                  }}
+                >
+                  👤 {userName || "Profil"}
+                </button>
+              </Link>
+            </>
           ) : (
             <Link href="/login" style={{ textDecoration: "none" }}>
               <button
@@ -377,6 +463,35 @@ export default function Header() {
               </button>
             </Link>
           )}
+
+          {/* İlanlar */}
+          <Link href="/listings" style={{ textDecoration: "none" }}>
+            <button
+              style={{
+                background: "#059669",
+                color: "white",
+                border: "none",
+                borderRadius: "6px",
+                padding: isMobile ? "6px 8px" : "10px 16px",
+                fontWeight: "600",
+                cursor: "pointer",
+                fontSize: isMobile ? "12px" : "14px",
+                transition: "background 0.2s",
+                whiteSpace: "nowrap",
+                display: "flex",
+                alignItems: "center",
+                gap: isMobile ? "4px" : "6px",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "#047857";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "#059669";
+              }}
+            >
+              📋 İlanlar
+            </button>
+          </Link>
 
           {/* Sepet */}
           <Link href="/cart" style={{ textDecoration: "none" }}>

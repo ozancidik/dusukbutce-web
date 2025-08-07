@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const MONGODB_URI = process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {
-  throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
+  throw new Error('MongoDB URI is not defined');
 }
 
 let isConnected = false;
@@ -16,6 +16,13 @@ async function connectDB() {
   try {
     if (!MONGODB_URI) {
       throw new Error('MONGODB_URI is not defined');
+    }
+    
+    // Eğer zaten bağlıysa, mevcut bağlantıyı kullan
+    if (mongoose.connection.readyState === 1) {
+      isConnected = true;
+      console.log('MongoDB already connected');
+      return;
     }
     
     // Connection pooling ve timeout ayarları

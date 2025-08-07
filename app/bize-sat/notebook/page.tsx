@@ -1,96 +1,30 @@
 "use client";
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
-export default function BuyNotebookPage() {
-  // State'ler
-  const [hasBox, setHasBox] = useState(false);
-  const [hasInvoice, setHasInvoice] = useState(false);
-  const [invoiceDate, setInvoiceDate] = useState('');
-  const [cosmeticCondition, setCosmeticCondition] = useState("");
-  const [showTooltip, setShowTooltip] = useState(false);
-  const [showCosmeticTooltip, setShowCosmeticTooltip] = useState(false);
-  const [images, setImages] = useState<(string | null)[]>(Array(10).fill(null));
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
-  const [screenStatus, setScreenStatus] = useState("");
-  const [deadPixelCount, setDeadPixelCount] = useState("");
-
-  // Input değerlerini takip etmek için state'ler
-  const [brandValue, setBrandValue] = useState('');
-  const [modelValue, setModelValue] = useState('');
-  const [graphicsCardValue, setGraphicsCardValue] = useState('');
-  const [processorValue, setProcessorValue] = useState('');
-  const [storageValue, setStorageValue] = useState('');
-  const [ramValue, setRamValue] = useState('');
-  const [refreshRateValue, setRefreshRateValue] = useState('');
-  const [wattValue, setWattValue] = useState('');
-  const [screenSizeValue, setScreenSizeValue] = useState('');
-  const [batteryHealthValue, setBatteryHealthValue] = useState('');
-  const [quantity, setQuantity] = useState(1);
-
+export default function NotebookPage() {
+  const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
-
-  const conditions = ["Kötü", "İyi", "Çok iyi", "Mükemmel"];
-  const pixelCounts = ["1", "2", "3", "3+"];
-
-  // Form geçerli mi kontrolü - useMemo ile optimize edildi
-  const isFormValid = useMemo(() => {
-    // Marka validasyonu
-    if (!brandValue || brandValue.trim().length < 2) {
-      return false;
-    }
-    
-    // Model validasyonu
-    if (!modelValue || modelValue.trim().length < 2) {
-      return false;
-    }
-    
-    // Ekran Kartı validasyonu
-    if (!graphicsCardValue || graphicsCardValue.trim().length < 2) {
-      return false;
-    }
-    
-    // İşlemci validasyonu
-    if (!processorValue || processorValue.trim().length < 2) {
-      return false;
-    }
-    
-    // Dahili Hafıza validasyonu
-    if (!storageValue || storageValue.trim().length < 2) {
-      return false;
-    }
-    
-    // RAM validasyonu
-    if (!ramValue || ramValue.trim().length < 2) {
-      return false;
-    }
-    
-    // Ekran Tazeleme Hızı validasyonu
-    if (!refreshRateValue || refreshRateValue.trim().length < 2) {
-      return false;
-    }
-    
-    // Ekran Boyutu validasyonu
-    if (!screenSizeValue || screenSizeValue.trim().length < 2) {
-      return false;
-    }
-    
-    // Pil Durumu validasyonu
-    if (!batteryHealthValue || batteryHealthValue.trim().length < 2) {
-      return false;
-    }
-    
-    return true;
-  }, [
-    brandValue,
-    modelValue,
-    graphicsCardValue,
-    processorValue,
-    storageValue,
-    ramValue,
-    refreshRateValue,
-    screenSizeValue,
-    batteryHealthValue
-  ]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [formData, setFormData] = useState({
+    brand: '',
+    model: '',
+    processor: '',
+    graphicsCard: '',
+    ram: '',
+    storage: '',
+    screenSize: '',
+    refreshRate: '',
+    batteryHealth: '',
+    description: '',
+    cosmeticCondition: 'İyi',
+    hasBox: false,
+    hasInvoice: false,
+    invoiceDate: '',
+    quantity: 1,
+    images: [] as string[]
+  });
 
   useEffect(() => {
     const checkMobile = () => {
@@ -105,1136 +39,733 @@ export default function BuyNotebookPage() {
     };
   }, []);
 
-  // Form submit fonksiyonu
-  const handleSubmit = async () => {
-    // Form geçerli değilse gönderme
-    if (!isFormValid) {
-      alert('Lütfen tüm gerekli alanları doldurun.');
-      return;
+  const handleInputChange = (field: string, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files) {
+      const newImages: string[] = [];
+      
+      Array.from(files).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          if (e.target?.result) {
+            newImages.push(e.target.result as string);
+            if (newImages.length === files.length) {
+              setFormData(prev => ({
+                ...prev,
+                images: [...prev.images, ...newImages]
+              }));
+            }
+          }
+        };
+        reader.readAsDataURL(file);
+      });
     }
+  };
+
+  const removeImage = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index)
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
 
     try {
-      // Form verilerini topla
-      const formData = {
-        // Temel bilgiler
-        hasBox,
-        hasInvoice,
-        invoiceDate,
-        cosmeticCondition,
-        screenStatus,
-        deadPixelCount,
-        
-        // Notebook özellikleri
-        brand: brandValue,
-        model: modelValue,
-        processor: processorValue,
-        graphicsCard: graphicsCardValue,
-        wattValue: wattValue,
-        ram: ramValue,
-        storage: storageValue,
-        refreshRate: refreshRateValue,
-        screenSize: screenSizeValue,
-        batteryHealth: batteryHealthValue,
-        
-        // Resimler (base64 formatında)
-        images: images.filter(img => img !== null)
-      };
-
-      // API'ye gönder
       const response = await fetch('/api/notebook-submissions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({
+          ...formData,
+          category: 'notebook'
+        }),
       });
 
-      const result = await response.json();
-
       if (response.ok) {
-        alert('Form başarıyla gönderildi! Teklifiniz en kısa sürede size ulaşacak.');
-        // Formu temizle
-        // setHasBox(false);
-        // setHasInvoice(false);
-        // ... diğer state'leri sıfırla
+        setShowSuccessModal(true);
+        setFormData({
+          brand: '',
+          model: '',
+          processor: '',
+          graphicsCard: '',
+          ram: '',
+          storage: '',
+          screenSize: '',
+          refreshRate: '',
+          batteryHealth: '',
+          description: '',
+          cosmeticCondition: 'İyi',
+          hasBox: false,
+          hasInvoice: false,
+          invoiceDate: '',
+          quantity: 1,
+          images: []
+        });
       } else {
-        alert(`Hata: ${result.error}`);
+        alert('Bir hata oluştu. Lütfen tekrar deneyin.');
       }
-
     } catch (error) {
-      console.error('Form gönderme hatası:', error);
-      alert('Form gönderilirken bir hata oluştu. Lütfen tekrar deneyin.');
+      alert('Bir hata oluştu. Lütfen tekrar deneyin.');
+    } finally {
+      setIsSubmitting(false);
     }
-  };
-
-  // ESC tuşu ile preview'i kapat
-  const handleEscKey = (event: KeyboardEvent) => {
-    if (event.key === 'Escape') {
-      setPreviewImage(null);
-    }
-  };
-
-  useEffect(() => {
-    document.addEventListener('keydown', handleEscKey);
-    return () => {
-      document.removeEventListener('keydown', handleEscKey);
-    };
-  }, []);
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files) {
-      const newImages = [...images];
-      let imageIndex = 0;
-      
-      for (let i = 0; i < newImages.length && imageIndex < files.length; i++) {
-        if (newImages[i] === null) {
-          const file = files[imageIndex];
-          // Dosyayı base64'e çevir
-          const reader = new FileReader();
-          reader.onload = (event) => {
-            const base64Data = event.target?.result as string;
-            newImages[i] = base64Data;
-            setImages([...newImages]);
-          };
-          reader.readAsDataURL(file);
-          imageIndex++;
-        }
-      }
-    }
-  };
-
-  const removeImage = (index: number) => {
-    const newImages = [...images];
-    newImages[index] = null;
-    setImages(newImages);
-  };
-
-  const openPreview = (imageData: string) => {
-    setPreviewImage(imageData);
   };
 
   return (
     <div style={{
+      background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%)',
-      padding: isMobile ? '16px 8px' : '40px 20px'
+      padding: isMobile ? '20px 12px' : '40px'
     }}>
       <div style={{
-        maxWidth: isMobile ? '100%' : '1200px',
-        margin: '0 auto',
-        padding: isMobile ? '24px 16px' : '40px',
-        background: 'linear-gradient(145deg, #ffffff 0%, #fafbfc 100%)',
-        borderRadius: isMobile ? '16px' : '24px',
-        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.1), 0 8px 25px rgba(0, 0, 0, 0.05)',
-        fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
-        minHeight: '80vh',
-        border: '1px solid rgba(255, 255, 255, 0.2)',
-        backdropFilter: 'blur(10px)'
+        maxWidth: isMobile ? '100%' : '800px',
+        margin: '0 auto'
       }}>
-        {/* Başlık ve TEKLİF AL butonu */}
+        {/* Header */}
         <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: isMobile ? '24px' : '32px',
-          flexDirection: isMobile ? 'column' : 'row',
-          gap: isMobile ? '16px' : '0'
+          background: 'white',
+          borderRadius: '16px',
+          padding: isMobile ? '24px' : '32px',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1)',
+          marginBottom: '32px',
+          border: '1px solid #e5e7eb',
+          textAlign: 'center'
         }}>
           <h1 style={{
-            background: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)',
-            backgroundClip: 'text',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            fontSize: isMobile ? '28px' : '36px',
-            margin: 0,
-            fontWeight: '800',
-            letterSpacing: '-0.025em',
-            textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+            fontSize: isMobile ? '24px' : '32px',
+            fontWeight: '700',
+            color: '#1f2937',
+            margin: '0 0 8px 0'
           }}>
-            Dizüstü (Notebook) Sat
+            Dizüstü Bilgisayar Sat
           </h1>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: isMobile ? '12px' : '16px'
+          <p style={{
+            fontSize: isMobile ? '14px' : '16px',
+            color: '#6b7280',
+            margin: 0
           }}>
-            <div style={{
+            Dizüstü bilgisayarınızı satın, en iyi fiyatı alın
+          </p>
+        </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} style={{
+          background: 'white',
+          borderRadius: '16px',
+          padding: isMobile ? '24px' : '32px',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1)',
+          border: '1px solid #e5e7eb'
+        }}>
+          {/* Temel Bilgiler */}
+          <div style={{ marginBottom: '32px' }}>
+            <h2 style={{
+              fontSize: isMobile ? '18px' : '20px',
+              fontWeight: '600',
+              color: '#374151',
+              margin: '0 0 20px 0',
               display: 'flex',
               alignItems: 'center',
               gap: '8px'
             }}>
-              <label style={{
-                fontSize: isMobile ? '16px' : '18px',
-                fontWeight: '600',
-                color: '#374151',
-                whiteSpace: 'nowrap'
-              }}>
-                ADET:
-              </label>
-              <input
-                type="number"
-                min="1"
-                value={quantity}
-                onChange={(e) => {
-                  const value = parseInt(e.target.value);
-                  if (value >= 1) {
-                    setQuantity(value);
-                  }
-                }}
-                style={{
-                  width: '80px',
-                  padding: '8px 12px',
-                  border: '2px solid #e2e8f0',
-                  borderRadius: '8px',
-                  fontSize: isMobile ? '14px' : '16px',
-                  fontWeight: '600',
-                  textAlign: 'center',
-                  backgroundColor: '#f8fafc',
-                  color: '#374151',
-                  boxSizing: 'border-box'
-                }}
-              />
-            </div>
-            <button
-            onClick={handleSubmit}
-            disabled={!isFormValid}
-            style={{
-              background: isFormValid 
-                ? 'linear-gradient(135deg, #059669 0%, #10b981 100%)' 
-                : 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)',
-              color: 'white',
-              border: 'none',
-              borderRadius: '16px',
-              padding: isMobile ? '14px 24px' : '18px 36px',
-              fontSize: isMobile ? '16px' : '20px',
-              fontWeight: '700',
-              cursor: isFormValid ? 'pointer' : 'not-allowed',
-              boxShadow: isFormValid 
-                ? '0 8px 25px rgba(16, 185, 129, 0.3), 0 4px 10px rgba(0, 0, 0, 0.1)' 
-                : '0 4px 10px rgba(0, 0, 0, 0.1)',
-              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-              whiteSpace: 'nowrap',
-              position: 'relative',
-              overflow: 'hidden',
-              opacity: isFormValid ? 1 : 0.6
-            }}
-            onMouseEnter={(e) => {
-              if (!isFormValid) return;
-              const target = e.target as HTMLButtonElement;
-              target.style.background = 'linear-gradient(135deg, #047857 0%, #059669 100%)';
-              target.style.transform = 'translateY(-3px) scale(1.02)';
-              target.style.boxShadow = '0 12px 35px rgba(16, 185, 129, 0.4), 0 6px 15px rgba(0, 0, 0, 0.15)';
-            }}
-            onMouseLeave={(e) => {
-              if (!isFormValid) return;
-              const target = e.target as HTMLButtonElement;
-              target.style.background = 'linear-gradient(135deg, #059669 0%, #10b981 100%)';
-              target.style.transform = 'translateY(0) scale(1)';
-              target.style.boxShadow = '0 8px 25px rgba(16, 185, 129, 0.3), 0 4px 10px rgba(0, 0, 0, 0.1)';
-            }}
-          >
-            TEKLİF AL
-          </button>
-          </div>
-        </div>
-
-        {/* Form alanları */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
-          gap: isMobile ? '20px' : '32px'
-        }}>
-          {/* Sol sütun */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '16px' : '24px' }}>
-            {/* Marka */}
-            <div>
-              <label style={{
-                display: 'block',
-                marginBottom: '10px',
-                fontSize: isMobile ? '16px' : '20px',
-                fontWeight: '600',
-                color: '#475569',
-                letterSpacing: '0.025em'
-              }}>
-                Marka
-              </label>
-              <input
-                type="text"
-                placeholder="Örn: Asus, Dell, HP, Monster..."
-                value={brandValue}
-                onChange={(e) => setBrandValue(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: isMobile ? '14px 16px' : '16px 20px',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '10px',
-                  fontSize: isMobile ? '16px' : '18px',
-                  boxSizing: 'border-box',
-                  background: '#ffffff',
-                  transition: 'all 0.2s ease',
-                  outline: 'none'
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = '#6366f1';
-                  e.target.style.boxShadow = '0 0 0 3px rgba(99, 102, 241, 0.1)';
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = '#e2e8f0';
-                  e.target.style.boxShadow = 'none';
-                }}
-              />
-            </div>
-
-            {/* Ekran Kartı */}
-            <div>
-              <label style={{
-                display: 'block',
-                marginBottom: '8px',
-                fontSize: isMobile ? '16px' : '20px',
-                fontWeight: '600',
-                color: '#475569'
-              }}>
-                Ekran Kartı
-              </label>
-              <input
-                type="text"
-                placeholder="Örn: RTX 4060, GTX 1650, RX 6600..."
-                value={graphicsCardValue}
-                onChange={(e) => setGraphicsCardValue(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: isMobile ? '14px 16px' : '16px 20px',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '10px',
-                  fontSize: isMobile ? '16px' : '18px',
-                  boxSizing: 'border-box',
-                  background: '#ffffff',
-                  transition: 'all 0.2s ease',
-                  outline: 'none'
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = '#6366f1';
-                  e.target.style.boxShadow = '0 0 0 3px rgba(99, 102, 241, 0.1)';
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = '#e2e8f0';
-                  e.target.style.boxShadow = 'none';
-                }}
-              />
-            </div>
-
-            {/* İşlemci */}
-            <div>
-              <label style={{
-                display: 'block',
-                marginBottom: '8px',
-                fontSize: isMobile ? '16px' : '20px',
-                fontWeight: '600',
-                color: '#475569'
-              }}>
-                İşlemci
-              </label>
-              <input
-                type="text"
-                placeholder="Örn: Intel i5-12400, AMD Ryzen 5 5600H..."
-                value={processorValue}
-                onChange={(e) => setProcessorValue(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: isMobile ? '14px 16px' : '16px 20px',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '10px',
-                  fontSize: isMobile ? '16px' : '18px',
-                  boxSizing: 'border-box',
-                  background: '#ffffff',
-                  transition: 'all 0.2s ease',
-                  outline: 'none'
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = '#6366f1';
-                  e.target.style.boxShadow = '0 0 0 3px rgba(99, 102, 241, 0.1)';
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = '#e2e8f0';
-                  e.target.style.boxShadow = 'none';
-                }}
-              />
-            </div>
-
-            {/* RAM */}
-            <div>
-              <label style={{
-                display: 'block',
-                marginBottom: '8px',
-                fontSize: isMobile ? '16px' : '20px',
-                fontWeight: '600',
-                color: '#475569'
-              }}>
-                RAM
-              </label>
-              <input
-                type="text"
-                placeholder="Örn: 8GB, 16GB, 32GB, 64GB..."
-                value={ramValue}
-                onChange={(e) => setRamValue(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: isMobile ? '14px 16px' : '16px 20px',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '10px',
-                  fontSize: isMobile ? '16px' : '18px',
-                  boxSizing: 'border-box',
-                  background: '#ffffff',
-                  transition: 'all 0.2s ease',
-                  outline: 'none'
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = '#6366f1';
-                  e.target.style.boxShadow = '0 0 0 3px rgba(99, 102, 241, 0.1)';
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = '#e2e8f0';
-                  e.target.style.boxShadow = 'none';
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Sağ sütun */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '16px' : '24px' }}>
-            {/* Model */}
-            <div>
-              <label style={{
-                display: 'block',
-                marginBottom: '8px',
-                fontSize: isMobile ? '16px' : '20px',
-                fontWeight: '600',
-                color: '#475569'
-              }}>
-                Model
-              </label>
-              <input
-                type="text"
-                placeholder="Örn: Vivobook, Inspiron, Pavilion..."
-                value={modelValue}
-                onChange={(e) => setModelValue(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: isMobile ? '14px 16px' : '16px 20px',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '10px',
-                  fontSize: isMobile ? '16px' : '18px',
-                  boxSizing: 'border-box',
-                  background: '#ffffff',
-                  transition: 'all 0.2s ease',
-                  outline: 'none'
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = '#6366f1';
-                  e.target.style.boxShadow = '0 0 0 3px rgba(99, 102, 241, 0.1)';
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = '#e2e8f0';
-                  e.target.style.boxShadow = 'none';
-                }}
-              />
-            </div>
-
-            {/* Watt Değeri */}
-            <div>
-              <label style={{
-                display: 'block',
-                marginBottom: '8px',
-                fontSize: isMobile ? '16px' : '20px',
-                fontWeight: '600',
-                color: '#475569'
-              }}>
-                Watt Değeri
-              </label>
-              <input
-                type="text"
-                placeholder="Örn: 40W, 100W, 140W..."
-                value={wattValue}
-                onChange={(e) => setWattValue(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: isMobile ? '14px 16px' : '16px 20px',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '10px',
-                  fontSize: isMobile ? '16px' : '18px',
-                  boxSizing: 'border-box',
-                  background: '#ffffff',
-                  transition: 'all 0.2s ease',
-                  outline: 'none'
-                }}
-              />
-            </div>
-
-            {/* Dahili Hafıza */}
-            <div>
-              <label style={{
-                display: 'block',
-                marginBottom: '8px',
-                fontSize: isMobile ? '16px' : '20px',
-                fontWeight: '600',
-                color: '#475569'
-              }}>
-                Dahili Hafıza
-              </label>
-              <input
-                type="text"
-                placeholder="Örn: 512GB SSD, 1TB HDD..."
-                value={storageValue}
-                onChange={(e) => setStorageValue(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: isMobile ? '14px 16px' : '16px 20px',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '10px',
-                  fontSize: isMobile ? '16px' : '18px',
-                  boxSizing: 'border-box',
-                  background: '#ffffff',
-                  transition: 'all 0.2s ease',
-                  outline: 'none'
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = '#6366f1';
-                  e.target.style.boxShadow = '0 0 0 3px rgba(99, 102, 241, 0.1)';
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = '#e2e8f0';
-                  e.target.style.boxShadow = 'none';
-                }}
-              />
-            </div>
-
-            {/* Ekran Tazeleme Hızı */}
-            <div>
-              <label style={{
-                display: 'block',
-                marginBottom: '8px',
-                fontSize: isMobile ? '16px' : '20px',
-                fontWeight: '600',
-                color: '#475569'
-              }}>
-                Ekran Tazeleme Hızı
-              </label>
-              <input
-                type="text"
-                placeholder="Örn: 60 Hz, 144 Hz, 240 Hz..."
-                value={refreshRateValue}
-                onChange={(e) => setRefreshRateValue(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: isMobile ? '14px 16px' : '16px 20px',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '10px',
-                  fontSize: isMobile ? '16px' : '18px',
-                  boxSizing: 'border-box',
-                  background: '#ffffff',
-                  transition: 'all 0.2s ease',
-                  outline: 'none'
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = '#6366f1';
-                  e.target.style.boxShadow = '0 0 0 3px rgba(99, 102, 241, 0.1)';
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = '#e2e8f0';
-                  e.target.style.boxShadow = 'none';
-                }}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Ekran Boyutu + Ekran Durumu ve Kozmetik Durumu + Pil Durumu */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
-          gap: isMobile ? '20px' : '32px',
-          marginTop: isMobile ? '20px' : '32px'
-        }}>
-          {/* Sol Sütun: Ekran Boyutu + Ekran Durumu */}
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: isMobile ? '20px' : '32px'
-          }}>
-            {/* Ekran Boyutu */}
-            <div>
-              <label style={{
-                display: 'block',
-                marginBottom: isMobile ? '8px' : '10px',
-                fontSize: isMobile ? '18px' : '20px',
-                fontWeight: '600',
-                color: '#475569'
-              }}>
-                Ekran Boyutu
-              </label>
-              <input
-                type="text"
-                placeholder="Örn: 13.3 inç, 15.6 inç, 17.3 inç..."
-                value={screenSizeValue}
-                onChange={(e) => setScreenSizeValue(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: isMobile ? '14px 16px' : '16px 20px',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '10px',
-                  fontSize: isMobile ? '16px' : '18px',
-                  boxSizing: 'border-box',
-                  background: '#ffffff',
-                  transition: 'all 0.2s ease',
-                  outline: 'none'
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = '#6366f1';
-                  e.target.style.boxShadow = '0 0 0 3px rgba(99, 102, 241, 0.1)';
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = '#e2e8f0';
-                  e.target.style.boxShadow = 'none';
-                }}
-              />
-            </div>
-
-            {/* Ekran Durumu */}
-            <div>
-              <h3 style={{
-                fontSize: isMobile ? '18px' : '20px',
-                fontWeight: '600',
-                marginBottom: isMobile ? '12px' : '16px',
-                color: '#374151'
-              }}>
-                Ekran Durumu
-              </h3>
-              <div style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: isMobile ? '12px' : '16px'
-              }}>
-                <div style={{
-                  display: 'flex',
-                  gap: isMobile ? '8px' : '12px',
-                  flexWrap: 'wrap',
-                  justifyContent: 'flex-start'
-                }}>
-                  <button
-                    onClick={() => setScreenStatus('sağlam')}
-                    style={{
-                      background: screenStatus === 'sağlam' ? '#6366f1' : 'white',
-                      color: screenStatus === 'sağlam' ? 'white' : '#374151',
-                      border: '1px solid #e2e8f0',
-                      borderRadius: '8px',
-                      padding: isMobile ? '8px 12px' : '12px 16px',
-                      fontSize: isMobile ? '14px' : '16px',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s'
-                    }}
-                  >
-                    Sağlam
-                  </button>
-                  <button
-                    onClick={() => setScreenStatus('çizikler var')}
-                    style={{
-                      background: screenStatus === 'çizikler var' ? '#6366f1' : 'white',
-                      color: screenStatus === 'çizikler var' ? 'white' : '#374151',
-                      border: '1px solid #e2e8f0',
-                      borderRadius: '8px',
-                      padding: isMobile ? '8px 12px' : '12px 16px',
-                      fontSize: isMobile ? '14px' : '16px',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s'
-                    }}
-                  >
-                    Çizikler var
-                  </button>
-                  <button
-                    onClick={() => setScreenStatus('ölü piksel')}
-                    style={{
-                      background: screenStatus === 'ölü piksel' ? '#6366f1' : 'white',
-                      color: screenStatus === 'ölü piksel' ? 'white' : '#374151',
-                      border: '1px solid #e2e8f0',
-                      borderRadius: '8px',
-                      padding: isMobile ? '8px 12px' : '12px 16px',
-                      fontSize: isMobile ? '14px' : '16px',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s'
-                    }}
-                  >
-                    Ölü piksel var
-                  </button>
-                </div>
-                {screenStatus === 'ölü piksel' && (
-                  <div style={{
-                    display: 'flex',
-                    gap: isMobile ? '6px' : '8px',
-                    marginTop: '8px',
-                    justifyContent: 'flex-start',
-                    width: '100%',
-                    flexWrap: 'wrap',
-                    paddingLeft: '225px'
-                  }}>
-                    {pixelCounts.map((count) => (
-                      <button
-                        key={count}
-                        onClick={() => setDeadPixelCount(count)}
-                        style={{
-                          background: deadPixelCount === count ? '#10b981' : 'white',
-                          color: deadPixelCount === count ? 'white' : '#374151',
-                          border: '1px solid #e2e8f0',
-                          borderRadius: '8px',
-                          padding: isMobile ? '6px 10px' : '8px 12px',
-                          fontSize: isMobile ? '12px' : '14px',
-                          cursor: 'pointer',
-                          transition: 'all 0.2s'
-                        }}
-                      >
-                        {count}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Sağ Sütun: Kozmetik Durumu + Pil Durumu */}
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: isMobile ? '20px' : '32px'
-          }}>
-            {/* Kozmetik Durumu */}
-            <div>
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                marginBottom: isMobile ? '16px' : '20px'
-              }}>
-                <h3 style={{
-                  fontSize: isMobile ? '18px' : '20px',
-                  fontWeight: '700',
-                  color: '#374151',
-                  letterSpacing: '0.025em',
-                  margin: 0
-                }}>
-                  Kozmetik Durumu
-                </h3>
-                <div
-                  style={{
-                    width: '20px',
-                    height: '20px',
-                    borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    position: 'relative',
-                    fontSize: '14px',
-                    fontWeight: 'bold',
-                    color: 'white',
-                    boxShadow: '0 2px 4px rgba(59, 130, 246, 0.3)',
-                    transition: 'all 0.2s ease'
-                  }}
-                  onMouseEnter={() => setShowCosmeticTooltip(true)}
-                  onMouseLeave={() => setShowCosmeticTooltip(false)}
-                >
-                  ?
-                  {showCosmeticTooltip && (
-                    <div style={{
-                      position: 'absolute',
-                      top: '-10px',
-                      left: '30px',
-                      background: '#1f2937',
-                      color: 'white',
-                      padding: '16px 20px',
-                      borderRadius: '12px',
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      maxWidth: '350px',
-                      minWidth: '320px',
-                      zIndex: 1000,
-                      boxShadow: '0 8px 25px rgba(0, 0, 0, 0.3)',
-                      lineHeight: '1.5'
-                    }}>
-                      <div style={{ marginBottom: '12px', fontWeight: '600', fontSize: '15px' }}>
-                        Kozmetik Durumu Nasıl Değerlendirilir?
-                      </div>
-                      <div style={{ marginBottom: '8px', lineHeight: '1.4' }}>
-                        <strong>Kötü:</strong> Çizikler, darbeler, renk değişimi, aşınma belirtileri
-                      </div>
-                      <div style={{ marginBottom: '8px', lineHeight: '1.4' }}>
-                        <strong>İyi:</strong> Hafif çizikler, minimal aşınma, genel durumu korunmuş
-                      </div>
-                      <div style={{ marginBottom: '8px', lineHeight: '1.4' }}>
-                        <strong>Çok İyi:</strong> Çok az çizik, neredeyse yeni görünüm
-                      </div>
-                      <div style={{ lineHeight: '1.4' }}>
-                        <strong>Mükemmel:</strong> Hiç kullanılmamış gibi, kutusundan yeni çıkmış
-                      </div>
-                      <div style={{ 
-                        position: 'absolute', 
-                        top: '20px', 
-                        left: '-8px', 
-                        width: '0',
-                        height: '0',
-                        borderTop: '8px solid transparent',
-                        borderBottom: '8px solid transparent',
-                        borderRight: '8px solid #1f2937'
-                      }}></div>
-                    </div>
-                  )}
-                </div>
-              </div>
-              <div style={{
-                display: 'flex',
-                gap: isMobile ? '8px' : '12px',
-                flexWrap: 'wrap'
-              }}>
-                {conditions.map((condition) => (
-                  <button
-                    key={condition}
-                    onClick={() => setCosmeticCondition(condition)}
-                    style={{
-                      background: cosmeticCondition === condition ? 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)' : 'white',
-                      color: cosmeticCondition === condition ? 'white' : '#374151',
-                      border: cosmeticCondition === condition ? 'none' : '2px solid #e5e7eb',
-                      borderRadius: '12px',
-                      padding: isMobile ? '10px 16px' : '12px 20px',
-                      fontSize: isMobile ? '14px' : '16px',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease',
-                      fontWeight: cosmeticCondition === condition ? '600' : '500',
-                      boxShadow: cosmeticCondition === condition ? '0 4px 12px rgba(59, 130, 246, 0.3)' : '0 2px 4px rgba(0, 0, 0, 0.05)'
-                    }}
-                  >
-                    {condition}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Pil Durumu */}
-            <div>
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                marginBottom: isMobile ? '8px' : '10px'
-              }}>
+              💻 Temel Bilgiler
+            </h2>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
+              gap: '16px'
+            }}>
+              <div>
                 <label style={{
-                  fontSize: isMobile ? '18px' : '20px',
-                  fontWeight: '600',
-                  color: '#475569'
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Marka *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.brand}
+                  onChange={(e) => handleInputChange('brand', e.target.value)}
+                  placeholder="Örn: Asus, Dell, HP"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                />
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Model *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.model}
+                  onChange={(e) => handleInputChange('model', e.target.value)}
+                  placeholder="Örn: ROG Strix, Inspiron"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Teknik Özellikler */}
+          <div style={{ marginBottom: '32px' }}>
+            <h2 style={{
+              fontSize: isMobile ? '18px' : '20px',
+              fontWeight: '600',
+              color: '#374151',
+              margin: '0 0 20px 0',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              ⚙️ Teknik Özellikler
+            </h2>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
+              gap: '16px'
+            }}>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  İşlemci
+                </label>
+                <input
+                  type="text"
+                  value={formData.processor}
+                  onChange={(e) => handleInputChange('processor', e.target.value)}
+                  placeholder="Örn: Intel i7-12700H"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                />
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Ekran Kartı
+                </label>
+                <input
+                  type="text"
+                  value={formData.graphicsCard}
+                  onChange={(e) => handleInputChange('graphicsCard', e.target.value)}
+                  placeholder="Örn: RTX 4060, GTX 1650"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                />
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  RAM
+                </label>
+                <input
+                  type="text"
+                  value={formData.ram}
+                  onChange={(e) => handleInputChange('ram', e.target.value)}
+                  placeholder="Örn: 16GB DDR4"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                />
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Depolama
+                </label>
+                <input
+                  type="text"
+                  value={formData.storage}
+                  onChange={(e) => handleInputChange('storage', e.target.value)}
+                  placeholder="Örn: 512GB SSD"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                />
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Ekran Boyutu
+                </label>
+                <input
+                  type="text"
+                  value={formData.screenSize}
+                  onChange={(e) => handleInputChange('screenSize', e.target.value)}
+                  placeholder={'Örn: 15.6", 17.3"'}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                />
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Yenileme Hızı
+                </label>
+                <input
+                  type="text"
+                  value={formData.refreshRate}
+                  onChange={(e) => handleInputChange('refreshRate', e.target.value)}
+                  placeholder="Örn: 144Hz, 60Hz"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                />
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
                 }}>
                   Pil Durumu
                 </label>
-                <div
+                <input
+                  type="text"
+                  value={formData.batteryHealth}
+                  onChange={(e) => handleInputChange('batteryHealth', e.target.value)}
+                  placeholder="Örn: %85, %90"
                   style={{
-                    width: '20px',
-                    height: '20px',
-                    borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    position: 'relative',
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
                     fontSize: '14px',
-                    fontWeight: 'bold',
-                    color: 'white',
-                    boxShadow: '0 2px 4px rgba(59, 130, 246, 0.3)',
-                    transition: 'all 0.2s ease'
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
                   }}
-                  onMouseEnter={() => setShowTooltip(true)}
-                  onMouseLeave={() => setShowTooltip(false)}
-                >
-                  ?
-                  {showTooltip && (
-                    <div style={{
-                      position: 'absolute',
-                      top: '-10px',
-                      left: '30px',
-                      background: '#1f2937',
-                      color: 'white',
-                      padding: '16px 20px',
-                      borderRadius: '12px',
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      maxWidth: '350px',
-                      minWidth: '320px',
-                      zIndex: 1000,
-                      boxShadow: '0 8px 25px rgba(0, 0, 0, 0.3)',
-                      lineHeight: '1.5'
-                    }}>
-                      <div style={{ marginBottom: '12px', fontWeight: '600', fontSize: '15px' }}>
-                        Pil Durumu Nasıl Hesaplanır?
-                      </div>
-                      <div style={{ marginBottom: '8px', lineHeight: '1.4' }}>
-                        <strong>Windows:</strong> Aygıt Yöneticisi → Pil → Sağ tık → Özellikler → Durum
-                      </div>
-                      <div style={{ marginBottom: '8px', lineHeight: '1.4' }}>
-                        <strong>macOS:</strong> Sistem Ayarları → Pil → Pil Sağlığı
-                      </div>
-                      <div style={{ lineHeight: '1.4' }}>
-                        <strong>Linux:</strong> Terminal → upower -i /org/freedesktop/UPower/devices/battery_BAT0
-                      </div>
-                      <div style={{ 
-                        position: 'absolute', 
-                        top: '20px', 
-                        left: '-8px', 
-                        width: '0',
-                        height: '0',
-                        borderTop: '8px solid transparent',
-                        borderBottom: '8px solid transparent',
-                        borderRight: '8px solid #1f2937'
-                      }}></div>
-                    </div>
-                  )}
-                </div>
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                />
               </div>
-              <input
-                type="text"
-                placeholder="Örn: %80, %60, %40..."
-                value={batteryHealthValue}
-                onChange={(e) => setBatteryHealthValue(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: isMobile ? '14px 16px' : '16px 20px',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '10px',
-                  fontSize: isMobile ? '16px' : '18px',
-                  boxSizing: 'border-box',
-                  background: '#ffffff',
-                  transition: 'all 0.2s ease',
-                  outline: 'none'
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = '#6366f1';
-                  e.target.style.boxShadow = '0 0 0 3px rgba(99, 102, 241, 0.1)';
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = '#e2e8f0';
-                  e.target.style.boxShadow = 'none';
-                }}
-              />
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Açıklama
+                </label>
+                <textarea
+                  value={formData.description}
+                  onChange={(e) => handleInputChange('description', e.target.value)}
+                  placeholder="Ürün hakkında ek bilgiler, özellikler, kullanım durumu vb."
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s',
+                    minHeight: '80px',
+                    resize: 'vertical'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                />
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Kutu ve Fatura */}
-        <div style={{ marginTop: isMobile ? '20px' : '32px' }}>
-          <h3 style={{
-            fontSize: isMobile ? '18px' : '20px',
-            fontWeight: '600',
-            marginBottom: isMobile ? '12px' : '16px',
-            color: '#374151'
-          }}>
-            Kutu ve Fatura
-          </h3>
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: isMobile ? '12px' : '16px'
-          }}>
-            <div style={{
+          {/* Durum Bilgileri */}
+          <div style={{ marginBottom: '32px' }}>
+            <h2 style={{
+              fontSize: isMobile ? '18px' : '20px',
+              fontWeight: '600',
+              color: '#374151',
+              margin: '0 0 20px 0',
               display: 'flex',
-              gap: isMobile ? '24px' : '32px',
-              flexWrap: 'wrap',
-              alignItems: 'flex-start'
+              alignItems: 'center',
+              gap: '8px'
             }}>
-              <label style={{
+              📋 Durum Bilgileri
+            </h2>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
+              gap: '16px'
+            }}>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Kozmetik Durum *
+                </label>
+                <select
+                  required
+                  value={formData.cosmeticCondition}
+                  onChange={(e) => handleInputChange('cosmeticCondition', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                >
+                  <option value="Mükemmel">Mükemmel</option>
+                  <option value="İyi">İyi</option>
+                  <option value="Orta">Orta</option>
+                  <option value="Kötü">Kötü</option>
+                </select>
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Adet *
+                </label>
+                <input
+                  type="number"
+                  required
+                  min="1"
+                  value={formData.quantity}
+                  onChange={(e) => handleInputChange('quantity', parseInt(e.target.value))}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                />
+              </div>
+            </div>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
+              gap: '16px',
+              marginTop: '16px'
+            }}>
+              <div style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px',
-                fontSize: isMobile ? '16px' : '18px',
-                cursor: 'pointer'
+                gap: '8px'
               }}>
                 <input
                   type="checkbox"
-                  checked={hasBox}
-                  onChange={(e) => setHasBox(e.target.checked)}
-                  style={{ width: isMobile ? '18px' : '20px', height: isMobile ? '18px' : '20px' }}
+                  checked={formData.hasBox}
+                  onChange={(e) => handleInputChange('hasBox', e.target.checked)}
+                  style={{
+                    width: '16px',
+                    height: '16px'
+                  }}
                 />
-                Orijinal kutusu var
-              </label>
+                <label style={{
+                  fontSize: '14px',
+                  color: '#374151'
+                }}>
+                  Kutusu var
+                </label>
+              </div>
               <div style={{
                 display: 'flex',
-                alignItems: 'flex-start',
-                gap: isMobile ? '16px' : '20px'
+                alignItems: 'center',
+                gap: '8px'
               }}>
+                <input
+                  type="checkbox"
+                  checked={formData.hasInvoice}
+                  onChange={(e) => handleInputChange('hasInvoice', e.target.checked)}
+                  style={{
+                    width: '16px',
+                    height: '16px'
+                  }}
+                />
                 <label style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  fontSize: isMobile ? '16px' : '18px',
-                  cursor: 'pointer'
+                  fontSize: '14px',
+                  color: '#374151'
                 }}>
-                  <input
-                    type="checkbox"
-                    checked={hasInvoice}
-                    onChange={(e) => setHasInvoice(e.target.checked)}
-                    style={{ width: isMobile ? '18px' : '20px', height: isMobile ? '18px' : '20px' }}
-                  />
                   Faturası var
                 </label>
-                {hasInvoice && (
-                  <div style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: isMobile ? '8px' : '12px',
-                    marginLeft: isMobile ? '20px' : '40px'
-                  }}>
-                    <label style={{
-                      fontSize: isMobile ? '16px' : '18px',
-                      fontWeight: '500',
-                      color: '#374151',
-                      whiteSpace: 'nowrap'
-                    }}>
-                      Fatura Tarihi
-                    </label>
-                    <input
-                      type="date"
-                      value={invoiceDate}
-                      onChange={(e) => setInvoiceDate(e.target.value)}
-                      style={{
-                        padding: isMobile ? '10px 12px' : '12px 16px',
-                        border: '1px solid #e2e8f0',
-                        borderRadius: '8px',
-                        fontSize: isMobile ? '16px' : '18px',
-                        minWidth: isMobile ? '120px' : '140px',
-                        background: '#ffffff',
-                        transition: 'all 0.2s ease',
-                        outline: 'none'
-                      }}
-                    />
-                  </div>
-                )}
               </div>
             </div>
+            {formData.hasInvoice && (
+              <div style={{ marginTop: '16px' }}>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Fatura Tarihi
+                </label>
+                <input
+                  type="date"
+                  value={formData.invoiceDate}
+                  onChange={(e) => handleInputChange('invoiceDate', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                />
+              </div>
+            )}
           </div>
-        </div>
 
-        {/* Resim Yükleme */}
-        <div style={{ marginTop: isMobile ? '20px' : '32px' }}>
-          <h3 style={{
-            fontSize: isMobile ? '18px' : '20px',
-            fontWeight: '600',
-            marginBottom: isMobile ? '12px' : '16px',
-            color: '#374151'
-          }}>
-            Ürün Fotoğrafları (Maksimum 10 adet)
-          </h3>
-          {/* 10 tane resim kutucuğu */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: isMobile ? 'repeat(5, 1fr)' : 'repeat(10, 1fr)',
-            gap: isMobile ? '8px' : '12px',
-            marginTop: '16px'
-          }}>
-            {Array.from({ length: 10 }, (_, index) => (
-              <div key={index} style={{
-                position: 'relative',
-                border: '2px dashed #d1d5db',
+          {/* Fotoğraflar */}
+          <div style={{ marginBottom: '32px' }}>
+            <h2 style={{
+              fontSize: isMobile ? '18px' : '20px',
+              fontWeight: '600',
+              color: '#374151',
+              margin: '0 0 20px 0',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              📸 Fotoğraflar
+            </h2>
+            <input
+              type="file"
+              multiple
+              accept="image/*"
+              onChange={handleImageUpload}
+              style={{
+                width: '100%',
+                padding: '12px',
+                border: '1px solid #d1d5db',
                 borderRadius: '8px',
-                overflow: 'hidden',
-                aspectRatio: '1',
-                backgroundColor: '#f9fafb',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                transition: 'all 0.2s'
+                fontSize: '14px',
+                outline: 'none',
+                transition: 'border-color 0.2s'
               }}
-              onClick={() => {
-                if (!images[index]) {
-                  const input = document.createElement('input');
-                  input.type = 'file';
-                  input.accept = 'image/*';
-                  input.onchange = (e) => {
-                    const file = (e.target as HTMLInputElement).files?.[0];
-                    if (file) {
-                      const reader = new FileReader();
-                      reader.onload = (event) => {
-                        const newImages = [...images];
-                        newImages[index] = event.target?.result as string;
-                        setImages(newImages);
-                      };
-                      reader.readAsDataURL(file);
-                    }
-                  };
-                  input.click();
-                }
-              }}
-              >
-                {images[index] ? (
-                  <>
+            />
+            {formData.images.length > 0 && (
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))',
+                gap: '12px',
+                marginTop: '16px'
+              }}>
+                {formData.images.map((image, index) => (
+                  <div key={index} style={{
+                    position: 'relative',
+                    aspectRatio: '1',
+                    borderRadius: '8px',
+                    overflow: 'hidden',
+                    border: '1px solid #e5e7eb'
+                  }}>
                     <img
-                      src={images[index]}
-                      alt={`Resim ${index + 1}`}
+                      src={image}
+                      alt={`Fotoğraf ${index + 1}`}
                       style={{
                         width: '100%',
                         height: '100%',
-                        objectFit: 'cover',
-                        cursor: 'pointer'
-                      }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openPreview(images[index]!);
+                        objectFit: 'cover'
                       }}
                     />
                     <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        removeImage(index);
-                      }}
+                      type="button"
+                      onClick={() => removeImage(index)}
                       style={{
                         position: 'absolute',
                         top: '4px',
                         right: '4px',
-                        background: '#ef4444',
+                        background: 'rgba(0, 0, 0, 0.7)',
                         color: 'white',
                         border: 'none',
                         borderRadius: '50%',
-                        width: isMobile ? '20px' : '24px',
-                        height: isMobile ? '20px' : '24px',
-                        fontSize: isMobile ? '12px' : '14px',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        zIndex: 10
+                        width: '24px',
+                        height: '24px',
+                        fontSize: '12px',
+                        cursor: 'pointer'
                       }}
                     >
-                      ×
+                      ✕
                     </button>
-                  </>
-                ) : (
-                  <div style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#6b7280',
-                    fontSize: isMobile ? '12px' : '14px'
-                  }}>
-                    <div style={{ fontSize: isMobile ? '20px' : '24px', marginBottom: '4px' }}>+</div>
-                    <div>Resim {index + 1}</div>
                   </div>
-                )}
+                ))}
               </div>
-            ))}
+            )}
           </div>
-        </div>
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            style={{
+              width: '100%',
+              background: isSubmitting ? '#9ca3af' : 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '12px',
+              padding: '16px',
+              fontSize: '16px',
+              fontWeight: '600',
+              cursor: isSubmitting ? 'not-allowed' : 'pointer',
+              transition: 'all 0.2s',
+              boxShadow: '0 4px 12px rgba(37, 99, 235, 0.3)'
+            }}
+            onMouseEnter={(e) => {
+              if (!isSubmitting) {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 6px 20px rgba(37, 99, 235, 0.4)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isSubmitting) {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(37, 99, 235, 0.3)';
+              }
+            }}
+          >
+            {isSubmitting ? 'Gönderiliyor...' : 'TEKLİF AL'}
+          </button>
+        </form>
       </div>
 
-      {/* Resim Preview Modal */}
-      {previewImage && (
+      {/* Success Modal */}
+      {showSuccessModal && (
         <div style={{
           position: 'fixed',
           top: 0,
@@ -1247,20 +778,68 @@ export default function BuyNotebookPage() {
           justifyContent: 'center',
           zIndex: 1000,
           padding: '20px'
-        }}
-        onClick={() => setPreviewImage(null)}
-        >
-          <img
-            src={previewImage}
-            alt="Preview"
-            style={{
-              maxWidth: '90%',
-              maxHeight: '90%',
-              objectFit: 'contain',
-              borderRadius: '8px'
-            }}
-            onClick={(e) => e.stopPropagation()}
-          />
+        }}>
+          <div style={{
+            background: 'white',
+            borderRadius: '16px',
+            padding: '32px',
+            textAlign: 'center',
+            maxWidth: '400px',
+            width: '100%'
+          }}>
+            <div style={{
+              background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
+              width: '64px',
+              height: '64px',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '32px',
+              color: 'white',
+              margin: '0 auto 16px'
+            }}>
+              ✅
+            </div>
+            <h3 style={{
+              fontSize: '20px',
+              fontWeight: '600',
+              color: '#1f2937',
+              margin: '0 0 8px 0'
+            }}>
+              Başarıyla Gönderildi!
+            </h3>
+            <p style={{
+              fontSize: '14px',
+              color: '#6b7280',
+              margin: '0 0 24px 0',
+              lineHeight: '1.5'
+            }}>
+              Dizüstü bilgisayarınız için teklif talebiniz alındı. En kısa sürede size ulaşacağız.
+            </p>
+            <button
+              onClick={() => setShowSuccessModal(false)}
+              style={{
+                background: 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                padding: '12px 24px',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'all 0.2s'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-1px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
+            >
+              Tamam
+            </button>
+          </div>
         </div>
       )}
     </div>

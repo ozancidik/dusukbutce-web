@@ -9,12 +9,16 @@
 - [x] Referrer-Policy: strict-origin-when-cross-origin
 - [x] Permissions-Policy: camera=(), microphone=(), geolocation=()
 - [x] Content-Security-Policy: default-src 'self'
+- [x] Strict-Transport-Security: max-age=31536000
+- [x] Cache-Control: no-store, no-cache, must-revalidate
 
 ### 2. **Input Validation & Sanitization** ✅
 - [x] XSS koruması (sanitizeInput)
 - [x] SQL Injection koruması (checkSQLInjection)
 - [x] Input validation (validateInput)
 - [x] Register API'de güvenlik entegrasyonu
+- [x] Gelişmiş URL parametre kontrolü
+- [x] Request body validation
 
 ### 3. **Rate Limiting & Bot Protection** ✅
 - [x] Bot detection (User-Agent kontrolü)
@@ -49,15 +53,28 @@
 - [x] Erişim engellendi sayfası
 - [x] IP adresi öğrenme sayfası (/what-is-my-ip)
 
+### 8. **Authentication & Authorization** ✅
+- [x] JWT Token doğrulama
+- [x] CSRF Token oluşturma ve doğrulama
+- [x] Şifre güvenliği kontrolü (validatePasswordStrength)
+- [x] Güvenli şifre hash'leme (PBKDF2)
+- [x] Session token yönetimi
+- [x] Korumalı endpoint'ler için auth kontrolü
+
+### 9. **File Upload Security** ✅
+- [x] Dosya türü kontrolü
+- [x] Dosya boyutu sınırlaması (5MB)
+- [x] Güvenli dosya upload validation
+
 ## 🔄 Devam Eden Güvenlik Önlemleri
 
-### 8. **Monitoring & Alerting (Sentry)** 🔄
+### 10. **Monitoring & Alerting (Sentry)** 🔄
 - [x] Sentry kurulumu
 - [ ] Sentry hesap oluşturma (kullanıcı tarafından)
 - [ ] Sentry yapılandırması
 - [ ] Hata takibi aktif
 
-### 9. **Captcha Sistemi** ⏳
+### 11. **Captcha Sistemi** ⏳
 - [ ] Google reCAPTCHA kurulumu
 - [ ] Login formuna captcha
 - [ ] Register formuna captcha
@@ -65,34 +82,28 @@
 
 ## 📋 Yapılacak Güvenlik Önlemleri
 
-### 10. **Two-Factor Authentication (2FA)** ⏳
+### 12. **Two-Factor Authentication (2FA)** ⏳
 - [ ] TOTP (Time-based One-Time Password)
 - [ ] SMS/Email 2FA
 - [ ] Backup codes
 
-### 11. **Session Management** ⏳
+### 13. **Session Management** ⏳
 - [ ] Session timeout
 - [ ] Concurrent session limit
 - [ ] Session hijacking koruması
 
-### 12. **File Upload Security** ⏳
-- [ ] File type validation
-- [ ] File size limits
-- [ ] Virus scanning
-- [ ] Secure file storage
-
-### 13. **Database Security** ⏳
+### 14. **Database Security** ⏳
 - [ ] MongoDB Atlas güvenlik ayarları
 - [ ] Database backup encryption
 - [ ] Connection string güvenliği
 
-### 14. **API Security** ⏳
+### 15. **API Security** ⏳
 - [ ] API rate limiting
 - [ ] API authentication
 - [ ] API versioning
 - [ ] Request/Response validation
 
-### 15. **Logging & Monitoring** ⏳
+### 16. **Logging & Monitoring** ⏳
 - [ ] Security event logging
 - [ ] Failed login attempts
 - [ ] Suspicious activity detection
@@ -106,15 +117,25 @@
 - **IP Ekleme:** `ALLOWED_IPS` listesine IP adresinizi ekleyin
 - **IP Öğrenme:** `/what-is-my-ip` sayfasını ziyaret edin
 
+### Yeni Güvenlik Özellikleri
+- **JWT Token Doğrulama:** Korumalı endpoint'ler için otomatik token kontrolü
+- **CSRF Koruması:** Form güvenliği için CSRF token sistemi
+- **Şifre Güvenliği:** Güçlü şifre zorunluluğu ve güvenli hash'leme
+- **Dosya Upload Güvenliği:** Güvenli dosya yükleme kontrolü
+
 ### Güvenlik Testleri
 - [ ] Admin panel erişim testi (izin verilen IP)
 - [ ] Admin panel erişim testi (izin verilmeyen IP)
 - [ ] WAF kuralları testi
 - [ ] Rate limiting testi
+- [ ] JWT token doğrulama testi
+- [ ] CSRF token testi
+- [ ] Şifre güvenliği testi
+- [ ] Dosya upload güvenliği testi
 
 ## 📞 Acil Durum İletişimi
 - **Güvenlik Sorunları:** [E-posta adresiniz]
 - **Teknik Destek:** [E-posta adresiniz]
 
 ---
-*Son güncelleme: Admin Panel IP Kısıtlaması eklendi* 
+*Son güncelleme: JWT Token, CSRF Koruması, Şifre Güvenliği ve Dosya Upload Güvenliği eklendi* 

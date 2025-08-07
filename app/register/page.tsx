@@ -133,8 +133,8 @@ export default function RegisterPage() {
     
     try {
       const res = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: form.firstName.trim() + ' ' + form.lastName.trim(),
           email: form.email.trim().toLowerCase(),
@@ -143,7 +143,7 @@ export default function RegisterPage() {
         }),
       });
       
-      const data = await res.json();
+    const data = await res.json();
       
       if (data.success) {
         setSuccess('Kayıt başarılı! Giriş yapabilirsiniz.');
@@ -461,8 +461,8 @@ export default function RegisterPage() {
             }}
           >
             Giriş Yap
-          </Link>
-        </div>
+        </Link>
+      </div>
       </div>
     </div>
   );

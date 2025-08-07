@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "./components/Header";
-import StructuredData from "./components/StructuredData";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -85,9 +84,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="tr">
-      <head>
-        <StructuredData />
+    <html lang="tr" suppressHydrationWarning>
+      <head suppressHydrationWarning>
         {/* PWA Meta Tags */}
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#2563eb" />
@@ -101,8 +99,10 @@ export default function RootLayout({
         <script
           async
           src="https://www.googletagmanager.com/gtag/js?id=G-NME1DVTX1C"
+          suppressHydrationWarning
         />
         <script
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html: `
               window.dataLayer = window.dataLayer || [];
@@ -114,6 +114,7 @@ export default function RootLayout({
         />
         {/* Service Worker Registration */}
         <script
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html: `
               if ('serviceWorker' in navigator) {
@@ -133,6 +134,7 @@ export default function RootLayout({
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        suppressHydrationWarning
       >
         <Header />
         {children}

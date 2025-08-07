@@ -1,6 +1,12 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { securityHeaders } from './lib/security';
+import { 
+  securityHeaders, 
+  checkSQLInjection, 
+  sanitizeInput,
+  verifyJWTToken,
+  validateCSRFToken
+} from './lib/security';
 
 // İzin verilen IP adresleri (admin panel için)
 const ALLOWED_IPS = [
@@ -9,6 +15,8 @@ const ALLOWED_IPS = [
   '212.154.23.66',    // Kullanıcının IP adresi
   '162.158.14.228',   // Cloudflare IP
   '164.92.73.53',     // Gerçek istemci IP (logdan tespit)
+  '172.68.213.148',   // Vercel log'dan tespit edilen IP
+  '172.68.213.166',   // Vercel log'dan tespit edilen IP
   // Buraya kendi IP adresinizi ekleyin
   // Örnek: '192.168.1.100',
   // Örnek: '203.0.113.0/24', // IP aralığı
@@ -42,13 +50,49 @@ function ipToLong(ip: string): number {
   return ip.split('.').reduce((acc, octet) => (acc << 8) + parseInt(octet), 0) >>> 0;
 }
 
+// Gelişmiş Input Validation
+function validateRequestInput(request: NextRequest): boolean {
+  const url = request.url;
+  const searchParams = request.nextUrl.searchParams;
+  
+  // URL parametrelerini kontrol et
+  for (const [key, value] of searchParams.entries()) {
+    if (checkSQLInjection(value) || checkSQLInjection(key)) {
+      console.log(`🚫 SQL Injection tespit edildi - Param: ${key}, Value: ${value}`);
+      return false;
+    }
+  }
+  
+  // URL path'ini kontrol et
+  if (checkSQLInjection(url)) {
+    console.log(`🚫 SQL Injection tespit edildi - URL: ${url}`);
+    return false;
+  }
+  
+  return true;
+}
+
+// JWT Token Doğrulama
+function validateAuthToken(request: NextRequest): boolean {
+  const authHeader = request.headers.get('authorization');
+  if (!authHeader) return true; // Auth gerektirmeyen endpoint'ler için
+  
+  const token = authHeader.replace('Bearer ', '');
+  return verifyJWTToken(token);
+}
+
 export function middleware(request: NextRequest) {
   const response = NextResponse.next();
   const pathname = request.nextUrl.pathname;
 
-  // API endpoint'lerini EN ERKEN muaf tut
-  if (pathname.startsWith('/api/')) {
-    console.log(`🔓 API endpoint EN ERKEN muaf tutuldu - Path: ${pathname}`);
+  // API endpoint'lerini ve OAuth callback'leri EN ERKEN muaf tut
+  if (pathname.startsWith('/api/') || 
+      pathname.includes('/callback') || 
+      pathname.includes('/auth') ||
+      pathname.includes('google') ||
+      pathname.includes('facebook') ||
+      pathname.includes('oauth')) {
+    console.log(`🔓 API/OAuth endpoint muaf tutuldu - Path: ${pathname}`);
     return response;
   }
 
@@ -57,12 +101,38 @@ export function middleware(request: NextRequest) {
     response.headers.set(key, value);
   });
 
+  // Gelişmiş Input Validation
+  if (!validateRequestInput(request)) {
+    return NextResponse.json(
+      { error: 'Geçersiz istek tespit edildi' },
+      { status: 400 }
+    );
+  }
+
   // Rate limiting için basit kontrol
-  const ip = (request.headers.get('x-forwarded-for') || '').split(',')[0].trim() || 'unknown';
+  const forwardedFor = request.headers.get('x-forwarded-for') || '';
+  const realIP = request.headers.get('x-real-ip') || '';
+  const connectionIP = request.headers.get('x-connection-ip') || '';
+  
+  // IP adresini belirle (localhost için özel kontrol)
+  let ip = 'unknown';
+  if (forwardedFor) {
+    ip = forwardedFor.split(',')[0].trim();
+  } else if (realIP) {
+    ip = realIP;
+  } else if (connectionIP) {
+    ip = connectionIP;
+  }
+  
+  // Localhost kontrolü
+  if (ip === 'unknown' || ip === '127.0.0.1' || ip === '::1' || ip === 'localhost') {
+    ip = '127.0.0.1';
+  }
+  
   const userAgent = request.headers.get('user-agent') || '';
   
   // DEBUG: IP adresini ve diğer bilgileri logla
-  console.log('DEBUG IP:', ip, 'User-Agent:', userAgent, 'Path:', pathname, new Date().toISOString());
+  console.log('DEBUG IP:', ip, 'Forwarded-For:', forwardedFor, 'Real-IP:', realIP, 'Path:', pathname, new Date().toISOString());
   
   // Bot koruması
   if (userAgent.includes('bot') || userAgent.includes('crawler')) {
@@ -72,18 +142,18 @@ export function middleware(request: NextRequest) {
     );
   }
 
-  // SQL Injection kontrolü
-  const url = request.url;
-  if (url.includes('SELECT') || url.includes('INSERT') || url.includes('DROP')) {
-    return NextResponse.json(
-      { error: 'Geçersiz istek' },
-      { status: 400 }
-    );
+  // JWT Token Doğrulama (sadece korumalı endpoint'ler için)
+  if (pathname.startsWith('/admin') || pathname.startsWith('/profile') || pathname.startsWith('/orders')) {
+    if (!validateAuthToken(request)) {
+      console.log(`🚫 Geçersiz JWT token - Path: ${pathname}`);
+      return NextResponse.json(
+        { error: 'Geçersiz oturum' },
+        { status: 401 }
+      );
+    }
   }
 
   // Admin panel IP kısıtlaması (sadece sayfa route'ları için, API değil)
-  
-  // Sadece admin sayfaları için IP kontrolü
   if (pathname.startsWith('/admin') || pathname.startsWith('/admin-users')) {
     if (!isIPAllowed(ip)) {
       console.log(`🚫 Admin panel erişim engellendi - IP: ${ip}, Path: ${pathname}`);
