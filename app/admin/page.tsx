@@ -197,6 +197,35 @@ export default function AdminPage() {
     }
   };
 
+  const handleDeleteSubmission = async (submissionId: string) => {
+    if (!confirm('Bu ilanı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz!')) {
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/admin/submissions', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ action: 'deleteOne', submissionId }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        showToastMessage(data.message, 'success');
+        // UI'dan da temizle
+        setSubmissions(prev => prev.filter(sub => sub._id !== submissionId));
+      } else {
+        showToastMessage(data.message || 'İlan silinirken bir hata oluştu', 'error');
+      }
+    } catch (error) {
+      console.error('Error deleting submission:', error);
+      showToastMessage('Bağlantı hatası oluştu', 'error');
+    }
+  };
+
   if (!isAuthenticated) {
     return null;
   }
@@ -1031,6 +1060,34 @@ export default function AdminPage() {
                   }}
                 >
                   ❌ {submission.status === 'rejected' ? 'Reddedildi' : 'Reddet'}
+                </button>
+                <button
+                  onClick={() => handleDeleteSubmission(submission._id)}
+                  style={{
+                    background: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '12px',
+                    padding: isMobile ? '12px 16px' : '14px 20px',
+                    fontSize: isMobile ? '13px' : '14px',
+                    cursor: 'pointer',
+                    fontWeight: '600',
+                    transition: 'all 0.2s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    boxShadow: '0 4px 12px rgba(220, 38, 38, 0.3)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(220, 38, 38, 0.4)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.3)';
+                  }}
+                >
+                  🗑️ Sil
                 </button>
               </div>
             </div>

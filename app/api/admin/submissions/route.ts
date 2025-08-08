@@ -102,7 +102,7 @@ export async function GET(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const { action } = await request.json();
+    const { action, submissionId } = await request.json();
 
     if (!MONGODB_URI) {
       return NextResponse.json({ success: false, message: 'Database not configured' }, { status: 500 });
@@ -119,8 +119,21 @@ export async function DELETE(request: NextRequest) {
         message: `${result.deletedCount} ilan başarıyla silindi`,
         deletedCount: result.deletedCount
       });
+    } else if (action === 'deleteOne' && submissionId) {
+      // Tek ilanı sil
+      const result = await ProductSubmission.findByIdAndDelete(submissionId);
+      
+      if (!result) {
+        return NextResponse.json({ success: false, message: 'İlan bulunamadı' }, { status: 404 });
+      }
+      
+      return NextResponse.json({ 
+        success: true, 
+        message: 'İlan başarıyla silindi',
+        deletedSubmission: result
+      });
     } else {
-      return NextResponse.json({ success: false, message: 'Invalid action' }, { status: 400 });
+      return NextResponse.json({ success: false, message: 'Invalid action or missing submissionId' }, { status: 400 });
     }
 
   } catch (error) {
