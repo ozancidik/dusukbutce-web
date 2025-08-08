@@ -2,12 +2,9 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  const response = NextResponse.next();
-  const pathname = request.nextUrl.pathname;
-
-  // API endpoint'leri için sadece CORS headers ekle
-  if (pathname.startsWith('/api/')) {
-    console.log(`🔓 API endpoint - Path: ${pathname}`);
+  // Sadece API endpoint'leri için CORS headers ekle
+  if (request.nextUrl.pathname.startsWith('/api/')) {
+    const response = NextResponse.next();
     
     // CORS headers ekle
     response.headers.set('Access-Control-Allow-Origin', '*');
@@ -25,22 +22,11 @@ export function middleware(request: NextRequest) {
     return response;
   }
 
-  // Diğer sayfalar için güvenlik headers ekle
-  response.headers.set('X-Frame-Options', 'DENY');
-  response.headers.set('X-Content-Type-Options', 'nosniff');
-  response.headers.set('Referrer-Policy', 'origin-when-cross-origin');
-
-  return response;
+  return NextResponse.next();
 }
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
     '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
 }; 
