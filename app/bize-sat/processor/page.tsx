@@ -81,7 +81,7 @@ export default function ProcessorPage() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/notebook-submissions', {
+      const response = await fetch('/api/processor-submissions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

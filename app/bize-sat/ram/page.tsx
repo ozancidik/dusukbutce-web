@@ -79,7 +79,7 @@ export default function RAMPage() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/notebook-submissions', {
+      const response = await fetch('/api/ram-submissions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

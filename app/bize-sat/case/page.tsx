@@ -76,7 +76,7 @@ export default function CasePage() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/notebook-submissions', {
+      const response = await fetch('/api/case-submissions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

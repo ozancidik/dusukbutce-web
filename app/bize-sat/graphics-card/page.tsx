@@ -80,7 +80,7 @@ export default function GraphicsCardPage() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/notebook-submissions', {
+      const response = await fetch('/api/graphics-card-submissions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

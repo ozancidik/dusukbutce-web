@@ -77,7 +77,7 @@ export default function KeyboardPage() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/notebook-submissions', {
+      const response = await fetch('/api/keyboard-submissions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -76,7 +76,7 @@ export default function HeadphonesPage() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/notebook-submissions', {
+      const response = await fetch('/api/headphones-submissions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

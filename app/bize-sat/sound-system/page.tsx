@@ -77,7 +77,7 @@ export default function SoundSystemPage() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/notebook-submissions', {
+      const response = await fetch('/api/sound-system-submissions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
