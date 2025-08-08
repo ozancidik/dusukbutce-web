@@ -47,6 +47,9 @@ export default function AdminPage() {
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState<'success' | 'error'>('success');
   const [isDeletingAll, setIsDeletingAll] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteModalType, setDeleteModalType] = useState<'single' | 'all' | null>(null);
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -166,64 +169,78 @@ export default function AdminPage() {
     }
   };
 
-  const handleDeleteAllSubmissions = async () => {
-    if (!confirm('Tüm ilanları silmek istediğinizden emin misiniz? Bu işlem geri alınamaz!')) {
-      return;
-    }
-
-    setIsDeletingAll(true);
-    try {
-      const response = await fetch('/api/admin/submissions', {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ action: 'deleteAll' }),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        showToastMessage(data.message, 'success');
-        setSubmissions([]); // UI'dan da temizle
-      } else {
-        showToastMessage(data.message || 'İlanlar silinirken bir hata oluştu', 'error');
-      }
-    } catch (error) {
-      console.error('Error deleting all submissions:', error);
-      showToastMessage('Bağlantı hatası oluştu', 'error');
-    } finally {
-      setIsDeletingAll(false);
-    }
+  const handleDeleteAllSubmissions = () => {
+    setDeleteModalType('all');
+    setShowDeleteModal(true);
   };
 
-  const handleDeleteSubmission = async (submissionId: string) => {
-    if (!confirm('Bu ilanı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz!')) {
-      return;
-    }
+  const handleDeleteSubmission = (submissionId: string) => {
+    setDeleteModalType('single');
+    setDeleteTargetId(submissionId);
+    setShowDeleteModal(true);
+  };
 
-    try {
-      const response = await fetch('/api/admin/submissions', {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ action: 'deleteOne', submissionId }),
-      });
+  const confirmDelete = async () => {
+    if (deleteModalType === 'all') {
+      setIsDeletingAll(true);
+      try {
+        const response = await fetch('/api/admin/submissions', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ action: 'deleteAll' }),
+        });
 
-      const data = await response.json();
+        const data = await response.json();
 
-      if (data.success) {
-        showToastMessage(data.message, 'success');
-        // UI'dan da temizle
-        setSubmissions(prev => prev.filter(sub => sub._id !== submissionId));
-      } else {
-        showToastMessage(data.message || 'İlan silinirken bir hata oluştu', 'error');
+        if (data.success) {
+          showToastMessage(data.message, 'success');
+          setSubmissions([]); // UI'dan da temizle
+        } else {
+          showToastMessage(data.message || 'İlanlar silinirken bir hata oluştu', 'error');
+        }
+      } catch (error) {
+        console.error('Error deleting all submissions:', error);
+        showToastMessage('Bağlantı hatası oluştu', 'error');
+      } finally {
+        setIsDeletingAll(false);
       }
-    } catch (error) {
-      console.error('Error deleting submission:', error);
-      showToastMessage('Bağlantı hatası oluştu', 'error');
+    } else if (deleteModalType === 'single' && deleteTargetId) {
+      try {
+        const response = await fetch('/api/admin/submissions', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ action: 'deleteOne', submissionId: deleteTargetId }),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          showToastMessage(data.message, 'success');
+          // UI'dan da temizle
+          setSubmissions(prev => prev.filter(sub => sub._id !== deleteTargetId));
+        } else {
+          showToastMessage(data.message || 'İlan silinirken bir hata oluştu', 'error');
+        }
+      } catch (error) {
+        console.error('Error deleting submission:', error);
+        showToastMessage('Bağlantı hatası oluştu', 'error');
+      }
     }
+
+    // Modal'ı kapat
+    setShowDeleteModal(false);
+    setDeleteModalType(null);
+    setDeleteTargetId(null);
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
+    setDeleteModalType(null);
+    setDeleteTargetId(null);
   };
 
   if (!isAuthenticated) {
@@ -1218,6 +1235,212 @@ export default function AdminPage() {
               }}
               isMobile={isMobile}
             />
+          </div>
+        </div>
+      )}
+
+      {/* Silme Onay Modalı */}
+      {showDeleteModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          padding: '20px'
+        }}>
+          <div style={{
+            background: 'white',
+            borderRadius: '16px',
+            padding: isMobile ? '24px' : '32px',
+            width: '100%',
+            maxWidth: isMobile ? '100%' : '450px',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+            border: '1px solid #e5e7eb'
+          }}>
+            {/* İkon ve Başlık */}
+            <div style={{
+              textAlign: 'center',
+              marginBottom: '24px'
+            }}>
+              <div style={{
+                width: '64px',
+                height: '64px',
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 16px auto',
+                border: '2px solid #fecaca'
+              }}>
+                <span style={{
+                  fontSize: '32px',
+                  color: '#dc2626'
+                }}>
+                  ⚠️
+                </span>
+              </div>
+              <h2 style={{
+                fontSize: isMobile ? '20px' : '24px',
+                fontWeight: '700',
+                color: '#1f2937',
+                margin: '0 0 8px 0'
+              }}>
+                {deleteModalType === 'all' ? 'Tüm İlanları Sil' : 'İlanı Sil'}
+              </h2>
+              <p style={{
+                fontSize: isMobile ? '14px' : '16px',
+                color: '#6b7280',
+                margin: 0,
+                lineHeight: '1.5'
+              }}>
+                {deleteModalType === 'all' 
+                  ? `Tüm ilanları (${submissions.length} adet) kalıcı olarak silmek istediğinizden emin misiniz?`
+                  : 'Bu ilanı kalıcı olarak silmek istediğinizden emin misiniz?'
+                }
+              </p>
+            </div>
+
+            {/* Uyarı Mesajı */}
+            <div style={{
+              background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)',
+              border: '1px solid #fecaca',
+              borderRadius: '12px',
+              padding: '16px',
+              marginBottom: '24px'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '12px'
+              }}>
+                <span style={{
+                  fontSize: '20px',
+                  color: '#dc2626',
+                  marginTop: '2px'
+                }}>
+                  ⚠️
+                </span>
+                <div>
+                  <p style={{
+                    fontSize: isMobile ? '13px' : '14px',
+                    color: '#991b1b',
+                    margin: '0 0 4px 0',
+                    fontWeight: '600'
+                  }}>
+                    Bu işlem geri alınamaz!
+                  </p>
+                  <p style={{
+                    fontSize: isMobile ? '12px' : '13px',
+                    color: '#7f1d1d',
+                    margin: 0,
+                    lineHeight: '1.4'
+                  }}>
+                    {deleteModalType === 'all' 
+                      ? 'Tüm ilanlar ve ilgili veriler kalıcı olarak silinecektir.'
+                      : 'Bu ilan ve ilgili veriler kalıcı olarak silinecektir.'
+                    }
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Butonlar */}
+            <div style={{
+              display: 'flex',
+              gap: '12px',
+              justifyContent: 'center'
+            }}>
+              <button
+                onClick={cancelDelete}
+                disabled={isDeletingAll}
+                style={{
+                  background: 'white',
+                  color: '#374151',
+                  border: '2px solid #d1d5db',
+                  borderRadius: '12px',
+                  padding: isMobile ? '12px 20px' : '14px 24px',
+                  fontSize: isMobile ? '14px' : '16px',
+                  fontWeight: '600',
+                  cursor: isDeletingAll ? 'not-allowed' : 'pointer',
+                  transition: 'all 0.2s',
+                  opacity: isDeletingAll ? 0.6 : 1,
+                  minWidth: '120px'
+                }}
+                onMouseEnter={(e) => {
+                  if (!isDeletingAll) {
+                    e.currentTarget.style.borderColor = '#9ca3af';
+                    e.currentTarget.style.background = '#f9fafb';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isDeletingAll) {
+                    e.currentTarget.style.borderColor = '#d1d5db';
+                    e.currentTarget.style.background = 'white';
+                  }
+                }}
+              >
+                İptal
+              </button>
+              <button
+                onClick={confirmDelete}
+                disabled={isDeletingAll}
+                style={{
+                  background: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '12px',
+                  padding: isMobile ? '12px 20px' : '14px 24px',
+                  fontSize: isMobile ? '14px' : '16px',
+                  fontWeight: '600',
+                  cursor: isDeletingAll ? 'not-allowed' : 'pointer',
+                  transition: 'all 0.2s',
+                  opacity: isDeletingAll ? 0.7 : 1,
+                  minWidth: '120px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px'
+                }}
+                onMouseEnter={(e) => {
+                  if (!isDeletingAll) {
+                    e.currentTarget.style.transform = 'translateY(-1px)';
+                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(220, 38, 38, 0.4)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isDeletingAll) {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.3)';
+                  }
+                }}
+              >
+                {isDeletingAll ? (
+                  <>
+                    <div style={{
+                      width: '16px',
+                      height: '16px',
+                      border: '2px solid rgba(255,255,255,0.3)',
+                      borderTop: '2px solid white',
+                      borderRadius: '50%',
+                      animation: 'spin 1s linear infinite'
+                    }}></div>
+                    Siliniyor...
+                  </>
+                ) : (
+                  <>
+                    🗑️
+                    {deleteModalType === 'all' ? 'Tümünü Sil' : 'Sil'}
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}
