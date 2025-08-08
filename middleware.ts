@@ -93,6 +93,20 @@ export function middleware(request: NextRequest) {
       pathname.includes('facebook') ||
       pathname.includes('oauth')) {
     console.log(`🔓 API/OAuth endpoint muaf tutuldu - Path: ${pathname}`);
+    
+    // CORS headers ekle
+    response.headers.set('Access-Control-Allow-Origin', '*');
+    response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    
+    // OPTIONS request için erken dön
+    if (request.method === 'OPTIONS') {
+      return new NextResponse(null, { 
+        status: 200,
+        headers: response.headers
+      });
+    }
+    
     return response;
   }
 
