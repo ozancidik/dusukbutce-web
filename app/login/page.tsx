@@ -50,126 +50,14 @@ export default function LoginPage() {
     }
   };
 
-  // Google ile giriş
+  // Google ile giriş (geçici olarak devre dışı)
   const handleGoogleLogin = async () => {
-    setSocialLoading("google");
-    setError("");
-    
-    try {
-      // Google OAuth popup açma
-      const width = 500;
-      const height = 600;
-      const left = window.screenX + (window.outerWidth - width) / 2;
-      const top = window.screenY + (window.outerHeight - height) / 2;
-      
-      const popup = window.open(
-        '/api/auth/google',
-        'google-login',
-        `width=${width},height=${height},left=${left},top=${top}`
-      );
-
-      // Popup mesajlarını dinle
-      const handleMessage = (event: MessageEvent) => {
-        if (event.origin !== window.location.origin) return;
-        
-        if (event.data.type === 'GOOGLE_LOGIN_SUCCESS') {
-          const userData = event.data.user;
-          const loginTime = Date.now();
-          localStorage.setItem("userLoggedIn", "true");
-          localStorage.setItem("userEmail", userData.email);
-          localStorage.setItem("userName", userData.name);
-          localStorage.setItem("userId", userData.id);
-          localStorage.setItem("loginTime", loginTime.toString());
-          
-          if (userData.isAdmin) {
-            localStorage.setItem("adminLoggedIn", "true");
-            localStorage.setItem("adminEmail", userData.email);
-          }
-          
-          popup?.close();
-          window.removeEventListener('message', handleMessage);
-          router.push("/");
-        } else if (event.data.type === 'GOOGLE_LOGIN_ERROR') {
-          setError(event.data.error || "Google ile giriş yapılırken bir hata oluştu.");
-          popup?.close();
-          window.removeEventListener('message', handleMessage);
-        }
-      };
-
-      window.addEventListener('message', handleMessage);
-      
-      // Popup kapandığında loading'i durdur
-      const checkClosed = setInterval(() => {
-        if (popup?.closed) {
-          clearInterval(checkClosed);
-          setSocialLoading("");
-        }
-      }, 1000);
-      
-    } catch (err) {
-      setError("Google ile giriş yapılırken bir hata oluştu.");
-      setSocialLoading("");
-    }
+    setError("Google OAuth henüz yapılandırılmadı. Lütfen email/şifre ile giriş yapın.");
   };
 
-  // Facebook ile giriş
+  // Facebook ile giriş (geçici olarak devre dışı)
   const handleFacebookLogin = async () => {
-    setSocialLoading("facebook");
-    setError("");
-    
-    try {
-      // Facebook OAuth popup açma
-      const width = 500;
-      const height = 600;
-      const left = window.screenX + (window.outerWidth - width) / 2;
-      const top = window.screenY + (window.outerHeight - height) / 2;
-      
-      const popup = window.open(
-        '/api/auth/facebook',
-        'facebook-login',
-        `width=${width},height=${height},left=${left},top=${top}`
-      );
-
-      // Popup mesajlarını dinle
-      const handleMessage = (event: MessageEvent) => {
-        if (event.origin !== window.location.origin) return;
-        
-        if (event.data.type === 'FACEBOOK_LOGIN_SUCCESS') {
-          const userData = event.data.user;
-          localStorage.setItem("userLoggedIn", "true");
-          localStorage.setItem("userEmail", userData.email);
-          localStorage.setItem("userName", userData.name);
-          localStorage.setItem("userId", userData.id);
-          
-          if (userData.isAdmin) {
-            localStorage.setItem("adminLoggedIn", "true");
-            localStorage.setItem("adminEmail", userData.email);
-          }
-          
-          popup?.close();
-          window.removeEventListener('message', handleMessage);
-          router.push("/");
-        } else if (event.data.type === 'FACEBOOK_LOGIN_ERROR') {
-          setError(event.data.error || "Facebook ile giriş yapılırken bir hata oluştu.");
-          popup?.close();
-          window.removeEventListener('message', handleMessage);
-        }
-      };
-
-      window.addEventListener('message', handleMessage);
-      
-      // Popup kapandığında loading'i durdur
-      const checkClosed = setInterval(() => {
-        if (popup?.closed) {
-          clearInterval(checkClosed);
-          setSocialLoading("");
-        }
-      }, 1000);
-      
-    } catch (err) {
-      setError("Facebook ile giriş yapılırken bir hata oluştu.");
-      setSocialLoading("");
-    }
+    setError("Facebook OAuth henüz yapılandırılmadı. Lütfen email/şifre ile giriş yapın.");
   };
 
   return (
