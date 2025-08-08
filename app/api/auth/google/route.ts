@@ -1,5 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
-
+import { NextResponse } from "next/server";
 export async function GET(request: NextRequest) {
   // Google OAuth URL'ini oluştur
   const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +

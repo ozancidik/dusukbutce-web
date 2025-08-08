@@ -1,5 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
-import connectDB from '@/lib/mongodb';
+import { NextResponse } from "next/server";
 import ProductSubmission from '@/models/ProductSubmission';
 
 const MONGODB_URI = process.env.MONGODB_URI;

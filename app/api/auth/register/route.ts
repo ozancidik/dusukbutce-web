@@ -1,5 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
-import connectDB from '@/lib/mongodb';
+import { NextResponse } from "next/server";
 import User from '@/models/User';
 import bcrypt from 'bcryptjs';
 import { sanitizeInput, checkSQLInjection } from '@/lib/security';

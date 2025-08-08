@@ -1,5 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
-import connectDB from '@/lib/mongodb';
+import { NextResponse } from "next/server";
 import ProductSubmission from '@/models/ProductSubmission';
 
 export async function GET() {

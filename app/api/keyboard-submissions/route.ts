@@ -1,6 +1,4 @@
-"use server";
 import { NextResponse } from "next/server";
-import connectDB from "@/lib/mongodb";
 import ProductSubmission from "@/models/ProductSubmission";
 
 export async function POST(request: Request) {
