@@ -107,6 +107,7 @@ export function middleware(request: NextRequest) {
       });
     }
     
+    // API endpoint'leri için sadece CORS headers ile dön
     return response;
   }
 
