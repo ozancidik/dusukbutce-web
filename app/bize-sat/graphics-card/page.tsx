@@ -635,68 +635,145 @@ export default function GraphicsCardPage() {
             }}>
               📸 Fotoğraflar
             </h2>
+            
+            {/* Fotoğraf Grid */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(5, 1fr)',
+              gap: '12px',
+              marginBottom: '16px'
+            }}>
+              {/* Mevcut fotoğraflar */}
+              {formData.images.map((image, index) => (
+                <div key={index} style={{
+                  position: 'relative',
+                  aspectRatio: '1',
+                  borderRadius: '8px',
+                  overflow: 'hidden',
+                  border: '1px solid #e5e7eb',
+                  background: '#f9fafb'
+                }}>
+                  <img
+                    src={image}
+                    alt={`Fotoğraf ${index + 1}`}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover'
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeImage(index)}
+                    style={{
+                      position: 'absolute',
+                      top: '4px',
+                      right: '4px',
+                      background: 'rgba(220, 38, 38, 0.9)',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '50%',
+                      width: '24px',
+                      height: '24px',
+                      fontSize: '12px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'rgba(220, 38, 38, 1)';
+                      e.currentTarget.style.transform = 'scale(1.1)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'rgba(220, 38, 38, 0.9)';
+                      e.currentTarget.style.transform = 'scale(1)';
+                    }}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+              
+              {/* Boş fotoğraf alanları */}
+              {Array.from({ length: Math.max(0, 10 - formData.images.length) }).map((_, index) => (
+                <div key={`empty-${index}`} style={{
+                  aspectRatio: '1',
+                  borderRadius: '8px',
+                  border: '2px dashed #d1d5db',
+                  background: '#f9fafb',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  position: 'relative'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = '#3b82f6';
+                  e.currentTarget.style.background = '#eff6ff';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = '#d1d5db';
+                  e.currentTarget.style.background = '#f9fafb';
+                }}
+                onClick={() => {
+                  const fileInput = document.createElement('input');
+                  fileInput.type = 'file';
+                  fileInput.accept = 'image/*';
+                  fileInput.multiple = true;
+                  fileInput.onchange = (e) => {
+                    const target = e.target as HTMLInputElement;
+                    if (target.files) {
+                      handleImageUpload({ target } as React.ChangeEvent<HTMLInputElement>);
+                    }
+                  };
+                  fileInput.click();
+                }}
+                >
+                  <div style={{
+                    textAlign: 'center',
+                    color: '#6b7280'
+                  }}>
+                    <div style={{
+                      fontSize: '24px',
+                      marginBottom: '4px'
+                    }}>
+                      📷
+                    </div>
+                    <div style={{
+                      fontSize: '12px',
+                      fontWeight: '500'
+                    }}>
+                      Fotoğraf Ekle
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            {/* Dosya seçici (gizli) */}
             <input
               type="file"
               multiple
               accept="image/*"
               onChange={handleImageUpload}
               style={{
-                width: '100%',
-                padding: '12px',
-                border: '1px solid #d1d5db',
-                borderRadius: '8px',
-                fontSize: '14px',
-                outline: 'none',
-                transition: 'border-color 0.2s'
+                display: 'none'
               }}
+              id="image-upload-input"
             />
-            {formData.images.length > 0 && (
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))',
-                gap: '12px',
-                marginTop: '16px'
-              }}>
-                {formData.images.map((image, index) => (
-                  <div key={index} style={{
-                    position: 'relative',
-                    aspectRatio: '1',
-                    borderRadius: '8px',
-                    overflow: 'hidden',
-                    border: '1px solid #e5e7eb'
-                  }}>
-                    <img
-                      src={image}
-                      alt={`Fotoğraf ${index + 1}`}
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover'
-                      }}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeImage(index)}
-                      style={{
-                        position: 'absolute',
-                        top: '4px',
-                        right: '4px',
-                        background: 'rgba(0, 0, 0, 0.7)',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '50%',
-                        width: '24px',
-                        height: '24px',
-                        fontSize: '12px',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      ✕
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
+            
+            {/* Bilgi metni */}
+            <p style={{
+              fontSize: '12px',
+              color: '#6b7280',
+              margin: '8px 0 0 0',
+              textAlign: 'center'
+            }}>
+              Maksimum 10 fotoğraf ekleyebilirsiniz. Her kareye tıklayarak fotoğraf seçebilirsiniz.
+            </p>
           </div>
 
           {/* Submit Button */}
