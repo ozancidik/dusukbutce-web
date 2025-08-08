@@ -1,3 +1,4 @@
+import { NextRequest } from "next/server";
 import { NextResponse, NextRequest } from "next/server";
 import connectDB from "@/lib/mongodb";
 import ProductSubmission from '@/models/ProductSubmission';
