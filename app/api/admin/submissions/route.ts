@@ -98,4 +98,33 @@ export async function GET(request: NextRequest) {
     console.error('Error fetching submissions:', error);
     return NextResponse.json({ success: false, message: 'Internal server error' }, { status: 500 });
   }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const { action } = await request.json();
+
+    if (!MONGODB_URI) {
+      return NextResponse.json({ success: false, message: 'Database not configured' }, { status: 500 });
+    }
+
+    await connectDB();
+
+    if (action === 'deleteAll') {
+      // Tüm ilanları sil
+      const result = await ProductSubmission.deleteMany({});
+      
+      return NextResponse.json({ 
+        success: true, 
+        message: `${result.deletedCount} ilan başarıyla silindi`,
+        deletedCount: result.deletedCount
+      });
+    } else {
+      return NextResponse.json({ success: false, message: 'Invalid action' }, { status: 400 });
+    }
+
+  } catch (error) {
+    console.error('Error deleting submissions:', error);
+    return NextResponse.json({ success: false, message: 'Internal server error' }, { status: 500 });
+  }
 } 

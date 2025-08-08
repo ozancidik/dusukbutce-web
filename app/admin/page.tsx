@@ -46,6 +46,7 @@ export default function AdminPage() {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState<'success' | 'error'>('success');
+  const [isDeletingAll, setIsDeletingAll] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -165,6 +166,37 @@ export default function AdminPage() {
     }
   };
 
+  const handleDeleteAllSubmissions = async () => {
+    if (!confirm('Tüm ilanları silmek istediğinizden emin misiniz? Bu işlem geri alınamaz!')) {
+      return;
+    }
+
+    setIsDeletingAll(true);
+    try {
+      const response = await fetch('/api/admin/submissions', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ action: 'deleteAll' }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        showToastMessage(data.message, 'success');
+        setSubmissions([]); // UI'dan da temizle
+      } else {
+        showToastMessage(data.message || 'İlanlar silinirken bir hata oluştu', 'error');
+      }
+    } catch (error) {
+      console.error('Error deleting all submissions:', error);
+      showToastMessage('Bağlantı hatası oluştu', 'error');
+    } finally {
+      setIsDeletingAll(false);
+    }
+  };
+
   if (!isAuthenticated) {
     return null;
   }
@@ -281,6 +313,41 @@ export default function AdminPage() {
                     📋 İlanları Görüntüle
                   </button>
                 </Link>
+                
+                <button
+                  onClick={handleDeleteAllSubmissions}
+                  disabled={isDeletingAll}
+                  style={{
+                    background: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '8px 16px',
+                    fontSize: isMobile ? '12px' : '14px',
+                    fontWeight: '600',
+                    cursor: isDeletingAll ? 'not-allowed' : 'pointer',
+                    transition: 'all 0.2s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    boxShadow: '0 2px 8px rgba(220, 38, 38, 0.3)',
+                    opacity: isDeletingAll ? 0.7 : 1
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isDeletingAll) {
+                      e.currentTarget.style.transform = 'translateY(-1px)';
+                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.4)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isDeletingAll) {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = '0 2px 8px rgba(220, 38, 38, 0.3)';
+                    }
+                  }}
+                >
+                  {isDeletingAll ? '🗑️ Siliniyor...' : '🗑️ Tüm İlanları Sil'}
+                </button>
               </div>
             </div>
             
