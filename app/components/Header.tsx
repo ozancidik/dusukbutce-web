@@ -51,8 +51,8 @@ export default function Header() {
       const userName = localStorage.getItem("userName");
       const loginTime = localStorage.getItem("loginTime");
       
-      // Timeout kontrolü (20 dakika = 1200000 ms)
-      const TIMEOUT_DURATION = 20 * 60 * 1000; // 20 dakika
+      // Timeout kontrolü (60 dakika = 3600000 ms)
+      const TIMEOUT_DURATION = 60 * 60 * 1000; // 60 dakika
       const isExpired = loginTime && (Date.now() - parseInt(loginTime)) > TIMEOUT_DURATION;
       
       if (isExpired) {
