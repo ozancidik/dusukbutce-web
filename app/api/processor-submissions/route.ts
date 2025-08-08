@@ -1,6 +1,6 @@
 "use server";
 import { NextResponse } from "next/server";
-import { connectToDatabase } from "@/lib/mongodb";
+import connectDB from "@/lib/mongodb";
 import ProductSubmission from "@/models/ProductSubmission";
 
 export async function POST(request: Request) {
@@ -25,7 +25,7 @@ export async function POST(request: Request) {
       category
     } = body;
 
-    await connectToDatabase();
+    await connectDB();
 
     const submission = new ProductSubmission({
       brand,
