@@ -45,6 +45,12 @@ export async function GET(request: NextRequest) {
   }
 
   try {
+    // Environment'a göre redirect URI belirle
+    const isLocalhost = request.headers.get('host')?.includes('localhost');
+    const redirectUri = isLocalhost 
+      ? 'http://localhost:3000/api/auth/google/callback'
+      : 'https://dusukbutce.com/api/auth/google/callback';
+
     // Google'dan access token al
     const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
@@ -56,7 +62,7 @@ export async function GET(request: NextRequest) {
         client_secret: process.env.GOOGLE_CLIENT_SECRET || 'your-google-client-secret',
         code: code,
         grant_type: 'authorization_code',
-        redirect_uri: 'https://dusukbutce.com/api/auth/google/callback',
+        redirect_uri: redirectUri,
       }),
     });
 
