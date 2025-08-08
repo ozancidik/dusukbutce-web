@@ -1,6 +1,5 @@
 import { NextResponse, NextRequest } from "next/server";
 import connectDB from "@/lib/mongodb";
-import connectDB from "@/lib/mongodb";
 import ProductSubmission from '@/models/ProductSubmission';
 
 const MONGODB_URI = process.env.MONGODB_URI;
