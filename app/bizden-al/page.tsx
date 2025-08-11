@@ -106,17 +106,11 @@ export default function BizdenAlPage() {
           border: '1px solid #e5e7eb',
           textAlign: 'center'
         }}>
-          <div style={{
-            fontSize: isMobile ? '48px' : '64px',
-            marginBottom: '16px'
-          }}>
-            🛒
-          </div>
           <h1 style={{
             fontSize: isMobile ? '28px' : '36px',
             fontWeight: '800',
             color: '#1f2937',
-            margin: '0 0 16px 0',
+            margin: '0 0 20px 0',
             background: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
@@ -124,16 +118,18 @@ export default function BizdenAlPage() {
           }}>
             Bizden Al
           </h1>
-          <p style={{
-            fontSize: isMobile ? '16px' : '18px',
-            color: '#6b7280',
-            margin: '0 auto 24px',
-            lineHeight: '1.6',
-            maxWidth: '600px'
+          <h2 style={{
+            fontSize: isMobile ? '18px' : '22px',
+            fontWeight: '600',
+            color: '#374151',
+            margin: '0 0 24px 0',
+            lineHeight: '1.5',
+            maxWidth: '700px',
+            marginLeft: 'auto',
+            marginRight: 'auto'
           }}>
-            Kaliteli ürünleri uygun fiyatlarla sizlere sunuyoruz. 
-            Güvenilir alışveriş deneyimi için doğru adrestesiniz.
-          </p>
+            2. El Alışverişte Güvenilir Adres, Kaliteli Ürünler, Uygun Fiyatlar
+          </h2>
           <div style={{
             display: 'flex',
             gap: '12px',
