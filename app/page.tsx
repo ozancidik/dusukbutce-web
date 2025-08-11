@@ -226,51 +226,61 @@ export default function HomePage() {
 
 
 
-      {/* BİZDEN AL butonu */}
-      <Link href="/bizden-al" style={{ width: "100%", maxWidth: "400px" }}>
-        <button
-          style={{
-            background: "#dc2626",
-            color: "white",
-            border: "none",
-            borderRadius: "12px",
-            padding: isMobile ? "20px 0" : "24px 0",
-            fontWeight: "800",
-            fontSize: isMobile ? "24px" : "32px",
-            width: "100%",
-            marginBottom: "16px",
-            cursor: "pointer",
-            boxShadow: "0 4px 16px #0001",
-            letterSpacing: isMobile ? "1px" : "2px",
-            transition: "background 0.2s, color 0.2s",
-          }}
-        >
-          BİZDEN AL
-        </button>
-      </Link>
+      {/* Butonlar yan yana */}
+      <div style={{
+        display: "flex",
+        flexDirection: isMobile ? "column" : "row",
+        gap: isMobile ? "16px" : "24px",
+        width: "100%",
+        maxWidth: "800px",
+        justifyContent: "center",
+        alignItems: "stretch",
+        marginBottom: "32px"
+      }}>
+        {/* BİZE SAT butonu */}
+        <Link href="/bize-sat" style={{ flex: 1, maxWidth: isMobile ? "400px" : "350px" }}>
+          <button
+            style={{
+              background: "#22c55e",
+              color: "white",
+              border: "none",
+              borderRadius: "12px",
+              padding: isMobile ? "20px 0" : "20px 0",
+              fontWeight: "800",
+              fontSize: isMobile ? "20px" : "24px",
+              width: "100%",
+              cursor: "pointer",
+              boxShadow: "0 4px 16px #0001",
+              letterSpacing: isMobile ? "1px" : "2px",
+              transition: "background 0.2s, color 0.2s",
+            }}
+          >
+            BİZE SAT
+          </button>
+        </Link>
 
-      {/* BİZE SAT butonu */}
-      <Link href="/bize-sat" style={{ width: "100%", maxWidth: "400px" }}>
-        <button
-          style={{
-            background: "#22c55e",
-            color: "white",
-            border: "none",
-            borderRadius: "12px",
-            padding: isMobile ? "20px 0" : "24px 0",
-            fontWeight: "800",
-            fontSize: isMobile ? "24px" : "32px",
-            width: "100%",
-            marginBottom: "32px",
-            cursor: "pointer",
-            boxShadow: "0 4px 16px #0001",
-            letterSpacing: isMobile ? "1px" : "2px",
-            transition: "background 0.2s, color 0.2s",
-          }}
-        >
-          BİZE SAT
-        </button>
-      </Link>
+        {/* SATILIK İLANLAR butonu */}
+        <Link href="/bizden-al" style={{ flex: 1, maxWidth: isMobile ? "400px" : "350px" }}>
+          <button
+            style={{
+              background: "#dc2626",
+              color: "white",
+              border: "none",
+              borderRadius: "12px",
+              padding: isMobile ? "20px 0" : "20px 0",
+              fontWeight: "800",
+              fontSize: isMobile ? "20px" : "24px",
+              width: "100%",
+              cursor: "pointer",
+              boxShadow: "0 4px 16px #0001",
+              letterSpacing: isMobile ? "1px" : "2px",
+              transition: "background 0.2s, color 0.2s",
+            }}
+          >
+            SATILIK İLANLAR
+          </button>
+        </Link>
+      </div>
 
       {/* Buton şeklinde linkler */}
       <div
