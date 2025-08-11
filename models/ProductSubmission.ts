@@ -44,7 +44,15 @@ const productSubmissionSchema = new mongoose.Schema({
     note: { type: String },
     reason: { type: String },
     date: { type: Date }
-  }
+  },
+  // Ekran kartı özel alanları
+  memory: { type: String },
+  memoryType: { type: String },
+  coreClock: { type: String },
+  boostClock: { type: String },
+  powerConsumption: { type: String },
+  ports: { type: String },
+  interface: { type: String }
 });
 
 export default mongoose.models.ProductSubmission || mongoose.model('ProductSubmission', productSubmissionSchema); 
