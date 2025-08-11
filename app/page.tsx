@@ -224,6 +224,29 @@ export default function HomePage() {
         </p>
       </div>
 
+      {/* BİZDEN AL butonu */}
+      <Link href="/buy" style={{ width: "100%", maxWidth: "400px" }}>
+        <button
+          style={{
+            background: "#dc2626",
+            color: "white",
+            border: "none",
+            borderRadius: "12px",
+            padding: isMobile ? "20px 0" : "24px 0",
+            fontWeight: "800",
+            fontSize: isMobile ? "24px" : "32px",
+            width: "100%",
+            marginBottom: "16px",
+            cursor: "pointer",
+            boxShadow: "0 4px 16px #0001",
+            letterSpacing: isMobile ? "1px" : "2px",
+            transition: "background 0.2s, color 0.2s",
+          }}
+        >
+          BİZDEN AL
+        </button>
+      </Link>
+
       {/* BİZE SAT butonu */}
       <Link href="/bize-sat" style={{ width: "100%", maxWidth: "400px" }}>
         <button
