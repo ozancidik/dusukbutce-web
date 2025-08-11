@@ -174,7 +174,7 @@ export default function HomePage() {
           display: "flex", 
           flexDirection: "column", 
           alignItems: "center", 
-          marginTop: isIPhoneSE ? "0" : (isMobile ? "20px" : "0"),
+          marginTop: isIPhoneSE ? "0" : (isMobile ? "10px" : "0"),
           marginBottom: isIPhoneSE ? "0" : "32px",
           textAlign: "center",
           position: "relative",
@@ -437,36 +437,7 @@ export default function HomePage() {
           ‹
         </button>
         
-        <button
-          onClick={() => setCurrent((prev) => (prev + 1) % sliderItems.length)}
-          style={{
-            position: "absolute",
-            right: isMobile ? "-40px" : "-50px",
-            top: "50%",
-            transform: "translateY(-50%)",
-            background: "rgba(37, 99, 235, 0.8)",
-            color: "white",
-            border: "none",
-            borderRadius: "50%",
-            width: isMobile ? "32px" : "40px",
-            height: isMobile ? "32px" : "40px",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: isMobile ? "16px" : "20px",
-            zIndex: 10,
-            transition: "background 0.2s",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = "rgba(37, 99, 235, 1)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = "rgba(37, 99, 235, 0.8)";
-          }}
-        >
-          ›
-        </button>
+
       </div>
 
       {/* Slider altı noktalar */}
@@ -497,10 +468,91 @@ export default function HomePage() {
       <footer style={{ 
         marginTop: isMobile ? "24px" : "40px", 
         textAlign: "center", 
-        color: "#64748b", 
-        fontSize: isMobile ? "12px" : "14px",
+        padding: isMobile ? "20px 16px" : "32px 24px",
+        background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
+        borderRadius: "16px",
+        border: "1px solid #e5e7eb",
+        boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
+        maxWidth: "100%",
+        width: "100%"
       }}>
-        © {new Date().getFullYear()} Düşük Bütçe. Tüm hakları saklıdır.
+        <div style={{
+          display: "flex",
+          flexDirection: isMobile ? "column" : "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: isMobile ? "16px" : "24px",
+          marginBottom: "16px"
+        }}>
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px"
+          }}>
+            <div style={{
+              width: "24px",
+              height: "24px",
+              background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
+              borderRadius: "6px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "white",
+              fontSize: "12px",
+              fontWeight: "700"
+            }}>
+              DB
+            </div>
+            <span style={{
+              fontSize: isMobile ? "16px" : "18px",
+              fontWeight: "700",
+              color: "#1f2937",
+              background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text"
+            }}>
+              Düşük Bütçe
+            </span>
+          </div>
+          
+          <div style={{
+            fontSize: isMobile ? "12px" : "14px",
+            color: "#6b7280",
+            fontWeight: "500"
+          }}>
+            Güvenilir Alışveriş Deneyimi
+          </div>
+        </div>
+        
+        <div style={{
+          borderTop: "1px solid #e5e7eb",
+          paddingTop: "16px",
+          fontSize: isMobile ? "11px" : "12px",
+          color: "#9ca3af",
+          display: "flex",
+          flexDirection: isMobile ? "column" : "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: isMobile ? "8px" : "16px"
+        }}>
+          <span>© {new Date().getFullYear()} Düşük Bütçe. Tüm hakları saklıdır.</span>
+          <div style={{
+            display: "flex",
+            gap: isMobile ? "12px" : "16px"
+          }}>
+            <a href="/privacy-policy" style={{
+              color: "#6b7280",
+              textDecoration: "none",
+              transition: "color 0.2s"
+            }}>Gizlilik Politikası</a>
+            <a href="/terms" style={{
+              color: "#6b7280",
+              textDecoration: "none",
+              transition: "color 0.2s"
+            }}>Kullanım Şartları</a>
+          </div>
+        </div>
       </footer>
     </div>
     </div>
