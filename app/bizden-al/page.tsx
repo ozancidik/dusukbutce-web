@@ -23,7 +23,7 @@ export default function BizdenAlPage() {
   const categories = [
     { id: 'all', name: 'Tüm Kategoriler', icon: '🏠', color: '#3b82f6' },
     { id: 'notebook', name: 'Dizüstü Bilgisayar', icon: '💻', color: '#10b981' },
-    { id: 'desktop', name: 'Masaüstü Bilgisayar', icon: '💻', color: '#f59e0b' },
+    { id: 'desktop', name: 'Masaüstü Bilgisayar', icon: '🖥️', color: '#f59e0b' },
     { id: 'monitor', name: 'Monitör', icon: '🖥️', color: '#8b5cf6' },
     { id: 'keyboard', name: 'Klavye', icon: '⌨️', color: '#ef4444' },
     { id: 'mouse', name: 'Fare', icon: '🖱️', color: '#06b6d4' },
