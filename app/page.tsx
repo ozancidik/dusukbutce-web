@@ -225,7 +225,7 @@ export default function HomePage() {
       </div>
 
       {/* BİZDEN AL butonu */}
-      <Link href="/buy" style={{ width: "100%", maxWidth: "400px" }}>
+      <Link href="/bizden-al" style={{ width: "100%", maxWidth: "400px" }}>
         <button
           style={{
             background: "#dc2626",
