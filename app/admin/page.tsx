@@ -27,6 +27,15 @@ interface Submission {
   status: string;
   adminNotes?: string;
   images: string[]; // Base64 encoded images
+  // Ekran kartı özel alanları
+  memory?: string;
+  memoryType?: string;
+  coreClock?: string;
+  boostClock?: string;
+  powerConsumption?: string;
+  ports?: string;
+  // Interface alanı (ekran kartı için)
+  interface?: string;
   customerResponse?: {
     action: 'accepted' | 'rejected';
     note?: string;
@@ -50,6 +59,7 @@ export default function AdminPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteModalType, setDeleteModalType] = useState<'single' | 'all' | null>(null);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const router = useRouter();
 
   useEffect(() => {
@@ -90,7 +100,7 @@ export default function AdminPage() {
 
   const fetchSubmissions = async () => {
     try {
-      const response = await fetch('/api/notebook-submissions');
+      const response = await fetch('/api/admin/submissions');
       const data = await response.json();
       
       if (response.ok) {
@@ -104,6 +114,11 @@ export default function AdminPage() {
       setLoading(false);
     }
   };
+
+  // Filtrelenmiş submission'ları hesapla
+  const filteredSubmissions = selectedCategory === 'all' 
+    ? submissions 
+    : submissions.filter(submission => submission.category === selectedCategory);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString('tr-TR', {
@@ -323,7 +338,7 @@ export default function AdminPage() {
                 color: '#6b7280',
                 margin: 0
               }}>
-                Notebook satış taleplerini yönetin ve teklifler verin
+                Tüm kategorilerdeki satış taleplerini yönetin ve teklifler verin
               </p>
               <div style={{
                 marginTop: '12px',
@@ -456,7 +471,72 @@ export default function AdminPage() {
         </div>
       </div>
 
-      {submissions.length === 0 ? (
+      {/* Kategori Filtresi */}
+      <div style={{
+        maxWidth: isMobile ? '100%' : '1400px',
+        margin: '0 auto 24px auto'
+      }}>
+        <div style={{
+          background: 'white',
+          borderRadius: '12px',
+          padding: isMobile ? '16px' : '20px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          border: '1px solid #e5e7eb'
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            flexWrap: 'wrap'
+          }}>
+            <span style={{
+              fontSize: isMobile ? '14px' : '16px',
+              fontWeight: '600',
+              color: '#374151'
+            }}>
+              Kategori Filtresi:
+            </span>
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              style={{
+                padding: '8px 12px',
+                borderRadius: '8px',
+                border: '1px solid #d1d5db',
+                fontSize: isMobile ? '14px' : '16px',
+                background: 'white',
+                cursor: 'pointer'
+              }}
+            >
+              <option value="all">Tüm Kategoriler</option>
+              <option value="notebook">Dizüstü Bilgisayar</option>
+              <option value="desktop">Masaüstü Bilgisayar</option>
+              <option value="graphics-card">Ekran Kartı</option>
+              <option value="processor">İşlemci</option>
+              <option value="monitor">Monitör</option>
+              <option value="keyboard">Klavye</option>
+              <option value="mouse">Fare</option>
+              <option value="headphones">Kulaklık</option>
+              <option value="ram">RAM</option>
+              <option value="ssd">SSD</option>
+              <option value="tablet">Tablet</option>
+              <option value="audio-system">Ses Sistemi</option>
+              <option value="case">Kasa</option>
+              <option value="cooler">Soğutucu</option>
+              <option value="gaming-wheel">Gaming Direksiyon</option>
+              <option value="sound-system">Ses Sistemi</option>
+            </select>
+            <span style={{
+              fontSize: isMobile ? '12px' : '14px',
+              color: '#6b7280'
+            }}>
+              {filteredSubmissions.length} talep bulundu
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {filteredSubmissions.length === 0 ? (
         <div style={{
           textAlign: 'center',
           padding: isMobile ? '40px 20px' : '80px 40px',
@@ -485,7 +565,7 @@ export default function AdminPage() {
           maxWidth: isMobile ? '100%' : '1400px',
           margin: '0 auto'
         }}>
-          {submissions.map((submission) => (
+          {filteredSubmissions.map((submission) => (
             <div key={submission._id} style={{
               background: 'white',
               borderRadius: '16px',
@@ -551,14 +631,42 @@ export default function AdminPage() {
                 flexDirection: isMobile ? 'column' : 'row',
                 gap: isMobile ? '8px' : '0'
               }}>
-                <h3 style={{
-                  fontSize: isMobile ? '18px' : '20px',
-                  fontWeight: '600',
-                  color: '#374151',
-                  margin: 0
-                }}>
-                  {submission.brand} {submission.model}
-                </h3>
+                <div>
+                  <h3 style={{
+                    fontSize: isMobile ? '18px' : '20px',
+                    fontWeight: '600',
+                    color: '#374151',
+                    margin: '0 0 4px 0'
+                  }}>
+                    {submission.brand} {submission.model}
+                  </h3>
+                  <span style={{
+                    fontSize: isMobile ? '12px' : '14px',
+                    color: '#6b7280',
+                    background: '#f1f5f9',
+                    padding: '4px 8px',
+                    borderRadius: '6px',
+                    textTransform: 'capitalize'
+                  }}>
+                    {submission.category === 'graphics-card' ? 'Ekran Kartı' :
+                     submission.category === 'notebook' ? 'Dizüstü Bilgisayar' :
+                     submission.category === 'desktop' ? 'Masaüstü Bilgisayar' :
+                     submission.category === 'processor' ? 'İşlemci' :
+                     submission.category === 'monitor' ? 'Monitör' :
+                     submission.category === 'keyboard' ? 'Klavye' :
+                     submission.category === 'mouse' ? 'Fare' :
+                     submission.category === 'headphones' ? 'Kulaklık' :
+                     submission.category === 'ram' ? 'RAM' :
+                     submission.category === 'ssd' ? 'SSD' :
+                     submission.category === 'tablet' ? 'Tablet' :
+                     submission.category === 'audio-system' ? 'Ses Sistemi' :
+                     submission.category === 'case' ? 'Kasa' :
+                     submission.category === 'cooler' ? 'Soğutucu' :
+                     submission.category === 'gaming-wheel' ? 'Gaming Direksiyon' :
+                     submission.category === 'sound-system' ? 'Ses Sistemi' :
+                     submission.category}
+                  </span>
+                </div>
                 <span style={{
                   fontSize: isMobile ? '12px' : '14px',
                   color: '#6b7280',
@@ -589,18 +697,84 @@ export default function AdminPage() {
                     {submission.processor}
                   </span>
                 </div>
-                <div>
-                  <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
-                    Ekran Kartı:
-                  </strong>
-                  <span style={{ 
-                    fontSize: isMobile ? '14px' : '16px', 
-                    color: '#6b7280',
-                    marginLeft: '8px'
-                  }}>
-                    {submission.graphicsCard}
-                  </span>
-                </div>
+                {submission.category === 'graphics-card' && (
+                  <>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Bellek:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.memory} {submission.memoryType}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Core Clock:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.coreClock}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Boost Clock:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.boostClock}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Güç Tüketimi:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.powerConsumption}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Portlar:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.ports}
+                      </span>
+                    </div>
+                  </>
+                )}
+                {submission.category !== 'graphics-card' && (
+                  <div>
+                    <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                      Ekran Kartı:
+                    </strong>
+                    <span style={{ 
+                      fontSize: isMobile ? '14px' : '16px', 
+                      color: '#6b7280',
+                      marginLeft: '8px'
+                    }}>
+                      {submission.graphicsCard}
+                    </span>
+                  </div>
+                )}
                 <div>
                   <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
                     RAM:
