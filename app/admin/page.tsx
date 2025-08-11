@@ -685,18 +685,20 @@ export default function AdminPage() {
                 gap: isMobile ? '12px' : '16px',
                 marginBottom: isMobile ? '12px' : '16px'
               }}>
-                <div>
-                  <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
-                    İşlemci:
-                  </strong>
-                  <span style={{ 
-                    fontSize: isMobile ? '14px' : '16px', 
-                    color: '#6b7280',
-                    marginLeft: '8px'
-                  }}>
-                    {submission.processor}
-                  </span>
-                </div>
+                {submission.category !== 'graphics-card' && (
+                  <div>
+                    <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                      İşlemci:
+                    </strong>
+                    <span style={{ 
+                      fontSize: isMobile ? '14px' : '16px', 
+                      color: '#6b7280',
+                      marginLeft: '8px'
+                    }}>
+                      {submission.processor}
+                    </span>
+                  </div>
+                )}
                 {submission.category === 'graphics-card' && (
                   <>
                     <div>
@@ -775,31 +777,35 @@ export default function AdminPage() {
                     </span>
                   </div>
                 )}
-                <div>
-                  <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
-                    RAM:
-                  </strong>
-                  <span style={{ 
-                    fontSize: isMobile ? '14px' : '16px', 
-                    color: '#6b7280',
-                    marginLeft: '8px'
-                  }}>
-                    {submission.ram}
-                  </span>
-                </div>
-                <div>
-                  <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
-                    Depolama:
-                  </strong>
-                  <span style={{ 
-                    fontSize: isMobile ? '14px' : '16px', 
-                    color: '#6b7280',
-                    marginLeft: '8px'
-                  }}>
-                    {submission.storage}
-                  </span>
-                </div>
-                {submission.wattValue && (
+                {submission.category !== 'graphics-card' && (
+                  <>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        RAM:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.ram}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Depolama:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.storage}
+                      </span>
+                    </div>
+                  </>
+                )}
+                {submission.category !== 'graphics-card' && submission.wattValue && (
                   <div>
                     <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
                       Watt:
@@ -813,7 +819,7 @@ export default function AdminPage() {
                     </span>
                   </div>
                 )}
-                {submission.refreshRate && (
+                {submission.category !== 'graphics-card' && submission.refreshRate && (
                   <div>
                     <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
                       Tazeleme Hızı:
