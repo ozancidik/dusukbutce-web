@@ -9,6 +9,7 @@ interface SearchResult {
   price: number;
   image: string;
   url: string;
+  type?: 'product' | 'bizden-al' | 'bize-sat';
 }
 
 export default function Search() {
@@ -62,6 +63,25 @@ export default function Search() {
     }
   ];
 
+  // Bize Sat ve Bizden Al kategorileri
+  const bizdenAlCategories = [
+    { name: 'Dizüstü Bilgisayar', path: '/bizden-al', icon: '💻' },
+    { name: 'Masaüstü Bilgisayar', path: '/bizden-al', icon: '🖥️' },
+    { name: 'İşlemci', path: '/bizden-al', icon: '⚡' },
+    { name: 'Ekran Kartı', path: '/bizden-al', icon: '🎮' },
+    { name: 'RAM', path: '/bizden-al', icon: '🧠' },
+    { name: 'SSD', path: '/bizden-al', icon: '💾' }
+  ];
+
+  const bizeSatCategories = [
+    { name: 'Dizüstü Bilgisayar', path: '/bize-sat/notebook', icon: '💻' },
+    { name: 'Masaüstü Bilgisayar', path: '/bize-sat/desktop', icon: '🖥️' },
+    { name: 'İşlemci', path: '/bize-sat/processor', icon: '⚡' },
+    { name: 'Ekran Kartı', path: '/bize-sat/graphics-card', icon: '🎮' },
+    { name: 'RAM', path: '/bize-sat/ram', icon: '🧠' },
+    { name: 'SSD', path: '/bize-sat/ssd', icon: '💾' }
+  ];
+
   // Search functionality
   const handleSearch = (searchQuery: string) => {
     setQuery(searchQuery);
@@ -76,12 +96,48 @@ export default function Search() {
     
     // Simulate API delay
     setTimeout(() => {
-      const filtered = mockProducts.filter(product =>
+      // Ürün araması
+      const filteredProducts = mockProducts.filter(product =>
         product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.category.toLowerCase().includes(searchQuery.toLowerCase())
       );
+
+      // Kategori araması
+      const filteredBizdenAl = bizdenAlCategories.filter(category =>
+        category.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+
+      const filteredBizeSat = bizeSatCategories.filter(category =>
+        category.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+
+      // Sonuçları birleştir
+      const allResults: SearchResult[] = [
+        ...filteredProducts.map(product => ({
+          ...product,
+          type: 'product' as const
+        })),
+        ...filteredBizdenAl.map(category => ({
+          id: `bizden-al-${category.name}`,
+          title: `${category.name} (Bizden Al)`,
+          category: 'Kategori',
+          price: 0,
+          image: category.icon,
+          url: category.path,
+          type: 'bizden-al' as const
+        })),
+        ...filteredBizeSat.map(category => ({
+          id: `bize-sat-${category.name}`,
+          title: `${category.name} (Bize Sat)`,
+          category: 'Kategori',
+          price: 0,
+          image: category.icon,
+          url: category.path,
+          type: 'bize-sat' as const
+        }))
+      ];
       
-      setResults(filtered);
+      setResults(allResults);
       setIsOpen(true);
       setLoading(false);
     }, 300);
@@ -176,17 +232,31 @@ export default function Search() {
                 e.currentTarget.style.backgroundColor = 'white';
               }}
             >
-              <img
-                src={result.image}
-                alt={result.title}
-                style={{
-                  width: '40px',
-                  height: '40px',
-                  objectFit: 'contain',
-                  marginRight: '12px',
-                  borderRadius: '4px'
-                }}
-              />
+              <div style={{
+                width: '40px',
+                height: '40px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginRight: '12px',
+                borderRadius: '4px',
+                fontSize: '24px'
+              }}>
+                {result.type === 'product' ? (
+                  <img
+                    src={result.image}
+                    alt={result.title}
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      objectFit: 'contain',
+                      borderRadius: '4px'
+                    }}
+                  />
+                ) : (
+                  result.image
+                )}
+              </div>
               <div style={{ flex: 1 }}>
                 <div style={{
                   fontWeight: '600',
@@ -204,10 +274,14 @@ export default function Search() {
               </div>
               <div style={{
                 fontWeight: '700',
-                color: '#2563eb',
-                fontSize: '14px'
+                fontSize: '14px',
+                color: result.type === 'bizden-al' ? '#dc2626' : 
+                       result.type === 'bize-sat' ? '#22c55e' : '#2563eb'
               }}>
-                {result.price.toLocaleString('tr-TR')} ₺
+                {result.type === 'product' ? 
+                  `${result.price.toLocaleString('tr-TR')} ₺` : 
+                  result.type === 'bizden-al' ? 'Bizden Al' : 'Bize Sat'
+                }
               </div>
             </a>
           ))}

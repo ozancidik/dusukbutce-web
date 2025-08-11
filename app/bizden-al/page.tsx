@@ -23,16 +23,16 @@ export default function BizdenAlPage() {
   const categories = [
     { id: 'all', name: 'Tüm Kategoriler', icon: '🏠', color: '#3b82f6' },
     { id: 'notebook', name: 'Dizüstü Bilgisayar', icon: '💻', color: '#10b981' },
-    { id: 'desktop', name: 'Masaüstü Bilgisayar', icon: '🖥️', color: '#f59e0b' },
+    { id: 'desktop', name: 'Masaüstü Bilgisayar', icon: '/case.png', color: '#f59e0b' },
+    { id: 'graphics-card', name: 'Ekran Kartı', icon: '/graphic-card.png', color: '#f97316' },
+    { id: 'processor', name: 'İşlemci', icon: '/cpu-tower.png', color: '#ec4899' },
     { id: 'monitor', name: 'Monitör', icon: '🖥️', color: '#8b5cf6' },
     { id: 'keyboard', name: 'Klavye', icon: '⌨️', color: '#ef4444' },
     { id: 'mouse', name: 'Fare', icon: '🖱️', color: '#06b6d4' },
     { id: 'headphones', name: 'Kulaklık', icon: '🎧', color: '#84cc16' },
-    { id: 'graphics-card', name: 'Ekran Kartı', icon: '🎮', color: '#f97316' },
-    { id: 'processor', name: 'İşlemci', icon: '⚡', color: '#ec4899' },
-    { id: 'ram', name: 'RAM', icon: '🧠', color: '#6366f1' },
-    { id: 'ssd', name: 'SSD', icon: '💾', color: '#14b8a6' },
-    { id: 'tablet', name: 'Tablet', icon: '📱', color: '#f43f5e' }
+    { id: 'ram', name: 'RAM', icon: '/ram.png', color: '#6366f1' },
+    { id: 'ssd', name: 'SSD', icon: '/ssd.png', color: '#14b8a6' },
+    { id: 'tablet', name: 'Tablet', icon: '/tablet.png', color: '#f43f5e' }
   ];
 
   const featuredProducts = [
@@ -223,7 +223,17 @@ export default function BizdenAlPage() {
                   }
                 }}
               >
-                <div style={{ fontSize: '24px' }}>{category.icon}</div>
+                <div style={{ fontSize: '24px' }}>
+                  {category.icon.startsWith('/') ? (
+                    <img 
+                      src={category.icon} 
+                      alt={category.name}
+                      style={{ width: '24px', height: '24px' }}
+                    />
+                  ) : (
+                    category.icon
+                  )}
+                </div>
                 <div style={{ 
                   fontSize: isMobile ? '11px' : '12px',
                   textAlign: 'center',

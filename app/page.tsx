@@ -224,6 +224,8 @@ export default function HomePage() {
         </p>
       </div>
 
+
+
       {/* BİZDEN AL butonu */}
       <Link href="/bizden-al" style={{ width: "100%", maxWidth: "400px" }}>
         <button
