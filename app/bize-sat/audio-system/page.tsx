@@ -7,6 +7,8 @@ export default function AudioSystemPage() {
   const [isMobile, setIsMobile] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [formData, setFormData] = useState({
     brand: '',
     model: '',
@@ -29,8 +31,50 @@ export default function AudioSystemPage() {
     checkMobile();
     window.addEventListener('resize', checkMobile);
     
+    // Login durumunu kontrol et
+    const checkLoginStatus = () => {
+      const userLoggedIn = localStorage.getItem('userLoggedIn');
+      const loginTime = localStorage.getItem('loginTime');
+      
+      if (userLoggedIn && loginTime) {
+        const loginTimestamp = parseInt(loginTime);
+        const currentTime = Date.now();
+        const timeDiff = currentTime - loginTimestamp;
+        const hoursDiff = timeDiff / (1000 * 60 * 60);
+        
+        // 24 saat geçerli
+        if (hoursDiff < 24) {
+          setIsLoggedIn(true);
+        } else {
+          localStorage.removeItem('userLoggedIn');
+          localStorage.removeItem('userEmail');
+          localStorage.removeItem('userName');
+          localStorage.removeItem('userId');
+          localStorage.removeItem('loginTime');
+          setIsLoggedIn(false);
+        }
+      } else {
+        setIsLoggedIn(false);
+      }
+      setIsLoading(false);
+    };
+    
+    checkLoginStatus();
+    
+    // Login durumu değişikliklerini dinle
+    const handleStorageChange = () => {
+      checkLoginStatus();
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('login', handleStorageChange);
+    window.addEventListener('logout', handleStorageChange);
+    
     return () => {
       window.removeEventListener('resize', checkMobile);
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('login', handleStorageChange);
+      window.removeEventListener('logout', handleStorageChange);
     };
   }, []);
 
@@ -73,6 +117,12 @@ export default function AudioSystemPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!isLoggedIn) {
+      router.push('/login');
+      return;
+    }
+    
     setIsSubmitting(true);
 
     try {
@@ -644,30 +694,38 @@ export default function AudioSystemPage() {
             style={{
               width: '100%',
               padding: '16px',
-              background: isSubmitting ? '#9ca3af' : 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+              background: isSubmitting ? '#9ca3af' : (isLoggedIn ? 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)' : 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)'),
               color: 'white',
               border: 'none',
               borderRadius: '12px',
               fontSize: '16px',
               fontWeight: '600',
-              cursor: isSubmitting ? 'not-allowed' : 'pointer',
+              cursor: isSubmitting ? 'not-allowed' : (isLoggedIn ? 'pointer' : 'pointer'),
               transition: 'all 0.2s ease',
-              boxShadow: '0 4px 6px rgba(59, 130, 246, 0.25)'
+              boxShadow: isLoggedIn ? '0 4px 6px rgba(59, 130, 246, 0.25)' : '0 4px 6px rgba(220, 38, 38, 0.25)'
             }}
             onMouseEnter={(e) => {
               if (!isSubmitting) {
                 e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 6px 12px rgba(59, 130, 246, 0.35)';
+                if (isLoggedIn) {
+                  e.currentTarget.style.boxShadow = '0 6px 12px rgba(59, 130, 246, 0.35)';
+                } else {
+                  e.currentTarget.style.boxShadow = '0 6px 12px rgba(220, 38, 38, 0.35)';
+                }
               }
             }}
             onMouseLeave={(e) => {
               if (!isSubmitting) {
                 e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 4px 6px rgba(59, 130, 246, 0.25)';
+                if (isLoggedIn) {
+                  e.currentTarget.style.boxShadow = '0 4px 6px rgba(59, 130, 246, 0.25)';
+                } else {
+                  e.currentTarget.style.boxShadow = '0 4px 6px rgba(220, 38, 38, 0.25)';
+                }
               }
             }}
           >
-            {isSubmitting ? 'Gönderiliyor...' : 'Teklif Al'}
+            {isSubmitting ? 'Gönderiliyor...' : (isLoggedIn ? 'Teklif Al' : 'GİRİŞ YAP')}
           </button>
         </form>
       </div>
