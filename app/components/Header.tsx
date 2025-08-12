@@ -307,7 +307,7 @@ export default function Header() {
             )}
 
             {/* İlanlar Butonu */}
-            <Link href="/listings" style={{ textDecoration: "none" }}>
+            <Link href="/satilik-ilanlar" style={{ textDecoration: "none" }}>
               <button
                 style={{
                   background: "#059669",
@@ -465,7 +465,7 @@ export default function Header() {
           )}
 
           {/* İlanlar */}
-          <Link href="/listings" style={{ textDecoration: "none" }}>
+          <Link href="/satilik-ilanlar" style={{ textDecoration: "none" }}>
             <button
               style={{
                 background: "#059669",

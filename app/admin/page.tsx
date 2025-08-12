@@ -345,7 +345,7 @@ export default function AdminPage() {
                 gap: '12px',
                 flexWrap: 'wrap'
               }}>
-                <Link href="/listings" style={{ textDecoration: 'none' }}>
+                <Link href="/satilik-ilanlar" style={{ textDecoration: 'none' }}>
                   <button style={{
                     background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
                     color: 'white',
