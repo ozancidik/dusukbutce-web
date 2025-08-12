@@ -260,7 +260,7 @@ export default function HomePage() {
         </Link>
 
         {/* SATILIK İLANLAR butonu */}
-        <Link href="/bizden-al" style={{ flex: 1, maxWidth: isMobile ? "400px" : "350px" }}>
+                      <Link href="/satilik-ilanlar" style={{ flex: 1, maxWidth: isMobile ? "400px" : "350px" }}>
           <button
             style={{
               background: "#dc2626",
