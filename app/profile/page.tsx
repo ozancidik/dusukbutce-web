@@ -231,17 +231,7 @@ export default function ProfilePage() {
 
   const handleLogout = () => {
     // Tüm localStorage'ı temizle
-    localStorage.removeItem('userLoggedIn');
-    localStorage.removeItem('userEmail');
-    localStorage.removeItem('userName');
-    localStorage.removeItem('userId');
-    localStorage.removeItem('loginTime');
-    localStorage.removeItem('adminLoggedIn');
-    localStorage.removeItem('adminEmail');
-    
-    // useAuth hook için gerekli alanları da temizle
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    localStorage.clear();
     
     // Custom event'i tetikle
     window.dispatchEvent(new Event('localStorageChange'));
@@ -249,7 +239,8 @@ export default function ProfilePage() {
     // Header'a logout mesajı gönder
     window.dispatchEvent(new CustomEvent('logout'));
     
-    router.push('/');
+    // Sayfayı yenile ve ana sayfaya yönlendir
+    window.location.href = '/';
   };
 
   if (!userInfo) {

@@ -84,17 +84,8 @@ export default function AdminPage() {
   }, [router]);
 
   const handleLogout = () => {
-    localStorage.removeItem('adminLoggedIn');
-    localStorage.removeItem('adminEmail');
-    localStorage.removeItem('userLoggedIn');
-    localStorage.removeItem('userEmail');
-    localStorage.removeItem('userName');
-    localStorage.removeItem('userId');
-    localStorage.removeItem('loginTime');
-    
-    // useAuth hook için gerekli alanları da temizle
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    // Tüm localStorage'ı temizle
+    localStorage.clear();
     
     // Custom event'i tetikle
     window.dispatchEvent(new Event('localStorageChange'));
@@ -102,7 +93,8 @@ export default function AdminPage() {
     // Header'a logout mesajı gönder
     window.dispatchEvent(new CustomEvent('logout'));
     
-    router.push('/admin/login');
+    // Sayfayı yenile ve admin login'e yönlendir
+    window.location.href = '/admin/login';
   };
 
   const fetchSubmissions = async () => {
