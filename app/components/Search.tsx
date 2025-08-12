@@ -9,7 +9,7 @@ interface SearchResult {
   price: number;
   image: string;
   url: string;
-  type?: 'product' | 'bizden-al' | 'bize-sat';
+  type?: 'product' | 'satilik-ilanlar' | 'bize-sat';
 }
 
 export default function Search() {
@@ -63,95 +63,95 @@ export default function Search() {
     }
   ];
 
-  // Bize Sat ve Bizden Al kategorileri (İngilizce eşleştirmeleri ile)
-  const bizdenAlCategories = [
+  // Bize Sat ve Satılık İlanlar kategorileri (İngilizce eşleştirmeleri ile)
+  const satilikIlanlarCategories = [
     { 
       name: 'Dizüstü Bilgisayar', 
-      path: '/bizden-al', 
+      path: '/satilik-ilanlar', 
       icon: '💻',
       keywords: ['notebook', 'laptop', 'dizüstü', 'bilgisayar', 'laptop bilgisayar']
     },
     { 
       name: 'Masaüstü Bilgisayar', 
-      path: '/bizden-al', 
+      path: '/satilik-ilanlar', 
       icon: '🖥️',
       keywords: ['desktop', 'masaüstü', 'bilgisayar', 'pc', 'computer']
     },
     { 
       name: 'İşlemci', 
-      path: '/bizden-al', 
+      path: '/satilik-ilanlar', 
       icon: '⚡',
       keywords: ['processor', 'cpu', 'işlemci', 'processor']
     },
     { 
       name: 'Ekran Kartı', 
-      path: '/bizden-al', 
+      path: '/satilik-ilanlar', 
       icon: '🎮',
       keywords: ['graphics card', 'gpu', 'ekran kartı', 'video card', 'graphics']
     },
     { 
       name: 'RAM', 
-      path: '/bizden-al', 
+      path: '/satilik-ilanlar', 
       icon: '🧠',
       keywords: ['ram', 'memory', 'bellek', 'ddr']
     },
     { 
       name: 'SSD', 
-      path: '/bizden-al', 
+      path: '/satilik-ilanlar', 
       icon: '💾',
       keywords: ['ssd', 'hard disk', 'disk', 'sabit disk', 'storage']
     },
     { 
       name: 'Soğutucu', 
-      path: '/bizden-al', 
+      path: '/satilik-ilanlar', 
       icon: '❄️',
       keywords: ['cooler', 'fan', 'soğutucu', 'fan', 'heatsink']
     },
     { 
       name: 'Boş Kasa', 
-      path: '/bizden-al', 
+      path: '/satilik-ilanlar', 
       icon: '📦',
       keywords: ['case', 'kasa', 'computer case', 'pc case', 'boş kasa']
     },
     { 
       name: 'Monitör', 
-      path: '/bizden-al', 
+      path: '/satilik-ilanlar', 
       icon: '🖥️',
       keywords: ['monitor', 'ekran', 'display', 'screen', 'monitör']
     },
     { 
       name: 'Klavye', 
-      path: '/bizden-al', 
+      path: '/satilik-ilanlar', 
       icon: '⌨️',
       keywords: ['keyboard', 'klavye', 'keyboard']
     },
     { 
       name: 'Mouse', 
-      path: '/bizden-al', 
+      path: '/satilik-ilanlar', 
       icon: '🖱️',
       keywords: ['mouse', 'fare', 'mouse']
     },
     { 
       name: 'Tablet', 
-      path: '/bizden-al', 
+      path: '/satilik-ilanlar', 
       icon: '📱',
       keywords: ['tablet', 'tablet', 'ipad', 'android tablet']
     },
     { 
       name: 'Kulaklık', 
-      path: '/bizden-al', 
+      path: '/satilik-ilanlar', 
       icon: '🎧',
       keywords: ['headphones', 'headset', 'kulaklık', 'earphones']
     },
     { 
       name: 'Ses Sistemi', 
-      path: '/bizden-al', 
+      path: '/satilik-ilanlar', 
       icon: '🔊',
       keywords: ['sound system', 'speaker', 'ses sistemi', 'audio system']
     },
     { 
       name: 'Oyuncu Direksiyonu', 
-      path: '/bizden-al', 
+      path: '/satilik-ilanlar', 
       icon: '🎮',
       keywords: ['gaming wheel', 'steering wheel', 'direksiyon', 'racing wheel', 'oyuncu direksiyonu']
     }
@@ -271,7 +271,7 @@ export default function Search() {
       );
 
       // Kategori araması (keywords dahil)
-      const filteredBizdenAl = bizdenAlCategories.filter(category =>
+      const filteredSatilikIlanlar = satilikIlanlarCategories.filter(category =>
         category.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         category.keywords.some(keyword => 
           keyword.toLowerCase().includes(searchQuery.toLowerCase())
@@ -291,14 +291,14 @@ export default function Search() {
           ...product,
           type: 'product' as const
         })),
-        ...filteredBizdenAl.map(category => ({
-          id: `bizden-al-${category.name}`,
-          title: `${category.name} (Bizden Al)`,
+        ...filteredSatilikIlanlar.map(category => ({
+          id: `satilik-ilanlar-${category.name}`,
+          title: `${category.name} (Satılık İlanlar)`,
           category: 'Kategori',
           price: 0,
           image: category.icon,
           url: category.path,
-          type: 'bizden-al' as const
+          type: 'satilik-ilanlar' as const
         })),
         ...filteredBizeSat.map(category => ({
           id: `bize-sat-${category.name}`,
@@ -400,7 +400,7 @@ export default function Search() {
             </div>
           )}
           
-          {results.some(r => r.type === 'bizden-al') && (
+          {results.some(r => r.type === 'satilik-ilanlar') && (
             <div style={{
               padding: '8px 16px',
               backgroundColor: '#fef2f2',
@@ -409,7 +409,7 @@ export default function Search() {
               fontWeight: '600',
               color: '#991b1b'
             }}>
-              🔴 Bizden Al Kategorileri
+              🔴 Satılık İlanlar Kategorileri
             </div>
           )}
           
@@ -439,15 +439,15 @@ export default function Search() {
                 borderBottom: '1px solid #f1f5f9',
                 transition: 'background-color 0.2s',
                 backgroundColor: result.type === 'bize-sat' ? '#f0fdf4' : 
-                               result.type === 'bizden-al' ? '#fef2f2' : 'white'
+                               result.type === 'satilik-ilanlar' ? '#fef2f2' : 'white'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = result.type === 'bize-sat' ? '#dcfce7' : 
-                                                     result.type === 'bizden-al' ? '#fecaca' : '#f8fafc';
+                                                     result.type === 'satilik-ilanlar' ? '#fecaca' : '#f8fafc';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.backgroundColor = result.type === 'bize-sat' ? '#f0fdf4' : 
-                                                     result.type === 'bizden-al' ? '#fef2f2' : 'white';
+                                                     result.type === 'satilik-ilanlar' ? '#fef2f2' : 'white';
               }}
             >
               <div style={{
@@ -460,7 +460,7 @@ export default function Search() {
                 borderRadius: '4px',
                 fontSize: '24px',
                 backgroundColor: result.type === 'bize-sat' ? '#dcfce7' : 
-                               result.type === 'bizden-al' ? '#fecaca' : '#f1f5f9'
+                               result.type === 'satilik-ilanlar' ? '#fecaca' : '#f1f5f9'
               }}>
                 {result.type === 'product' ? (
                   <img
@@ -483,31 +483,31 @@ export default function Search() {
                   fontSize: '14px',
                   marginBottom: '2px',
                   color: result.type === 'bize-sat' ? '#166534' : 
-                         result.type === 'bizden-al' ? '#991b1b' : '#1f2937'
+                         result.type === 'satilik-ilanlar' ? '#991b1b' : '#1f2937'
                 }}>
                   {result.title}
                 </div>
                 <div style={{
                   fontSize: '12px',
                   color: result.type === 'bize-sat' ? '#16a34a' : 
-                         result.type === 'bizden-al' ? '#dc2626' : '#64748b'
+                         result.type === 'satilik-ilanlar' ? '#dc2626' : '#64748b'
                 }}>
                   {result.category}
                 </div>
               </div>
               <div style={{
                 fontWeight: '700',
-                color: result.type === 'bizden-al' ? '#dc2626' : 
+                color: result.type === 'satilik-ilanlar' ? '#dc2626' : 
                        result.type === 'bize-sat' ? '#22c55e' : '#2563eb',
                 backgroundColor: result.type === 'bize-sat' ? '#dcfce7' : 
-                               result.type === 'bizden-al' ? '#fecaca' : '#eff6ff',
+                               result.type === 'satilik-ilanlar' ? '#fecaca' : '#eff6ff',
                 padding: '4px 8px',
                 borderRadius: '6px',
                 fontSize: '12px'
               }}>
                 {result.type === 'product' ? 
                   `${result.price.toLocaleString('tr-TR')} ₺` : 
-                  result.type === 'bizden-al' ? 'Bizden Al' : 'Bize Sat'
+                  result.type === 'satilik-ilanlar' ? 'Satılık İlanlar' : 'Bize Sat'
                 }
               </div>
             </a>
