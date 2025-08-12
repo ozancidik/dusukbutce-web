@@ -483,7 +483,7 @@ export default function CasePage() {
                       padding: '4px 8px',
                       border: '1px solid #d1d5db',
                       borderRadius: '4px',
-                      fontSize: '12px',
+                      fontSize: isMobile ? '8px' : '12px',
                       outline: 'none'
                     }}
                   >
@@ -553,8 +553,9 @@ export default function CasePage() {
             {/* Fotoğraf Grid */}
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(5, 1fr)',
-              gap: '12px',
+              gridTemplateColumns: isMobile ? 'repeat(5, 1fr)' : 'repeat(5, 1fr)',
+              gridTemplateRows: isMobile ? 'repeat(2, 1fr)' : 'auto',
+              gap: isMobile ? '8px' : '12px',
               marginBottom: '16px'
             }}>
               {/* Mevcut fotoğraflar */}
@@ -565,7 +566,11 @@ export default function CasePage() {
                   borderRadius: '8px',
                   overflow: 'hidden',
                   border: '1px solid #e5e7eb',
-                  background: '#f9fafb'
+                  background: '#f9fafb',
+                  width: isMobile ? '60px' : 'auto',
+                  height: isMobile ? '60px' : 'auto',
+                  minWidth: isMobile ? '60px' : 'auto',
+                  minHeight: isMobile ? '60px' : 'auto'
                 }}>
                   <img
                     src={image}
@@ -581,15 +586,15 @@ export default function CasePage() {
                     onClick={() => removeImage(index)}
                     style={{
                       position: 'absolute',
-                      top: '4px',
-                      right: '4px',
+                      top: '2px',
+                      right: '2px',
                       background: 'rgba(220, 38, 38, 0.9)',
                       color: 'white',
                       border: 'none',
                       borderRadius: '50%',
-                      width: '24px',
-                      height: '24px',
-                      fontSize: '12px',
+                      width: isMobile ? '18px' : '24px',
+                      height: isMobile ? '18px' : '24px',
+                      fontSize: isMobile ? '10px' : '12px',
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
@@ -622,7 +627,11 @@ export default function CasePage() {
                   justifyContent: 'center',
                   cursor: 'pointer',
                   transition: 'all 0.2s',
-                  position: 'relative'
+                  position: 'relative',
+                  width: isMobile ? '60px' : 'auto',
+                  height: isMobile ? '60px' : 'auto',
+                  minWidth: isMobile ? '60px' : 'auto',
+                  minHeight: isMobile ? '60px' : 'auto'
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.borderColor = '#3b82f6';
@@ -651,16 +660,16 @@ export default function CasePage() {
                     color: '#6b7280'
                   }}>
                     <div style={{
-                      fontSize: '24px',
-                      marginBottom: '4px'
+                      fontSize: isMobile ? '16px' : '24px',
+                      marginBottom: '2px'
                     }}>
                       📷
                     </div>
                     <div style={{
-                      fontSize: '12px',
+                      fontSize: isMobile ? '8px' : '12px',
                       fontWeight: '500'
                     }}>
-                      Fotoğraf Ekle
+                      {isMobile ? 'Ekle' : 'Fotoğraf Ekle'}
                     </div>
                   </div>
                 </div>
@@ -681,7 +690,7 @@ export default function CasePage() {
             
             {/* Bilgi metni */}
             <p style={{
-              fontSize: '12px',
+              fontSize: isMobile ? '8px' : '12px',
               color: '#6b7280',
               margin: '8px 0 0 0',
               textAlign: 'center'
