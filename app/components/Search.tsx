@@ -63,23 +63,191 @@ export default function Search() {
     }
   ];
 
-  // Bize Sat ve Bizden Al kategorileri
+  // Bize Sat ve Bizden Al kategorileri (İngilizce eşleştirmeleri ile)
   const bizdenAlCategories = [
-    { name: 'Dizüstü Bilgisayar', path: '/bizden-al', icon: '💻' },
-    { name: 'Masaüstü Bilgisayar', path: '/bizden-al', icon: '🖥️' },
-    { name: 'İşlemci', path: '/bizden-al', icon: '⚡' },
-    { name: 'Ekran Kartı', path: '/bizden-al', icon: '🎮' },
-    { name: 'RAM', path: '/bizden-al', icon: '🧠' },
-    { name: 'SSD', path: '/bizden-al', icon: '💾' }
+    { 
+      name: 'Dizüstü Bilgisayar', 
+      path: '/bizden-al', 
+      icon: '💻',
+      keywords: ['notebook', 'laptop', 'dizüstü', 'bilgisayar', 'laptop bilgisayar']
+    },
+    { 
+      name: 'Masaüstü Bilgisayar', 
+      path: '/bizden-al', 
+      icon: '🖥️',
+      keywords: ['desktop', 'masaüstü', 'bilgisayar', 'pc', 'computer']
+    },
+    { 
+      name: 'İşlemci', 
+      path: '/bizden-al', 
+      icon: '⚡',
+      keywords: ['processor', 'cpu', 'işlemci', 'processor']
+    },
+    { 
+      name: 'Ekran Kartı', 
+      path: '/bizden-al', 
+      icon: '🎮',
+      keywords: ['graphics card', 'gpu', 'ekran kartı', 'video card', 'graphics']
+    },
+    { 
+      name: 'RAM', 
+      path: '/bizden-al', 
+      icon: '🧠',
+      keywords: ['ram', 'memory', 'bellek', 'ddr']
+    },
+    { 
+      name: 'SSD', 
+      path: '/bizden-al', 
+      icon: '💾',
+      keywords: ['ssd', 'hard disk', 'disk', 'sabit disk', 'storage']
+    },
+    { 
+      name: 'Soğutucu', 
+      path: '/bizden-al', 
+      icon: '❄️',
+      keywords: ['cooler', 'fan', 'soğutucu', 'fan', 'heatsink']
+    },
+    { 
+      name: 'Boş Kasa', 
+      path: '/bizden-al', 
+      icon: '📦',
+      keywords: ['case', 'kasa', 'computer case', 'pc case', 'boş kasa']
+    },
+    { 
+      name: 'Monitör', 
+      path: '/bizden-al', 
+      icon: '🖥️',
+      keywords: ['monitor', 'ekran', 'display', 'screen', 'monitör']
+    },
+    { 
+      name: 'Klavye', 
+      path: '/bizden-al', 
+      icon: '⌨️',
+      keywords: ['keyboard', 'klavye', 'keyboard']
+    },
+    { 
+      name: 'Mouse', 
+      path: '/bizden-al', 
+      icon: '🖱️',
+      keywords: ['mouse', 'fare', 'mouse']
+    },
+    { 
+      name: 'Tablet', 
+      path: '/bizden-al', 
+      icon: '📱',
+      keywords: ['tablet', 'tablet', 'ipad', 'android tablet']
+    },
+    { 
+      name: 'Kulaklık', 
+      path: '/bizden-al', 
+      icon: '🎧',
+      keywords: ['headphones', 'headset', 'kulaklık', 'earphones']
+    },
+    { 
+      name: 'Ses Sistemi', 
+      path: '/bizden-al', 
+      icon: '🔊',
+      keywords: ['sound system', 'speaker', 'ses sistemi', 'audio system']
+    },
+    { 
+      name: 'Oyuncu Direksiyonu', 
+      path: '/bizden-al', 
+      icon: '🎮',
+      keywords: ['gaming wheel', 'steering wheel', 'direksiyon', 'racing wheel', 'oyuncu direksiyonu']
+    }
   ];
 
   const bizeSatCategories = [
-    { name: 'Dizüstü Bilgisayar', path: '/bize-sat/notebook', icon: '💻' },
-    { name: 'Masaüstü Bilgisayar', path: '/bize-sat/desktop', icon: '🖥️' },
-    { name: 'İşlemci', path: '/bize-sat/processor', icon: '⚡' },
-    { name: 'Ekran Kartı', path: '/bize-sat/graphics-card', icon: '🎮' },
-    { name: 'RAM', path: '/bize-sat/ram', icon: '🧠' },
-    { name: 'SSD', path: '/bize-sat/ssd', icon: '💾' }
+    { 
+      name: 'Dizüstü Bilgisayar', 
+      path: '/bize-sat/notebook', 
+      icon: '💻',
+      keywords: ['notebook', 'laptop', 'dizüstü', 'bilgisayar', 'laptop bilgisayar']
+    },
+    { 
+      name: 'Masaüstü Bilgisayar', 
+      path: '/bize-sat/desktop', 
+      icon: '🖥️',
+      keywords: ['desktop', 'masaüstü', 'bilgisayar', 'pc', 'computer']
+    },
+    { 
+      name: 'İşlemci', 
+      path: '/bize-sat/processor', 
+      icon: '⚡',
+      keywords: ['processor', 'cpu', 'işlemci', 'processor']
+    },
+    { 
+      name: 'Ekran Kartı', 
+      path: '/bize-sat/graphics-card', 
+      icon: '🎮',
+      keywords: ['graphics card', 'gpu', 'ekran kartı', 'video card', 'graphics']
+    },
+    { 
+      name: 'RAM', 
+      path: '/bize-sat/ram', 
+      icon: '🧠',
+      keywords: ['ram', 'memory', 'bellek', 'ddr']
+    },
+    { 
+      name: 'SSD', 
+      path: '/bize-sat/ssd', 
+      icon: '💾',
+      keywords: ['ssd', 'hard disk', 'disk', 'sabit disk', 'storage']
+    },
+    { 
+      name: 'Soğutucu', 
+      path: '/bize-sat/cooler', 
+      icon: '❄️',
+      keywords: ['cooler', 'fan', 'soğutucu', 'fan', 'heatsink']
+    },
+    { 
+      name: 'Boş Kasa', 
+      path: '/bize-sat/case', 
+      icon: '📦',
+      keywords: ['case', 'kasa', 'computer case', 'pc case', 'boş kasa']
+    },
+    { 
+      name: 'Monitör', 
+      path: '/bize-sat/monitor', 
+      icon: '🖥️',
+      keywords: ['monitor', 'ekran', 'display', 'screen', 'monitör']
+    },
+    { 
+      name: 'Klavye', 
+      path: '/bize-sat/keyboard', 
+      icon: '⌨️',
+      keywords: ['keyboard', 'klavye', 'keyboard']
+    },
+    { 
+      name: 'Mouse', 
+      path: '/bize-sat/mouse', 
+      icon: '🖱️',
+      keywords: ['mouse', 'fare', 'mouse']
+    },
+    { 
+      name: 'Tablet', 
+      path: '/bize-sat/tablet', 
+      icon: '📱',
+      keywords: ['tablet', 'tablet', 'ipad', 'android tablet']
+    },
+    { 
+      name: 'Kulaklık', 
+      path: '/bize-sat/headphones', 
+      icon: '🎧',
+      keywords: ['headphones', 'headset', 'kulaklık', 'earphones']
+    },
+    { 
+      name: 'Ses Sistemi', 
+      path: '/bize-sat/sound-system', 
+      icon: '🔊',
+      keywords: ['sound system', 'speaker', 'ses sistemi', 'audio system']
+    },
+    { 
+      name: 'Oyuncu Direksiyonu', 
+      path: '/bize-sat/gaming-wheel', 
+      icon: '🎮',
+      keywords: ['gaming wheel', 'steering wheel', 'direksiyon', 'racing wheel', 'oyuncu direksiyonu']
+    }
   ];
 
   // Search functionality
@@ -102,13 +270,19 @@ export default function Search() {
         product.category.toLowerCase().includes(searchQuery.toLowerCase())
       );
 
-      // Kategori araması
+      // Kategori araması (keywords dahil)
       const filteredBizdenAl = bizdenAlCategories.filter(category =>
-        category.name.toLowerCase().includes(searchQuery.toLowerCase())
+        category.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        category.keywords.some(keyword => 
+          keyword.toLowerCase().includes(searchQuery.toLowerCase())
+        )
       );
 
       const filteredBizeSat = bizeSatCategories.filter(category =>
-        category.name.toLowerCase().includes(searchQuery.toLowerCase())
+        category.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        category.keywords.some(keyword => 
+          keyword.toLowerCase().includes(searchQuery.toLowerCase())
+        )
       );
 
       // Sonuçları birleştir
@@ -212,6 +386,46 @@ export default function Search() {
           overflowY: 'auto',
           marginTop: '4px'
         }}>
+          {/* Kategori Başlıkları */}
+          {results.some(r => r.type === 'bize-sat') && (
+            <div style={{
+              padding: '8px 16px',
+              backgroundColor: '#f0fdf4',
+              borderBottom: '1px solid #dcfce7',
+              fontSize: '12px',
+              fontWeight: '600',
+              color: '#166534'
+            }}>
+              🟢 Bize Sat Kategorileri
+            </div>
+          )}
+          
+          {results.some(r => r.type === 'bizden-al') && (
+            <div style={{
+              padding: '8px 16px',
+              backgroundColor: '#fef2f2',
+              borderBottom: '1px solid #fecaca',
+              fontSize: '12px',
+              fontWeight: '600',
+              color: '#991b1b'
+            }}>
+              🔴 Bizden Al Kategorileri
+            </div>
+          )}
+          
+          {results.some(r => r.type === 'product') && (
+            <div style={{
+              padding: '8px 16px',
+              backgroundColor: '#eff6ff',
+              borderBottom: '1px solid #dbeafe',
+              fontSize: '12px',
+              fontWeight: '600',
+              color: '#1e40af'
+            }}>
+              🔵 Ürünler
+            </div>
+          )}
+
           {results.map((result) => (
             <a
               key={result.id}
@@ -223,13 +437,17 @@ export default function Search() {
                 textDecoration: 'none',
                 color: 'inherit',
                 borderBottom: '1px solid #f1f5f9',
-                transition: 'background-color 0.2s'
+                transition: 'background-color 0.2s',
+                backgroundColor: result.type === 'bize-sat' ? '#f0fdf4' : 
+                               result.type === 'bizden-al' ? '#fef2f2' : 'white'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#f8fafc';
+                e.currentTarget.style.backgroundColor = result.type === 'bize-sat' ? '#dcfce7' : 
+                                                     result.type === 'bizden-al' ? '#fecaca' : '#f8fafc';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'white';
+                e.currentTarget.style.backgroundColor = result.type === 'bize-sat' ? '#f0fdf4' : 
+                                                     result.type === 'bizden-al' ? '#fef2f2' : 'white';
               }}
             >
               <div style={{
@@ -240,7 +458,9 @@ export default function Search() {
                 justifyContent: 'center',
                 marginRight: '12px',
                 borderRadius: '4px',
-                fontSize: '24px'
+                fontSize: '24px',
+                backgroundColor: result.type === 'bize-sat' ? '#dcfce7' : 
+                               result.type === 'bizden-al' ? '#fecaca' : '#f1f5f9'
               }}>
                 {result.type === 'product' ? (
                   <img
@@ -261,22 +481,29 @@ export default function Search() {
                 <div style={{
                   fontWeight: '600',
                   fontSize: '14px',
-                  marginBottom: '2px'
+                  marginBottom: '2px',
+                  color: result.type === 'bize-sat' ? '#166534' : 
+                         result.type === 'bizden-al' ? '#991b1b' : '#1f2937'
                 }}>
                   {result.title}
                 </div>
                 <div style={{
                   fontSize: '12px',
-                  color: '#64748b'
+                  color: result.type === 'bize-sat' ? '#16a34a' : 
+                         result.type === 'bizden-al' ? '#dc2626' : '#64748b'
                 }}>
                   {result.category}
                 </div>
               </div>
               <div style={{
                 fontWeight: '700',
-                fontSize: '14px',
                 color: result.type === 'bizden-al' ? '#dc2626' : 
-                       result.type === 'bize-sat' ? '#22c55e' : '#2563eb'
+                       result.type === 'bize-sat' ? '#22c55e' : '#2563eb',
+                backgroundColor: result.type === 'bize-sat' ? '#dcfce7' : 
+                               result.type === 'bizden-al' ? '#fecaca' : '#eff6ff',
+                padding: '4px 8px',
+                borderRadius: '6px',
+                fontSize: '12px'
               }}>
                 {result.type === 'product' ? 
                   `${result.price.toLocaleString('tr-TR')} ₺` : 
