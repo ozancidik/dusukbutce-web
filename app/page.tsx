@@ -54,7 +54,14 @@ export default function HomePage() {
 
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      
+      // iPad Mini (768x1024) ve Surface Duo (540x720) için özel kontrol
+      const isTablet = (width === 768 && height === 1024) || (width === 540 && height === 720);
+      
+      // 768px ve altı veya tablet boyutları için mobile layout
+      setIsMobile(width <= 768 || isTablet);
     };
     
     checkMobile();
@@ -232,13 +239,14 @@ export default function HomePage() {
         flexDirection: isMobile ? "column" : "row",
         gap: isMobile ? "16px" : "24px",
         width: "100%",
-        maxWidth: "800px",
+        maxWidth: isMobile ? "400px" : "800px",
         justifyContent: "center",
         alignItems: "stretch",
-        marginBottom: "32px"
+        marginBottom: "32px",
+        margin: "0 auto 32px auto"
       }}>
         {/* BİZE SAT butonu */}
-        <Link href="/bize-sat" style={{ flex: 1, maxWidth: isMobile ? "400px" : "350px" }}>
+        <Link href="/bize-sat" style={{ flex: 1, maxWidth: isMobile ? "100%" : "350px" }}>
           <button
             style={{
               background: "#22c55e",
@@ -260,7 +268,7 @@ export default function HomePage() {
         </Link>
 
         {/* SATILIK İLANLAR butonu */}
-                      <Link href="/satilik-ilanlar" style={{ flex: 1, maxWidth: isMobile ? "400px" : "350px" }}>
+        <Link href="/satilik-ilanlar" style={{ flex: 1, maxWidth: isMobile ? "100%" : "350px" }}>
           <button
             style={{
               background: "#dc2626",
