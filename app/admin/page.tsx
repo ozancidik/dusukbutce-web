@@ -92,6 +92,13 @@ export default function AdminPage() {
     localStorage.removeItem('userId');
     localStorage.removeItem('loginTime');
     
+    // useAuth hook için gerekli alanları da temizle
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    
+    // Custom event'i tetikle
+    window.dispatchEvent(new Event('localStorageChange'));
+    
     // Header'a logout mesajı gönder
     window.dispatchEvent(new CustomEvent('logout'));
     

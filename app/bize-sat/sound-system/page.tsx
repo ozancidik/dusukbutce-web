@@ -1,8 +1,10 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '../../hooks/useAuth';
 
 export default function SoundSystemPage() {
+  const { isLoggedIn } = useAuth();
   const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);

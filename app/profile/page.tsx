@@ -239,6 +239,13 @@ export default function ProfilePage() {
     localStorage.removeItem('adminLoggedIn');
     localStorage.removeItem('adminEmail');
     
+    // useAuth hook için gerekli alanları da temizle
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    
+    // Custom event'i tetikle
+    window.dispatchEvent(new Event('localStorageChange'));
+    
     // Header'a logout mesajı gönder
     window.dispatchEvent(new CustomEvent('logout'));
     

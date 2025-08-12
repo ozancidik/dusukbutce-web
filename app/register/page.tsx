@@ -373,6 +373,7 @@ export default function RegisterPage() {
               type="password"
               value={form.password}
               onChange={handleChange}
+              autoComplete="off"
               required
               style={{
                 width: "100%",

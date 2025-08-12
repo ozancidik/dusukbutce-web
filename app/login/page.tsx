@@ -34,6 +34,18 @@ export default function LoginPage() {
         localStorage.setItem("userId", data.user.id);
         localStorage.setItem("loginTime", loginTime.toString());
         
+        // Token ve user bilgilerini de kaydet (useAuth hook için)
+        localStorage.setItem("token", data.token || "login-token-" + Math.random().toString(36).substr(2, 9));
+        localStorage.setItem("user", JSON.stringify({
+          id: data.user.id,
+          email: data.user.email,
+          name: data.user.name,
+          isAdmin: data.user.isAdmin
+        }));
+        
+        // Custom event'i tetikle
+        window.dispatchEvent(new Event('localStorageChange'));
+        
         if (data.user.isAdmin) {
           localStorage.setItem("adminLoggedIn", "true");
           localStorage.setItem("adminEmail", data.user.email);
@@ -80,6 +92,18 @@ export default function LoginPage() {
           localStorage.setItem("userName", userData.name);
           localStorage.setItem("userId", userData.id);
           localStorage.setItem("loginTime", loginTime.toString());
+          
+          // Token ve user bilgilerini de kaydet (useAuth hook için)
+          localStorage.setItem("token", "google-oauth-token-" + Math.random().toString(36).substr(2, 9));
+          localStorage.setItem("user", JSON.stringify({
+            id: userData.id,
+            email: userData.email,
+            name: userData.name,
+            isAdmin: userData.isAdmin
+          }));
+          
+          // Custom event'i tetikle
+          window.dispatchEvent(new Event('localStorageChange'));
           
           if (userData.isAdmin) {
             localStorage.setItem("adminLoggedIn", "true");
@@ -210,6 +234,7 @@ export default function LoginPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              autoComplete="off"
               required
               style={{
                 width: "100%",

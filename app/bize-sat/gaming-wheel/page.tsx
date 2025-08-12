@@ -1,14 +1,14 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '../../hooks/useAuth';
 
 export default function GamingWheelPage() {
   const router = useRouter();
+  const { isLoggedIn } = useAuth();
   const [isMobile, setIsMobile] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const [formData, setFormData] = useState({
     brand: '',
     model: '',
@@ -33,50 +33,8 @@ export default function GamingWheelPage() {
     checkMobile();
     window.addEventListener('resize', checkMobile);
     
-    // Login durumunu kontrol et
-    const checkLoginStatus = () => {
-      const userLoggedIn = localStorage.getItem('userLoggedIn');
-      const loginTime = localStorage.getItem('loginTime');
-      
-      if (userLoggedIn && loginTime) {
-        const loginTimestamp = parseInt(loginTime);
-        const currentTime = Date.now();
-        const timeDiff = currentTime - loginTimestamp;
-        const hoursDiff = timeDiff / (1000 * 60 * 60);
-        
-        // 24 saat geçerli
-        if (hoursDiff < 24) {
-          setIsLoggedIn(true);
-        } else {
-          localStorage.removeItem('userLoggedIn');
-          localStorage.removeItem('userEmail');
-          localStorage.removeItem('userName');
-          localStorage.removeItem('userId');
-          localStorage.removeItem('loginTime');
-          setIsLoggedIn(false);
-        }
-      } else {
-        setIsLoggedIn(false);
-      }
-      setIsLoading(false);
-    };
-    
-    checkLoginStatus();
-    
-    // Login durumu değişikliklerini dinle
-    const handleStorageChange = () => {
-      checkLoginStatus();
-    };
-    
-    window.addEventListener('storage', handleStorageChange);
-    window.addEventListener('login', handleStorageChange);
-    window.addEventListener('logout', handleStorageChange);
-    
     return () => {
       window.removeEventListener('resize', checkMobile);
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('login', handleStorageChange);
-      window.removeEventListener('logout', handleStorageChange);
     };
   }, []);
 
@@ -119,12 +77,6 @@ export default function GamingWheelPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!isLoggedIn) {
-      router.push('/login');
-      return;
-    }
-    
     setIsSubmitting(true);
 
     try {
@@ -751,45 +703,67 @@ export default function GamingWheelPage() {
           </div>
 
           {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            style={{
-              width: '100%',
-              padding: '16px',
-              background: isSubmitting ? '#9ca3af' : (isLoggedIn ? 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)' : 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)'),
-              color: 'white',
-              border: 'none',
-              borderRadius: '12px',
-              fontSize: '16px',
-              fontWeight: '600',
-              cursor: isSubmitting ? 'not-allowed' : 'pointer',
-              transition: 'all 0.2s ease',
-              boxShadow: isLoggedIn ? '0 4px 6px rgba(59, 130, 246, 0.25)' : '0 4px 6px rgba(220, 38, 38, 0.25)'
-            }}
-            onMouseEnter={(e) => {
-              if (!isSubmitting) {
+          {isLoggedIn ? (
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              style={{
+                width: '100%',
+                background: isSubmitting ? '#9ca3af' : 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '12px',
+                padding: '16px',
+                fontSize: '16px',
+                fontWeight: '600',
+                cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                transition: 'all 0.2s',
+                boxShadow: '0 4px 12px rgba(37, 99, 235, 0.3)'
+              }}
+              onMouseEnter={(e) => {
+                if (!isSubmitting) {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(37, 99, 235, 0.4)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isSubmitting) {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(37, 99, 235, 0.3)';
+                }
+              }}
+            >
+              {isSubmitting ? 'Gönderiliyor...' : 'TEKLİF AL'}
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => router.push('/login')}
+              style={{
+                width: '100%',
+                background: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '12px',
+                padding: '16px',
+                fontSize: '16px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                boxShadow: '0 4px 12px rgba(220, 38, 38, 0.3)'
+              }}
+              onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-2px)';
-                if (isLoggedIn) {
-                  e.currentTarget.style.boxShadow = '0 6px 12px rgba(59, 130, 246, 0.35)';
-                } else {
-                  e.currentTarget.style.boxShadow = '0 6px 12px rgba(220, 38, 38, 0.35)';
-                }
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!isSubmitting) {
+                e.currentTarget.style.boxShadow = '0 6px 20px rgba(220, 38, 38, 0.4)';
+              }}
+              onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateY(0)';
-                if (isLoggedIn) {
-                  e.currentTarget.style.boxShadow = '0 4px 6px rgba(59, 130, 246, 0.25)';
-                } else {
-                  e.currentTarget.style.boxShadow = '0 4px 6px rgba(220, 38, 38, 0.25)';
-                }
-              }
-            }}
-          >
-            {isSubmitting ? 'Gönderiliyor...' : (isLoggedIn ? 'Teklif Al' : 'GİRİŞ YAP')}
-          </button>
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.3)';
+              }}
+            >
+              TEKLİF ALABİLMEK İÇİN GİRİŞ YAPMALISINIZ
+            </button>
+          )}
         </form>
       </div>
 
