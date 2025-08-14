@@ -13,9 +13,13 @@ export default function NotebookPage() {
     brand: '',
     model: '',
     processor: '',
+    processorBrand: '',
     graphicsCard: '',
+    graphicsCardWatt: '',
     ram: '',
+    ramType: '',
     storage: '',
+    storageType: '',
     screenSize: '',
     refreshRate: '',
     batteryHealth: '',
@@ -102,9 +106,13 @@ export default function NotebookPage() {
           brand: '',
           model: '',
           processor: '',
+          processorBrand: '',
           graphicsCard: '',
+          graphicsCardWatt: '',
           ram: '',
+          ramType: '',
           storage: '',
+          storageType: '',
           screenSize: '',
           refreshRate: '',
           batteryHealth: '',
@@ -270,117 +278,265 @@ export default function NotebookPage() {
               gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
               gap: '16px'
             }}>
-              <div>
-                <label style={{
-                  display: 'block',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  color: '#374151',
-                  marginBottom: '6px'
-                }}>
-                  İşlemci
-                </label>
-                <input
-                  type="text"
-                  value={formData.processor}
-                  onChange={(e) => handleInputChange('processor', e.target.value)}
-                  placeholder="Örn: Intel i7-12700H"
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '8px',
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '12px'
+              }}>
+                <div>
+                  <label style={{
+                    display: 'block',
                     fontSize: '14px',
-                    outline: 'none',
-                    transition: 'border-color 0.2s'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-                />
+                    fontWeight: '500',
+                    color: '#374151',
+                    marginBottom: '6px'
+                  }}>
+                    İşlemci
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.processor}
+                    onChange={(e) => handleInputChange('processor', e.target.value)}
+                    placeholder="Örn: i7-12700H"
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      outline: 'none',
+                      transition: 'border-color 0.2s'
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                    onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                  />
+                </div>
+                <div>
+                  <label style={{
+                    display: 'block',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    color: '#374151',
+                    marginBottom: '6px'
+                  }}>
+                    Marka
+                  </label>
+                  <select
+                    value={formData.processorBrand}
+                    onChange={(e) => handleInputChange('processorBrand', e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      outline: 'none',
+                      transition: 'border-color 0.2s'
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                    onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                  >
+                    <option value="">Seçiniz</option>
+                    <option value="Intel">Intel</option>
+                    <option value="AMD">AMD</option>
+                  </select>
+                </div>
               </div>
-              <div>
-                <label style={{
-                  display: 'block',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  color: '#374151',
-                  marginBottom: '6px'
-                }}>
-                  Ekran Kartı
-                </label>
-                <input
-                  type="text"
-                  value={formData.graphicsCard}
-                  onChange={(e) => handleInputChange('graphicsCard', e.target.value)}
-                  placeholder="Örn: RTX 4060, GTX 1650"
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '8px',
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '12px'
+              }}>
+                <div>
+                  <label style={{
+                    display: 'block',
                     fontSize: '14px',
-                    outline: 'none',
-                    transition: 'border-color 0.2s'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-                />
+                    fontWeight: '500',
+                    color: '#374151',
+                    marginBottom: '6px'
+                  }}>
+                    Ekran Kartı
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.graphicsCard}
+                    onChange={(e) => handleInputChange('graphicsCard', e.target.value)}
+                    placeholder="Örn: RTX 4060"
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      outline: 'none',
+                      transition: 'border-color 0.2s'
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                    onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                  />
+                </div>
+                <div>
+                  <label style={{
+                    display: 'block',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    color: '#374151',
+                    marginBottom: '6px'
+                  }}>
+                    Watt Değeri
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.graphicsCardWatt}
+                    onChange={(e) => handleInputChange('graphicsCardWatt', e.target.value)}
+                    placeholder="Örn: 140W"
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      outline: 'none',
+                      transition: 'border-color 0.2s'
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                    onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                  />
+                </div>
               </div>
-              <div>
-                <label style={{
-                  display: 'block',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  color: '#374151',
-                  marginBottom: '6px'
-                }}>
-                  RAM
-                </label>
-                <input
-                  type="text"
-                  value={formData.ram}
-                  onChange={(e) => handleInputChange('ram', e.target.value)}
-                  placeholder="Örn: 16GB DDR4"
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '8px',
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '12px'
+              }}>
+                <div>
+                  <label style={{
+                    display: 'block',
                     fontSize: '14px',
-                    outline: 'none',
-                    transition: 'border-color 0.2s'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-                />
+                    fontWeight: '500',
+                    color: '#374151',
+                    marginBottom: '6px'
+                  }}>
+                    RAM
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.ram}
+                    onChange={(e) => handleInputChange('ram', e.target.value)}
+                    placeholder="Örn: 16GB"
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      outline: 'none',
+                      transition: 'border-color 0.2s'
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                    onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                  />
+                </div>
+                <div>
+                  <label style={{
+                    display: 'block',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    color: '#374151',
+                    marginBottom: '6px'
+                  }}>
+                    RAM Tipi
+                  </label>
+                  <select
+                    value={formData.ramType}
+                    onChange={(e) => handleInputChange('ramType', e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      outline: 'none',
+                      transition: 'border-color 0.2s'
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                    onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                  >
+                    <option value="">Seçiniz</option>
+                    <option value="DDR4">DDR4</option>
+                    <option value="DDR5">DDR5</option>
+                    <option value="DDR3">DDR3</option>
+                    <option value="LPDDR4">LPDDR4</option>
+                    <option value="LPDDR5">LPDDR5</option>
+                  </select>
+                </div>
               </div>
-              <div>
-                <label style={{
-                  display: 'block',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  color: '#374151',
-                  marginBottom: '6px'
-                }}>
-                  Depolama
-                </label>
-                <input
-                  type="text"
-                  value={formData.storage}
-                  onChange={(e) => handleInputChange('storage', e.target.value)}
-                  placeholder="Örn: 512GB SSD"
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '8px',
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '12px'
+              }}>
+                <div>
+                  <label style={{
+                    display: 'block',
                     fontSize: '14px',
-                    outline: 'none',
-                    transition: 'border-color 0.2s'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-                />
+                    fontWeight: '500',
+                    color: '#374151',
+                    marginBottom: '6px'
+                  }}>
+                    Disk Kapasitesi
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.storage}
+                    onChange={(e) => handleInputChange('storage', e.target.value)}
+                    placeholder="Örn: 512GB"
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      outline: 'none',
+                      transition: 'border-color 0.2s'
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                    onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                  />
+                </div>
+                <div>
+                  <label style={{
+                    display: 'block',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    color: '#374151',
+                    marginBottom: '6px'
+                  }}>
+                    Disk Tipi
+                  </label>
+                  <select
+                    value={formData.storageType}
+                    onChange={(e) => handleInputChange('storageType', e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      outline: 'none',
+                      transition: 'border-color 0.2s'
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                    onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                  >
+                    <option value="">Seçiniz</option>
+                    <option value="SSD(SATA)">SSD(SATA)</option>
+                    <option value="SSD(PCIe NVMe)">SSD(PCIe NVMe)</option>
+                    <option value="HDD">HDD</option>
+                    <option value="SSD(SATA)+HDD">SSD(SATA)+HDD</option>
+                    <option value="SSD(PCIe NVMe)+HDD">SSD(PCIe NVMe)+HDD</option>
+                  </select>
+                </div>
               </div>
               <div>
                 <label style={{

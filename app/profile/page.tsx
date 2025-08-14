@@ -230,8 +230,9 @@ export default function ProfilePage() {
   };
 
   const handleLogout = () => {
-    // Tüm localStorage'ı temizle
+    // Tüm localStorage ve sessionStorage'ı temizle
     localStorage.clear();
+    sessionStorage.clear();
     
     // Custom event'i tetikle
     window.dispatchEvent(new Event('localStorageChange'));

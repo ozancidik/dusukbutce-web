@@ -47,9 +47,17 @@ export default function Header() {
   // Kullanıcı giriş durumunu kontrol et
   useEffect(() => {
     const checkLoginStatus = () => {
-      const userLoggedIn = localStorage.getItem("userLoggedIn");
-      const userName = localStorage.getItem("userName");
-      const loginTime = localStorage.getItem("loginTime");
+      // Önce localStorage'dan kontrol et, yoksa sessionStorage'dan
+      let userLoggedIn = localStorage.getItem("userLoggedIn");
+      let userName = localStorage.getItem("userName");
+      let loginTime = localStorage.getItem("loginTime");
+      
+      // localStorage'da yoksa sessionStorage'dan al
+      if (!userLoggedIn) {
+        userLoggedIn = sessionStorage.getItem("userLoggedIn");
+        userName = sessionStorage.getItem("userName");
+        loginTime = sessionStorage.getItem("loginTime");
+      }
       
       // Timeout kontrolü (60 dakika = 3600000 ms)
       const TIMEOUT_DURATION = 60 * 60 * 1000; // 60 dakika
@@ -64,6 +72,18 @@ export default function Header() {
         localStorage.removeItem("loginTime");
         localStorage.removeItem("adminLoggedIn");
         localStorage.removeItem("adminEmail");
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        
+        sessionStorage.removeItem("userLoggedIn");
+        sessionStorage.removeItem("userEmail");
+        sessionStorage.removeItem("userName");
+        sessionStorage.removeItem("userId");
+        sessionStorage.removeItem("loginTime");
+        sessionStorage.removeItem("adminLoggedIn");
+        sessionStorage.removeItem("adminEmail");
+        sessionStorage.removeItem("token");
+        sessionStorage.removeItem("user");
         
         setIsLoggedIn(false);
         setUserName("");

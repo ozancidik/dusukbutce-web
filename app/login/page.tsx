@@ -26,22 +26,32 @@ export default function LoginPage() {
       const data = await res.json();
       
       if (data.success) {
-        // Kullanıcı bilgilerini localStorage'a kaydet
+        // Kullanıcı bilgilerini hem localStorage hem sessionStorage'a kaydet
         const loginTime = Date.now();
-        localStorage.setItem("userLoggedIn", "true");
-        localStorage.setItem("userEmail", data.user.email);
-        localStorage.setItem("userName", data.user.name);
-        localStorage.setItem("userId", data.user.id);
-        localStorage.setItem("loginTime", loginTime.toString());
+        const userData = {
+          userLoggedIn: "true",
+          userEmail: data.user.email,
+          userName: data.user.name,
+          userId: data.user.id,
+          loginTime: loginTime.toString(),
+          token: data.token || "login-token-" + Math.random().toString(36).substr(2, 9),
+          user: JSON.stringify({
+            id: data.user.id,
+            email: data.user.email,
+            name: data.user.name,
+            isAdmin: data.user.isAdmin
+          })
+        };
         
-        // Token ve user bilgilerini de kaydet (useAuth hook için)
-        localStorage.setItem("token", data.token || "login-token-" + Math.random().toString(36).substr(2, 9));
-        localStorage.setItem("user", JSON.stringify({
-          id: data.user.id,
-          email: data.user.email,
-          name: data.user.name,
-          isAdmin: data.user.isAdmin
-        }));
+        // localStorage'a kaydet
+        Object.entries(userData).forEach(([key, value]) => {
+          localStorage.setItem(key, value);
+        });
+        
+        // sessionStorage'a da kaydet (gizli sekme desteği için)
+        Object.entries(userData).forEach(([key, value]) => {
+          sessionStorage.setItem(key, value);
+        });
         
         // Custom event'i tetikle
         window.dispatchEvent(new Event('localStorageChange'));
@@ -49,6 +59,8 @@ export default function LoginPage() {
         if (data.user.isAdmin) {
           localStorage.setItem("adminLoggedIn", "true");
           localStorage.setItem("adminEmail", data.user.email);
+          sessionStorage.setItem("adminLoggedIn", "true");
+          sessionStorage.setItem("adminEmail", data.user.email);
         }
         
         router.push("/"); // Anasayfaya yönlendir
@@ -87,20 +99,30 @@ export default function LoginPage() {
         if (event.data.type === 'GOOGLE_LOGIN_SUCCESS') {
           const userData = event.data.user;
           const loginTime = Date.now();
-          localStorage.setItem("userLoggedIn", "true");
-          localStorage.setItem("userEmail", userData.email);
-          localStorage.setItem("userName", userData.name);
-          localStorage.setItem("userId", userData.id);
-          localStorage.setItem("loginTime", loginTime.toString());
+          const userDataToStore = {
+            userLoggedIn: "true",
+            userEmail: userData.email,
+            userName: userData.name,
+            userId: userData.id,
+            loginTime: loginTime.toString(),
+            token: "google-oauth-token-" + Math.random().toString(36).substr(2, 9),
+            user: JSON.stringify({
+              id: userData.id,
+              email: userData.email,
+              name: userData.name,
+              isAdmin: userData.isAdmin
+            })
+          };
           
-          // Token ve user bilgilerini de kaydet (useAuth hook için)
-          localStorage.setItem("token", "google-oauth-token-" + Math.random().toString(36).substr(2, 9));
-          localStorage.setItem("user", JSON.stringify({
-            id: userData.id,
-            email: userData.email,
-            name: userData.name,
-            isAdmin: userData.isAdmin
-          }));
+          // localStorage'a kaydet
+          Object.entries(userDataToStore).forEach(([key, value]) => {
+            localStorage.setItem(key, value);
+          });
+          
+          // sessionStorage'a da kaydet (gizli sekme desteği için)
+          Object.entries(userDataToStore).forEach(([key, value]) => {
+            sessionStorage.setItem(key, value);
+          });
           
           // Custom event'i tetikle
           window.dispatchEvent(new Event('localStorageChange'));
@@ -108,6 +130,8 @@ export default function LoginPage() {
           if (userData.isAdmin) {
             localStorage.setItem("adminLoggedIn", "true");
             localStorage.setItem("adminEmail", userData.email);
+            sessionStorage.setItem("adminLoggedIn", "true");
+            sessionStorage.setItem("adminEmail", userData.email);
           }
           
           popup?.close();

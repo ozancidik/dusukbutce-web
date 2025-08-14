@@ -10,15 +10,23 @@ export const useAuth = () => {
   useEffect(() => {
     const checkAuthStatus = () => {
       try {
-        // Yeni format: token ve user
-        const token = localStorage.getItem('token');
-        const userData = localStorage.getItem('user');
+        // Önce localStorage'dan kontrol et, yoksa sessionStorage'dan
+        let token = localStorage.getItem('token');
+        let userData = localStorage.getItem('user');
+        let userLoggedIn = localStorage.getItem('userLoggedIn');
+        let userEmail = localStorage.getItem('userEmail');
+        let userName = localStorage.getItem('userName');
+        let userId = localStorage.getItem('userId');
         
-        // Eski format: userLoggedIn, userEmail, userName
-        const userLoggedIn = localStorage.getItem('userLoggedIn');
-        const userEmail = localStorage.getItem('userEmail');
-        const userName = localStorage.getItem('userName');
-        const userId = localStorage.getItem('userId');
+        // localStorage'da yoksa sessionStorage'dan al
+        if (!userLoggedIn && !token) {
+          token = sessionStorage.getItem('token');
+          userData = sessionStorage.getItem('user');
+          userLoggedIn = sessionStorage.getItem('userLoggedIn');
+          userEmail = sessionStorage.getItem('userEmail');
+          userName = sessionStorage.getItem('userName');
+          userId = sessionStorage.getItem('userId');
+        }
         
         if ((token && userData) || (userLoggedIn === 'true' && userEmail)) {
           setIsLoggedIn(true);
@@ -30,16 +38,14 @@ export const useAuth = () => {
               id: userId,
               email: userEmail,
               name: userName,
-              isAdmin: localStorage.getItem('adminLoggedIn') === 'true'
+              isAdmin: localStorage.getItem('adminLoggedIn') === 'true' || sessionStorage.getItem('adminLoggedIn') === 'true'
             });
           }
           
-          // 60 dakika sonra otomatik logout
           startLogoutTimer();
         } else {
           setIsLoggedIn(false);
           setUser(null);
-          // Timer'ı temizle
           clearLogoutTimer();
         }
       } catch (error) {
@@ -59,7 +65,7 @@ export const useAuth = () => {
       
       // 60 dakika = 60 * 60 * 1000 = 3,600,000 ms
       const timer = setTimeout(() => {
-        // Otomatik logout
+        // Otomatik logout - hem localStorage hem sessionStorage'ı temizle
         localStorage.removeItem('userLoggedIn');
         localStorage.removeItem('userEmail');
         localStorage.removeItem('userName');
@@ -69,6 +75,16 @@ export const useAuth = () => {
         localStorage.removeItem('adminEmail');
         localStorage.removeItem('token');
         localStorage.removeItem('user');
+        
+        sessionStorage.removeItem('userLoggedIn');
+        sessionStorage.removeItem('userEmail');
+        sessionStorage.removeItem('userName');
+        sessionStorage.removeItem('userId');
+        sessionStorage.removeItem('loginTime');
+        sessionStorage.removeItem('adminLoggedIn');
+        sessionStorage.removeItem('adminEmail');
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('user');
         
         // State'i güncelle
         setIsLoggedIn(false);
@@ -94,7 +110,7 @@ export const useAuth = () => {
 
     checkAuthStatus();
     
-    // Local storage değişikliklerini dinle
+    // Storage değişikliklerini dinle
     const handleStorageChange = () => {
       checkAuthStatus();
     };
@@ -104,14 +120,13 @@ export const useAuth = () => {
       checkAuthStatus();
     };
 
-    window.addEventListener('storage', handleStorageChange);
-    window.addEventListener('localStorageChange', handleCustomStorageChange);
-    
     // Sayfa focus olduğunda da kontrol et
     const handleFocus = () => {
       checkAuthStatus();
     };
     
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('localStorageChange', handleCustomStorageChange);
     window.addEventListener('focus', handleFocus);
     
     return () => {
