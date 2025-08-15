@@ -444,12 +444,11 @@ export default function GraphicsCardPage() {
             }}>
               <div>
                 <label style={{
-                  display: 'block',
+                  display: 'flex',
                   fontSize: '14px',
                   fontWeight: '500',
                   color: '#374151',
                   marginBottom: '6px',
-                  display: 'flex',
                   alignItems: 'center',
                   gap: '8px'
                 }}>
@@ -493,7 +492,6 @@ export default function GraphicsCardPage() {
                           position: 'absolute',
                           bottom: '-6px',
                           left: '50%',
-                          transform: 'translateX(-50%)',
                           width: '12px',
                           height: '12px',
                           background: 'white',
