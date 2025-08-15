@@ -9,15 +9,21 @@ export default function GraphicsCardPage() {
   const [isMobile, setIsMobile] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showFurmarkHelp, setShowFurmarkHelp] = useState(false);
   const [formData, setFormData] = useState({
     brand: '',
+    chipSet: '',
     model: '',
     memory: '',
     memoryType: '',
-    coreClock: '',
-    boostClock: '',
-    powerConsumption: '',
     ports: '',
+    dviOutput: '',
+    furmarkResult: '',
+    opened: '',
+    thermalPadChanged: '',
+    miningUsed: '',
+    miningDuration: '',
+    warrantySticker: '',
     description: '',
     cosmeticCondition: 'İyi',
     hasBox: false,
@@ -99,13 +105,18 @@ export default function GraphicsCardPage() {
         setShowSuccessModal(true);
         setFormData({
           brand: '',
+          chipSet: '',
           model: '',
           memory: '',
           memoryType: '',
-          coreClock: '',
-          boostClock: '',
-          powerConsumption: '',
           ports: '',
+          dviOutput: '',
+          furmarkResult: '',
+          opened: '',
+          thermalPadChanged: '',
+          miningUsed: '',
+          miningDuration: '',
+          warrantySticker: '',
           description: '',
           cosmeticCondition: 'İyi',
           hasBox: false,
@@ -204,7 +215,7 @@ export default function GraphicsCardPage() {
                   required
                   value={formData.brand}
                   onChange={(e) => handleInputChange('brand', e.target.value)}
-                  placeholder="Örn: NVIDIA, AMD, ASUS"
+                  placeholder="Örn: ASUS, MSI, GIGABYTE, PNY, ZOTAC"
                   style={{
                     width: '100%',
                     padding: '12px',
@@ -226,6 +237,45 @@ export default function GraphicsCardPage() {
                   color: '#374151',
                   marginBottom: '6px'
                 }}>
+                  Chip Set *
+                </label>
+                <select
+                  required
+                  value={formData.chipSet}
+                  onChange={(e) => handleInputChange('chipSet', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                >
+                  <option value="">Chip Set seçin</option>
+                  <option value="NVIDIA">NVIDIA</option>
+                  <option value="AMD">AMD</option>
+                  <option value="Intel">Intel</option>
+                </select>
+              </div>
+            </div>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
+              gap: '16px',
+              marginTop: '16px'
+            }}>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
                   Model *
                 </label>
                 <input
@@ -233,7 +283,7 @@ export default function GraphicsCardPage() {
                   required
                   value={formData.model}
                   onChange={(e) => handleInputChange('model', e.target.value)}
-                  placeholder="Örn: RTX 4070, RX 6700 XT"
+                  placeholder="Örn: RTX 4070, RX 6700 XT, ARC B580"
                   style={{
                     width: '100%',
                     padding: '12px',
@@ -304,13 +354,13 @@ export default function GraphicsCardPage() {
                   color: '#374151',
                   marginBottom: '6px'
                 }}>
-                  Bellek Tipi
+                  Bit Değeri
                 </label>
                 <input
                   type="text"
                   value={formData.memoryType}
                   onChange={(e) => handleInputChange('memoryType', e.target.value)}
-                  placeholder="Örn: GDDR6, GDDR6X"
+                  placeholder="Örn: 128-bit, 256-bit"
                   style={{
                     width: '100%',
                     padding: '12px',
@@ -324,90 +374,7 @@ export default function GraphicsCardPage() {
                   onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
                 />
               </div>
-              <div>
-                <label style={{
-                  display: 'block',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  color: '#374151',
-                  marginBottom: '6px'
-                }}>
-                  Temel Hız
-                </label>
-                <input
-                  type="text"
-                  value={formData.coreClock}
-                  onChange={(e) => handleInputChange('coreClock', e.target.value)}
-                  placeholder="Örn: 1920 MHz"
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    outline: 'none',
-                    transition: 'border-color 0.2s'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-                />
-              </div>
-              <div>
-                <label style={{
-                  display: 'block',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  color: '#374151',
-                  marginBottom: '6px'
-                }}>
-                  Boost Hız
-                </label>
-                <input
-                  type="text"
-                  value={formData.boostClock}
-                  onChange={(e) => handleInputChange('boostClock', e.target.value)}
-                  placeholder="Örn: 2475 MHz"
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    outline: 'none',
-                    transition: 'border-color 0.2s'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-                />
-              </div>
-              <div>
-                <label style={{
-                  display: 'block',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  color: '#374151',
-                  marginBottom: '6px'
-                }}>
-                  Güç Tüketimi
-                </label>
-                <input
-                  type="text"
-                  value={formData.powerConsumption}
-                  onChange={(e) => handleInputChange('powerConsumption', e.target.value)}
-                  placeholder="Örn: 200W"
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    outline: 'none',
-                    transition: 'border-color 0.2s'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-                />
-              </div>
+
               <div>
                 <label style={{
                   display: 'block',
@@ -436,6 +403,329 @@ export default function GraphicsCardPage() {
                   onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
                 />
               </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  DVI Çıkışı
+                </label>
+                <select
+                  value={formData.dviOutput}
+                  onChange={(e) => handleInputChange('dviOutput', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                >
+                  <option value="">DVI Çıkışı seçin</option>
+                  <option value="Var">Var</option>
+                  <option value="Yok">Yok</option>
+                </select>
+              </div>
+            </div>
+            
+            {/* Test Sonuçları ve Açıklama */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
+              gap: '16px',
+              marginTop: '16px'
+            }}>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}>
+                  Furmark Test Sonucu
+                  <div
+                    onMouseEnter={() => setShowFurmarkHelp(true)}
+                    onMouseLeave={() => setShowFurmarkHelp(false)}
+                    style={{
+                      width: '16px',
+                      height: '16px',
+                      borderRadius: '50%',
+                      background: '#6b7280',
+                      color: 'white',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '10px',
+                      cursor: 'help',
+                      fontWeight: 'bold',
+                      position: 'relative'
+                    }}
+                  >
+                    ?
+                    {showFurmarkHelp && (
+                      <div style={{
+                        position: 'absolute',
+                        bottom: '25px',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        background: 'white',
+                        border: '1px solid #e5e7eb',
+                        borderRadius: '8px',
+                        padding: '16px',
+                        boxShadow: '0 10px 25px rgba(0, 0, 0, 0.15)',
+                        width: '280px',
+                        zIndex: 1000,
+                        fontSize: '13px',
+                        lineHeight: '1.5'
+                      }}>
+                        <div style={{
+                          position: 'absolute',
+                          bottom: '-6px',
+                          left: '50%',
+                          transform: 'translateX(-50%)',
+                          width: '12px',
+                          height: '12px',
+                          background: 'white',
+                          border: '1px solid #e5e7eb',
+                          borderTop: 'none',
+                          borderLeft: 'none',
+                          transform: 'translateX(-50%) rotate(45deg)'
+                        }}></div>
+                        <h4 style={{
+                          margin: '0 0 8px 0',
+                          fontSize: '14px',
+                          fontWeight: '600',
+                          color: '#1f2937'
+                        }}>
+                          🔥 Furmark Test Rehberi
+                        </h4>
+                        <div style={{ color: '#374151' }}>
+                          <p style={{ margin: '0 0 8px 0' }}>
+                            <strong>1.</strong> Furmark programını indirin (ücretsiz)
+                          </p>
+                          <p style={{ margin: '0 0 8px 0' }}>
+                            <strong>2.</strong> GPU stres testini başlatın
+                          </p>
+                          <p style={{ margin: '0 0 8px 0' }}>
+                            <strong>3.</strong> 5-10 dakika çalıştırın
+                          </p>
+                          <p style={{ margin: '0 0 8px 0' }}>
+                            <strong>4.</strong> 1920x1080 çözünürlükte test yapın
+                          </p>
+                          <p style={{ margin: '0 0 8px 0' }}>
+                            <strong>5.</strong> Sıcaklık (°C) ve FPS değerlerini not edin
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </label>
+                <input
+                  type="text"
+                  value={formData.furmarkResult}
+                  onChange={(e) => handleInputChange('furmarkResult', e.target.value)}
+                  placeholder="Örn: 85°C, 98%"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                />
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Garanti Etiketi Duruyor mu
+                </label>
+                <select
+                  value={formData.warrantySticker}
+                  onChange={(e) => handleInputChange('warrantySticker', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                >
+                  <option value="">Seçin</option>
+                  <option value="Evet">Evet</option>
+                  <option value="Hayır">Hayır</option>
+                </select>
+              </div>
+
+            </div>
+            
+            {/* Ürün Geçmişi */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
+              gap: '16px',
+              marginTop: '16px'
+            }}>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  İçi Açıldı mı
+                </label>
+                <select
+                  value={formData.opened}
+                  onChange={(e) => handleInputChange('opened', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                >
+                  <option value="">Seçin</option>
+                  <option value="Evet">Evet</option>
+                  <option value="Hayır">Hayır</option>
+                </select>
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Termal Ped Değişti mi
+                </label>
+                <select
+                  value={formData.thermalPadChanged}
+                  onChange={(e) => handleInputChange('thermalPadChanged', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                >
+                  <option value="">Seçin</option>
+                  <option value="Evet">Evet</option>
+                  <option value="Hayır">Hayır</option>
+                </select>
+              </div>
+            </div>
+            
+            {/* Ürün Geçmişi - 2. Satır */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
+              gap: '16px',
+              marginTop: '16px'
+            }}>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Mining Yapıldı mı
+                </label>
+                <select
+                  value={formData.miningUsed}
+                  onChange={(e) => handleInputChange('miningUsed', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                >
+                  <option value="">Seçin</option>
+                  <option value="Evet">Evet</option>
+                  <option value="Hayır">Hayır</option>
+                </select>
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Mining Süresi
+                </label>
+                <input
+                  type="text"
+                  value={formData.miningDuration}
+                  onChange={(e) => handleInputChange('miningDuration', e.target.value)}
+                  placeholder="Örn: Yapılmadı, 6 ay, 1 yıl"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                />
+              </div>
+
+            </div>
+            
+            {/* Açıklama */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: isMobile ? '1fr' : 'repeat(1, 1fr)',
+              gap: '16px',
+              marginTop: '16px'
+            }}>
               <div>
                 <label style={{
                   display: 'block',
