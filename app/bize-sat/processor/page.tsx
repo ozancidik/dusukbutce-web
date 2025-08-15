@@ -12,13 +12,7 @@ export default function ProcessorPage() {
   const [formData, setFormData] = useState({
     brand: '',
     model: '',
-    cores: '',
-    threads: '',
-    baseClock: '',
-    boostClock: '',
-    socket: '',
-    tdp: '',
-    integratedGraphics: false,
+    stokFan: '',
     description: '',
     cosmeticCondition: 'İyi',
     hasBox: false,
@@ -101,13 +95,7 @@ export default function ProcessorPage() {
         setFormData({
           brand: '',
           model: '',
-          cores: '',
-          threads: '',
-          baseClock: '',
-          boostClock: '',
-          socket: '',
-          tdp: '',
-          integratedGraphics: false,
+          stokFan: '',
           description: '',
           cosmeticCondition: 'İyi',
           hasBox: false,
@@ -278,13 +266,11 @@ export default function ProcessorPage() {
                   color: '#374151',
                   marginBottom: '6px'
                 }}>
-                  Çekirdek Sayısı
+                  Stok Fan Var Mı
                 </label>
-                <input
-                  type="text"
-                  value={formData.cores}
-                  onChange={(e) => handleInputChange('cores', e.target.value)}
-                  placeholder="Örn: 8, 12, 16"
+                <select
+                  value={formData.stokFan}
+                  onChange={(e) => handleInputChange('stokFan', e.target.value)}
                   style={{
                     width: '100%',
                     padding: '12px',
@@ -296,148 +282,17 @@ export default function ProcessorPage() {
                   }}
                   onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
                   onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-                />
+                >
+                  <option value="">Seçin</option>
+                  <option value="Evet">Evet</option>
+                  <option value="Hayır">Hayır</option>
+                </select>
               </div>
-              <div>
-                <label style={{
-                  display: 'block',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  color: '#374151',
-                  marginBottom: '6px'
-                }}>
-                  İş Parçacığı Sayısı
-                </label>
-                <input
-                  type="text"
-                  value={formData.threads}
-                  onChange={(e) => handleInputChange('threads', e.target.value)}
-                  placeholder="Örn: 16, 24, 32"
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    outline: 'none',
-                    transition: 'border-color 0.2s'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-                />
-              </div>
-              <div>
-                <label style={{
-                  display: 'block',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  color: '#374151',
-                  marginBottom: '6px'
-                }}>
-                  Temel Hız
-                </label>
-                <input
-                  type="text"
-                  value={formData.baseClock}
-                  onChange={(e) => handleInputChange('baseClock', e.target.value)}
-                  placeholder="Örn: 3.6 GHz"
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    outline: 'none',
-                    transition: 'border-color 0.2s'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-                />
-              </div>
-              <div>
-                <label style={{
-                  display: 'block',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  color: '#374151',
-                  marginBottom: '6px'
-                }}>
-                  Boost Hız
-                </label>
-                <input
-                  type="text"
-                  value={formData.boostClock}
-                  onChange={(e) => handleInputChange('boostClock', e.target.value)}
-                  placeholder="Örn: 5.0 GHz"
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    outline: 'none',
-                    transition: 'border-color 0.2s'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-                />
-              </div>
-              <div>
-                <label style={{
-                  display: 'block',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  color: '#374151',
-                  marginBottom: '6px'
-                }}>
-                  Soket
-                </label>
-                <input
-                  type="text"
-                  value={formData.socket}
-                  onChange={(e) => handleInputChange('socket', e.target.value)}
-                  placeholder="Örn: LGA1700, AM4"
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    outline: 'none',
-                    transition: 'border-color 0.2s'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-                />
-              </div>
-              <div>
-                <label style={{
-                  display: 'block',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  color: '#374151',
-                  marginBottom: '6px'
-                }}>
-                  TDP
-                </label>
-                <input
-                  type="text"
-                  value={formData.tdp}
-                  onChange={(e) => handleInputChange('tdp', e.target.value)}
-                  placeholder="Örn: 125W"
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    outline: 'none',
-                    transition: 'border-color 0.2s'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-                />
-              </div>
+
+
+
+
+
               <div>
                 <label style={{
                   display: 'block',
@@ -468,28 +323,7 @@ export default function ProcessorPage() {
                 />
               </div>
             </div>
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              marginTop: '16px'
-            }}>
-              <input
-                type="checkbox"
-                checked={formData.integratedGraphics}
-                onChange={(e) => handleInputChange('integratedGraphics', e.target.checked)}
-                style={{
-                  width: '16px',
-                  height: '16px'
-                }}
-              />
-              <label style={{
-                fontSize: '14px',
-                color: '#374151'
-              }}>
-                Entegre Grafik Kartı var
-              </label>
-            </div>
+
           </div>
 
           {/* Durum Bilgileri */}
