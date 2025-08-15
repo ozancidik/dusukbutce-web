@@ -14,8 +14,9 @@ export default function CasePage() {
     model: '',
     size: '',
     material: '',
+    powerSupplyWatt: '',
     description: '',
-    cosmeticCondition: 'İyi',
+    cosmeticCondition: 'Mükemmel',
     hasBox: false,
     hasInvoice: false,
     hasWarranty: false,
@@ -98,8 +99,9 @@ export default function CasePage() {
           model: '',
           size: '',
           material: '',
+          powerSupplyWatt: '',
           description: '',
-          cosmeticCondition: 'İyi',
+          cosmeticCondition: 'Mükemmel',
           hasBox: false,
           hasInvoice: false,
           hasWarranty: false,
@@ -247,7 +249,7 @@ export default function CasePage() {
                   color: '#374151',
                   marginBottom: '6px'
                 }}>
-                  Boyut *
+                  Anakart Desteği *
                 </label>
                 <input
                   type="text"
@@ -268,33 +270,69 @@ export default function CasePage() {
                   onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
                 />
               </div>
-              <div>
-                <label style={{
-                  display: 'block',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  color: '#374151',
-                  marginBottom: '6px'
-                }}>
-                  Malzeme
-                </label>
-                <input
-                  type="text"
-                  value={formData.material}
-                  onChange={(e) => handleInputChange('material', e.target.value)}
-                  placeholder="Örn: Çelik, Alüminyum, Plastik"
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '8px',
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '16px'
+              }}>
+                <div>
+                  <label style={{
+                    display: 'block',
                     fontSize: '14px',
-                    outline: 'none',
-                    transition: 'border-color 0.2s'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-                />
+                    fontWeight: '500',
+                    color: '#374151',
+                    marginBottom: '6px'
+                  }}>
+                    Güç Kaynağı
+                  </label>
+                  <select
+                    value={formData.material}
+                    onChange={(e) => handleInputChange('material', e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      outline: 'none',
+                      transition: 'border-color 0.2s'
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                    onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                  >
+                    <option value="">Seçin</option>
+                    <option value="Var">Var</option>
+                    <option value="Yok">Yok</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={{
+                    display: 'block',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    color: '#374151',
+                    marginBottom: '6px'
+                  }}>
+                    Watt Değeri
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.powerSupplyWatt}
+                    onChange={(e) => handleInputChange('powerSupplyWatt', e.target.value)}
+                    placeholder="Örn: 550W, 750W"
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      outline: 'none',
+                      transition: 'border-color 0.2s'
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                    onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                  />
+                </div>
               </div>
               <div>
                 <label style={{

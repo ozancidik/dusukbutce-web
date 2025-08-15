@@ -13,9 +13,9 @@ export default function CoolerPage() {
     brand: '',
     model: '',
     type: '',
-    manufacturingYear: '',
+    fanSize: '',
     description: '',
-    cosmeticCondition: 'İyi',
+    cosmeticCondition: 'Mükemmel',
     hasBox: false,
     hasInvoice: false,
     hasWarranty: false,
@@ -97,9 +97,9 @@ export default function CoolerPage() {
           brand: '',
           model: '',
           type: '',
-          manufacturingYear: '',
+          fanSize: '',
           description: '',
-          cosmeticCondition: 'İyi',
+          cosmeticCondition: 'Mükemmel',
           hasBox: false,
           hasInvoice: false,
           hasWarranty: false,
@@ -276,14 +276,13 @@ export default function CoolerPage() {
                   color: '#374151',
                   marginBottom: '6px'
                 }}>
-                  Üretim Yılı *
+                  Fan Boyutu
                 </label>
                 <input
                   type="text"
-                  required
-                  value={formData.manufacturingYear}
-                  onChange={(e) => handleInputChange('manufacturingYear', e.target.value)}
-                  placeholder="Örn: 2022, 2023"
+                  value={formData.fanSize}
+                  onChange={(e) => handleInputChange('fanSize', e.target.value)}
+                  placeholder="Örn: 120mm, 240mm, 360mm"
                   style={{
                     width: '100%',
                     padding: '12px',
@@ -326,6 +325,7 @@ export default function CoolerPage() {
                   onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
                 />
               </div>
+
             </div>
           </div>
 

@@ -17,9 +17,8 @@ export default function SsdPage() {
     readSpeed: '',
     writeSpeed: '',
     interface: '',
-    formFactor: '',
     description: '',
-    cosmeticCondition: 'İyi',
+    cosmeticCondition: 'Mükemmel',
     hasBox: false,
     hasInvoice: false,
     hasWarranty: false,
@@ -105,9 +104,8 @@ export default function SsdPage() {
           readSpeed: '',
           writeSpeed: '',
           interface: '',
-          formFactor: '',
           description: '',
-          cosmeticCondition: 'İyi',
+          cosmeticCondition: 'Mükemmel',
           hasBox: false,
           hasInvoice: false,
           hasWarranty: false,
@@ -310,7 +308,7 @@ export default function SsdPage() {
                   type="text"
                   value={formData.type}
                   onChange={(e) => handleInputChange('type', e.target.value)}
-                  placeholder="Örn: NVMe, SATA"
+                  placeholder="Örn: M2, SATA"
                   style={{
                     width: '100%',
                     padding: '12px',
@@ -394,35 +392,7 @@ export default function SsdPage() {
                   type="text"
                   value={formData.interface}
                   onChange={(e) => handleInputChange('interface', e.target.value)}
-                  placeholder="Örn: PCIe 4.0, SATA III"
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    outline: 'none',
-                    transition: 'border-color 0.2s'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-                />
-              </div>
-              <div>
-                <label style={{
-                  display: 'block',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  color: '#374151',
-                  marginBottom: '6px'
-                }}>
-                  Form Faktörü
-                </label>
-                <input
-                  type="text"
-                  value={formData.formFactor}
-                  onChange={(e) => handleInputChange('formFactor', e.target.value)}
-                  placeholder={'Örn: M.2 2280, 2.5"'}
+                  placeholder="Örn: Gen3x4, Gen4x4"
                   style={{
                     width: '100%',
                     padding: '12px',
@@ -465,6 +435,7 @@ export default function SsdPage() {
                   onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
                 />
               </div>
+
             </div>
           </div>
 
