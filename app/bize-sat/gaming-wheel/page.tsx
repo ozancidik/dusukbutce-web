@@ -12,10 +12,9 @@ export default function GamingWheelPage() {
   const [formData, setFormData] = useState({
     brand: '',
     model: '',
-    type: '',
-    manufacturingYear: '',
+    compatibility: '',
     description: '',
-    cosmeticCondition: 'İyi',
+    cosmeticCondition: 'Mükemmel',
     hasBox: false,
     hasInvoice: false,
     hasWarranty: false,
@@ -96,10 +95,9 @@ export default function GamingWheelPage() {
         setFormData({
           brand: '',
           model: '',
-          type: '',
-          manufacturingYear: '',
+          compatibility: '',
           description: '',
-          cosmeticCondition: 'İyi',
+          cosmeticCondition: 'Mükemmel',
           hasBox: false,
           hasInvoice: false,
           hasWarranty: false,
@@ -247,14 +245,12 @@ export default function GamingWheelPage() {
                   color: '#374151',
                   marginBottom: '6px'
                 }}>
-                  Tip *
+                  Uyumluluk *
                 </label>
-                <input
-                  type="text"
+                <select
                   required
-                  value={formData.type}
-                  onChange={(e) => handleInputChange('type', e.target.value)}
-                  placeholder="Örn: Force Feedback, Belt Drive, Direct Drive..."
+                  value={formData.compatibility}
+                  onChange={(e) => handleInputChange('compatibility', e.target.value)}
                   style={{
                     width: '100%',
                     padding: '12px',
@@ -266,37 +262,14 @@ export default function GamingWheelPage() {
                   }}
                   onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
                   onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-                />
+                >
+                  <option value="">Seçin</option>
+                  <option value="Bilgisayar">Bilgisayar</option>
+                  <option value="Playstation">Playstation</option>
+                  <option value="Bilgisayar+Playstation">Bilgisayar+Playstation</option>
+                </select>
               </div>
-              <div>
-                <label style={{
-                  display: 'block',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  color: '#374151',
-                  marginBottom: '6px'
-                }}>
-                  Üretim Yılı *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.manufacturingYear}
-                  onChange={(e) => handleInputChange('manufacturingYear', e.target.value)}
-                  placeholder="Örn: 2020, 2021, 2022, 2023..."
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    outline: 'none',
-                    transition: 'border-color 0.2s'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-                />
-              </div>
+
               <div>
                 <label style={{
                   display: 'block',

@@ -12,7 +12,7 @@ export default function HeadphonesPage() {
   const [formData, setFormData] = useState({
     brand: '',
     model: '',
-    type: '',
+    color: '',
     connectivity: '',
     description: '',
     cosmeticCondition: 'Mükemmel',
@@ -96,7 +96,7 @@ export default function HeadphonesPage() {
         setFormData({
           brand: '',
           model: '',
-          type: '',
+          color: '',
           connectivity: '',
           description: '',
           cosmeticCondition: 'Mükemmel',
@@ -196,7 +196,7 @@ export default function HeadphonesPage() {
                   required
                   value={formData.brand}
                   onChange={(e) => handleInputChange('brand', e.target.value)}
-                  placeholder="Örn: Sony, Bose, Sennheiser"
+                  placeholder="Örn: Razer, SteelSeries, Logitech"
                   style={{
                     width: '100%',
                     padding: '12px',
@@ -225,7 +225,7 @@ export default function HeadphonesPage() {
                   required
                   value={formData.model}
                   onChange={(e) => handleInputChange('model', e.target.value)}
-                  placeholder="Örn: WH-1000XM4, QC35, HD 660S"
+                  placeholder="Örn: BlackShark V2, Arctis 7, G Pro X"
                   style={{
                     width: '100%',
                     padding: '12px',
@@ -247,13 +247,13 @@ export default function HeadphonesPage() {
                   color: '#374151',
                   marginBottom: '6px'
                 }}>
-                  Tip
+                  Renk
                 </label>
                 <input
                   type="text"
-                  value={formData.type}
-                  onChange={(e) => handleInputChange('type', e.target.value)}
-                  placeholder="Örn: Over-ear, In-ear, On-ear"
+                  value={formData.color}
+                  onChange={(e) => handleInputChange('color', e.target.value)}
+                  placeholder="Örn: Siyah, Beyaz, Kırmızı"
                   style={{
                     width: '100%',
                     padding: '12px',

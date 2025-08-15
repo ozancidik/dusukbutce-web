@@ -13,7 +13,6 @@ export default function AudioSystemPage() {
     brand: '',
     model: '',
     type: '',
-    manufacturingYear: '',
     description: '',
     cosmeticCondition: 'Mükemmel',
     hasBox: false,
@@ -97,7 +96,6 @@ export default function AudioSystemPage() {
           brand: '',
           model: '',
           type: '',
-          manufacturingYear: '',
           description: '',
           cosmeticCondition: 'Mükemmel',
           hasBox: false,
@@ -268,35 +266,7 @@ export default function AudioSystemPage() {
                   onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
                 />
               </div>
-              <div>
-                <label style={{
-                  display: 'block',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  color: '#374151',
-                  marginBottom: '6px'
-                }}>
-                  Üretim Yılı *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.manufacturingYear}
-                  onChange={(e) => handleInputChange('manufacturingYear', e.target.value)}
-                  placeholder="Örn: 2020, 2021, 2022, 2023..."
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    outline: 'none',
-                    transition: 'border-color 0.2s'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-                />
-              </div>
+
               <div>
                 <label style={{
                   display: 'block',
