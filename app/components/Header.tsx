@@ -514,7 +514,7 @@ export default function Header() {
           </Link>
 
           {/* Sepet */}
-          <Link href="/cart" style={{ textDecoration: "none" }}>
+          <Link href="/sepet" style={{ textDecoration: "none" }}>
             <button
               style={{
                 background: "#2563eb",

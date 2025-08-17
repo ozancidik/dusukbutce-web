@@ -73,7 +73,7 @@ export default function Breadcrumb() {
       displayName = 'Al';
     } else if (segment === 'sell') {
       displayName = 'Sat';
-    } else if (segment === 'cart') {
+    } else if (segment === 'sepet') {
       displayName = 'Sepet';
     } else if (segment === 'profile') {
       displayName = 'Profil';
