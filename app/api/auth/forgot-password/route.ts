@@ -2,6 +2,7 @@ import { NextResponse, NextRequest } from "next/server";
 import connectDB from "@/lib/mongodb";
 import User from "../../../../models/User";
 import crypto from "crypto";
+import { sendPasswordResetEmail } from "@/lib/email";
 
 export async function POST(request: NextRequest) {
   try {
@@ -55,14 +56,19 @@ export async function POST(request: NextRequest) {
 
     console.log('✅ Şifre sıfırlama token\'ı oluşturuldu:', email);
 
-    // TODO: E-posta gönderme işlemi burada yapılacak
-    // Şimdilik sadece başarılı mesajı döndürüyoruz
+    // E-posta gönderme işlemi
+    const emailSent = await sendPasswordResetEmail(email, resetToken, user.name);
+    
+    if (!emailSent) {
+      return NextResponse.json({
+        success: false,
+        error: 'E-posta gönderilemedi. Lütfen tekrar deneyin.'
+      }, { status: 500 });
+    }
     
     return NextResponse.json({
       success: true,
-      message: 'Şifre sıfırlama bağlantısı e-posta adresinize gönderildi. Lütfen gelen kutunuzu kontrol edin.',
-      resetToken: resetToken, // Geliştirme aşamasında token'ı döndürüyoruz
-      expiresAt: resetTokenExpiry
+      message: 'Şifre sıfırlama bağlantısı e-posta adresinize gönderildi. Lütfen gelen kutunuzu kontrol edin.'
     });
 
   } catch (error) {
