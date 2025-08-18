@@ -98,9 +98,9 @@ export default function Header() {
         const isAdminLoggedIn = adminLoggedIn === "true";
         
         setIsLoggedIn(isUserLoggedIn || isAdminLoggedIn);
-        setAdminLoggedIn(isAdminLoggedIn === "true");
+        setAdminLoggedIn(isAdminLoggedIn);
         
-        if (isAdminLoggedIn === "true") {
+        if (isAdminLoggedIn) {
           setUserName("Admin");
         } else if (isUserLoggedIn) {
           setUserName(userName || "");
