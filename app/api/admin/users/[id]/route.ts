@@ -4,11 +4,12 @@ import User from '../../../../../models/User';
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     console.log('🗑️ Admin user delete API çağrıldı');
-    console.log('🆔 Silinecek kullanıcı ID:', params.id);
+    console.log('🆔 Silinecek kullanıcı ID:', id);
     
     // MongoDB bağlantısı
     console.log('📡 MongoDB bağlantısı kuruluyor...');
@@ -20,7 +21,7 @@ export async function DELETE(
     console.log(`🌐 IP: ${ip} - Admin kullanıcı silme istedi`);
     
     // Kullanıcıyı bul
-    const user = await User.findById(params.id);
+    const user = await User.findById(id);
     if (!user) {
       console.log('❌ Kullanıcı bulunamadı');
       return NextResponse.json(
@@ -40,7 +41,7 @@ export async function DELETE(
     
     // Kullanıcıyı sil
     console.log('🗑️ Admin kullanıcı siliniyor:', user.email);
-    await User.findByIdAndDelete(params.id);
+    await User.findByIdAndDelete(id);
     console.log('✅ Admin kullanıcı başarıyla silindi');
     
     return NextResponse.json({ 
