@@ -46,9 +46,10 @@ export default function LoginPage() {
     };
   }, [router]);
 
-  // Smart form detection - email'e göre admin form tespiti
+  // Smart form detection - sadece gerçek admin email'leri için
   React.useEffect(() => {
-    if (email.includes("@admin.") || email.includes("admin@") || email.includes("ozancidik@gmail.com")) {
+    // Sadece gerçek admin email formatları için admin form tespiti
+    if (email.includes("@admin.") || email.includes("admin@")) {
       setIsAdminForm(true);
     } else {
       setIsAdminForm(false);
