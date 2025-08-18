@@ -453,10 +453,10 @@ export default function Header() {
                   💰 Tekliflerim
                 </button>
               </Link>
-              <Link href={adminLoggedIn === "true" ? "/admin" : "/profile"} style={{ textDecoration: "none" }}>
+              <Link href={adminLoggedIn ? "/admin" : "/profile"} style={{ textDecoration: "none" }}>
                 <button
                   style={{
-                    background: adminLoggedIn === "true" ? "#7c3aed" : "#10b981",
+                    background: adminLoggedIn ? "#7c3aed" : "#10b981",
                     color: "white",
                     border: "none",
                     borderRadius: "6px",
@@ -471,13 +471,13 @@ export default function Header() {
                     gap: isMobile ? "4px" : "6px",
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.background = adminLoggedIn === "true" ? "#6d28d9" : "#059669";
+                    e.currentTarget.style.background = adminLoggedIn ? "#6d28d9" : "#059669";
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.background = adminLoggedIn === "true" ? "#7c3aed" : "#10b981";
+                    e.currentTarget.style.background = adminLoggedIn ? "#7c3aed" : "#10b981";
                   }}
                 >
-                  {adminLoggedIn === "true" ? "⚙️" : "👤"} {userName || (adminLoggedIn === "true" ? "Admin" : "Profil")}
+                  {adminLoggedIn ? "⚙️" : "👤"} {userName || (adminLoggedIn ? "Admin" : "Profil")}
                 </button>
               </Link>
             </>
