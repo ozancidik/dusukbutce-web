@@ -22,19 +22,29 @@ export default function LoginPage() {
       const adminLoggedIn = localStorage.getItem("adminLoggedIn") || sessionStorage.getItem("adminLoggedIn");
       const adminEmail = localStorage.getItem("adminEmail") || sessionStorage.getItem("adminEmail");
       
+      // Admin bilgileri varsa ve geçerliyse yönlendir
       if (adminLoggedIn === "true" && adminEmail) {
         console.log("🔒 Admin giriş yapmış, admin paneline yönlendiriliyor...");
         router.push("/admin");
         return;
       }
+      
+      // Admin bilgileri yoksa veya geçersizse, hiçbir şey yapma
+      console.log("🔓 Admin giriş yapılmamış, login sayfasında kalınıyor...");
     };
 
     // İlk kontrol
     checkAdminStatus();
 
-    // localStorage değişikliklerini dinle
+    // localStorage değişikliklerini dinle - sadece admin giriş yapıldığında
     const handleStorageChange = () => {
-      checkAdminStatus();
+      const adminLoggedIn = localStorage.getItem("adminLoggedIn") || sessionStorage.getItem("adminLoggedIn");
+      const adminEmail = localStorage.getItem("adminEmail") || sessionStorage.getItem("adminEmail");
+      
+      // Sadece admin giriş yapıldıysa kontrol et
+      if (adminLoggedIn === "true" && adminEmail) {
+        checkAdminStatus();
+      }
     };
 
     // Custom event'leri dinle

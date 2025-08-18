@@ -256,9 +256,11 @@ export default function AdminUsersPage() {
             </Link>
             <button 
               onClick={() => {
-                // Tüm localStorage'ı temizle
-                localStorage.clear();
-                sessionStorage.clear();
+                // Sadece admin bilgilerini temizle
+                localStorage.removeItem('adminLoggedIn');
+                localStorage.removeItem('adminEmail');
+                sessionStorage.removeItem('adminLoggedIn');
+                sessionStorage.removeItem('adminEmail');
                 
                 // Custom event'i tetikle
                 window.dispatchEvent(new Event('localStorageChange'));
@@ -266,8 +268,8 @@ export default function AdminUsersPage() {
                 // Header'a logout mesajı gönder
                 window.dispatchEvent(new CustomEvent('logout'));
                 
-                // Anasayfaya yönlendir
-                router.push('/');
+                // Sayfayı tamamen yenile ve anasayfaya git
+                window.location.href = '/';
               }}
               style={{
                 background: '#dc2626',
@@ -413,136 +415,164 @@ export default function AdminUsersPage() {
             <p>Kullanıcılar kayıt oldukça burada görünecek.</p>
           </div>
         ) : (
-          <div style={{ overflowX: "auto" }}>
-            <table style={{ 
-              width: "100%", 
-              borderCollapse: "collapse",
-              fontSize: "14px"
-            }}>
-              <thead>
-                <tr style={{ background: "#f1f5f9" }}>
-                  <th style={{ padding: "12px", textAlign: "left", borderBottom: "1px solid #e2e8f0" }}>Ad Soyad</th>
-                  <th style={{ padding: "12px", textAlign: "left", borderBottom: "1px solid #e2e8f0" }}>Email</th>
-                  <th style={{ padding: "12px", textAlign: "left", borderBottom: "1px solid #e2e8f0" }}>Telefon</th>
-                  <th style={{ padding: "12px", textAlign: "left", borderBottom: "1px solid #e2e8f0" }}>Admin</th>
-                  <th style={{ padding: "12px", textAlign: "left", borderBottom: "1px solid #e2e8f0" }}>Kayıt Tarihi</th>
-                  <th style={{ padding: "12px", textAlign: "left", borderBottom: "1px solid #e2e8f0" }}>Son Giriş</th>
-                  <th style={{ padding: "12px", textAlign: "left", borderBottom: "1px solid #e2e8f0" }}>Online Durumu</th>
-                  <th style={{ padding: "12px", textAlign: "left", borderBottom: "1px solid #e2e8f0" }}>Durum</th>
-                  <th style={{ padding: "12px", textAlign: "left", borderBottom: "1px solid #e2e8f0" }}>İşlemler</th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.map((user) => (
-                  <tr key={user._id} style={{ borderBottom: "1px solid #f1f5f9" }}>
-                    <td style={{ padding: "12px" }}>{user.name}</td>
-                    <td style={{ padding: "12px" }}>{user.email}</td>
-                    <td style={{ padding: "12px" }}>{user.phone || "-"}</td>
-                    <td style={{ padding: "12px" }}>
-                      <span style={{
-                        background: user.isAdmin ? "#dc2626" : "#059669",
-                        color: "white",
-                        padding: "4px 8px",
-                        borderRadius: "4px",
-                        fontSize: "12px"
-                      }}>
-                        {user.isAdmin ? "Admin" : "Kullanıcı"}
-                      </span>
-                    </td>
-                    <td style={{ padding: "12px" }}>
-                      {new Date(user.createdAt).toLocaleDateString('tr-TR')}
-                    </td>
-                    <td style={{ padding: "12px" }}>
-                      {user.lastLogin ? (
-                        <div>
-                          <div style={{ fontSize: "12px", color: "#374151", marginBottom: "2px" }}>
-                            {new Date(user.lastLogin).toLocaleDateString('tr-TR')}
-                          </div>
-                          <div style={{ fontSize: "11px", color: "#6b7280" }}>
-                            {new Date(user.lastLogin).toLocaleTimeString('tr-TR', { 
-                              hour: '2-digit', 
-                              minute: '2-digit' 
-                            })}
-                          </div>
-                        </div>
-                      ) : (
-                        <span style={{ color: "#9ca3af", fontSize: "12px" }}>Hiç giriş yapmamış</span>
-                      )}
-                    </td>
-                    <td style={{ padding: "12px" }}>
-                      {user.lastLogin ? (
+          <>
+            {/* Desktop Tablo Görünümü */}
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ 
+                width: "100%", 
+                borderCollapse: "collapse",
+                fontSize: "14px"
+              }}>
+                <thead>
+                  <tr style={{ background: "#f1f5f9" }}>
+                    <th style={{ padding: "12px", textAlign: "left", borderBottom: "1px solid #e2e8f0" }}>Ad Soyad</th>
+                    <th style={{ padding: "12px", textAlign: "left", borderBottom: "1px solid #e2e8f0" }}>Email</th>
+                    <th style={{ padding: "12px", textAlign: "left", borderBottom: "1px solid #e2e8f0" }}>Telefon</th>
+                    <th style={{ padding: "12px", textAlign: "left", borderBottom: "1px solid #e2e8f0" }}>Admin</th>
+                    <th style={{ padding: "12px", textAlign: "left", borderBottom: "1px solid #e2e8f0" }}>Kayıt Tarihi</th>
+                    <th style={{ padding: "12px", textAlign: "left", borderBottom: "1px solid #e2e8f0" }}>Son Giriş</th>
+                    <th style={{ padding: "12px", textAlign: "left", borderBottom: "1px solid #e2e8f0" }}>Online Durumu</th>
+                    <th style={{ padding: "12px", textAlign: "left", borderBottom: "1px solid #e2e8f0" }}>Durum</th>
+                    <th style={{ padding: "12px", textAlign: "left", borderBottom: "1px solid #e2e8f0" }}>İşlemler</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users.map((user) => (
+                    <tr key={user._id} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                      <td style={{ padding: "12px" }}>{user.name}</td>
+                      <td style={{ padding: "12px" }}>{user.email}</td>
+                      <td style={{ padding: "12px" }}>{user.phone || "-"}</td>
+                      <td style={{ padding: "12px" }}>
                         <span style={{
-                          background: isUserOnline(user.lastLogin) ? "#059669" : "#6b7280",
-                          color: "white",
-                          padding: "4px 8px",
-                          borderRadius: "4px",
-                          fontSize: "12px",
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "4px"
-                        }}>
-                          {isUserOnline(user.lastLogin) ? "🟢" : "⚫"} 
-                          {isUserOnline(user.lastLogin) ? "Online" : "Offline"}
-                        </span>
-                      ) : (
-                        <span style={{
-                          background: "#6b7280",
+                          background: user.isAdmin ? "#dc2626" : "#059669",
                           color: "white",
                           padding: "4px 8px",
                           borderRadius: "4px",
                           fontSize: "12px"
                         }}>
-                          ⚫ Offline
+                          {user.isAdmin ? "Admin" : "Kullanıcı"}
                         </span>
-                      )}
-                    </td>
-                    <td style={{ padding: "12px" }}>
-                      <span style={{
-                        background: user.isActive ? "#059669" : "#dc2626",
-                        color: "white",
-                        padding: "4px 8px",
-                        borderRadius: "4px",
-                        fontSize: "12px"
-                      }}>
-                        {user.isActive ? "Aktif" : "Pasif"}
-                      </span>
-                    </td>
-                    <td style={{ padding: "12px" }}>
-                      {user.isAdmin && (
-                        <div style={{ display: "flex", gap: "8px" }}>
-                          {showDeleteConfirm === user._id ? (
-                            <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
+                      </td>
+                      <td style={{ padding: "12px" }}>
+                        {new Date(user.createdAt).toLocaleDateString('tr-TR')}
+                      </td>
+                      <td style={{ padding: "12px" }}>
+                        {user.lastLogin ? (
+                          <div>
+                            <div style={{ fontSize: "12px", color: "#374151", marginBottom: "2px" }}>
+                              {new Date(user.lastLogin).toLocaleDateString('tr-TR')}
+                            </div>
+                            <div style={{ fontSize: "11px", color: "#6b7280" }}>
+                              {new Date(user.lastLogin).toLocaleTimeString('tr-TR', { 
+                                hour: '2-digit', 
+                                minute: '2-digit' 
+                              })}
+                            </div>
+                          </div>
+                        ) : (
+                          <span style={{ color: "#9ca3af", fontSize: "12px" }}>Hiç giriş yapmamış</span>
+                        )}
+                      </td>
+                      <td style={{ padding: "12px" }}>
+                        {user.lastLogin ? (
+                          <span style={{
+                            background: isUserOnline(user.lastLogin) ? "#059669" : "#6b7280",
+                            color: "white",
+                            padding: "4px 8px",
+                            borderRadius: "4px",
+                            fontSize: "12px",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "4px"
+                          }}>
+                            {isUserOnline(user.lastLogin) ? "🟢" : "⚫"} 
+                            {isUserOnline(user.lastLogin) ? "Online" : "Offline"}
+                          </span>
+                        ) : (
+                          <span style={{
+                            background: "#6b7280",
+                            color: "white",
+                            padding: "4px 8px",
+                            borderRadius: "4px",
+                            fontSize: "12px",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "4px"
+                          }}>
+                            ⚫ Offline
+                          </span>
+                        )}
+                      </td>
+                      <td style={{ padding: "12px" }}>
+                        <span style={{
+                          background: user.isActive ? "#059669" : "#dc2626",
+                          color: "white",
+                          padding: "4px 8px",
+                          borderRadius: "4px",
+                          fontSize: "12px"
+                        }}>
+                          {user.isActive ? "Aktif" : "Pasif"}
+                        </span>
+                      </td>
+                      <td style={{ padding: "12px" }}>
+                        {user.isAdmin && (
+                          <div style={{ display: "flex", gap: "8px" }}>
+                            {showDeleteConfirm === user._id ? (
+                              <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
+                                <button
+                                  onClick={() => deleteAdminUser(user._id)}
+                                  disabled={deletingUser === user._id}
+                                  style={{
+                                    background: "#dc2626",
+                                    color: "white",
+                                    border: "none",
+                                    borderRadius: "4px",
+                                    padding: "4px 8px",
+                                    fontSize: "11px",
+                                    cursor: deletingUser === user._id ? "not-allowed" : "pointer",
+                                    opacity: deletingUser === user._id ? 0.6 : 1,
+                                    transition: "background 0.2s"
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    if (deletingUser !== user._id) {
+                                      e.currentTarget.style.background = "#b91c1c";
+                                    }
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    if (deletingUser !== user._id) {
+                                      e.currentTarget.style.background = "#dc2626";
+                                    }
+                                  }}
+                                >
+                                  {deletingUser === user._id ? "⏳" : "✅"}
+                                </button>
+                                <button
+                                  onClick={() => setShowDeleteConfirm(null)}
+                                  style={{
+                                    background: "#6b7280",
+                                    color: "white",
+                                    border: "none",
+                                    borderRadius: "4px",
+                                    padding: "4px 8px",
+                                    fontSize: "11px",
+                                    cursor: "pointer",
+                                    transition: "background 0.2s"
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.background = "#4b5563";
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = "#6b7280";
+                                  }}
+                                >
+                                  ❌
+                                </button>
+                              </div>
+                            ) : (
                               <button
-                                onClick={() => deleteAdminUser(user._id)}
-                                disabled={deletingUser === user._id}
+                                onClick={() => setShowDeleteConfirm(user._id)}
                                 style={{
                                   background: "#dc2626",
-                                  color: "white",
-                                  border: "none",
-                                  borderRadius: "4px",
-                                  padding: "4px 8px",
-                                  fontSize: "11px",
-                                  cursor: deletingUser === user._id ? "not-allowed" : "pointer",
-                                  opacity: deletingUser === user._id ? 0.6 : 1,
-                                  transition: "background 0.2s"
-                                }}
-                                onMouseEnter={(e) => {
-                                  if (deletingUser !== user._id) {
-                                    e.currentTarget.style.background = "#b91c1c";
-                                  }
-                                }}
-                                onMouseLeave={(e) => {
-                                  if (deletingUser !== user._id) {
-                                    e.currentTarget.style.background = "#dc2626";
-                                  }
-                                }}
-                              >
-                                {deletingUser === user._id ? "⏳" : "✅"}
-                              </button>
-                              <button
-                                onClick={() => setShowDeleteConfirm(null)}
-                                style={{
-                                  background: "#6b7280",
                                   color: "white",
                                   border: "none",
                                   borderRadius: "4px",
@@ -552,46 +582,26 @@ export default function AdminUsersPage() {
                                   transition: "background 0.2s"
                                 }}
                                 onMouseEnter={(e) => {
-                                  e.currentTarget.style.background = "#4b5563";
+                                  e.currentTarget.style.background = "#b91c1c";
                                 }}
                                 onMouseLeave={(e) => {
-                                  e.currentTarget.style.background = "#6b7280";
+                                  e.currentTarget.style.background = "#dc2626";
                                 }}
                               >
-                                ❌
+                                🗑️
                               </button>
-                            </div>
-                          ) : (
-                            <button
-                              onClick={() => setShowDeleteConfirm(user._id)}
-                              style={{
-                                background: "#dc2626",
-                                color: "white",
-                                border: "none",
-                                borderRadius: "4px",
-                                padding: "4px 8px",
-                                fontSize: "11px",
-                                cursor: "pointer",
-                                transition: "background 0.2s"
-                              }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.background = "#b91c1c";
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.background = "#dc2626";
-                              }}
-                            >
-                              🗑️
-                            </button>
-                          )}
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                            )}
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+
+          </>
         )}
       </div>
     </div>

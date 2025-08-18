@@ -69,12 +69,12 @@ export default function AdminPage() {
     };
     
     const checkAdminStatus = () => {
-      const adminLoggedIn = localStorage.getItem('adminLoggedIn');
-      const adminEmail = localStorage.getItem('adminEmail');
+      const adminLoggedIn = localStorage.getItem('adminLoggedIn') || sessionStorage.getItem('adminLoggedIn');
+      const adminEmail = localStorage.getItem('adminEmail') || sessionStorage.getItem('adminEmail');
       
       if (!adminLoggedIn || !adminEmail) {
-        console.log("🔒 Admin giriş yapılmamış, admin login'e yönlendiriliyor...");
-        router.push('/login');
+        console.log("🔒 Admin giriş yapılmamış, anasayfaya yönlendiriliyor...");
+        router.push('/');
         return;
       }
       setIsAuthenticated(true);
@@ -104,8 +104,11 @@ export default function AdminPage() {
   }, [router]);
 
   const handleLogout = () => {
-    // Tüm localStorage'ı temizle
-    localStorage.clear();
+    // Sadece admin bilgilerini temizle
+    localStorage.removeItem('adminLoggedIn');
+    localStorage.removeItem('adminEmail');
+    sessionStorage.removeItem('adminLoggedIn');
+    sessionStorage.removeItem('adminEmail');
     
     // Custom event'i tetikle
     window.dispatchEvent(new Event('localStorageChange'));
@@ -113,8 +116,8 @@ export default function AdminPage() {
     // Header'a logout mesajı gönder
     window.dispatchEvent(new CustomEvent('logout'));
     
-    // Sayfayı yenile ve admin login'e yönlendir
-            window.location.href = '/login';
+    // Sayfayı tamamen yenile ve anasayfaya git
+    window.location.href = '/';
   };
 
   const fetchSubmissions = async () => {
