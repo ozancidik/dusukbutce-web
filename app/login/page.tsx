@@ -9,6 +9,10 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [socialLoading, setSocialLoading] = useState("");
+  const [isAdminForm, setIsAdminForm] = useState(false);
+  const [loginSuccess, setLoginSuccess] = useState(false);
+  const [redirectMessage, setRedirectMessage] = useState("");
+  const [loginAttempts, setLoginAttempts] = useState(0);
   const router = useRouter();
 
   // Admin giriş kontrolü
@@ -20,8 +24,41 @@ export default function LoginPage() {
     }
   }, [router]);
 
+  // Smart form detection - email'e göre admin form tespiti
+  React.useEffect(() => {
+    if (email.includes("@admin.") || email.includes("admin@") || email.includes("ozancidik@gmail.com")) {
+      setIsAdminForm(true);
+    } else {
+      setIsAdminForm(false);
+    }
+  }, [email]);
+
+  // Rate limiting kontrolü
+  React.useEffect(() => {
+    const attempts = localStorage.getItem("loginAttempts") || "0";
+    setLoginAttempts(parseInt(attempts));
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Rate limiting kontrolü
+    if (loginAttempts >= 5) {
+      const lastAttemptTime = localStorage.getItem("lastLoginAttempt");
+      const now = Date.now();
+      const timeDiff = now - (lastAttemptTime ? parseInt(lastAttemptTime) : 0);
+      
+      if (timeDiff < 15 * 60 * 1000) { // 15 dakika bekleme süresi
+        const remainingTime = Math.ceil((15 * 60 * 1000 - timeDiff) / (60 * 1000));
+        setError(`Çok fazla giriş denemesi. Lütfen ${remainingTime} dakika bekleyin.`);
+        return;
+      } else {
+        // Süre dolmuş, sıfırla
+        localStorage.setItem("loginAttempts", "0");
+        setLoginAttempts(0);
+      }
+    }
+    
     setIsLoading(true);
     setError("");
 
@@ -65,18 +102,48 @@ export default function LoginPage() {
         // Custom event'i tetikle
         window.dispatchEvent(new Event('localStorageChange'));
         
+        // Rate limiting'i sıfırla
+        localStorage.setItem("loginAttempts", "0");
+        setLoginAttempts(0);
+        
         if (data.user.isAdmin) {
           localStorage.setItem("adminLoggedIn", "true");
           localStorage.setItem("adminEmail", data.user.email);
           sessionStorage.setItem("adminLoggedIn", "true");
           sessionStorage.setItem("adminEmail", data.user.email);
+          
+          // Admin giriş sonrası özel mesaj ve yönlendirme
+          setLoginSuccess(true);
+          setRedirectMessage("Admin giriş başarılı! Admin paneline yönlendiriliyor...");
+          
+          setTimeout(() => {
+            router.push("/admin");
+          }, 2000);
+        } else {
+          // Normal kullanıcı yönlendirmesi
+          setLoginSuccess(true);
+          setRedirectMessage("Giriş başarılı! Anasayfaya yönlendiriliyor...");
+          
+          setTimeout(() => {
+            router.push("/");
+          }, 2000);
         }
-        
-        router.push("/"); // Anasayfaya yönlendir
       } else {
+        // Hata durumunda rate limiting'i artır
+        const newAttempts = loginAttempts + 1;
+        localStorage.setItem("loginAttempts", newAttempts.toString());
+        localStorage.setItem("lastLoginAttempt", Date.now().toString());
+        setLoginAttempts(newAttempts);
+        
         setError(data.message || "Giriş yapılırken bir hata oluştu.");
       }
     } catch (err) {
+      // Hata durumunda rate limiting'i artır
+      const newAttempts = loginAttempts + 1;
+      localStorage.setItem("loginAttempts", newAttempts.toString());
+      localStorage.setItem("lastLoginAttempt", Date.now().toString());
+      setLoginAttempts(newAttempts);
+      
       setError("Bağlantı hatası oluştu.");
     } finally {
       setIsLoading(false);
@@ -174,6 +241,61 @@ export default function LoginPage() {
     setError("Facebook OAuth henüz yapılandırılmadı. Lütfen email/şifre ile giriş yapın.");
   };
 
+  // Success state'inde loading ekranı göster
+  if (loginSuccess) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%)",
+          padding: "20px",
+        }}
+      >
+        <div
+          style={{
+            background: "white",
+            padding: "40px",
+            borderRadius: "16px",
+            boxShadow: "0 4px 32px rgba(0, 0, 0, 0.1)",
+            textAlign: "center",
+            maxWidth: "400px",
+          }}
+        >
+          <div style={{ fontSize: "48px", marginBottom: "16px" }}>
+            {isAdminForm ? "⚙️" : "✅"}
+          </div>
+          <h2 style={{ 
+            color: isAdminForm ? "#7c3aed" : "#10b981", 
+            fontSize: "24px", 
+            fontWeight: "600", 
+            margin: "0 0 16px 0" 
+          }}>
+            {isAdminForm ? "Admin Giriş Başarılı!" : "Giriş Başarılı!"}
+          </h2>
+          <p style={{ 
+            color: "#64748b", 
+            margin: "0 0 24px 0",
+            fontSize: "16px"
+          }}>
+            {redirectMessage}
+          </p>
+          <div style={{
+            width: "40px",
+            height: "40px",
+            border: `3px solid ${isAdminForm ? "#7c3aed" : "#10b981"}`,
+            borderTop: "3px solid transparent",
+            borderRadius: "50%",
+            margin: "0 auto",
+            animation: "spin 1s linear infinite"
+          }}></div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <style jsx>{`
@@ -203,12 +325,30 @@ export default function LoginPage() {
         }}
       >
         <div style={{ textAlign: "center", marginBottom: "32px" }}>
-          <h1 style={{ color: "#2563eb", fontSize: "28px", fontWeight: "700", margin: "0 0 8px 0" }}>
-            Giriş Yap
+          <h1 style={{ 
+            color: isAdminForm ? "#7c3aed" : "#2563eb", 
+            fontSize: "28px", 
+            fontWeight: "700", 
+            margin: "0 0 8px 0" 
+          }}>
+            {isAdminForm ? "⚙️ Admin Girişi" : "Giriş Yap"}
           </h1>
           <p style={{ color: "#64748b", margin: 0 }}>
-            Hesabınıza giriş yapın
+            {isAdminForm ? "Admin hesabınıza giriş yapın" : "Hesabınıza giriş yapın"}
           </p>
+          {isAdminForm && (
+            <div style={{
+              background: "rgba(124, 58, 237, 0.1)",
+              border: "1px solid rgba(124, 58, 237, 0.3)",
+              borderRadius: "8px",
+              padding: "12px",
+              marginTop: "16px",
+              fontSize: "14px",
+              color: "#7c3aed"
+            }}>
+              🔒 Admin girişi tespit edildi - Güvenlik kontrolleri aktif
+            </div>
+          )}
         </div>
 
         <form onSubmit={handleSubmit}>
@@ -230,6 +370,7 @@ export default function LoginPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              placeholder={isAdminForm ? "admin@example.com" : "ornek@email.com"}
               required
               style={{
                 width: "100%",
@@ -241,7 +382,7 @@ export default function LoginPage() {
                 transition: "border-color 0.2s",
               }}
               onFocus={(e) => {
-                e.target.style.borderColor = "#2563eb";
+                e.target.style.borderColor = isAdminForm ? "#7c3aed" : "#2563eb";
               }}
               onBlur={(e) => {
                 e.target.style.borderColor = "#e2e8f0";
@@ -279,7 +420,7 @@ export default function LoginPage() {
                 transition: "border-color 0.2s",
               }}
               onFocus={(e) => {
-                e.target.style.borderColor = "#2563eb";
+                e.target.style.borderColor = isAdminForm ? "#7c3aed" : "#2563eb";
               }}
               onBlur={(e) => {
                 e.target.style.borderColor = "#e2e8f0";
@@ -303,13 +444,30 @@ export default function LoginPage() {
             </div>
           )}
 
+          {/* Rate Limiting Uyarısı */}
+          {loginAttempts > 0 && (
+            <div
+              style={{
+                background: "#fef3c7",
+                color: "#d97706",
+                padding: "12px",
+                borderRadius: "8px",
+                marginBottom: "20px",
+                fontSize: "14px",
+                border: "1px solid #fed7aa",
+              }}
+            >
+              ⚠️ {loginAttempts}/5 giriş denemesi kullanıldı. 5 deneme sonrası 15 dakika bekleme süresi aktif.
+            </div>
+          )}
+
           <button
             type="submit"
             disabled={isLoading}
             style={{
               width: "100%",
               padding: "14px",
-              background: "#2563eb",
+              background: isAdminForm ? "#7c3aed" : "#2563eb",
               color: "white",
               border: "none",
               borderRadius: "8px",
@@ -321,16 +479,16 @@ export default function LoginPage() {
             }}
             onMouseEnter={(e) => {
               if (!isLoading) {
-                e.currentTarget.style.background = "#1d4ed8";
+                e.currentTarget.style.background = isAdminForm ? "#6d28d9" : "#1d4ed8";
               }
             }}
             onMouseLeave={(e) => {
               if (!isLoading) {
-                e.currentTarget.style.background = "#2563eb";
+                e.currentTarget.style.background = isAdminForm ? "#7c3aed" : "#2563eb";
               }
             }}
           >
-            {isLoading ? "Giriş yapılıyor..." : "Giriş Yap"}
+            {isLoading ? (isAdminForm ? "Admin girişi yapılıyor..." : "Giriş yapılıyor...") : (isAdminForm ? "Admin Girişi" : "Giriş Yap")}
           </button>
         </form>
 
