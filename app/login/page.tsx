@@ -15,13 +15,35 @@ export default function LoginPage() {
   const [loginAttempts, setLoginAttempts] = useState(0);
   const router = useRouter();
 
-  // Admin giriş kontrolü
+  // Admin giriş kontrolü - daha güçlü kontrol
   React.useEffect(() => {
-    const adminLoggedIn = localStorage.getItem("adminLoggedIn") || sessionStorage.getItem("adminLoggedIn");
-    if (adminLoggedIn === "true") {
-      router.push("/admin");
-      return;
-    }
+    const checkAdminStatus = () => {
+      const adminLoggedIn = localStorage.getItem("adminLoggedIn") || sessionStorage.getItem("adminLoggedIn");
+      const adminEmail = localStorage.getItem("adminEmail") || sessionStorage.getItem("adminEmail");
+      
+      if (adminLoggedIn === "true" && adminEmail) {
+        console.log("🔒 Admin giriş yapmış, admin paneline yönlendiriliyor...");
+        router.push("/admin");
+        return;
+      }
+    };
+
+    // İlk kontrol
+    checkAdminStatus();
+
+    // localStorage değişikliklerini dinle
+    const handleStorageChange = () => {
+      checkAdminStatus();
+    };
+
+    // Custom event'leri dinle
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('localStorageChange', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('localStorageChange', handleStorageChange);
+    };
   }, [router]);
 
   // Smart form detection - email'e göre admin form tespiti

@@ -15,13 +15,38 @@ export default function AdminLoginPage() {
       setIsMobile(window.innerWidth <= 768);
     };
     
+    const checkAdminStatus = () => {
+      const adminLoggedIn = localStorage.getItem('adminLoggedIn');
+      const adminEmail = localStorage.getItem('adminEmail');
+      
+      if (adminLoggedIn === 'true' && adminEmail) {
+        console.log("🔒 Admin zaten giriş yapmış, admin paneline yönlendiriliyor...");
+        router.push('/admin');
+        return;
+      }
+    };
+    
     checkMobile();
     window.addEventListener('resize', checkMobile);
     
+    // İlk admin durumu kontrolü
+    checkAdminStatus();
+    
+    // localStorage değişikliklerini dinle
+    const handleStorageChange = () => {
+      checkAdminStatus();
+    };
+    
+    // Custom event'leri dinle
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('localStorageChange', handleStorageChange);
+    
     return () => {
       window.removeEventListener('resize', checkMobile);
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('localStorageChange', handleStorageChange);
     };
-  }, []);
+  }, [router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,6 +58,10 @@ export default function AdminLoginPage() {
       if (email === 'admin@dusukbutce.com' && password === 'admin123') {
         localStorage.setItem('adminLoggedIn', 'true');
         localStorage.setItem('adminEmail', email);
+        
+        // Custom event'i tetikle
+        window.dispatchEvent(new Event('localStorageChange'));
+        
         router.push('/admin');
       } else {
         setError('Geçersiz email veya şifre!');

@@ -68,19 +68,38 @@ export default function AdminPage() {
       setIsMobile(window.innerWidth <= 768);
     };
     
+    const checkAdminStatus = () => {
+      const adminLoggedIn = localStorage.getItem('adminLoggedIn');
+      const adminEmail = localStorage.getItem('adminEmail');
+      
+      if (!adminLoggedIn || !adminEmail) {
+        console.log("🔒 Admin giriş yapılmamış, admin login'e yönlendiriliyor...");
+        router.push('/admin/login');
+        return;
+      }
+      setIsAuthenticated(true);
+      fetchSubmissions();
+    };
+    
     checkMobile();
     window.addEventListener('resize', checkMobile);
     
-    const adminLoggedIn = localStorage.getItem('adminLoggedIn');
-    if (!adminLoggedIn) {
-      router.push('/admin/login');
-      return;
-    }
-    setIsAuthenticated(true);
-    fetchSubmissions();
+    // İlk admin durumu kontrolü
+    checkAdminStatus();
+    
+    // localStorage değişikliklerini dinle
+    const handleStorageChange = () => {
+      checkAdminStatus();
+    };
+    
+    // Custom event'leri dinle
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('localStorageChange', handleStorageChange);
     
     return () => {
       window.removeEventListener('resize', checkMobile);
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('localStorageChange', handleStorageChange);
     };
   }, [router]);
 
