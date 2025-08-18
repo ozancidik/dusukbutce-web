@@ -15,21 +15,21 @@ async function connectDB() {
     }
     
     // Eğer zaten bağlıysa, mevcut bağlantıyı kullan
-    if (mongoose.connection.readyState === mongoose.ConnectionStates.connected) {
+    if (mongoose.connection.readyState === 1) {
       isConnected = true;
       console.log('MongoDB already connected');
       return;
     }
     
     // Eğer bağlantı kuruluyorsa, bekle
-    if (mongoose.connection.readyState === mongoose.ConnectionStates.connecting) {
+    if (mongoose.connection.readyState === 2) {
       console.log('MongoDB connection in progress, waiting...');
       await new Promise(resolve => {
         mongoose.connection.once('connected', resolve);
         mongoose.connection.once('error', resolve);
       });
       
-      if (mongoose.connection.readyState === mongoose.ConnectionStates.connected) {
+      if (mongoose.connection.readyState === 1) {
         isConnected = true;
         console.log('MongoDB connection completed');
         return;
@@ -37,7 +37,7 @@ async function connectDB() {
     }
     
     // Yeni bağlantı kur
-    if (mongoose.connection.readyState === mongoose.ConnectionStates.disconnected) {
+    if (mongoose.connection.readyState === 0) {
       console.log('Establishing new MongoDB connection...');
       await mongoose.connect(MONGODB_URI, {
         maxPoolSize: 10,
