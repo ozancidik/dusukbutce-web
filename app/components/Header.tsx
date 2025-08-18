@@ -30,6 +30,7 @@ export default function Header() {
   const [showResults, setShowResults] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState("");
+  const [adminLoggedIn, setAdminLoggedIn] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -51,12 +52,16 @@ export default function Header() {
       let userLoggedIn = localStorage.getItem("userLoggedIn");
       let userName = localStorage.getItem("userName");
       let loginTime = localStorage.getItem("loginTime");
+      let adminLoggedIn = localStorage.getItem("adminLoggedIn");
+      let adminEmail = localStorage.getItem("adminEmail");
       
       // localStorage'da yoksa sessionStorage'dan al
-      if (!userLoggedIn) {
+      if (!userLoggedIn && !adminLoggedIn) {
         userLoggedIn = sessionStorage.getItem("userLoggedIn");
         userName = sessionStorage.getItem("userName");
         loginTime = sessionStorage.getItem("loginTime");
+        adminLoggedIn = sessionStorage.getItem("adminLoggedIn");
+        adminEmail = sessionStorage.getItem("adminEmail");
       }
       
       // Timeout kontrolü (60 dakika = 3600000 ms)
@@ -88,8 +93,20 @@ export default function Header() {
         setIsLoggedIn(false);
         setUserName("");
       } else {
-        setIsLoggedIn(userLoggedIn === "true");
-        setUserName(userName || "");
+        // Hem kullanıcı hem admin giriş durumunu kontrol et
+        const isUserLoggedIn = userLoggedIn === "true";
+        const isAdminLoggedIn = adminLoggedIn === "true";
+        
+        setIsLoggedIn(isUserLoggedIn || isAdminLoggedIn);
+        setAdminLoggedIn(isAdminLoggedIn);
+        
+        if (isAdminLoggedIn) {
+          setUserName(adminEmail || "Admin");
+        } else if (isUserLoggedIn) {
+          setUserName(userName || "");
+        } else {
+          setUserName("");
+        }
       }
     };
 
@@ -271,10 +288,10 @@ export default function Header() {
                     💰 Tekliflerim
                   </button>
                 </Link>
-                <Link href="/profile" style={{ textDecoration: "none" }}>
+                <Link href={adminLoggedIn === "true" ? "/admin" : "/profile"} style={{ textDecoration: "none" }}>
                   <button
                     style={{
-                      background: "#10b981",
+                      background: adminLoggedIn === "true" ? "#7c3aed" : "#10b981",
                       color: "white",
                       border: "none",
                       borderRadius: "6px",
@@ -289,13 +306,13 @@ export default function Header() {
                       gap: "6px",
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.background = "#059669";
+                      e.currentTarget.style.background = adminLoggedIn === "true" ? "#6d28d9" : "#059669";
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.background = "#10b981";
+                      e.currentTarget.style.background = adminLoggedIn === "true" ? "#7c3aed" : "#10b981";
                     }}
                   >
-                    👤 {userName || "Profil"}
+                    {adminLoggedIn === "true" ? "⚙️" : "👤"} {userName || (adminLoggedIn === "true" ? "Admin" : "Profil")}
                   </button>
                 </Link>
               </>
@@ -429,10 +446,10 @@ export default function Header() {
                   💰 Tekliflerim
                 </button>
               </Link>
-              <Link href="/profile" style={{ textDecoration: "none" }}>
+              <Link href={adminLoggedIn === "true" ? "/admin" : "/profile"} style={{ textDecoration: "none" }}>
                 <button
                   style={{
-                    background: "#10b981",
+                    background: adminLoggedIn === "true" ? "#7c3aed" : "#10b981",
                     color: "white",
                     border: "none",
                     borderRadius: "6px",
@@ -447,13 +464,13 @@ export default function Header() {
                     gap: isMobile ? "4px" : "6px",
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "#059669";
+                    e.currentTarget.style.background = adminLoggedIn === "true" ? "#6d28d9" : "#059669";
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.background = "#10b981";
+                    e.currentTarget.style.background = adminLoggedIn === "true" ? "#7c3aed" : "#10b981";
                   }}
                 >
-                  👤 {userName || "Profil"}
+                  {adminLoggedIn === "true" ? "⚙️" : "👤"} {userName || (adminLoggedIn === "true" ? "Admin" : "Profil")}
                 </button>
               </Link>
             </>
