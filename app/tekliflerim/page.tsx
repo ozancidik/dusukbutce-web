@@ -213,7 +213,7 @@ export default function TekliflerimPage() {
           color: '#6b7280',
           margin: 0
         }}>
-          Notebook satış talepleriniz ve teklifleriniz
+          Satış talepleriniz ve teklifleriniz
         </p>
       </div>
 
@@ -244,10 +244,10 @@ export default function TekliflerimPage() {
             color: '#6b7280',
             marginBottom: '24px'
           }}>
-            Notebook satış talebi oluşturmak için aşağıdaki butona tıklayın
+            Satış talebi oluşturmak için aşağıdaki butona tıklayın
           </p>
           <button
-            onClick={() => router.push('/bize-sat/notebook')}
+            onClick={() => router.push('/bize-sat')}
             style={{
               background: 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)',
               color: 'white',
@@ -269,7 +269,7 @@ export default function TekliflerimPage() {
               e.currentTarget.style.boxShadow = '0 4px 12px rgba(37, 99, 235, 0.3)';
             }}
           >
-            Notebook Satış Talebi Oluştur
+            Satış Talebi Oluştur
           </button>
         </div>
       ) : (

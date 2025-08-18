@@ -42,16 +42,35 @@ export default function NotebookPage() {
     checkMobile();
     window.addEventListener('resize', checkMobile);
     
+    // localStorage'dan kaydedilmiş form verilerini yükle
+    const savedFormData = localStorage.getItem('notebookFormData');
+    if (savedFormData) {
+      try {
+        const parsedData = JSON.parse(savedFormData);
+        setFormData(parsedData);
+        console.log('📝 Kaydedilmiş form verileri yüklendi');
+      } catch (error) {
+        console.error('Form verileri yüklenirken hata:', error);
+      }
+    }
+    
     return () => {
       window.removeEventListener('resize', checkMobile);
     };
   }, []);
 
   const handleInputChange = (field: string, value: any) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    setFormData(prev => {
+      const newData = {
+        ...prev,
+        [field]: value
+      };
+      
+      // Form verilerini localStorage'a kaydet
+      localStorage.setItem('notebookFormData', JSON.stringify(newData));
+      
+      return newData;
+    });
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -65,10 +84,17 @@ export default function NotebookPage() {
           if (e.target?.result) {
             newImages.push(e.target.result as string);
             if (newImages.length === files.length) {
-              setFormData(prev => ({
-                ...prev,
-                images: [...prev.images, ...newImages]
-              }));
+              setFormData(prev => {
+                const newData = {
+                  ...prev,
+                  images: [...prev.images, ...newImages]
+                };
+                
+                // Form verilerini localStorage'a kaydet
+                localStorage.setItem('notebookFormData', JSON.stringify(newData));
+                
+                return newData;
+              });
             }
           }
         };
@@ -78,10 +104,17 @@ export default function NotebookPage() {
   };
 
   const removeImage = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      images: prev.images.filter((_, i) => i !== index)
-    }));
+    setFormData(prev => {
+      const newData = {
+        ...prev,
+        images: prev.images.filter((_, i) => i !== index)
+      };
+      
+      // Form verilerini localStorage'a kaydet
+      localStorage.setItem('notebookFormData', JSON.stringify(newData));
+      
+      return newData;
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -102,6 +135,10 @@ export default function NotebookPage() {
 
       if (response.ok) {
         setShowSuccessModal(true);
+        
+        // Form başarıyla gönderildikten sonra localStorage'ı temizle
+        localStorage.removeItem('notebookFormData');
+        
         setFormData({
           brand: '',
           model: '',
@@ -1063,7 +1100,7 @@ export default function NotebookPage() {
           ) : (
             <button
               type="button"
-              onClick={() => router.push('/login')}
+              onClick={() => router.push(`/login?returnUrl=${encodeURIComponent('/bize-sat/notebook')}`)}
               style={{
                 width: '100%',
                 background: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',

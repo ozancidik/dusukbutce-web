@@ -796,7 +796,7 @@ export default function TabletPage() {
           ) : (
             <button
               type="button"
-              onClick={() => router.push('/login')}
+                              onClick={() => router.push(`/login?returnUrl=${encodeURIComponent('/bize-sat/tablet')}`)}
               style={{
                 width: '100%',
                 background: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',

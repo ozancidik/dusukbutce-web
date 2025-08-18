@@ -735,7 +735,7 @@ export default function ProcessorPage() {
           ) : (
             <button
               type="button"
-              onClick={() => router.push('/login')}
+                              onClick={() => router.push(`/login?returnUrl=${encodeURIComponent('/bize-sat/processor')}`)}
               style={{
                 width: '100%',
                 background: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',

@@ -154,12 +154,14 @@ export default function LoginPage() {
             router.push("/admin");
           }, 2000);
         } else {
-          // Normal kullanıcı yönlendirmesi
+          // Normal kullanıcı yönlendirmesi - geldiği sayfaya geri dön
+          const returnUrl = new URLSearchParams(window.location.search).get('returnUrl') || '/';
+          
           setLoginSuccess(true);
-          setRedirectMessage("Giriş başarılı! Anasayfaya yönlendiriliyor...");
+          setRedirectMessage("Giriş başarılı! Yönlendiriliyor...");
           
           setTimeout(() => {
-            router.push("/");
+            router.push(returnUrl);
           }, 2000);
         }
       } else {
@@ -246,7 +248,10 @@ export default function LoginPage() {
           
           popup?.close();
           window.removeEventListener('message', handleMessage);
-          router.push("/");
+          
+          // returnUrl'e göre yönlendir
+          const returnUrl = new URLSearchParams(window.location.search).get('returnUrl') || '/';
+          router.push(returnUrl);
         } else if (event.data.type === 'GOOGLE_LOGIN_ERROR') {
           setError(event.data.error || "Google ile giriş yapılırken bir hata oluştu.");
           popup?.close();
@@ -273,6 +278,10 @@ export default function LoginPage() {
   // Facebook ile giriş (geçici olarak devre dışı)
   const handleFacebookLogin = async () => {
     setError("Facebook OAuth henüz yapılandırılmadı. Lütfen email/şifre ile giriş yapın.");
+    
+    // Eğer Facebook OAuth aktif olursa, burada da returnUrl kullanılacak
+    // const returnUrl = new URLSearchParams(window.location.search).get('returnUrl') || '/';
+    // router.push(returnUrl);
   };
 
   // Success state'inde loading ekranı göster
@@ -695,7 +704,7 @@ export default function LoginPage() {
               href="/register"
               style={{
                 color: "#2563eb",
-                textDecoration: "none",
+                textDecoration: "underline",
                 fontWeight: "600",
               }}
             >
@@ -706,9 +715,10 @@ export default function LoginPage() {
           <Link
             href="/forgot-password"
             style={{
-              color: "#64748b",
-              textDecoration: "none",
+              color: "#2563eb",
+              textDecoration: "underline",
               fontSize: "14px",
+              fontWeight: "700",
             }}
           >
             Şifremi unuttum

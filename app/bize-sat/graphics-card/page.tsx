@@ -49,10 +49,19 @@ export default function GraphicsCardPage() {
   }, []);
 
   const handleInputChange = (field: string, value: any) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    setFormData(prev => {
+      const newData = {
+        ...prev,
+        [field]: value
+      };
+      
+      // Mining yapılmadı seçilirse mining süresini temizle
+      if (field === 'miningUsed' && value === 'Hayır') {
+        newData.miningDuration = '';
+      }
+      
+      return newData;
+    });
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -691,7 +700,7 @@ export default function GraphicsCardPage() {
                   display: 'block',
                   fontSize: '14px',
                   fontWeight: '500',
-                  color: '#374151',
+                  color: formData.miningUsed === 'Hayır' ? '#9ca3af' : '#374151',
                   marginBottom: '6px'
                 }}>
                   Mining Süresi
@@ -700,7 +709,8 @@ export default function GraphicsCardPage() {
                   type="text"
                   value={formData.miningDuration}
                   onChange={(e) => handleInputChange('miningDuration', e.target.value)}
-                  placeholder="Örn: Yapılmadı, 6 ay, 1 yıl"
+                  placeholder="Örn: 6 ay, 1 yıl"
+                  disabled={formData.miningUsed === 'Hayır'}
                   style={{
                     width: '100%',
                     padding: '12px',
@@ -708,10 +718,21 @@ export default function GraphicsCardPage() {
                     borderRadius: '8px',
                     fontSize: '14px',
                     outline: 'none',
-                    transition: 'border-color 0.2s'
+                    transition: 'border-color 0.2s',
+                    backgroundColor: formData.miningUsed === 'Hayır' ? '#f3f4f6' : 'white',
+                    color: formData.miningUsed === 'Hayır' ? '#9ca3af' : '#374151',
+                    cursor: formData.miningUsed === 'Hayır' ? 'not-allowed' : 'text'
                   }}
-                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                  onFocus={(e) => {
+                    if (formData.miningUsed !== 'Hayır') {
+                      e.target.style.borderColor = '#3b82f6';
+                    }
+                  }}
+                  onBlur={(e) => {
+                    if (formData.miningUsed !== 'Hayır') {
+                      e.target.style.borderColor = '#d1d5db';
+                    }
+                  }}
                 />
               </div>
 
@@ -1165,7 +1186,7 @@ export default function GraphicsCardPage() {
           ) : (
             <button
               type="button"
-              onClick={() => router.push('/login')}
+                              onClick={() => router.push(`/login?returnUrl=${encodeURIComponent('/bize-sat/graphics-card')}`)}
               style={{
                 width: '100%',
                 background: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',

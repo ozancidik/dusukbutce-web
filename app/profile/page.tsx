@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -377,25 +376,9 @@ export default function ProfilePage() {
       <div style={{ 
         maxWidth: '800px', 
         margin: '0 auto',
-        padding: '40px 20px'
+        padding: '20px 20px'
       }}>
-        {/* Header */}
-        <div style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center', 
-          marginBottom: '40px' 
-        }}>
-          <Link href="/">
-            <Image 
-              src="/logo.png" 
-              alt="Düşük Bütçe" 
-              width={150} 
-              height={50} 
-              style={{ objectFit: 'contain', cursor: 'pointer' }} 
-            />
-          </Link>
-        </div>
+
 
         {/* Ana Profil Kartı */}
         <div style={{ 
@@ -443,6 +426,34 @@ export default function ProfilePage() {
                 Admin
               </div>
             )}
+            
+                            {/* Çıkış Yap Butonu */}
+                <div style={{ marginTop: '20px' }}>
+                  <button
+                    onClick={handleLogout}
+                    style={{
+                      background: '#dc2626',
+                      color: 'white',
+                      border: '2px solid #b91c1c',
+                      borderRadius: '8px',
+                      padding: '10px 24px',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#b91c1c';
+                      e.currentTarget.style.borderColor = '#991b1b';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = '#dc2626';
+                      e.currentTarget.style.borderColor = '#b91c1c';
+                    }}
+                  >
+                    🚪 Çıkış Yap
+                  </button>
+                </div>
           </div>
 
           {/* Profil İçeriği */}
@@ -755,31 +766,7 @@ export default function ProfilePage() {
           )}
         </div>
 
-        {/* Çıkış Yap Butonu */}
-        <div style={{ textAlign: 'center' }}>
-          <button
-            onClick={handleLogout}
-            style={{
-              background: '#dc2626',
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              padding: '12px 32px',
-              fontSize: '16px',
-              fontWeight: '500',
-              cursor: 'pointer',
-              transition: 'background 0.2s'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = '#b91c1c';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = '#dc2626';
-            }}
-          >
-            Çıkış Yap
-          </button>
-        </div>
+
       </div>
       
       {/* Başarı Popup'ı */}
