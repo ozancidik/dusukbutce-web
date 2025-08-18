@@ -98,9 +98,9 @@ export default function Header() {
         const isAdminLoggedIn = adminLoggedIn === "true";
         
         setIsLoggedIn(isUserLoggedIn || isAdminLoggedIn);
-        setAdminLoggedIn(isAdminLoggedIn);
+        setAdminLoggedIn(isAdminLoggedIn === "true");
         
-        if (isAdminLoggedIn) {
+        if (isAdminLoggedIn === "true") {
           setUserName("Admin");
         } else if (isUserLoggedIn) {
           setUserName(userName || "");
@@ -251,10 +251,9 @@ export default function Header() {
         {isMobile && (
           <div
             style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "12px",
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "8px",
               width: "100%",
             }}
           >
@@ -268,15 +267,17 @@ export default function Header() {
                       color: "white",
                       border: "none",
                       borderRadius: "6px",
-                      padding: "8px 16px",
+                      padding: "8px 12px",
                       fontWeight: "600",
                       cursor: "pointer",
-                      fontSize: "14px",
+                      fontSize: "12px",
                       transition: "all 0.2s",
                       whiteSpace: "nowrap",
                       display: "flex",
                       alignItems: "center",
-                      gap: "6px",
+                      justifyContent: "center",
+                      gap: "4px",
+                      width: "100%",
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.background = "#d97706";
@@ -288,31 +289,33 @@ export default function Header() {
                     💰 Tekliflerim
                   </button>
                 </Link>
-                <Link href={adminLoggedIn === "true" ? "/admin" : "/profile"} style={{ textDecoration: "none" }}>
+                <Link href={adminLoggedIn ? "/admin" : "/profile"} style={{ textDecoration: "none" }}>
                   <button
                     style={{
-                      background: adminLoggedIn === "true" ? "#7c3aed" : "#10b981",
+                      background: adminLoggedIn ? "#7c3aed" : "#10b981",
                       color: "white",
                       border: "none",
                       borderRadius: "6px",
-                      padding: "8px 16px",
+                      padding: "8px 12px",
                       fontWeight: "600",
                       cursor: "pointer",
-                      fontSize: "14px",
+                      fontSize: "12px",
                       transition: "all 0.2s",
                       whiteSpace: "nowrap",
                       display: "flex",
                       alignItems: "center",
-                      gap: "6px",
+                      justifyContent: "center",
+                      gap: "4px",
+                      width: "100%",
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.background = adminLoggedIn === "true" ? "#6d28d9" : "#059669";
+                      e.currentTarget.style.background = adminLoggedIn ? "#6d28d9" : "#059669";
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.background = adminLoggedIn === "true" ? "#7c3aed" : "#10b981";
+                      e.currentTarget.style.background = adminLoggedIn ? "#7c3aed" : "#10b981";
                     }}
                   >
-                    {adminLoggedIn === "true" ? "⚙️" : "👤"} {userName || (adminLoggedIn === "true" ? "Admin" : "Profil")}
+                    {adminLoggedIn ? "⚙️" : "👤"} {userName || (adminLoggedIn ? "Admin" : "Profil")}
                   </button>
                 </Link>
               </>
@@ -354,15 +357,17 @@ export default function Header() {
                   color: "white",
                   border: "none",
                   borderRadius: "6px",
-                  padding: "8px 16px",
+                  padding: "8px 12px",
                   fontWeight: "600",
                   cursor: "pointer",
-                  fontSize: "14px",
+                  fontSize: "12px",
                   transition: "background 0.2s",
                   whiteSpace: "nowrap",
                   display: "flex",
-                    alignItems: "center",
-                    gap: "6px",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "4px",
+                  width: "100%",
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.background = "#047857";
@@ -383,15 +388,17 @@ export default function Header() {
                   color: "white",
                   border: "none",
                   borderRadius: "6px",
-                  padding: "8px 16px",
+                  padding: "8px 12px",
                   fontWeight: "600",
                   cursor: "pointer",
-                  fontSize: "14px",
+                  fontSize: "12px",
                   transition: "background 0.2s",
                   whiteSpace: "nowrap",
                   display: "flex",
-                    alignItems: "center",
-                    gap: "6px",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "4px",
+                  width: "100%",
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.background = "#1d4ed8";
