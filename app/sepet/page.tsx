@@ -30,10 +30,13 @@ export default function SepetPage() {
               alt="Düşük Bütçe" 
               width={140} 
               height={50} 
+              priority
               style={{ 
                 objectFit: 'contain', 
                 cursor: 'pointer',
-                transition: 'transform 0.2s'
+                transition: 'transform 0.2s',
+                width: 'auto',
+                height: 'auto'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'scale(1.05)';

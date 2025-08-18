@@ -5,6 +5,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function ProfilePage() {
+  console.log('🔍 ProfilePage component loaded!');
+  console.log('🔍 React version:', React.version);
+  console.log('🔍 useState available:', typeof useState);
+  
   const [userInfo, setUserInfo] = useState<any>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState({
@@ -15,7 +19,46 @@ export default function ProfilePage() {
   });
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState<'success' | 'error'>('success');
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [showErrorPopup, setShowErrorPopup] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const router = useRouter();
+
+  // Telefon numarasını formatlayan yardımcı fonksiyon
+  const formatPhoneNumber = (phone: string): string => {
+    if (!phone) return '';
+    
+    // Sadece rakamları al
+    const digits = phone.replace(/\D/g, '');
+    
+    if (digits.length === 0) return '';
+    
+    // (5xx) xxx xx xx formatına çevir
+    let formattedValue = '';
+    
+    if (digits.length > 0) {
+      // İlk rakam 5 olmalı
+      if (digits.length > 0 && digits[0] !== '5') {
+        return '';
+      }
+      
+      formattedValue = '(' + digits.substring(0, 3);
+      
+      if (digits.length > 3) {
+        formattedValue += ') ' + digits.substring(3, 6);
+      }
+      
+      if (digits.length > 6) {
+        formattedValue += ' ' + digits.substring(6, 8);
+      }
+      
+      if (digits.length > 8) {
+        formattedValue += ' ' + digits.substring(8, 10);
+      }
+    }
+    
+    return formattedValue;
+  };
 
   useEffect(() => {
     // localStorage'dan kullanıcı bilgilerini al
@@ -26,13 +69,19 @@ export default function ProfilePage() {
     }
 
     const userData = {
-      id: localStorage.getItem('userId'),
-      email: localStorage.getItem('userEmail'),
-      name: localStorage.getItem('userName'),
-      phone: localStorage.getItem('userPhone') || '',
-      isAdmin: localStorage.getItem('adminLoggedIn') === 'true'
+      id: localStorage.getItem('userId') || sessionStorage.getItem('userId'),
+      email: localStorage.getItem('userEmail') || sessionStorage.getItem('userEmail'),
+      name: localStorage.getItem('userName') || sessionStorage.getItem('userName'),
+      phone: localStorage.getItem('userPhone') || sessionStorage.getItem('userPhone') || '',
+      isAdmin: localStorage.getItem('adminLoggedIn') === 'true' || sessionStorage.getItem('adminLoggedIn') === 'true'
     };
-
+    
+    console.log('🔍 Profile sayfasında userData:', userData);
+    console.log('🔍 userData.phone:', userData.phone);
+    console.log('🔍 userData.id:', userData.id);
+    console.log('🔍 userData.email:', userData.email);
+    console.log('🔍 userData.name:', userData.name);
+    
     setUserInfo(userData);
     
     // İsim ve soyisimi ayır
@@ -41,7 +90,7 @@ export default function ProfilePage() {
       firstName: nameParts[0] || '',
       lastName: nameParts.slice(1).join(' ') || '',
       email: userData.email || '',
-      phone: '' // Telefon bilgisi localStorage'da yok
+      phone: formatPhoneNumber(userData.phone || '')
     });
   }, [router]);
 
@@ -115,7 +164,7 @@ export default function ProfilePage() {
       firstName: nameParts[0] || '',
       lastName: nameParts.slice(1).join(' ') || '',
       email: userInfo.email || '',
-      phone: ''
+      phone: formatPhoneNumber(userInfo.phone || '')
     });
   };
 
@@ -185,7 +234,23 @@ export default function ProfilePage() {
       }
     }
 
+    // userId kontrolü
+    if (!userInfo?.id) {
+      console.error('❌ userInfo.id bulunamadı:', userInfo);
+      setMessage('Kullanıcı ID bulunamadı. Lütfen tekrar giriş yapın.');
+      setMessageType('error');
+      return;
+    }
+
     try {
+      console.log('🔍 Profile update request data:', {
+        userId: userInfo.id,
+        firstName: editForm.firstName,
+        lastName: editForm.lastName,
+        email: editForm.email,
+        phone: editForm.phone
+      });
+      
       // API'ye güncelleme gönder
       const response = await fetch('/api/auth/update-profile', {
         method: 'PUT',
@@ -208,6 +273,12 @@ export default function ProfilePage() {
         localStorage.setItem('userEmail', editForm.email);
         localStorage.setItem('userPhone', editForm.phone);
         
+        // Telefon bilgisini formatlanmış halde localStorage'a kaydet
+        const formattedPhone = formatPhoneNumber(editForm.phone);
+        if (formattedPhone) {
+          localStorage.setItem('userPhone', formattedPhone);
+        }
+        
         setUserInfo({
           ...userInfo,
           name: newName,
@@ -218,14 +289,45 @@ export default function ProfilePage() {
         setIsEditing(false);
         setMessage('Profil başarıyla güncellendi!');
         setMessageType('success');
+        setShowSuccessPopup(true);
+        
+        // 3 saniye sonra popup'ı kapat
+        setTimeout(() => {
+          setShowSuccessPopup(false);
+        }, 3000);
+        
+        // Admin-users sayfasına bildirim gönder
+        window.dispatchEvent(new CustomEvent('profileUpdated', {
+          detail: {
+            userId: userInfo.id,
+            newName: newName,
+            newEmail: editForm.email
+          }
+        }));
       } else {
         const data = await response.json();
-        setMessage(data.message || 'Güncelleme sırasında bir hata oluştu.');
+        const errorMsg = data.message || 'Güncelleme sırasında bir hata oluştu.';
+        setMessage(errorMsg);
         setMessageType('error');
+        setErrorMessage(errorMsg);
+        setShowErrorPopup(true);
+        
+        // 5 saniye sonra hata popup'ını kapat
+        setTimeout(() => {
+          setShowErrorPopup(false);
+        }, 5000);
       }
     } catch (error) {
-      setMessage('Bağlantı hatası oluştu.');
+      const errorMsg = 'Bağlantı hatası oluştu.';
+      setMessage(errorMsg);
       setMessageType('error');
+      setErrorMessage(errorMsg);
+      setShowErrorPopup(true);
+      
+      // 5 saniye sonra hata popup'ını kapat
+      setTimeout(() => {
+        setShowErrorPopup(false);
+      }, 5000);
     }
   };
 
@@ -245,6 +347,7 @@ export default function ProfilePage() {
   };
 
   if (!userInfo) {
+    console.log('🔍 ProfilePage: userInfo is null, showing loading...');
     return (
       <div style={{ 
         minHeight: '60vh', 
@@ -261,6 +364,10 @@ export default function ProfilePage() {
     );
   }
 
+  console.log('🔍 ProfilePage component rendering...');
+  
+  console.log('🔍 ProfilePage: About to render...');
+  
   return (
     <div style={{ 
       minHeight: '100vh',
@@ -342,7 +449,7 @@ export default function ProfilePage() {
           <div style={{ padding: '32px' }}>
             {isEditing ? (
               /* Düzenleme Formu */
-              <div>
+              <form onSubmit={(e) => { e.preventDefault(); console.log('Form submitted!'); handleSave(); }}>
                 <h3 style={{ margin: '0 0 24px 0', color: '#1e293b', fontSize: '20px' }}>
                   Profil Bilgilerini Düzenle
                 </h3>
@@ -440,7 +547,8 @@ export default function ProfilePage() {
 
                 <div style={{ display: 'flex', gap: '12px' }}>
                   <button
-                    onClick={handleSave}
+                    type="button"
+                    onClick={() => { console.log('Kaydet clicked!'); handleSave(); }}
                     style={{
                       background: '#2563eb',
                       color: 'white',
@@ -472,7 +580,7 @@ export default function ProfilePage() {
                     İptal
                   </button>
                 </div>
-              </div>
+              </form>
             ) : (
               /* Görüntüleme Modu */
               <div>
@@ -673,6 +781,186 @@ export default function ProfilePage() {
           </button>
         </div>
       </div>
+      
+      {/* Başarı Popup'ı */}
+      {showSuccessPopup && (
+        <div style={{
+          position: 'fixed',
+          top: '20px',
+          right: '20px',
+          background: 'linear-gradient(135deg, #10b981, #059669)',
+          color: 'white',
+          padding: '20px 24px',
+          borderRadius: '12px',
+          boxShadow: '0 10px 25px rgba(16, 185, 129, 0.3)',
+          zIndex: 1000,
+          minWidth: '320px',
+          animation: 'slideInRight 0.3s ease-out',
+          border: '1px solid rgba(255, 255, 255, 0.2)'
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px'
+          }}>
+            <div style={{
+              background: 'rgba(255, 255, 255, 0.2)',
+              borderRadius: '50%',
+              width: '40px',
+              height: '40px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '20px'
+            }}>
+              ✅
+            </div>
+            <div>
+              <h4 style={{
+                margin: '0 0 4px 0',
+                fontSize: '16px',
+                fontWeight: '600'
+              }}>
+                Başarıyla Kaydedildi!
+              </h4>
+              <p style={{
+                margin: '0',
+                fontSize: '14px',
+                opacity: '0.9'
+              }}>
+                Profil bilgileriniz güncellendi
+              </p>
+            </div>
+          </div>
+          
+          <button
+            onClick={() => setShowSuccessPopup(false)}
+            style={{
+              position: 'absolute',
+              top: '8px',
+              right: '8px',
+              background: 'rgba(255, 255, 255, 0.2)',
+              border: 'none',
+              borderRadius: '50%',
+              width: '24px',
+              height: '24px',
+              color: 'white',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '12px',
+              transition: 'background 0.2s'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
+            }}
+          >
+            ✕
+          </button>
+        </div>
+      )}
+      
+      {/* Hata Popup'ı */}
+      {showErrorPopup && (
+        <div style={{
+          position: 'fixed',
+          top: '20px',
+          right: '20px',
+          background: 'linear-gradient(135deg, #ef4444, #dc2626)',
+          color: 'white',
+          padding: '20px 24px',
+          borderRadius: '12px',
+          boxShadow: '0 10px 25px rgba(239, 68, 68, 0.3)',
+          zIndex: 1000,
+          minWidth: '320px',
+          animation: 'slideInRight 0.3s ease-out',
+          border: '1px solid rgba(255, 255, 255, 0.2)'
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px'
+          }}>
+            <div style={{
+              background: 'rgba(255, 255, 255, 0.2)',
+              borderRadius: '50%',
+              width: '40px',
+              height: '40px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '20px'
+            }}>
+              ❌
+            </div>
+            <div>
+              <h4 style={{
+                margin: '0 0 4px 0',
+                fontSize: '16px',
+                fontWeight: '600'
+              }}>
+                Hata Oluştu!
+              </h4>
+              <p style={{
+                margin: '0',
+                fontSize: '14px',
+                opacity: '0.9',
+                maxWidth: '250px',
+                wordWrap: 'break-word'
+              }}>
+                {errorMessage}
+              </p>
+            </div>
+          </div>
+          
+          <button
+            onClick={() => setShowErrorPopup(false)}
+            style={{
+              position: 'absolute',
+              top: '8px',
+              right: '8px',
+              background: 'rgba(255, 255, 255, 0.2)',
+              border: 'none',
+              borderRadius: '50%',
+              width: '24px',
+              height: '24px',
+              color: 'white',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '12px',
+              transition: 'background 0.2s'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
+            }}
+          >
+            ✕
+          </button>
+        </div>
+      )}
+      
+      {/* CSS Animasyonları */}
+      <style jsx>{`
+        @keyframes slideInRight {
+          from {
+            transform: translateX(100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+      `}</style>
     </div>
   );
 } 

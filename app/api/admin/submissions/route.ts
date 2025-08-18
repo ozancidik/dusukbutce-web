@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import connectDB from "@/lib/mongodb";
 import ProductSubmission from '@/models/ProductSubmission';
+import mongoose from 'mongoose';
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
@@ -13,6 +14,15 @@ export async function PUT(request: NextRequest) {
     }
 
     await connectDB();
+    
+    // Bağlantı durumunu kontrol et
+    if (mongoose.connection.readyState !== 1) {
+      return NextResponse.json({ 
+        success: false, 
+        message: 'Database connection not ready',
+        error: 'Database connection not ready'
+      }, { status: 500 });
+    }
 
     let updateData: any = {};
 
@@ -85,7 +95,17 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: false, message: 'Database not configured' }, { status: 500 });
     }
 
+    // MongoDB'ye bağlan
     await connectDB();
+    
+    // Bağlantı durumunu kontrol et
+    if (mongoose.connection.readyState !== 1) {
+      return NextResponse.json({ 
+        success: false, 
+        message: 'Database connection not ready',
+        error: 'Database connection not ready'
+      }, { status: 500 });
+    }
     
     const submissions = await ProductSubmission.find({}).sort({ createdAt: -1 });
     
@@ -96,7 +116,12 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     console.error('Error fetching submissions:', error);
-    return NextResponse.json({ success: false, message: 'Internal server error' }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
+    return NextResponse.json({ 
+      success: false, 
+      message: errorMessage,
+      error: errorMessage
+    }, { status: 500 });
   }
 }
 
@@ -109,6 +134,15 @@ export async function DELETE(request: NextRequest) {
     }
 
     await connectDB();
+    
+    // Bağlantı durumunu kontrol et
+    if (mongoose.connection.readyState !== 1) {
+      return NextResponse.json({ 
+        success: false, 
+        message: 'Database connection not ready',
+        error: 'Database connection not ready'
+      }, { status: 500 });
+    }
 
     if (action === 'deleteAll') {
       // Tüm ilanları sil

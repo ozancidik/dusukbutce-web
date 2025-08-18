@@ -9,10 +9,6 @@ if (!MONGODB_URI) {
 let isConnected = false;
 
 async function connectDB() {
-  if (isConnected) {
-    return;
-  }
-
   try {
     if (!MONGODB_URI) {
       throw new Error('MONGODB_URI is not defined');
@@ -25,18 +21,37 @@ async function connectDB() {
       return;
     }
     
-    // Connection pooling ve timeout ayarları
-    await mongoose.connect(MONGODB_URI, {
-      maxPoolSize: 10,
-      serverSelectionTimeoutMS: 5000,
-      socketTimeoutMS: 45000,
-      bufferCommands: false
-    });
+    // Eğer bağlantı kuruluyorsa, bekle
+    if (mongoose.connection.readyState === 2) {
+      console.log('MongoDB connection in progress, waiting...');
+      await new Promise(resolve => {
+        mongoose.connection.once('connected', resolve);
+        mongoose.connection.once('error', resolve);
+      });
+      
+      if (mongoose.connection.readyState === 1) {
+        isConnected = true;
+        console.log('MongoDB connection completed');
+        return;
+      }
+    }
     
-    isConnected = true;
-    console.log('MongoDB connected successfully');
+    // Yeni bağlantı kur
+    if (mongoose.connection.readyState === 0) {
+      console.log('Establishing new MongoDB connection...');
+      await mongoose.connect(MONGODB_URI, {
+        maxPoolSize: 10,
+        serverSelectionTimeoutMS: 10000,
+        socketTimeoutMS: 45000,
+        bufferCommands: true
+      });
+      
+      isConnected = true;
+      console.log('MongoDB connected successfully');
+    }
   } catch (error) {
     console.error('MongoDB connection error:', error);
+    isConnected = false;
     throw error;
   }
 }

@@ -201,10 +201,13 @@ export default function Header() {
               alt="Düşük Bütçe" 
               width={isMobile ? 100 : 120} 
               height={isMobile ? 38 : 45} 
+              priority
               style={{ 
                 objectFit: "contain",
                 cursor: "pointer",
                 transition: "transform 0.2s",
+                width: "auto",
+                height: "auto"
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = "scale(1.05)";

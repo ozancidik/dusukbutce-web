@@ -47,6 +47,7 @@ interface Submission {
 export default function AdminPage() {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
@@ -99,16 +100,23 @@ export default function AdminPage() {
 
   const fetchSubmissions = async () => {
     try {
+      setError(null);
       const response = await fetch('/api/admin/submissions');
       const data = await response.json();
       
-      if (response.ok) {
+      if (response.ok && data.success) {
         setSubmissions(data.submissions || []);
       } else {
-        console.error('Veri çekme hatası:', data.error);
+        const errorMessage = data.message || data.error || 'Bilinmeyen hata';
+        console.error('Veri çekme hatası:', errorMessage);
+        setError(errorMessage);
+        setSubmissions([]);
       }
     } catch (error) {
-      console.error('API hatası:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Bağlantı hatası';
+      console.error('API hatası:', errorMessage);
+      setError(errorMessage);
+      setSubmissions([]);
     } finally {
       setLoading(false);
     }
@@ -275,6 +283,70 @@ export default function AdminPage() {
         }}>
           Yükleniyor...
         </h2>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div style={{ 
+        padding: isMobile ? '20px' : '40px', 
+        textAlign: 'center',
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #374151 0%, #6b7280 50%, #4b5563 100%)'
+      }}>
+        <div style={{
+          background: 'white',
+          borderRadius: '16px',
+          padding: '32px',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
+          maxWidth: '500px',
+          margin: '0 auto'
+        }}>
+          <div style={{
+            fontSize: '48px',
+            marginBottom: '16px'
+          }}>
+            ❌
+          </div>
+          <h2 style={{
+            fontSize: isMobile ? '20px' : '24px',
+            color: '#dc2626',
+            margin: '0 0 16px 0'
+          }}>
+            Veri Yüklenirken Hata Oluştu
+          </h2>
+          <p style={{
+            fontSize: '16px',
+            color: '#6b7280',
+            margin: '0 0 24px 0',
+            lineHeight: '1.5'
+          }}>
+            {error}
+          </p>
+          <button 
+            onClick={fetchSubmissions}
+            style={{
+              background: '#3b82f6',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              padding: '12px 24px',
+              fontWeight: '600',
+              fontSize: '16px',
+              cursor: 'pointer',
+              transition: 'background 0.2s'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = '#2563eb';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = '#3b82f6';
+            }}
+          >
+            🔄 Tekrar Dene
+          </button>
+        </div>
       </div>
     );
   }
