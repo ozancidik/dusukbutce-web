@@ -205,9 +205,23 @@ export default function AdminUsersPage() {
                 🏠 Anasayfaya Dön
               </button>
             </Link>
-            <Link href="/login" style={{ textDecoration: 'none' }}>
-              <button style={{
-                background: '#10b981',
+            <button 
+              onClick={() => {
+                // Tüm localStorage'ı temizle
+                localStorage.clear();
+                sessionStorage.clear();
+                
+                // Custom event'i tetikle
+                window.dispatchEvent(new Event('localStorageChange'));
+                
+                // Header'a logout mesajı gönder
+                window.dispatchEvent(new CustomEvent('logout'));
+                
+                // Anasayfaya yönlendir
+                router.push('/');
+              }}
+              style={{
+                background: '#dc2626',
                 color: 'white',
                 border: 'none',
                 borderRadius: '8px',
@@ -218,14 +232,13 @@ export default function AdminUsersPage() {
                 transition: 'background 0.2s'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#059669';
+                e.currentTarget.style.background = '#b91c1c';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = '#10b981';
+                e.currentTarget.style.background = '#dc2626';
               }}>
-                🔑 Giriş Yap
+                🚪 Çıkış Yap
               </button>
-            </Link>
           </div>
           <div style={{
             marginTop: '20px',
@@ -248,7 +261,7 @@ export default function AdminUsersPage() {
               margin: 0,
               lineHeight: '1.4'
             }}>
-              Eğer yönetici hesabınız olduğunu düşünüyorsanız, lütfen önce çıkış yapıp tekrar giriş yapın.
+              Eğer yönetici hesabınız olduğunu düşünüyorsanız, lütfen çıkış yapıp tekrar giriş yapın.
             </p>
           </div>
         </div>
