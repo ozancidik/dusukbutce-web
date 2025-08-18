@@ -101,7 +101,7 @@ export default function Header() {
         setAdminLoggedIn(isAdminLoggedIn);
         
         if (isAdminLoggedIn) {
-          setUserName(adminEmail || "Admin");
+          setUserName("Admin");
         } else if (isUserLoggedIn) {
           setUserName(userName || "");
         } else {
