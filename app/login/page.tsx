@@ -11,6 +11,15 @@ export default function LoginPage() {
   const [socialLoading, setSocialLoading] = useState("");
   const router = useRouter();
 
+  // Admin giriş kontrolü
+  React.useEffect(() => {
+    const adminLoggedIn = localStorage.getItem("adminLoggedIn") || sessionStorage.getItem("adminLoggedIn");
+    if (adminLoggedIn === "true") {
+      router.push("/admin");
+      return;
+    }
+  }, [router]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);

@@ -8,6 +8,15 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+  // Admin giriş kontrolü
+  React.useEffect(() => {
+    const adminLoggedIn = localStorage.getItem("adminLoggedIn") || sessionStorage.getItem("adminLoggedIn");
+    if (adminLoggedIn === "true") {
+      window.location.href = "/admin";
+      return;
+    }
+  }, []);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     
