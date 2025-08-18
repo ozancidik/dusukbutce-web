@@ -21,6 +21,8 @@ export default function AdminUsersPage() {
   const [error, setError] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
+  const [deletingUser, setDeletingUser] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -86,6 +88,40 @@ export default function AdminUsersPage() {
       setError('Kullanıcılar yüklenirken hata oluştu');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const deleteAdminUser = async (userId: string) => {
+    try {
+      setDeletingUser(userId);
+      console.log('🗑️ Admin kullanıcı siliniyor:', userId);
+      
+      const response = await fetch(`/api/admin/users/${userId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        console.log('✅ Admin kullanıcı başarıyla silindi');
+        // Kullanıcı listesinden sil
+        setUsers(prevUsers => prevUsers.filter(user => user._id !== userId));
+        setShowDeleteConfirm(null);
+      } else {
+        throw new Error(data.message || 'Kullanıcı silinirken hata oluştu');
+      }
+    } catch (error) {
+      console.error('❌ Delete error:', error);
+      setError(error instanceof Error ? error.message : 'Kullanıcı silinirken hata oluştu');
+    } finally {
+      setDeletingUser(null);
     }
   };
 
@@ -378,6 +414,7 @@ export default function AdminUsersPage() {
                   <th style={{ padding: "12px", textAlign: "left", borderBottom: "1px solid #e2e8f0" }}>Admin</th>
                   <th style={{ padding: "12px", textAlign: "left", borderBottom: "1px solid #e2e8f0" }}>Kayıt Tarihi</th>
                   <th style={{ padding: "12px", textAlign: "left", borderBottom: "1px solid #e2e8f0" }}>Durum</th>
+                  <th style={{ padding: "12px", textAlign: "left", borderBottom: "1px solid #e2e8f0" }}>İşlemler</th>
                 </tr>
               </thead>
               <tbody>
@@ -410,6 +447,86 @@ export default function AdminUsersPage() {
                       }}>
                         {user.isActive ? "Aktif" : "Pasif"}
                       </span>
+                    </td>
+                    <td style={{ padding: "12px" }}>
+                      {user.isAdmin && (
+                        <div style={{ display: "flex", gap: "8px" }}>
+                          {showDeleteConfirm === user._id ? (
+                            <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
+                              <button
+                                onClick={() => deleteAdminUser(user._id)}
+                                disabled={deletingUser === user._id}
+                                style={{
+                                  background: "#dc2626",
+                                  color: "white",
+                                  border: "none",
+                                  borderRadius: "4px",
+                                  padding: "4px 8px",
+                                  fontSize: "11px",
+                                  cursor: deletingUser === user._id ? "not-allowed" : "pointer",
+                                  opacity: deletingUser === user._id ? 0.6 : 1,
+                                  transition: "background 0.2s"
+                                }}
+                                onMouseEnter={(e) => {
+                                  if (deletingUser !== user._id) {
+                                    e.currentTarget.style.background = "#b91c1c";
+                                  }
+                                }}
+                                onMouseLeave={(e) => {
+                                  if (deletingUser !== user._id) {
+                                    e.currentTarget.style.background = "#dc2626";
+                                  }
+                                }}
+                              >
+                                {deletingUser === user._id ? "⏳" : "✅"}
+                              </button>
+                              <button
+                                onClick={() => setShowDeleteConfirm(null)}
+                                style={{
+                                  background: "#6b7280",
+                                  color: "white",
+                                  border: "none",
+                                  borderRadius: "4px",
+                                  padding: "4px 8px",
+                                  fontSize: "11px",
+                                  cursor: "pointer",
+                                  transition: "background 0.2s"
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.background = "#4b5563";
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.background = "#6b7280";
+                                }}
+                              >
+                                ❌
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => setShowDeleteConfirm(user._id)}
+                              style={{
+                                background: "#dc2626",
+                                color: "white",
+                                border: "none",
+                                borderRadius: "4px",
+                                padding: "4px 8px",
+                                fontSize: "11px",
+                                cursor: "pointer",
+                                transition: "background 0.2s"
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.background = "#b91c1c";
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.background = "#dc2626";
+                              }}
+                            >
+                              🗑️
+                            </button>
+                          )}
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))}
