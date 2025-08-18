@@ -1263,10 +1263,23 @@ export default function GraphicsCardPage() {
             <p style={{
               fontSize: '14px',
               color: '#6b7280',
-              margin: '0 0 24px 0',
+              margin: '0 0 16px 0',
               lineHeight: '1.5'
             }}>
               Ekran kartınız için teklif talebiniz alındı. En kısa sürede size ulaşacağız.
+            </p>
+            <p style={{
+              fontSize: '13px',
+              color: '#059669',
+              margin: '0 0 24px 0',
+              lineHeight: '1.5',
+              fontWeight: '500',
+              background: '#f0fdf4',
+              padding: '12px',
+              borderRadius: '8px',
+              border: '1px solid #bbf7d0'
+            }}>
+              💡 Teklif durumunuzu <strong>Tekliflerim</strong> sayfasından takip edebilirsiniz.
             </p>
             <button
               onClick={() => setShowSuccessModal(false)}
