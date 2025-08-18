@@ -74,7 +74,7 @@ export default function AdminPage() {
       
       if (!adminLoggedIn || !adminEmail) {
         console.log("🔒 Admin giriş yapılmamış, admin login'e yönlendiriliyor...");
-        router.push('/admin/login');
+        router.push('/login');
         return;
       }
       setIsAuthenticated(true);
@@ -114,7 +114,7 @@ export default function AdminPage() {
     window.dispatchEvent(new CustomEvent('logout'));
     
     // Sayfayı yenile ve admin login'e yönlendir
-    window.location.href = '/admin/login';
+            window.location.href = '/login';
   };
 
   const fetchSubmissions = async () => {
