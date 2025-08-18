@@ -1,0 +1,79 @@
+import { NextResponse, NextRequest } from "next/server";
+import connectDB from "@/lib/mongodb";
+import User from "../../../../models/User";
+import crypto from "crypto";
+
+export async function POST(request: NextRequest) {
+  try {
+    console.log('🔐 Şifre sıfırlama API çağrıldı');
+    
+    const { email } = await request.json();
+    
+    if (!email) {
+      return NextResponse.json(
+        { success: false, error: 'E-posta adresi gerekli' },
+        { status: 400 }
+      );
+    }
+
+    // E-posta formatını kontrol et
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return NextResponse.json(
+        { success: false, error: 'Geçerli bir e-posta adresi girin' },
+        { status: 400 }
+      );
+    }
+
+    // MongoDB bağlantısı
+    await connectDB();
+    
+    // Kullanıcıyı bul
+    const user = await User.findOne({ email: email.toLowerCase() });
+    
+    if (!user) {
+      // Güvenlik için kullanıcı bulunamasa da aynı mesajı döndür
+      console.log('📧 E-posta bulunamadı:', email);
+      return NextResponse.json(
+        { 
+          success: true, 
+          message: 'Şifre sıfırlama bağlantısı e-posta adresinize gönderildi. Lütfen gelen kutunuzu kontrol edin.' 
+        },
+        { status: 200 }
+      );
+    }
+
+    // Şifre sıfırlama token'ı oluştur
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetTokenExpiry = new Date(Date.now() + 3600000); // 1 saat geçerli
+
+    // Kullanıcıyı güncelle
+    await User.findByIdAndUpdate(user._id, {
+      resetPasswordToken: resetToken,
+      resetPasswordExpires: resetTokenExpiry
+    });
+
+    console.log('✅ Şifre sıfırlama token\'ı oluşturuldu:', email);
+
+    // TODO: E-posta gönderme işlemi burada yapılacak
+    // Şimdilik sadece başarılı mesajı döndürüyoruz
+    
+    return NextResponse.json({
+      success: true,
+      message: 'Şifre sıfırlama bağlantısı e-posta adresinize gönderildi. Lütfen gelen kutunuzu kontrol edin.',
+      resetToken: resetToken, // Geliştirme aşamasında token'ı döndürüyoruz
+      expiresAt: resetTokenExpiry
+    });
+
+  } catch (error) {
+    console.error('❌ Şifre sıfırlama hatası:', error);
+    
+    return NextResponse.json(
+      { 
+        success: false, 
+        error: 'Şifre sıfırlama işlemi sırasında bir hata oluştu. Lütfen tekrar deneyin.' 
+      },
+      { status: 500 }
+    );
+  }
+}
