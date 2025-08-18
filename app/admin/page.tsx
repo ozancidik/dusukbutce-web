@@ -464,6 +464,35 @@ export default function AdminPage() {
                     📋 İlanları Görüntüle
                   </button>
                 </Link>
+
+                <Link href="/admin-users" style={{ textDecoration: 'none' }}>
+                  <button style={{
+                    background: 'linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '8px 16px',
+                    fontSize: isMobile ? '12px' : '14px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    boxShadow: '0 2px 8px rgba(124, 58, 237, 0.3)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-1px)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(124, 58, 237, 0.4)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(124, 58, 237, 0.3)';
+                  }}
+                  >
+                    👥 Admin Kullanıcılar
+                  </button>
+                </Link>
                 
                 <button
                   onClick={handleDeleteAllSubmissions}

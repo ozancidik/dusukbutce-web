@@ -91,6 +91,19 @@ export default function AdminUsersPage() {
     }
   };
 
+  // Kullanıcının online olup olmadığını kontrol et
+  const isUserOnline = (lastLogin: string | Date) => {
+    if (!lastLogin) return false;
+    
+    const lastLoginTime = new Date(lastLogin).getTime();
+    const now = Date.now();
+    const timeDiff = now - lastLoginTime;
+    
+    // Son 15 dakika içinde giriş yapmışsa online kabul et
+    const fifteenMinutes = 15 * 60 * 1000;
+    return timeDiff < fifteenMinutes;
+  };
+
   const deleteAdminUser = async (userId: string) => {
     try {
       setDeletingUser(userId);
@@ -413,6 +426,8 @@ export default function AdminUsersPage() {
                   <th style={{ padding: "12px", textAlign: "left", borderBottom: "1px solid #e2e8f0" }}>Telefon</th>
                   <th style={{ padding: "12px", textAlign: "left", borderBottom: "1px solid #e2e8f0" }}>Admin</th>
                   <th style={{ padding: "12px", textAlign: "left", borderBottom: "1px solid #e2e8f0" }}>Kayıt Tarihi</th>
+                  <th style={{ padding: "12px", textAlign: "left", borderBottom: "1px solid #e2e8f0" }}>Son Giriş</th>
+                  <th style={{ padding: "12px", textAlign: "left", borderBottom: "1px solid #e2e8f0" }}>Online Durumu</th>
                   <th style={{ padding: "12px", textAlign: "left", borderBottom: "1px solid #e2e8f0" }}>Durum</th>
                   <th style={{ padding: "12px", textAlign: "left", borderBottom: "1px solid #e2e8f0" }}>İşlemler</th>
                 </tr>
@@ -436,6 +451,50 @@ export default function AdminUsersPage() {
                     </td>
                     <td style={{ padding: "12px" }}>
                       {new Date(user.createdAt).toLocaleDateString('tr-TR')}
+                    </td>
+                    <td style={{ padding: "12px" }}>
+                      {user.lastLogin ? (
+                        <div>
+                          <div style={{ fontSize: "12px", color: "#374151", marginBottom: "2px" }}>
+                            {new Date(user.lastLogin).toLocaleDateString('tr-TR')}
+                          </div>
+                          <div style={{ fontSize: "11px", color: "#6b7280" }}>
+                            {new Date(user.lastLogin).toLocaleTimeString('tr-TR', { 
+                              hour: '2-digit', 
+                              minute: '2-digit' 
+                            })}
+                          </div>
+                        </div>
+                      ) : (
+                        <span style={{ color: "#9ca3af", fontSize: "12px" }}>Hiç giriş yapmamış</span>
+                      )}
+                    </td>
+                    <td style={{ padding: "12px" }}>
+                      {user.lastLogin ? (
+                        <span style={{
+                          background: isUserOnline(user.lastLogin) ? "#059669" : "#6b7280",
+                          color: "white",
+                          padding: "4px 8px",
+                          borderRadius: "4px",
+                          fontSize: "12px",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "4px"
+                        }}>
+                          {isUserOnline(user.lastLogin) ? "🟢" : "⚫"} 
+                          {isUserOnline(user.lastLogin) ? "Online" : "Offline"}
+                        </span>
+                      ) : (
+                        <span style={{
+                          background: "#6b7280",
+                          color: "white",
+                          padding: "4px 8px",
+                          borderRadius: "4px",
+                          fontSize: "12px"
+                        }}>
+                          ⚫ Offline
+                        </span>
+                      )}
                     </td>
                     <td style={{ padding: "12px" }}>
                       <span style={{
