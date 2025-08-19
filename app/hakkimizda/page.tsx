@@ -2,7 +2,7 @@
 import React from "react";
 import Link from "next/link";
 
-export default function AboutPage() {
+export default function HakkimizdaPage() {
   return (
     <div style={{
       minHeight: '100vh',
@@ -58,10 +58,11 @@ export default function AboutPage() {
               color: '#374151',
               margin: '0 0 16px 0'
             }}>
-              Düşük Bütçe olarak, kaliteli teknoloji ürünlerini uygun fiyatlarla 
-              herkesin erişebileceği bir platform oluşturmayı hedefliyoruz. 
-              Müşterilerimizin bütçelerine uygun, güvenilir ve kaliteli ürünler 
-              bulabilmeleri için çalışıyoruz.
+              Düşük Bütçe olarak, kaliteli <strong>2. el teknoloji ürünlerini</strong> uygun fiyatlarla 
+              herkesin erişebileceği bir platform oluşturmayı hedefliyoruz. Müşterilerimizin bütçelerine uygun, 
+              güvenilir ve kaliteli <strong>2. el ürünler</strong> bulabilmeleri için çalışıyoruz. 
+              <strong>2. el teknoloji pazarında</strong> güven ve şeffaflık sağlayarak, 
+              hem satıcılar hem de alıcılar için ideal bir ortam yaratıyoruz.
             </p>
           </section>
 
@@ -79,9 +80,11 @@ export default function AboutPage() {
               color: '#374151',
               margin: '0 0 16px 0'
             }}>
-              Türkiye'nin en güvenilir ve tercih edilen teknoloji alışveriş 
-              platformu olmak. Müşteri memnuniyetini ön planda tutarak, 
-              sürdürülebilir büyüme ile sektörde lider konuma ulaşmak.
+              Türkiye'nin en güvenilir ve tercih edilen <strong>2. el teknoloji alışveriş</strong> 
+              platformu olmak. <strong>2. el ürün pazarında</strong> müşteri memnuniyetini ön planda tutarak, 
+              sürdürülebilir büyüme ile sektörde lider konuma ulaşmak. 
+              <strong>2. el teknoloji ürünlerinin</strong> değerini koruyarak, 
+              çevre dostu ve ekonomik alışveriş deneyimi sunmak.
             </p>
           </section>
 
@@ -118,7 +121,8 @@ export default function AboutPage() {
                   color: '#6b7280',
                   margin: 0
                 }}>
-                  Müşterilerimizin güvenini kazanmak ve korumak en önemli önceliğimizdir.
+                  <strong>2. el ürünlerde</strong> müşterilerimizin güvenini kazanmak ve korumak en önemli önceliğimizdir. 
+                  Tüm ürünlerimiz kalite kontrolünden geçer.
                 </p>
               </div>
 
@@ -141,7 +145,8 @@ export default function AboutPage() {
                   color: '#6b7280',
                   margin: 0
                 }}>
-                  Sadece kaliteli ve güvenilir markaların ürünlerini sunuyoruz.
+                  Sadece kaliteli ve güvenilir <strong>2. el ürünleri</strong> sunuyoruz. 
+                  Her ürün detaylı inceleme sonrası listelenir.
                 </p>
               </div>
 
@@ -164,7 +169,8 @@ export default function AboutPage() {
                   color: '#6b7280',
                   margin: 0
                 }}>
-                  En uygun fiyatlarla kaliteli ürünler sunmaya odaklanıyoruz.
+                  <strong>2. el ürünlerde</strong> en uygun fiyatlarla kaliteli ürünler sunmaya odaklanıyoruz. 
+                  Bütçe dostu teknoloji erişimi sağlıyoruz.
                 </p>
               </div>
 
@@ -187,7 +193,8 @@ export default function AboutPage() {
                   color: '#6b7280',
                   margin: 0
                 }}>
-                  Siparişlerinizi en kısa sürede teslim etmek için çalışıyoruz.
+                  <strong>2. el ürünlerinizi</strong> en kısa sürede teslim etmek için çalışıyoruz. 
+                  İstanbul içi aynı gün teslimat seçeneği mevcuttur.
                 </p>
               </div>
             </div>
@@ -207,17 +214,17 @@ export default function AboutPage() {
               color: '#374151',
               margin: '0 0 16px 0'
             }}>
-              2024 yılında İstanbul'da kurulan Düşük Bütçe, teknoloji tutkunları 
-              tarafından kurulmuş bir e-ticaret platformudur. Müşterilerimizin 
-              bütçelerine uygun, kaliteli ürünler bulabilmeleri için sürekli 
-              gelişim gösteriyoruz.
+              2025 yılında İstanbul'da kurulan Düşük Bütçe, <strong>2. el teknoloji ürünleri</strong> 
+              konusunda uzmanlaşmış bir e-ticaret platformudur. Müşterilerimizin bütçelerine uygun, 
+              kaliteli <strong>2. el ürünler</strong> bulabilmeleri için sürekli gelişim gösteriyoruz.
             </p>
             <p style={{
               fontSize: '16px',
               color: '#374151',
               margin: 0
             }}>
-              Bugün binlerce müşterimize hizmet veriyor, teknoloji dünyasında 
+              <strong>2. el teknoloji pazarında</strong> güven ve şeffaflık sağlayarak, 
+              bugün binlerce müşterimize hizmet veriyor, <strong>2. el ürün</strong> dünyasında 
               güvenilir bir partner olmaya devam ediyoruz.
             </p>
           </section>

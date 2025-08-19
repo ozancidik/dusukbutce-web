@@ -769,7 +769,7 @@ export default function HomePage() {
                 flexDirection: "column",
                 gap: "8px"
               }}>
-                <a href="/about" style={{
+                <a href="/hakkimizda" style={{
                   color: "#e5e7eb",
                   textDecoration: "none",
                   fontSize: isMobile ? "12px" : "14px",
