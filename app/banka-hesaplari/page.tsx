@@ -65,7 +65,7 @@ export default function BankAccountsPage() {
           borderBottom: '2px solid #e5e7eb'
         }}>
                   <h1 style={{
-          fontSize: window.innerWidth < 768 ? '24px' : '32px',
+          fontSize: isMobile ? '24px' : '32px',
           fontWeight: '700',
           color: '#1f2937',
           margin: '0 0 16px 0'
@@ -73,7 +73,7 @@ export default function BankAccountsPage() {
           Banka Hesaplarımız
         </h1>
         <p style={{
-          fontSize: window.innerWidth < 768 ? '16px' : '18px',
+          fontSize: isMobile ? '16px' : '18px',
           color: '#6b7280',
           margin: 0,
           lineHeight: '1.6'
