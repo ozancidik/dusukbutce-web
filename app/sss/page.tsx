@@ -251,7 +251,7 @@ export default function FAQPage() {
           padding: '24px',
           background: '#f0f9ff',
           borderRadius: '12px',
-          border: '1px solid '#0ea5e9'
+          border: '1px solid #0ea5e9'
         }}>
           <h3 style={{
             fontSize: '20px',
