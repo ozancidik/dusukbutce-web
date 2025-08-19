@@ -290,6 +290,97 @@ export default function HomePage() {
         </Link>
       </div>
 
+      {/* Hızlı Teslimat ve Anında Ödeme Kutucukları */}
+      <div style={{
+        display: "flex",
+        flexDirection: isMobile ? "column" : "row",
+        gap: isMobile ? "16px" : "24px",
+        width: "100%",
+        maxWidth: isMobile ? "400px" : "800px",
+        justifyContent: "center",
+        alignItems: "stretch",
+        marginBottom: "32px",
+        margin: "0 auto 32px auto"
+      }}>
+        {/* Hızlı Teslimat Bilgisi */}
+        <div style={{
+          flex: 1,
+          textAlign: "center",
+          padding: isMobile ? "16px" : "20px",
+          background: "linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)",
+          borderRadius: "12px",
+          border: "2px solid #bbf7d0",
+          boxShadow: "0 4px 12px rgba(34, 197, 94, 0.15)",
+          maxWidth: isMobile ? "100%" : "350px"
+        }}>
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "12px",
+            marginBottom: "8px"
+          }}>
+            <span style={{ fontSize: "24px" }}>🚚</span>
+            <h3 style={{
+              margin: 0,
+              color: "#059669",
+              fontSize: isMobile ? "16px" : "18px",
+              fontWeight: "700"
+            }}>
+              Hızlı Teslimat
+            </h3>
+          </div>
+          <p style={{
+            margin: 0,
+            color: "#047857",
+            fontSize: isMobile ? "14px" : "16px",
+            fontWeight: "600",
+            lineHeight: "1.4"
+          }}>
+            İstanbul içi ürününü aynı gün gelip teslim alalım
+          </p>
+        </div>
+
+        {/* Anında Ödeme Bilgisi */}
+        <div style={{
+          flex: 1,
+          textAlign: "center",
+          padding: isMobile ? "16px" : "20px",
+          background: "linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)",
+          borderRadius: "12px",
+          border: "2px solid #fbbf24",
+          boxShadow: "0 4px 12px rgba(251, 191, 36, 0.15)",
+          maxWidth: isMobile ? "100%" : "350px"
+        }}>
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "12px",
+            marginBottom: "8px"
+          }}>
+            <span style={{ fontSize: "24px" }}>💰</span>
+            <h3 style={{
+              margin: 0,
+              color: "#d97706",
+              fontSize: isMobile ? "16px" : "18px",
+              fontWeight: "700"
+            }}>
+              Anında Ödeme
+            </h3>
+          </div>
+          <p style={{
+            margin: 0,
+            color: "#b45309",
+            fontSize: isMobile ? "14px" : "16px",
+            fontWeight: "600",
+            lineHeight: "1.4"
+          }}>
+            Paran anında hesabına yatsın
+          </p>
+        </div>
+      </div>
+
       {/* Buton şeklinde linkler */}
       <div
         style={{
@@ -324,6 +415,8 @@ export default function HomePage() {
           </Link>
         ))}
       </div>
+
+
 
       {/* Slider */}
       <div style={{ 
@@ -481,6 +574,8 @@ export default function HomePage() {
           />
         ))}
       </div>
+
+
 
       {/* Footer */}
       <footer style={{ 
