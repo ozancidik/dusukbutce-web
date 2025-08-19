@@ -19,24 +19,24 @@ export default function BizeSatPage() {
   }, []);
 
   const leftCategories = [
-    { name: 'Dizüstü (Notebook)', path: '/bize-sat/notebook', icon: '💻' },
-    { name: 'Masaüstü (Kasa)', path: '/bize-sat/desktop', icon: '🖥️' },
-    { name: 'Ekran Kartı', path: '/bize-sat/graphics-card', icon: '🎮' },
-    { name: 'İşlemci', path: '/bize-sat/processor', icon: '⚡' },
+    { name: 'Dizüstü (Notebook)', path: '/bize-sat/dizustu', icon: '💻' },
+    { name: 'Masaüstü (Kasa)', path: '/bize-sat/masaustu', icon: '🖥️' },
+    { name: 'Ekran Kartı', path: '/bize-sat/ekran-karti', icon: '🎮' },
+    { name: 'İşlemci', path: '/bize-sat/islemci', icon: '⚡' },
     { name: 'RAM', path: '/bize-sat/ram', icon: '🧠' },
     { name: 'SSD', path: '/bize-sat/ssd', icon: '💾' },
-    { name: 'Soğutucu', path: '/bize-sat/cooler', icon: '❄️' },
-    { name: 'Boş Kasa', path: '/bize-sat/case', icon: '📦' }
+    { name: 'Soğutucu', path: '/bize-sat/sogutucu', icon: '❄️' },
+    { name: 'Boş Kasa', path: '/bize-sat/kasa', icon: '📦' }
   ];
 
   const rightCategories = [
     { name: 'Monitör', path: '/bize-sat/monitor', icon: '🖥️' },
-    { name: 'Klavye', path: '/bize-sat/keyboard', icon: '⌨️' },
-    { name: 'Mouse', path: '/bize-sat/mouse', icon: '🖱️' },
+    { name: 'Klavye', path: '/bize-sat/klavye', icon: '⌨️' },
+    { name: 'Mouse', path: '/bize-sat/fare', icon: '🖱️' },
     { name: 'Tablet', path: '/bize-sat/tablet', icon: '📱' },
-    { name: 'Kulaklık', path: '/bize-sat/headphones', icon: '🎧' },
-    { name: 'Ses Sistemi', path: '/bize-sat/audio-system', icon: '🔊' },
-    { name: 'Oyuncu Direksiyonu', path: '/bize-sat/gaming-wheel', icon: '🎮' }
+    { name: 'Kulaklık', path: '/bize-sat/kulaklik', icon: '🎧' },
+    { name: 'Ses Sistemi', path: '/bize-sat/ses-sistemi', icon: '🔊' },
+    { name: 'Oyuncu Direksiyonu', path: '/bize-sat/gaming-direksiyon', icon: '🎮' }
   ];
 
   return (

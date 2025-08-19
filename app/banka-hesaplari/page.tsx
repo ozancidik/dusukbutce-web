@@ -384,7 +384,7 @@ export default function BankAccountsPage() {
           }}>
             Ödeme işlemleri hakkında detaylı bilgi için bizimle iletişime geçin
           </p>
-          <Link href="/contact" style={{ textDecoration: 'none' }}>
+                                <Link href="/iletisim" style={{ textDecoration: 'none' }}>
             <button style={{
               background: '#0ea5e9',
               color: 'white',

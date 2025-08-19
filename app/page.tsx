@@ -775,13 +775,13 @@ export default function HomePage() {
                   fontSize: isMobile ? "12px" : "14px",
                   transition: "color 0.2s"
                 }}>Hakkımızda</a>
-                <a href="/bank-accounts" style={{
+                <a href="/banka-hesaplari" style={{
                   color: "#e5e7eb",
                   textDecoration: "none",
                   fontSize: isMobile ? "12px" : "14px",
                   transition: "color 0.2s"
                 }}>Banka Hesaplarımız</a>
-                <a href="/contact" style={{
+                <a href="/iletisim" style={{
                   color: "#e5e7eb",
                   textDecoration: "none",
                   fontSize: isMobile ? "12px" : "14px",
@@ -793,7 +793,7 @@ export default function HomePage() {
                   fontSize: isMobile ? "12px" : "14px",
                   transition: "color 0.2s"
                 }}>Blog</a>
-                <a href="/brands" style={{
+                <a href="/markalar" style={{
                   color: "#e5e7eb",
                   textDecoration: "none",
                   fontSize: isMobile ? "12px" : "14px",
@@ -818,25 +818,25 @@ export default function HomePage() {
                 flexDirection: "column",
                 gap: "8px"
               }}>
-                <a href="/privacy-policy" style={{
+                <a href="/gizlilik-politikasi" style={{
                   color: "#e5e7eb",
                   textDecoration: "none",
                   fontSize: isMobile ? "12px" : "14px",
                   transition: "color 0.2s"
                 }}>KVKK Bilgilendirme</a>
-                <a href="/sales-agreement" style={{
+                <a href="/satis-sozlesmesi" style={{
                   color: "#e5e7eb",
                   textDecoration: "none",
                   fontSize: isMobile ? "12px" : "14px",
                   transition: "color 0.2s"
                 }}>Satış Sözleşmesi</a>
-                <a href="/terms" style={{
+                <a href="/kullanim-sartlari" style={{
                   color: "#e5e7eb",
                   textDecoration: "none",
                   fontSize: isMobile ? "12px" : "14px",
                   transition: "color 0.2s"
                 }}>Şartlar ve Koşullar</a>
-                <a href="/faq" style={{
+                <a href="/sss" style={{
                   color: "#e5e7eb",
                   textDecoration: "none",
                   fontSize: isMobile ? "12px" : "14px",
@@ -867,19 +867,19 @@ export default function HomePage() {
                   fontSize: isMobile ? "12px" : "14px",
                   transition: "color 0.2s"
                 }}>Hesabım</a>
-                <a href="/orders" style={{
+                <a href="/siparisler" style={{
                   color: "#e5e7eb",
                   textDecoration: "none",
                   fontSize: isMobile ? "12px" : "14px",
                   transition: "color 0.2s"
                 }}>Sipariş Takibi</a>
-                <a href="/compare" style={{
+                <a href="/karsilastir" style={{
                   color: "#e5e7eb",
                   textDecoration: "none",
                   fontSize: isMobile ? "12px" : "14px",
                   transition: "color 0.2s"
                 }}>Karşılaştırma Listem</a>
-                <a href="/favorites" style={{
+                <a href="/favoriler" style={{
                   color: "#e5e7eb",
                   textDecoration: "none",
                   fontSize: isMobile ? "12px" : "14px",

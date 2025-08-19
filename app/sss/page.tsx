@@ -268,7 +268,7 @@ export default function FAQPage() {
           }}>
             Müşteri hizmetlerimizle iletişime geçin, size yardımcı olmaktan mutluluk duyarız.
           </p>
-          <Link href="/contact" style={{ textDecoration: 'none' }}>
+                                <Link href="/iletisim" style={{ textDecoration: 'none' }}>
             <button style={{
               background: '#0ea5e9',
               color: 'white',
