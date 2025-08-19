@@ -237,7 +237,7 @@ export default function BlogPage() {
           padding: '16px',
           background: '#f0f9ff',
           borderRadius: '8px',
-          border: '1px solid '#0ea5e9'
+          border: '1px solid #0ea5e9'
         }}>
           <p style={{
             fontSize: '16px',
