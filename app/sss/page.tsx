@@ -74,6 +74,20 @@ const categories = [
 export default function FAQPage() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [openItems, setOpenItems] = useState<number[]>([]);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
+  }, []);
 
   const filteredFAQs = selectedCategory === "all" 
     ? faqData 
