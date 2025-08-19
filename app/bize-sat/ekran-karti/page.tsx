@@ -10,6 +10,7 @@ export default function GraphicsCardPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showFurmarkHelp, setShowFurmarkHelp] = useState(false);
+  const [showCoilWhineHelp, setShowCoilWhineHelp] = useState(false);
   const [formData, setFormData] = useState({
     brand: '',
     chipSet: '',
@@ -24,6 +25,7 @@ export default function GraphicsCardPage() {
     miningUsed: '',
     miningDuration: '',
     warrantySticker: '',
+    coilWhine: 'Yok',
     description: '',
     cosmeticCondition: 'Mükemmel',
     hasBox: false,
@@ -734,6 +736,117 @@ export default function GraphicsCardPage() {
                     }
                   }}
                 />
+              </div>
+              <div>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  marginBottom: '6px'
+                }}>
+                  <label style={{
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    color: '#374151'
+                  }}>
+                    CW (Coil Whine)
+                  </label>
+                                    <div
+                    onMouseEnter={() => setShowCoilWhineHelp(true)}
+                    onMouseLeave={() => setShowCoilWhineHelp(false)}
+                    style={{
+                      width: '16px',
+                      height: '16px',
+                      borderRadius: '50%',
+                      background: '#6b7280',
+                      color: 'white',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '10px',
+                      cursor: 'help',
+                      fontWeight: 'bold',
+                      position: 'relative'
+                    }}
+                  >
+                    ?
+                    {showCoilWhineHelp && (
+                      <div style={{
+                        position: 'absolute',
+                        bottom: '25px',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        background: 'white',
+                        border: '1px solid #e5e7eb',
+                        borderRadius: '8px',
+                        padding: '16px',
+                        boxShadow: '0 10px 25px rgba(0, 0, 0, 0.15)',
+                        width: '280px',
+                        zIndex: 1000,
+                        fontSize: '13px',
+                        lineHeight: '1.5'
+                      }}>
+                        <div style={{
+                          position: 'absolute',
+                          bottom: '-6px',
+                          left: '50%',
+                          width: '12px',
+                          height: '12px',
+                          background: 'white',
+                          border: '1px solid #e5e7eb',
+                          borderTop: 'none',
+                          borderLeft: 'none',
+                          transform: 'translateX(-50%) rotate(45deg)'
+                        }}></div>
+                        <h4 style={{
+                          margin: '0 0 8px 0',
+                          fontSize: '14px',
+                          fontWeight: '600',
+                          color: '#1f2937'
+                        }}>
+                          🔊 Coil Whine (CW) Nedir?
+                        </h4>
+                        <div style={{ color: '#374151' }}>
+                          <p style={{ margin: '0 0 8px 0' }}>
+                            <strong>Coil Whine:</strong> Ekran kartında yük altında oluşan yüksek frekanslı ses. Genellikle elektrik bileşenlerinin (indüktörler, kapasitörler) titreşiminden kaynaklanır.
+                          </p>
+                          <p style={{ margin: '0 0 8px 0' }}>
+                            <strong>Yok:</strong> Hiç ses yok
+                          </p>
+                          <p style={{ margin: '0 0 8px 0' }}>
+                            <strong>Az:</strong> Çok hafif, sadece yakından duyulur
+                          </p>
+                          <p style={{ margin: '0 0 8px 0' }}>
+                            <strong>Orta:</strong> Normal mesafeden duyulur
+                          </p>
+                          <p style={{ margin: '0 0 8px 0' }}>
+                            <strong>Çok:</strong> Yüksek ses, rahatsız edici
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <select
+                  value={formData.coilWhine}
+                  onChange={(e) => handleInputChange('coilWhine', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                >
+                  <option value="Yok">Yok</option>
+                  <option value="Az">Az</option>
+                  <option value="Orta">Orta</option>
+                  <option value="Çok">Çok</option>
+                </select>
               </div>
 
             </div>

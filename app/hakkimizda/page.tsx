@@ -80,8 +80,8 @@ export default function HakkimizdaPage() {
               color: '#374151',
               margin: '0 0 16px 0'
             }}>
-              Türkiye'nin en güvenilir ve tercih edilen <strong>2. el teknoloji alışveriş</strong> 
-              platformu olmak. <strong>2. el ürün pazarında</strong> müşteri memnuniyetini ön planda tutarak, 
+              Türkiye'nin en güvenilir ve tercih edilen <strong>2. el teknoloji alışveriş platformu</strong> 
+              olmak. <strong>2. el ürün pazarında</strong> müşteri memnuniyetini ön planda tutarak, 
               sürdürülebilir büyüme ile sektörde lider konuma ulaşmak. 
               <strong>2. el teknoloji ürünlerinin</strong> değerini koruyarak, 
               çevre dostu ve ekonomik alışveriş deneyimi sunmak.
@@ -215,7 +215,7 @@ export default function HakkimizdaPage() {
               margin: '0 0 16px 0'
             }}>
               2025 yılında İstanbul'da kurulan Düşük Bütçe, <strong>2. el teknoloji ürünleri</strong> 
-              konusunda uzmanlaşmış bir e-ticaret platformudur. Müşterilerimizin bütçelerine uygun, 
+              <strong> konusunda</strong> uzmanlaşmış bir e-ticaret platformudur. Müşterilerimizin bütçelerine uygun, 
               kaliteli <strong>2. el ürünler</strong> bulabilmeleri için sürekli gelişim gösteriyoruz.
             </p>
             <p style={{

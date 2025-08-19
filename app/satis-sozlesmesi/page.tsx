@@ -24,22 +24,22 @@ export default function SalesAgreementPage() {
           paddingBottom: '20px',
           borderBottom: '2px solid #e5e7eb'
         }}>
-          <h1 style={{
-            fontSize: '32px',
-            fontWeight: '700',
-            color: '#1f2937',
-            margin: '0 0 16px 0'
-          }}>
-            Satış Sözleşmesi
-          </h1>
-          <p style={{
-            fontSize: '18px',
-            color: '#6b7280',
-            margin: 0,
-            lineHeight: '1.6'
-          }}>
-            Düşük Bütçe Teknoloji A.Ş. ile müşteri arasındaki satış koşulları
-          </p>
+                  <h1 style={{
+          fontSize: window.innerWidth < 768 ? '24px' : '32px',
+          fontWeight: '700',
+          color: '#1f2937',
+          margin: '0 0 16px 0'
+        }}>
+          Satış Sözleşmesi
+        </h1>
+        <p style={{
+          fontSize: window.innerWidth < 768 ? '16px' : '18px',
+          color: '#6b7280',
+          margin: 0,
+          lineHeight: '1.6'
+        }}>
+          Düşük Bütçe Teknoloji A.Ş. ile müşteri arasındaki satış koşulları
+        </p>
         </div>
 
         {/* Sözleşme İçeriği */}

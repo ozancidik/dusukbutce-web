@@ -597,8 +597,8 @@ export default function HomePage() {
         }}>
           <div style={{
             display: "grid",
-            gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(4, 1fr)",
-            gap: isMobile ? "16px" : "24px",
+            gridTemplateColumns: isMobile ? (window.innerWidth < 480 ? "1fr" : "repeat(2, 1fr)") : "repeat(4, 1fr)",
+            gap: isMobile ? (window.innerWidth < 480 ? "12px" : "16px") : "24px",
             maxWidth: "1200px",
             margin: "0 auto"
           }}>
@@ -747,8 +747,8 @@ export default function HomePage() {
         }}>
           <div style={{
             display: "grid",
-            gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(4, 1fr)",
-            gap: isMobile ? "24px" : "32px",
+            gridTemplateColumns: isMobile ? (window.innerWidth < 480 ? "1fr" : "repeat(2, 1fr)") : "repeat(4, 1fr)",
+            gap: isMobile ? (window.innerWidth < 480 ? "20px" : "24px") : "32px",
             maxWidth: "1200px",
             margin: "0 auto"
           }}>
@@ -773,31 +773,46 @@ export default function HomePage() {
                   color: "#e5e7eb",
                   textDecoration: "none",
                   fontSize: isMobile ? "12px" : "14px",
-                  transition: "color 0.2s"
+                  transition: "color 0.2s",
+                  padding: isMobile ? "8px 0" : "4px 0",
+                  display: "block",
+                  minHeight: isMobile ? "32px" : "auto"
                 }}>Hakkımızda</a>
                 <a href="/banka-hesaplari" style={{
                   color: "#e5e7eb",
                   textDecoration: "none",
                   fontSize: isMobile ? "12px" : "14px",
-                  transition: "color 0.2s"
+                  transition: "color 0.2s",
+                  padding: isMobile ? "8px 0" : "4px 0",
+                  display: "block",
+                  minHeight: isMobile ? "32px" : "auto"
                 }}>Banka Hesaplarımız</a>
                 <a href="/iletisim" style={{
                   color: "#e5e7eb",
                   textDecoration: "none",
                   fontSize: isMobile ? "12px" : "14px",
-                  transition: "color 0.2s"
+                  transition: "color 0.2s",
+                  padding: isMobile ? "8px 0" : "4px 0",
+                  display: "block",
+                  minHeight: isMobile ? "32px" : "auto"
                 }}>İletişim</a>
                 <a href="/blog" style={{
                   color: "#e5e7eb",
                   textDecoration: "none",
                   fontSize: isMobile ? "12px" : "14px",
-                  transition: "color 0.2s"
+                  transition: "color 0.2s",
+                  padding: isMobile ? "8px 0" : "4px 0",
+                  display: "block",
+                  minHeight: isMobile ? "32px" : "auto"
                 }}>Blog</a>
                 <a href="/markalar" style={{
                   color: "#e5e7eb",
                   textDecoration: "none",
                   fontSize: isMobile ? "12px" : "14px",
-                  transition: "color 0.2s"
+                  transition: "color 0.2s",
+                  padding: isMobile ? "8px 0" : "4px 0",
+                  display: "block",
+                  minHeight: isMobile ? "32px" : "auto"
                 }}>Markalar</a>
               </div>
             </div>
@@ -822,25 +837,37 @@ export default function HomePage() {
                   color: "#e5e7eb",
                   textDecoration: "none",
                   fontSize: isMobile ? "12px" : "14px",
-                  transition: "color 0.2s"
+                  transition: "color 0.2s",
+                  padding: isMobile ? "8px 0" : "4px 0",
+                  display: "block",
+                  minHeight: isMobile ? "32px" : "auto"
                 }}>KVKK Bilgilendirme</a>
                 <a href="/satis-sozlesmesi" style={{
                   color: "#e5e7eb",
                   textDecoration: "none",
                   fontSize: isMobile ? "12px" : "14px",
-                  transition: "color 0.2s"
+                  transition: "color 0.2s",
+                  padding: isMobile ? "8px 0" : "4px 0",
+                  display: "block",
+                  minHeight: isMobile ? "32px" : "auto"
                 }}>Satış Sözleşmesi</a>
                 <a href="/kullanim-sartlari" style={{
                   color: "#e5e7eb",
                   textDecoration: "none",
                   fontSize: isMobile ? "12px" : "14px",
-                  transition: "color 0.2s"
+                  transition: "color 0.2s",
+                  padding: isMobile ? "8px 0" : "4px 0",
+                  display: "block",
+                  minHeight: isMobile ? "32px" : "auto"
                 }}>Şartlar ve Koşullar</a>
                 <a href="/sss" style={{
                   color: "#e5e7eb",
                   textDecoration: "none",
                   fontSize: isMobile ? "12px" : "14px",
-                  transition: "color 0.2s"
+                  transition: "color 0.2s",
+                  padding: isMobile ? "8px 0" : "4px 0",
+                  display: "block",
+                  minHeight: isMobile ? "32px" : "auto"
                 }}>Sık Sorulan Sorular</a>
               </div>
             </div>
@@ -865,25 +892,37 @@ export default function HomePage() {
                   color: "#e5e7eb",
                   textDecoration: "none",
                   fontSize: isMobile ? "12px" : "14px",
-                  transition: "color 0.2s"
+                  transition: "color 0.2s",
+                  padding: isMobile ? "8px 0" : "4px 0",
+                  display: "block",
+                  minHeight: isMobile ? "32px" : "auto"
                 }}>Hesabım</a>
                 <a href="/siparisler" style={{
                   color: "#e5e7eb",
                   textDecoration: "none",
                   fontSize: isMobile ? "12px" : "14px",
-                  transition: "color 0.2s"
+                  transition: "color 0.2s",
+                  padding: isMobile ? "8px 0" : "4px 0",
+                  display: "block",
+                  minHeight: isMobile ? "32px" : "auto"
                 }}>Sipariş Takibi</a>
                 <a href="/karsilastir" style={{
                   color: "#e5e7eb",
                   textDecoration: "none",
                   fontSize: isMobile ? "12px" : "14px",
-                  transition: "color 0.2s"
+                  transition: "color 0.2s",
+                  padding: isMobile ? "8px 0" : "4px 0",
+                  display: "block",
+                  minHeight: isMobile ? "32px" : "auto"
                 }}>Karşılaştırma Listem</a>
                 <a href="/favoriler" style={{
                   color: "#e5e7eb",
                   textDecoration: "none",
                   fontSize: isMobile ? "12px" : "14px",
-                  transition: "color 0.2s"
+                  transition: "color 0.2s",
+                  padding: isMobile ? "8px 0" : "4px 0",
+                  display: "block",
+                  minHeight: isMobile ? "32px" : "auto"
                 }}>Favori Ürünlerim</a>
               </div>
             </div>
