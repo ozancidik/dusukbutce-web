@@ -582,50 +582,452 @@ export default function HomePage() {
       {/* Footer */}
       <footer style={{ 
         marginTop: isMobile ? "24px" : "40px", 
-        textAlign: "center", 
-        padding: isMobile ? "20px 16px" : "32px 24px",
-        background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
+        background: "linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%)",
         borderRadius: "16px",
-        border: "1px solid #e5e7eb",
-        boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
+        boxShadow: "0 8px 32px rgba(0, 0, 0, 0.15)",
         maxWidth: "100%",
-        width: "100%"
+        width: "100%",
+        overflow: "hidden"
       }}>
+        
+        {/* Hizmet Garantileri */}
         <div style={{
+          padding: isMobile ? "24px 16px" : "32px 24px",
+          borderBottom: "1px solid rgba(255, 255, 255, 0.1)"
+        }}>
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(4, 1fr)",
+            gap: isMobile ? "16px" : "24px",
+            maxWidth: "1200px",
+            margin: "0 auto"
+          }}>
+            
+            {/* Güvenilir Gönderim */}
+            <div style={{
+              textAlign: "center",
+              padding: "20px 16px",
+              background: "rgba(255, 255, 255, 0.05)",
+              borderRadius: "12px",
+              border: "1px solid rgba(255, 255, 255, 0.1)"
+            }}>
+              <div style={{
+                fontSize: "32px",
+                marginBottom: "12px",
+                color: "#fbbf24"
+              }}>
+                🚚
+              </div>
+              <h3 style={{
+                margin: "0 0 8px 0",
+                color: "#fbbf24",
+                fontSize: isMobile ? "14px" : "16px",
+                fontWeight: "700",
+                textTransform: "uppercase"
+              }}>
+                Güvenilir Gönderim
+              </h3>
+              <p style={{
+                margin: 0,
+                color: "#e5e7eb",
+                fontSize: isMobile ? "12px" : "14px",
+                lineHeight: "1.4"
+              }}>
+                Hızlı ve güvenli gönderim
+              </p>
+            </div>
+
+            {/* Müşteri Memnuniyeti */}
+            <div style={{
+              textAlign: "center",
+              padding: "20px 16px",
+              background: "rgba(255, 255, 255, 0.05)",
+              borderRadius: "12px",
+              border: "1px solid rgba(255, 255, 255, 0.1)"
+            }}>
+              <div style={{
+                fontSize: "32px",
+                marginBottom: "12px",
+                color: "#fbbf24"
+              }}>
+                😊 ⭐⭐⭐⭐⭐
+              </div>
+              <h3 style={{
+                margin: "0 0 8px 0",
+                color: "#fbbf24",
+                fontSize: isMobile ? "14px" : "16px",
+                fontWeight: "700",
+                textTransform: "uppercase"
+              }}>
+                Müşteri Memnuniyeti
+              </h3>
+              <p style={{
+                margin: 0,
+                color: "#e5e7eb",
+                fontSize: isMobile ? "12px" : "14px",
+                lineHeight: "1.4"
+              }}>
+                Memnuniyetiniz önceliğimiz
+              </p>
+            </div>
+
+            {/* Güvenli Ödeme */}
+            <div style={{
+              textAlign: "center",
+              padding: "20px 16px",
+              background: "rgba(255, 255, 255, 0.05)",
+              borderRadius: "12px",
+              border: "1px solid rgba(255, 255, 255, 0.1)"
+            }}>
+              <div style={{
+                fontSize: "32px",
+                marginBottom: "12px",
+                color: "#fbbf24"
+              }}>
+                💳🛡️
+              </div>
+              <h3 style={{
+                margin: "0 0 8px 0",
+                color: "#fbbf24",
+                fontSize: isMobile ? "14px" : "16px",
+                fontWeight: "700",
+                textTransform: "uppercase"
+              }}>
+                Güvenli Ödeme
+              </h3>
+              <p style={{
+                margin: 0,
+                color: "#e5e7eb",
+                fontSize: isMobile ? "12px" : "14px",
+                lineHeight: "1.4"
+              }}>
+                %100 güvenli ödeme altyapısı
+              </p>
+            </div>
+
+            {/* Kaliteli Markalar */}
+            <div style={{
+              textAlign: "center",
+              padding: "20px 16px",
+              background: "rgba(255, 255, 255, 0.05)",
+              borderRadius: "12px",
+              border: "1px solid rgba(255, 255, 255, 0.1)"
+            }}>
+              <div style={{
+                fontSize: "32px",
+                marginBottom: "12px",
+                color: "#fbbf24"
+              }}>
+                ✅
+              </div>
+              <h3 style={{
+                margin: "0 0 8px 0",
+                color: "#fbbf24",
+                fontSize: isMobile ? "14px" : "16px",
+                fontWeight: "700",
+                textTransform: "uppercase"
+              }}>
+                Kaliteli Markalar
+              </h3>
+              <p style={{
+                margin: 0,
+                color: "#e5e7eb",
+                fontSize: isMobile ? "12px" : "14px",
+                lineHeight: "1.4"
+              }}>
+                Sadece bilinen kaliteli markalar
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Ana Footer İçeriği */}
+        <div style={{
+          padding: isMobile ? "24px 16px" : "32px 24px"
+        }}>
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(4, 1fr)",
+            gap: isMobile ? "24px" : "32px",
+            maxWidth: "1200px",
+            margin: "0 auto"
+          }}>
+            
+            {/* Kurumsal */}
+            <div>
+              <h4 style={{
+                margin: "0 0 16px 0",
+                color: "white",
+                fontSize: isMobile ? "14px" : "16px",
+                fontWeight: "700",
+                textTransform: "uppercase"
+              }}>
+                KURUMSAL
+              </h4>
+              <div style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "8px"
+              }}>
+                <a href="/about" style={{
+                  color: "#e5e7eb",
+                  textDecoration: "none",
+                  fontSize: isMobile ? "12px" : "14px",
+                  transition: "color 0.2s"
+                }}>Hakkımızda</a>
+                <a href="/bank-accounts" style={{
+                  color: "#e5e7eb",
+                  textDecoration: "none",
+                  fontSize: isMobile ? "12px" : "14px",
+                  transition: "color 0.2s"
+                }}>Banka Hesaplarımız</a>
+                <a href="/contact" style={{
+                  color: "#e5e7eb",
+                  textDecoration: "none",
+                  fontSize: isMobile ? "12px" : "14px",
+                  transition: "color 0.2s"
+                }}>İletişim</a>
+                <a href="/blog" style={{
+                  color: "#e5e7eb",
+                  textDecoration: "none",
+                  fontSize: isMobile ? "12px" : "14px",
+                  transition: "color 0.2s"
+                }}>Blog</a>
+                <a href="/brands" style={{
+                  color: "#e5e7eb",
+                  textDecoration: "none",
+                  fontSize: isMobile ? "12px" : "14px",
+                  transition: "color 0.2s"
+                }}>Markalar</a>
+              </div>
+            </div>
+
+            {/* Site Kullanımı */}
+            <div>
+              <h4 style={{
+                margin: "0 0 16px 0",
+                color: "white",
+                fontSize: isMobile ? "14px" : "16px",
+                fontWeight: "700",
+                textTransform: "uppercase"
+              }}>
+                SİTE KULLANIMI
+              </h4>
+              <div style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "8px"
+              }}>
+                <a href="/privacy-policy" style={{
+                  color: "#e5e7eb",
+                  textDecoration: "none",
+                  fontSize: isMobile ? "12px" : "14px",
+                  transition: "color 0.2s"
+                }}>KVKK Bilgilendirme</a>
+                <a href="/sales-agreement" style={{
+                  color: "#e5e7eb",
+                  textDecoration: "none",
+                  fontSize: isMobile ? "12px" : "14px",
+                  transition: "color 0.2s"
+                }}>Satış Sözleşmesi</a>
+                <a href="/terms" style={{
+                  color: "#e5e7eb",
+                  textDecoration: "none",
+                  fontSize: isMobile ? "12px" : "14px",
+                  transition: "color 0.2s"
+                }}>Şartlar ve Koşullar</a>
+                <a href="/faq" style={{
+                  color: "#e5e7eb",
+                  textDecoration: "none",
+                  fontSize: isMobile ? "12px" : "14px",
+                  transition: "color 0.2s"
+                }}>Sık Sorulan Sorular</a>
+              </div>
+            </div>
+
+            {/* Hesap Bilgileri */}
+            <div>
+              <h4 style={{
+                margin: "0 0 16px 0",
+                color: "white",
+                fontSize: isMobile ? "14px" : "16px",
+                fontWeight: "700",
+                textTransform: "uppercase"
+              }}>
+                HESAP BİLGİLERİ
+              </h4>
+              <div style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "8px"
+              }}>
+                <a href="/profile" style={{
+                  color: "#e5e7eb",
+                  textDecoration: "none",
+                  fontSize: isMobile ? "12px" : "14px",
+                  transition: "color 0.2s"
+                }}>Hesabım</a>
+                <a href="/orders" style={{
+                  color: "#e5e7eb",
+                  textDecoration: "none",
+                  fontSize: isMobile ? "12px" : "14px",
+                  transition: "color 0.2s"
+                }}>Sipariş Takibi</a>
+                <a href="/compare" style={{
+                  color: "#e5e7eb",
+                  textDecoration: "none",
+                  fontSize: isMobile ? "12px" : "14px",
+                  transition: "color 0.2s"
+                }}>Karşılaştırma Listem</a>
+                <a href="/favorites" style={{
+                  color: "#e5e7eb",
+                  textDecoration: "none",
+                  fontSize: isMobile ? "12px" : "14px",
+                  transition: "color 0.2s"
+                }}>Favori Ürünlerim</a>
+              </div>
+            </div>
+
+            {/* Mağaza Adresi */}
+            <div>
+              <h4 style={{
+                margin: "0 0 16px 0",
+                color: "white",
+                fontSize: isMobile ? "14px" : "16px",
+                fontWeight: "700",
+                textTransform: "uppercase"
+              }}>
+                MAĞAZA ADRESİMİZ
+              </h4>
+              <div style={{
+                display: "flex",
+                alignItems: "flex-start",
+                gap: "12px",
+                marginBottom: "16px"
+              }}>
+                <div style={{
+                  fontSize: "24px",
+                  color: "#ef4444"
+                }}>
+                  📍
+                </div>
+                <div style={{
+                  color: "#e5e7eb",
+                  fontSize: isMobile ? "12px" : "14px",
+                  lineHeight: "1.4"
+                }}>
+                  <div>Ihlamurkuyu Mahallesi</div>
+                  <div>Malazgirt Caddesi, No:32/A</div>
+                  <div>34771, Ümraniye / İstanbul</div>
+                </div>
+              </div>
+              
+              {/* Sosyal Medya */}
+              <div style={{
+                display: "flex",
+                gap: "12px",
+                marginTop: "16px"
+              }}>
+                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" style={{
+                  width: "36px",
+                  height: "36px",
+                  borderRadius: "50%",
+                  background: "#1877f2",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "white",
+                  textDecoration: "none",
+                  fontSize: "16px",
+                  fontWeight: "bold",
+                  transition: "transform 0.2s"
+                }}>
+                  f
+                </a>
+                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" style={{
+                  width: "36px",
+                  height: "36px",
+                  borderRadius: "50%",
+                  background: "linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "white",
+                  textDecoration: "none",
+                  fontSize: "18px",
+                  transition: "transform 0.2s"
+                }}>
+                  📷
+                </a>
+                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" style={{
+                  width: "36px",
+                  height: "36px",
+                  borderRadius: "50%",
+                  background: "#0077b5",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "white",
+                  textDecoration: "none",
+                  fontSize: "14px",
+                  fontWeight: "bold",
+                  transition: "transform 0.2s"
+                }}>
+                  in
+                </a>
+                <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" style={{
+                  width: "36px",
+                  height: "36px",
+                  borderRadius: "50%",
+                  background: "#ff0000",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "white",
+                  textDecoration: "none",
+                  fontSize: "18px",
+                  transition: "transform 0.2s"
+                }}>
+                  ▶️
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Alt Bilgi */}
+        <div style={{
+          padding: isMobile ? "20px 16px" : "24px 24px",
+          borderTop: "1px solid rgba(255, 255, 255, 0.1)",
           display: "flex",
           flexDirection: isMobile ? "column" : "row",
           alignItems: "center",
           justifyContent: "space-between",
-          gap: isMobile ? "16px" : "24px",
-          marginBottom: "16px"
+          gap: isMobile ? "16px" : "24px"
         }}>
           <div style={{
             display: "flex",
             alignItems: "center",
-            gap: "8px"
+            gap: "12px"
           }}>
             <div style={{
-              width: "24px",
-              height: "24px",
+              width: "32px",
+              height: "32px",
               background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
               borderRadius: "6px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               color: "white",
-              fontSize: "12px",
+              fontSize: "14px",
               fontWeight: "700"
             }}>
               DB
             </div>
             <span style={{
-              fontSize: isMobile ? "16px" : "18px",
+              fontSize: isMobile ? "14px" : "16px",
               fontWeight: "700",
-              color: "#1f2937",
-              background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text"
+              color: "white"
             }}>
               Düşük Bütçe
             </span>
@@ -633,39 +1035,10 @@ export default function HomePage() {
           
           <div style={{
             fontSize: isMobile ? "12px" : "14px",
-            color: "#6b7280",
-            fontWeight: "500"
+            color: "#e5e7eb",
+            textAlign: isMobile ? "center" : "right"
           }}>
-            Güvenilir Alışveriş Deneyimi
-          </div>
-        </div>
-        
-        <div style={{
-          borderTop: "1px solid #e5e7eb",
-          paddingTop: "16px",
-          fontSize: isMobile ? "11px" : "12px",
-          color: "#9ca3af",
-          display: "flex",
-          flexDirection: isMobile ? "column" : "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: isMobile ? "8px" : "16px"
-        }}>
-          <span>© {new Date().getFullYear()} Düşük Bütçe. Tüm hakları saklıdır.</span>
-          <div style={{
-            display: "flex",
-            gap: isMobile ? "12px" : "16px"
-          }}>
-            <a href="/privacy-policy" style={{
-              color: "#6b7280",
-              textDecoration: "none",
-              transition: "color 0.2s"
-            }}>Gizlilik Politikası</a>
-            <a href="/terms" style={{
-              color: "#6b7280",
-              textDecoration: "none",
-              transition: "color 0.2s"
-            }}>Kullanım Şartları</a>
+            © {new Date().getFullYear()} Düşük Bütçe. Tüm hakları saklıdır.
           </div>
         </div>
       </footer>
