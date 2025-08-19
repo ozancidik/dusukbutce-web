@@ -176,6 +176,8 @@ export default function HomePage() {
           justifyContent: isIPhoneSE ? "flex-start" : "center"
         }}
       >
+
+
         {/* Ana başlık */}
         <div style={{ 
           display: "flex", 
