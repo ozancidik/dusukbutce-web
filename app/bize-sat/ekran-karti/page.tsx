@@ -128,6 +128,7 @@ export default function GraphicsCardPage() {
           miningUsed: '',
           miningDuration: '',
           warrantySticker: '',
+          coilWhine: 'Yok',
           description: '',
           cosmeticCondition: 'Mükemmel',
           hasBox: false,
