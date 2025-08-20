@@ -16,11 +16,13 @@ export default function LoginPage() {
   const [loginAttempts, setLoginAttempts] = useState(0);
   const router = useRouter();
 
-  // Admin giriş kontrolü - daha güçlü kontrol
+  // Kullanıcı ve admin giriş kontrolü
   React.useEffect(() => {
-    const checkAdminStatus = () => {
+    const checkUserStatus = () => {
       const adminLoggedIn = localStorage.getItem("adminLoggedIn") || sessionStorage.getItem("adminLoggedIn");
       const adminEmail = localStorage.getItem("adminEmail") || sessionStorage.getItem("adminEmail");
+      const userLoggedIn = localStorage.getItem("userLoggedIn") || sessionStorage.getItem("userLoggedIn");
+      const userEmail = localStorage.getItem("userEmail") || sessionStorage.getItem("userEmail");
       
       // Admin bilgileri varsa ve geçerliyse yönlendir
       if (adminLoggedIn === "true" && adminEmail) {
@@ -29,21 +31,30 @@ export default function LoginPage() {
         return;
       }
       
-      // Admin bilgileri yoksa veya geçersizse, hiçbir şey yapma
-      console.log("🔓 Admin giriş yapılmamış, login sayfasında kalınıyor...");
+      // Normal kullanıcı giriş yapmışsa profile sayfasına yönlendir
+      if (userLoggedIn === "true" && userEmail) {
+        console.log("👤 Kullanıcı giriş yapmış, profil sayfasına yönlendiriliyor...");
+        router.push("/profile");
+        return;
+      }
+      
+      // Hiçbir giriş yoksa login sayfasında kal
+      console.log("🔓 Giriş yapılmamış, login sayfasında kalınıyor...");
     };
 
     // İlk kontrol
-    checkAdminStatus();
+    checkUserStatus();
 
-    // localStorage değişikliklerini dinle - sadece admin giriş yapıldığında
+    // localStorage değişikliklerini dinle
     const handleStorageChange = () => {
       const adminLoggedIn = localStorage.getItem("adminLoggedIn") || sessionStorage.getItem("adminLoggedIn");
       const adminEmail = localStorage.getItem("adminEmail") || sessionStorage.getItem("adminEmail");
+      const userLoggedIn = localStorage.getItem("userLoggedIn") || sessionStorage.getItem("userLoggedIn");
+      const userEmail = localStorage.getItem("userEmail") || sessionStorage.getItem("userEmail");
       
-      // Sadece admin giriş yapıldıysa kontrol et
-      if (adminLoggedIn === "true" && adminEmail) {
-        checkAdminStatus();
+      // Herhangi bir giriş yapıldıysa kontrol et
+      if ((adminLoggedIn === "true" && adminEmail) || (userLoggedIn === "true" && userEmail)) {
+        checkUserStatus();
       }
     };
 
@@ -154,14 +165,12 @@ export default function LoginPage() {
             router.push("/admin");
           }, 2000);
         } else {
-          // Normal kullanıcı yönlendirmesi - geldiği sayfaya geri dön
-          const returnUrl = new URLSearchParams(window.location.search).get('returnUrl') || '/';
-          
+          // Normal kullanıcı yönlendirmesi - profile sayfasına git
           setLoginSuccess(true);
-          setRedirectMessage("Giriş başarılı! Yönlendiriliyor...");
+          setRedirectMessage("Giriş başarılı! Profil sayfasına yönlendiriliyor...");
           
           setTimeout(() => {
-            router.push(returnUrl);
+            router.push("/profile");
           }, 2000);
         }
       } else {

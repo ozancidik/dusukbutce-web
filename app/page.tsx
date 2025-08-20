@@ -796,24 +796,8 @@ export default function HomePage() {
                   display: "block",
                   minHeight: isMobile ? "32px" : "auto"
                 }}>İletişim</a>
-                <a href="/blog" style={{
-                  color: "#e5e7eb",
-                  textDecoration: "none",
-                  fontSize: isMobile ? "12px" : "14px",
-                  transition: "color 0.2s",
-                  padding: isMobile ? "8px 0" : "4px 0",
-                  display: "block",
-                  minHeight: isMobile ? "32px" : "auto"
-                }}>Blog</a>
-                <a href="/markalar" style={{
-                  color: "#e5e7eb",
-                  textDecoration: "none",
-                  fontSize: isMobile ? "12px" : "14px",
-                  transition: "color 0.2s",
-                  padding: isMobile ? "8px 0" : "4px 0",
-                  display: "block",
-                  minHeight: isMobile ? "32px" : "auto"
-                }}>Markalar</a>
+
+
               </div>
             </div>
 
@@ -966,7 +950,7 @@ export default function HomePage() {
                 gap: "12px",
                 marginTop: "16px"
               }}>
-                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" style={{
+                <a href="https://www.facebook.com/dusukbutce/" target="_blank" rel="noopener noreferrer" style={{
                   width: "36px",
                   height: "36px",
                   borderRadius: "50%",

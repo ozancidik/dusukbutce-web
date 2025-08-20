@@ -10,10 +10,54 @@ export default function ContactPage() {
     message: ''
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<{
+    type: 'success' | 'error' | null;
+    message: string;
+  }>({ type: null, message: '' });
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Form gönderme işlemi burada yapılacak
-    alert('Mesajınız gönderildi! En kısa sürede size dönüş yapacağız.');
+    setIsSubmitting(true);
+    setSubmitStatus({ type: null, message: '' });
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setSubmitStatus({
+          type: 'success',
+          message: result.message
+        });
+        // Form'u temizle
+        setFormData({
+          name: '',
+          email: '',
+          subject: '',
+          message: ''
+        });
+      } else {
+        setSubmitStatus({
+          type: 'error',
+          message: result.error || 'Bir hata oluştu. Lütfen tekrar deneyiniz.'
+        });
+      }
+    } catch (error) {
+      setSubmitStatus({
+        type: 'error',
+        message: 'Bağlantı hatası. Lütfen tekrar deneyiniz.'
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -93,9 +137,8 @@ export default function ContactPage() {
                 margin: 0,
                 lineHeight: '1.6'
               }}>
-                Ihlamurkuyu Mahallesi<br />
-                Malazgirt Caddesi, No:32/A<br />
-                34771, Ümraniye / İstanbul
+                Atakent Mah. Yasemin Sokağı No:4<br />
+                34760 Ümraniye/İstanbul
               </p>
             </div>
 
@@ -113,7 +156,7 @@ export default function ContactPage() {
                 color: '#6b7280',
                 margin: 0
               }}>
-                +90 (212) XXX XX XX
+                +90 (530) 128 91 37
               </p>
             </div>
 
@@ -170,7 +213,7 @@ export default function ContactPage() {
                 display: 'flex',
                 gap: '12px'
               }}>
-                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" style={{
+                <a href="https://www.facebook.com/dusukbutce/" target="_blank" rel="noopener noreferrer" style={{
                   width: '40px',
                   height: '40px',
                   borderRadius: '50%',
@@ -180,11 +223,16 @@ export default function ContactPage() {
                   justifyContent: 'center',
                   color: 'white',
                   textDecoration: 'none',
-                  fontSize: '18px',
-                  fontWeight: 'bold',
                   transition: 'transform 0.2s'
                 }}>
-                  f
+                  <img 
+                    src="/facebook-svgrepo-com.svg" 
+                    alt="Facebook" 
+                    style={{ 
+                      width: '28px', 
+                      height: '28px'
+                    }} 
+                  />
                 </a>
                 <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" style={{
                   width: '40px',
@@ -196,26 +244,37 @@ export default function ContactPage() {
                   justifyContent: 'center',
                   color: 'white',
                   textDecoration: 'none',
-                  fontSize: '20px',
                   transition: 'transform 0.2s'
                 }}>
-                  📷
+                  <img 
+                    src="/Instagram_logo_2022.svg (1).webp" 
+                    alt="Instagram" 
+                    style={{ 
+                      width: '28px', 
+                      height: '28px'
+                    }} 
+                  />
                 </a>
-                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" style={{
+                <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" style={{
                   width: '40px',
                   height: '40px',
                   borderRadius: '50%',
-                  background: '#0077b5',
+                  background: '#ff0000',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   color: 'white',
                   textDecoration: 'none',
-                  fontSize: '16px',
-                  fontWeight: 'bold',
                   transition: 'transform 0.2s'
                 }}>
-                  in
+                  <img 
+                    src="/youtube-svgrepo-com.svg" 
+                    alt="YouTube" 
+                    style={{ 
+                      width: '32px', 
+                      height: '32px'
+                    }} 
+                  />
                 </a>
               </div>
             </div>
@@ -357,20 +416,177 @@ export default function ContactPage() {
 
               <button
                 type="submit"
+                disabled={isSubmitting}
                 style={{
-                  background: '#2563eb',
+                  background: isSubmitting ? '#9ca3af' : '#2563eb',
                   color: 'white',
                   border: 'none',
                   borderRadius: '8px',
                   padding: '14px 24px',
                   fontSize: '16px',
                   fontWeight: '500',
-                  cursor: 'pointer',
+                  cursor: isSubmitting ? 'not-allowed' : 'pointer',
                   transition: 'background 0.2s'
                 }}
               >
-                📤 Mesaj Gönder
+                {isSubmitting ? '📤 Gönderiliyor...' : '📤 Mesaj Gönder'}
               </button>
+
+              {/* Status Messages */}
+              {submitStatus.type && (
+                <>
+                  {/* Overlay */}
+                  <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: 'rgba(0, 0, 0, 0.5)',
+                    backdropFilter: 'blur(4px)',
+                    zIndex: 1000,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '20px'
+                  }}>
+                    {/* Modal */}
+                    <div style={{
+                      background: 'white',
+                      borderRadius: '20px',
+                      padding: '40px',
+                      maxWidth: '500px',
+                      width: '100%',
+                      textAlign: 'center',
+                      boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+                      animation: 'slideIn 0.3s ease-out',
+                      position: 'relative'
+                    }}>
+                      {/* Close Button */}
+                      <button
+                        onClick={() => setSubmitStatus({ type: null, message: '' })}
+                        style={{
+                          position: 'absolute',
+                          top: '16px',
+                          right: '16px',
+                          background: 'none',
+                          border: 'none',
+                          fontSize: '24px',
+                          cursor: 'pointer',
+                          color: '#9ca3af',
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '50%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          transition: 'all 0.2s'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = '#f3f4f6';
+                          e.currentTarget.style.color = '#6b7280';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = 'none';
+                          e.currentTarget.style.color = '#9ca3af';
+                        }}
+                      >
+                        ×
+                      </button>
+
+                      {/* Icon */}
+                      <div style={{
+                        fontSize: '64px',
+                        marginBottom: '24px',
+                        animation: 'bounceIn 0.6s ease-out'
+                      }}>
+                        {submitStatus.type === 'success' ? '🎉' : '⚠️'}
+                      </div>
+
+                      {/* Title */}
+                      <h3 style={{
+                        fontSize: '28px',
+                        fontWeight: '700',
+                        margin: '0 0 16px 0',
+                        color: submitStatus.type === 'success' ? '#059669' : '#dc2626'
+                      }}>
+                        {submitStatus.type === 'success' ? 'Mesaj Gönderildi!' : 'Hata Oluştu'}
+                      </h3>
+
+                      {/* Message */}
+                      <p style={{
+                        fontSize: '16px',
+                        color: '#6b7280',
+                        margin: '0 0 32px 0',
+                        lineHeight: '1.6'
+                      }}>
+                        {submitStatus.message}
+                      </p>
+
+                      {/* Action Button */}
+                      <button
+                        onClick={() => setSubmitStatus({ type: null, message: '' })}
+                        style={{
+                          background: submitStatus.type === 'success' 
+                            ? 'linear-gradient(135deg, #059669 0%, #10b981 100%)'
+                            : 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '12px',
+                          padding: '16px 32px',
+                          fontSize: '16px',
+                          fontWeight: '600',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s',
+                          boxShadow: '0 4px 14px 0 rgba(0, 0, 0, 0.1)'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.transform = 'translateY(-2px)';
+                          e.currentTarget.style.boxShadow = '0 8px 25px 0 rgba(0, 0, 0, 0.15)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = 'translateY(0)';
+                          e.currentTarget.style.boxShadow = '0 4px 14px 0 rgba(0, 0, 0, 0.1)';
+                        }}
+                      >
+                        {submitStatus.type === 'success' ? 'Tamam' : 'Tekrar Dene'}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* CSS Animations */}
+                  <style jsx>{`
+                    @keyframes slideIn {
+                      from {
+                        opacity: 0;
+                        transform: scale(0.9) translateY(-20px);
+                      }
+                      to {
+                        opacity: 1;
+                        transform: scale(1) translateY(0);
+                      }
+                    }
+                    
+                    @keyframes bounceIn {
+                      0% {
+                        opacity: 0;
+                        transform: scale(0.3);
+                      }
+                      50% {
+                        opacity: 1;
+                        transform: scale(1.05);
+                      }
+                      70% {
+                        transform: scale(0.9);
+                      }
+                      100% {
+                        opacity: 1;
+                        transform: scale(1);
+                      }
+                    }
+                  `}</style>
+                </>
+              )}
             </form>
           </div>
         </div>

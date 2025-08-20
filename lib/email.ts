@@ -1,87 +1,81 @@
 import nodemailer from 'nodemailer';
 
-// E-posta transporter konfigürasyonu
-export const transporter = nodemailer.createTransport({
-  service: 'gmail', // Gmail kullanıyoruz
-  auth: {
-    user: process.env.EMAIL_USER || 'your-email@gmail.com',
-    pass: process.env.EMAIL_PASS || 'your-app-password'
-  }
-});
+interface EmailData {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}
 
-// Şifre sıfırlama e-postası gönderme fonksiyonu
-export async function sendPasswordResetEmail(
-  email: string, 
-  resetToken: string, 
-  userName: string
-) {
-  const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}`;
-  
-  const mailOptions = {
-    from: `"Düşük Bütçe" <${process.env.EMAIL_USER || 'noreply@dusukbutce.com'}>`,
-    to: email,
-    subject: 'Şifre Sıfırlama - Düşük Bütçe',
-    html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8fafc;">
-        <div style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); padding: 30px; text-align: center; border-radius: 12px 12px 0 0;">
-          <h1 style="color: white; margin: 0; font-size: 24px;">Şifre Sıfırlama</h1>
-        </div>
-        
-        <div style="background: white; padding: 30px; border-radius: 0 0 12px 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-          <p style="color: #374151; font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
-            Merhaba <strong>${userName}</strong>,
-          </p>
+export async function sendContactNotification(data: EmailData) {
+  try {
+    // Gmail SMTP transporter oluştur
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_APP_PASSWORD
+      }
+    });
+
+    // E-posta içeriği
+    const mailOptions = {
+      from: process.env.GMAIL_USER,
+      to: 'ozancidik@gmail.com', // Bildirim gidecek e-posta
+      subject: `Yeni İletişim Formu: ${data.subject}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #2563eb; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">
+            🆕 Yeni İletişim Formu Mesajı
+          </h2>
           
-          <p style="color: #6b7280; font-size: 14px; line-height: 1.6; margin-bottom: 20px;">
-            Hesabınız için şifre sıfırlama talebinde bulundunuz. Aşağıdaki butona tıklayarak yeni şifrenizi belirleyebilirsiniz.
-          </p>
-          
-          <div style="text-align: center; margin: 30px 0;">
-            <a href="${resetUrl}" style="
-              display: inline-block;
-              background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-              color: white;
-              text-decoration: none;
-              padding: 16px 32px;
-              border-radius: 8px;
-              font-weight: 600;
-              font-size: 16px;
-              box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-            ">
-              Şifremi Sıfırla
-            </a>
+          <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3 style="color: #374151; margin-top: 0;">📋 Form Detayları</h3>
+            
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr>
+                <td style="padding: 8px 0; font-weight: 600; color: #374151; width: 120px;">Ad Soyad:</td>
+                <td style="padding: 8px 0; color: #6b7280;">${data.name}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; font-weight: 600; color: #374151;">E-posta:</td>
+                <td style="padding: 8px 0; color: #6b7280;">${data.email}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; font-weight: 600; color: #374151;">Konu:</td>
+                <td style="padding: 8px 0; color: #6b7280;">${data.subject}</td>
+              </tr>
+            </table>
           </div>
           
-          <p style="color: #6b7280; font-size: 14px; line-height: 1.6; margin-bottom: 20px;">
-            Bu bağlantı <strong>1 saat</strong> boyunca geçerlidir. Eğer şifre sıfırlama talebinde bulunmadıysanız, bu e-postayı görmezden gelebilirsiniz.
-          </p>
+          <div style="background: #f0f9ff; padding: 20px; border-radius: 8px; border-left: 4px solid #0ea5e9;">
+            <h3 style="color: #0369a1; margin-top: 0;">💬 Mesaj</h3>
+            <p style="color: #0c4a6e; line-height: 1.6; margin: 0;">${data.message}</p>
+          </div>
           
-          <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <p style="color: #6b7280; font-size: 12px; margin: 0; text-align: center;">
-              <strong>Güvenlik Uyarısı:</strong> Şifrenizi kimseyle paylaşmayın. Düşük Bütçe ekibi asla şifrenizi sormaz.
+          <div style="margin-top: 20px; padding: 15px; background: #fef3c7; border-radius: 8px; border-left: 4px solid #f59e0b;">
+            <p style="color: #92400e; margin: 0; font-size: 14px;">
+              <strong>⏰ Gönderim Zamanı:</strong> ${new Date().toLocaleString('tr-TR')}
             </p>
           </div>
           
-          <p style="color: #9ca3af; font-size: 12px; text-align: center; margin: 20px 0 0 0;">
-            Bu e-posta otomatik olarak gönderilmiştir. Lütfen yanıtlamayın.
-          </p>
+          <div style="margin-top: 20px; text-align: center;">
+            <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/login" 
+               style="background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block;">
+              🔐 Giriş Yap
+            </a>
+          </div>
         </div>
-        
-        <div style="text-align: center; margin-top: 20px;">
-          <p style="color: #9ca3af; font-size: 12px;">
-            © 2024 Düşük Bütçe. Tüm hakları saklıdır.
-          </p>
-        </div>
-      </div>
-    `
-  };
+      `
+    };
 
-  try {
-    await transporter.sendMail(mailOptions);
-    console.log('✅ Şifre sıfırlama e-postası gönderildi:', email);
+    // E-postayı gönder
+    const info = await transporter.sendMail(mailOptions);
+    console.log('E-posta gönderildi:', info.messageId);
     return true;
+
   } catch (error) {
-    console.error('❌ E-posta gönderme hatası:', error);
+    console.error('E-posta gönderim hatası:', error);
     return false;
   }
 }
