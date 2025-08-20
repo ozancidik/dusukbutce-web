@@ -650,7 +650,7 @@ export default function HomePage() {
                 marginBottom: "12px",
                 color: "#fbbf24"
               }}>
-                😊 ⭐⭐⭐⭐⭐
+                😊 <span style={{ fontSize: "20px" }}>⭐⭐⭐⭐⭐</span>
               </div>
               <h3 style={{
                 margin: "0 0 8px 0",
@@ -955,9 +955,8 @@ export default function HomePage() {
                   fontSize: isMobile ? "12px" : "14px",
                   lineHeight: "1.4"
                 }}>
-                  <div>Ihlamurkuyu Mahallesi</div>
-                  <div>Malazgirt Caddesi, No:32/A</div>
-                  <div>34771, Ümraniye / İstanbul</div>
+                  <div>Atakent Mah. Yasemin Sokağı No:4</div>
+                  <div>34760 Ümraniye/İstanbul</div>
                 </div>
               </div>
               
@@ -977,11 +976,16 @@ export default function HomePage() {
                   justifyContent: "center",
                   color: "white",
                   textDecoration: "none",
-                  fontSize: "16px",
-                  fontWeight: "bold",
                   transition: "transform 0.2s"
                 }}>
-                  f
+                  <img 
+                    src="/facebook-svgrepo-com.svg" 
+                    alt="Facebook" 
+                    style={{ 
+                      width: "28px", 
+                      height: "28px"
+                    }} 
+                  />
                 </a>
                 <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" style={{
                   width: "36px",
@@ -993,26 +997,16 @@ export default function HomePage() {
                   justifyContent: "center",
                   color: "white",
                   textDecoration: "none",
-                  fontSize: "18px",
                   transition: "transform 0.2s"
                 }}>
-                  📷
-                </a>
-                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" style={{
-                  width: "36px",
-                  height: "36px",
-                  borderRadius: "50%",
-                  background: "#0077b5",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "white",
-                  textDecoration: "none",
-                  fontSize: "14px",
-                  fontWeight: "bold",
-                  transition: "transform 0.2s"
-                }}>
-                  in
+                  <img 
+                    src="/Instagram_logo_2022.svg (1).webp" 
+                    alt="Instagram" 
+                    style={{ 
+                      width: "28px", 
+                      height: "28px"
+                    }} 
+                  />
                 </a>
                 <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" style={{
                   width: "36px",
@@ -1024,10 +1018,16 @@ export default function HomePage() {
                   justifyContent: "center",
                   color: "white",
                   textDecoration: "none",
-                  fontSize: "18px",
                   transition: "transform 0.2s"
                 }}>
-                  ▶️
+                  <img 
+                    src="/youtube-svgrepo-com.svg" 
+                    alt="YouTube" 
+                    style={{ 
+                      width: "32px", 
+                      height: "32px"
+                    }} 
+                  />
                 </a>
               </div>
             </div>
