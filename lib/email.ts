@@ -7,6 +7,64 @@ interface EmailData {
   message: string;
 }
 
+export async function sendPasswordResetEmail(email: string, resetToken: string, userName: string) {
+  try {
+    // Gmail SMTP transporter oluştur
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_APP_PASSWORD
+      }
+    });
+
+    // E-posta içeriği
+    const mailOptions = {
+      from: process.env.GMAIL_USER,
+      to: email,
+      subject: 'Şifre Sıfırlama - Düşük Bütçe',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #2563eb; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">
+            🔐 Şifre Sıfırlama
+          </h2>
+          
+          <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <p style="color: #374151; margin: 0; line-height: 1.6;">
+              Merhaba <strong>${userName}</strong>,
+            </p>
+            <p style="color: #374151; margin: 10px 0; line-height: 1.6;">
+              Şifrenizi sıfırlamak için aşağıdaki butona tıklayın. Bu bağlantı 1 saat süreyle geçerlidir.
+            </p>
+          </div>
+          
+          <div style="margin: 20px 0; text-align: center;">
+            <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}" 
+               style="background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block;">
+              🔑 Şifremi Sıfırla
+            </a>
+          </div>
+          
+          <div style="background: #fef3c7; padding: 15px; border-radius: 8px; border-left: 4px solid #f59e0b;">
+            <p style="color: #92400e; margin: 0; font-size: 14px;">
+              <strong>⚠️ Güvenlik Uyarısı:</strong> Bu e-postayı siz talep etmediyseniz, lütfen dikkate almayın.
+            </p>
+          </div>
+        </div>
+      `
+    };
+
+    // E-postayı gönder
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Şifre sıfırlama e-postası gönderildi:', info.messageId);
+    return true;
+
+  } catch (error) {
+    console.error('Şifre sıfırlama e-postası gönderim hatası:', error);
+    return false;
+  }
+}
+
 export async function sendContactNotification(data: EmailData) {
   try {
     // Gmail SMTP transporter oluştur
