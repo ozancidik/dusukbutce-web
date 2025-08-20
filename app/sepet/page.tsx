@@ -7,7 +7,6 @@ export default function SepetPage() {
   return (
     <div style={{
       background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
-      minHeight: '100vh',
       padding: '40px 20px'
     }}>
       <div style={{
@@ -24,33 +23,11 @@ export default function SepetPage() {
           textAlign: 'center',
           border: '1px solid #e5e7eb'
         }}>
-          <Link href="/" style={{ textDecoration: 'none' }}>
-            <Image 
-              src="/logo.png" 
-              alt="Düşük Bütçe" 
-              width={140} 
-              height={50} 
-              priority
-              style={{ 
-                objectFit: 'contain', 
-                cursor: 'pointer',
-                transition: 'transform 0.2s',
-                width: 'auto',
-                height: 'auto'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'scale(1.05)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'scale(1)';
-              }}
-            />
-          </Link>
           <h1 style={{
             fontSize: '32px',
             fontWeight: '700',
             color: '#1f2937',
-            margin: '24px 0 8px 0'
+            margin: '0 0 8px 0'
           }}>
             🛒 Sepetim
           </h1>

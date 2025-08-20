@@ -3,6 +3,7 @@ import { Inter, Roboto_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "./components/Header";
 import Breadcrumb from "./components/Breadcrumb";
+import Footer from "./components/Footer";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -137,9 +138,14 @@ export default function RootLayout({
         className={`${inter.variable} ${robotoMono.variable} antialiased`}
         suppressHydrationWarning
       >
-        <Header />
-        <Breadcrumb />
-        {children}
+        <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+          <Header />
+          <Breadcrumb />
+          <main style={{ flex: 1 }}>
+            {children}
+          </main>
+          <Footer />
+        </div>
       </body>
     </html>
   );

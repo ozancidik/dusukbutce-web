@@ -21,7 +21,6 @@ export default function PrivacyPolicyPage() {
 
   return (
     <div style={{
-      minHeight: "100vh",
       background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%)",
       padding: "20px"
     }}>
@@ -41,22 +40,7 @@ export default function PrivacyPolicyPage() {
           paddingBottom: "30px",
           borderBottom: "2px solid #f1f5f9"
         }}>
-          <Link href="/" style={{ display: "inline-block" }}>
-            <Image 
-              src="/logo.png" 
-              alt="Düşük Bütçe" 
-              width={180} 
-              height={60} 
-              style={{ 
-                objectFit: "contain", 
-                cursor: "pointer",
-                filter: "drop-shadow(0 2px 8px rgba(0, 0, 0, 0.1))"
-              }} 
-            />
-          </Link>
-          
           <div style={{
-            marginTop: "30px",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",

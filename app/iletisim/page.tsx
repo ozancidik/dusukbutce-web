@@ -69,7 +69,6 @@ export default function ContactPage() {
 
   return (
     <div style={{
-      minHeight: '100vh',
       background: 'linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%)',
       padding: '20px'
     }}>

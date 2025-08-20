@@ -1,53 +1,10 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import Search from "./Search";
 
 export default function Header() {
-  const [isMobile, setIsMobile] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userName, setUserName] = useState("");
-  const [adminLoggedIn, setAdminLoggedIn] = useState(false);
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-    
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    
-    return () => {
-      window.removeEventListener('resize', checkMobile);
-    };
-  }, []);
-
-  useEffect(() => {
-    const checkLoginStatus = () => {
-      let userLoggedIn = localStorage.getItem("userLoggedIn");
-      let userName = localStorage.getItem("userName");
-      let adminLoggedIn = localStorage.getItem("adminLoggedIn");
-      
-      if (!userLoggedIn && !adminLoggedIn) {
-        userLoggedIn = sessionStorage.getItem("userLoggedIn");
-        userName = sessionStorage.getItem("userName");
-        adminLoggedIn = sessionStorage.getItem("adminLoggedIn");
-      }
-      
-      setIsLoggedIn(userLoggedIn === "true" || adminLoggedIn === "true");
-      setUserName(userName || "");
-      setAdminLoggedIn(adminLoggedIn === "true");
-    };
-
-    checkLoginStatus();
-    window.addEventListener('storage', checkLoginStatus);
-    
-    return () => {
-      window.removeEventListener('storage', checkLoginStatus);
-    };
-  }, []);
-
   return (
     <header style={{
       position: "static",
@@ -59,232 +16,96 @@ export default function Header() {
       <div style={{
         maxWidth: "1600px",
         margin: "0 auto",
-        padding: isMobile ? "12px 16px" : "16px 24px",
+        padding: "16px 24px",
         display: "flex",
-        flexDirection: "column",
-        alignItems: "stretch",
-        gap: isMobile ? "12px" : "24px",
+        alignItems: "center",
+        justifyContent: "space-between",
       }}>
-        {isMobile ? (
-          <>
-            <div style={{ 
-              display: "flex", 
-              alignItems: "center", 
-              justifyContent: "space-between",
-              marginBottom: "8px" 
-            }}>
-              <Link href="/" style={{ textDecoration: "none" }}>
-                <Image 
-                  src="/logo.png" 
-                  alt="Düşük Bütçe" 
-                  width={120} 
-                  height={45} 
-                  priority
-                  style={{ 
-                    objectFit: "contain",
-                    cursor: "pointer",
-                    transition: "transform 0.2s"
-                  }}
-                />
-              </Link>
-              <div style={{ display: "flex", gap: "8px" }}>
-                {isLoggedIn ? (
-                  <>
-                    <Link href="/tekliflerim" style={{ textDecoration: "none" }}>
-                      <button style={{
-                        background: "#f59e0b",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "50%",
-                        width: "40px",
-                        height: "40px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        cursor: "pointer",
-                        fontSize: "18px"
-                      }}>
-                        <span style={{ filter: "brightness(0) invert(1)" }}>💰</span>
-                      </button>
-                    </Link>
-                    <Link href={adminLoggedIn ? "/admin" : "/profile"} style={{ textDecoration: "none" }}>
-                      <button style={{
-                        background: adminLoggedIn ? "#7c3aed" : "#10b981",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "50%",
-                        width: "40px",
-                        height: "40px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        cursor: "pointer",
-                        fontSize: "18px"
-                      }}>
-                        <span style={{ filter: "brightness(0) invert(1)" }}>{adminLoggedIn ? "⚙️" : "👤"}</span>
-                      </button>
-                    </Link>
-                  </>
-                ) : (
-                  <Link href="/login" style={{ textDecoration: "none" }}>
-                    <button style={{
-                      background: "#2563eb",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "50%",
-                      width: "40px",
-                      height: "40px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      cursor: "pointer",
-                      fontSize: "18px"
-                    }}>
-                      <span style={{ filter: "brightness(0) invert(1)" }}>👤</span>
-                    </button>
-                  </Link>
-                )}
-                <Link href="/sepet" style={{ textDecoration: "none" }}>
-                  <button style={{
-                    background: "#2563eb",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "50%",
-                    width: "40px",
-                    height: "40px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    cursor: "pointer",
-                    fontSize: "18px"
-                  }}>
-                    <span style={{ filter: "brightness(0) invert(1)" }}>🛒</span>
-                  </button>
-                </Link>
-              </div>
-            </div>
-            <div style={{ marginBottom: "8px" }}>
-              <Search />
-            </div>
-          </>
-        ) : (
-          <div style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-          }}>
-            <div style={{
+        {/* Logo */}
+        <Link href="/" style={{ textDecoration: "none", flexShrink: 0 }}>
+          <Image 
+            src="/logo.png" 
+            alt="Düşük Bütçe" 
+            width={120} 
+            height={45} 
+            priority
+            style={{ 
+              objectFit: "contain",
+              cursor: "pointer",
+              transition: "transform 0.2s"
+            }}
+          />
+        </Link>
+
+        {/* Search Bar */}
+        <div style={{
+          flex: 1,
+          maxWidth: "1000px",
+          position: "relative",
+          margin: "0 24px",
+        }}>
+          <Search />
+        </div>
+
+        {/* Buttons */}
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "16px",
+          flexShrink: 0,
+        }}>
+          <Link href="/login" style={{ textDecoration: "none" }}>
+            <button style={{
+              background: "#2563eb",
+              color: "white",
+              border: "none",
+              borderRadius: "8px",
+              padding: "12px 20px",
+              fontWeight: "600",
+              cursor: "pointer",
+              fontSize: "14px",
+              width: "140px",
+              height: "44px",
               display: "flex",
               alignItems: "center",
-              gap: "12px",
-              flex: 1,
+              justifyContent: "center",
+              whiteSpace: "nowrap",
+              gap: "8px",
             }}>
-              <Link href="/" style={{ textDecoration: "none", flexShrink: 0 }}>
-                <Image 
-                  src="/logo.png" 
-                  alt="Düşük Bütçe" 
-                  width={120} 
-                  height={45} 
-                  priority
-                  style={{ 
-                    objectFit: "contain",
-                    cursor: "pointer",
-                    transition: "transform 0.2s"
-                  }}
-                />
-              </Link>
-              <div style={{
-                flex: 1,
-                maxWidth: "1000px",
-                position: "relative",
-                marginRight: "2px",
-              }}>
-                <Search />
-              </div>
-            </div>
-            <div style={{
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="8" r="5" stroke="currentColor" strokeWidth="2" fill="none"/>
+                <path d="M20 21C20 16.5817 16.4183 13 12 13C7.58172 13 4 16.5817 4 21" stroke="currentColor" strokeWidth="2" fill="none"/>
+              </svg>
+              Giriş Yap
+            </button>
+          </Link>
+          <Link href="/sepet" style={{ textDecoration: "none" }}>
+            <button style={{
+              background: "#2563eb",
+              color: "white",
+              border: "none",
+              borderRadius: "8px",
+              padding: "12px 20px",
+              fontWeight: "600",
+              cursor: "pointer",
+              fontSize: "14px",
+              width: "140px",
+              height: "44px",
               display: "flex",
               alignItems: "center",
-              gap: "16px",
-              flexShrink: 0,
+              justifyContent: "center",
+              whiteSpace: "nowrap",
+              gap: "8px",
             }}>
-              {isLoggedIn ? (
-                <>
-                  <Link href="/tekliflerim" style={{ textDecoration: "none" }}>
-                    <button style={{
-                      background: "#f59e0b",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "8px",
-                      padding: "12px 20px",
-                      fontWeight: "600",
-                      cursor: "pointer",
-                      fontSize: "14px",
-                    }}>
-                      💰 Tekliflerim
-                    </button>
-                  </Link>
-                  <Link href={adminLoggedIn ? "/admin" : "/profile"} style={{ textDecoration: "none" }}>
-                    <button style={{
-                      background: adminLoggedIn ? "#7c3aed" : "#10b981",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "8px",
-                      padding: "12px 20px",
-                      fontWeight: "600",
-                      cursor: "pointer",
-                      fontSize: "14px",
-                    }}>
-                      {adminLoggedIn ? "⚙️" : "👤"} {userName || (adminLoggedIn ? "Admin" : "Profil")}
-                    </button>
-                  </Link>
-                </>
-              ) : (
-                <Link href="/login" style={{ textDecoration: "none" }}>
-                  <button style={{
-                    background: "#2563eb",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "8px",
-                    padding: "12px 20px",
-                    fontWeight: "600",
-                    cursor: "pointer",
-                    fontSize: "14px",
-                    width: "140px",
-                    height: "44px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    whiteSpace: "nowrap",
-                  }}>
-                    👤 Giriş Yap
-                  </button>
-                </Link>
-              )}
-              <Link href="/sepet" style={{ textDecoration: "none" }}>
-                <button style={{
-                  background: "#2563eb",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "8px",
-                  padding: "12px 20px",
-                  fontWeight: "600",
-                  cursor: "pointer",
-                  fontSize: "14px",
-                  width: "140px",
-                  height: "44px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  whiteSpace: "nowrap",
-                }}>
-                  🛒 Sepet
-                </button>
-              </Link>
-            </div>
-          </div>
-        )}
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 3H5L5.4 5M7 13H17L21 5H5.4M7 13L5.4 5M7 13L4.7 15.3C4.3 15.7 4.6 16.5 5.1 16.5H17M17 13V17C17 18.1 16.1 19 15 19H9C7.9 19 7 18.1 7 17V13H17Z" stroke="currentColor" strokeWidth="2" fill="none"/>
+                <circle cx="9" cy="20" r="1" fill="currentColor"/>
+                <circle cx="15" cy="20" r="1" fill="currentColor"/>
+              </svg>
+              Sepet
+            </button>
+          </Link>
+        </div>
       </div>
     </header>
   );
