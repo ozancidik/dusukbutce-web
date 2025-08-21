@@ -10,6 +10,7 @@ export default function ProfilePage() {
   
   const [userInfo, setUserInfo] = useState<any>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const [editForm, setEditForm] = useState({
     firstName: '',
     lastName: '',
@@ -22,6 +23,18 @@ export default function ProfilePage() {
   const [showErrorPopup, setShowErrorPopup] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const router = useRouter();
+
+  // Mobil responsive kontrol
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Telefon numarasını formatlayan yardımcı fonksiyon
   const formatPhoneNumber = (phone: string): string => {
@@ -84,7 +97,7 @@ export default function ProfilePage() {
     setUserInfo(userData);
     
     // İsim ve soyisimi ayır
-    const nameParts = userData.name?.split(' ') || ['', ''];
+    const nameParts = userData.name ? decodeURIComponent(escape(userData.name)).split(' ') : ['', ''];
     setEditForm({
       firstName: nameParts[0] || '',
       lastName: nameParts.slice(1).join(' ') || '',
@@ -158,7 +171,9 @@ export default function ProfilePage() {
 
   const handleCancel = () => {
     setIsEditing(false);
-    const nameParts = userInfo.name?.split(' ') || ['', ''];
+    if (!userInfo) return;
+    
+    const nameParts = userInfo.name ? decodeURIComponent(escape(userInfo.name)).split(' ') : ['', ''];
     setEditForm({
       firstName: nameParts[0] || '',
       lastName: nameParts.slice(1).join(' ') || '',
@@ -170,6 +185,13 @@ export default function ProfilePage() {
   const handleSave = async () => {
     setMessage('');
     setMessageType('error');
+
+    // userInfo null kontrolü
+    if (!userInfo) {
+      setMessage('Kullanıcı bilgileri bulunamadı. Lütfen tekrar giriş yapın.');
+      setMessageType('error');
+      return;
+    }
 
     // Ad validasyonu
     const nameRegex = /^[a-zA-ZğüşıöçĞÜŞİÖÇ\s-]+$/;
@@ -331,6 +353,12 @@ export default function ProfilePage() {
   };
 
   const handleLogout = () => {
+    // userInfo null kontrolü
+    if (!userInfo) {
+      console.error('❌ handleLogout: userInfo is null');
+      return;
+    }
+    
     // Tüm localStorage ve sessionStorage'ı temizle
     localStorage.clear();
     sessionStorage.clear();
@@ -371,13 +399,24 @@ export default function ProfilePage() {
     <div style={{ 
       minHeight: '100vh',
       background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
-      padding: '20px'
+      padding: isMobile ? '12px' : '20px'
     }}>
       <div style={{ 
         maxWidth: '800px', 
         margin: '0 auto',
-        padding: '20px 20px'
+        padding: isMobile ? '12px' : '20px'
       }}>
+
+        {/* Breadcrumb */}
+        <div style={{ 
+          marginBottom: isMobile ? '16px' : '20px',
+          fontSize: isMobile ? '12px' : '16px',
+          color: '#64748b'
+        }}>
+          <Link href="/" style={{ color: '#2563eb', textDecoration: 'none' }}>Anasayfa</Link>
+          <span style={{ margin: '0 8px' }}>›</span>
+          <span>Profil</span>
+        </div>
 
 
         {/* Ana Profil Kartı */}
@@ -391,7 +430,7 @@ export default function ProfilePage() {
           {/* Profil Header */}
           <div style={{ 
             background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
-            padding: '32px',
+            padding: isMobile ? '24px 16px' : '32px',
             textAlign: 'center',
             color: 'white'
           }}>
@@ -409,7 +448,7 @@ export default function ProfilePage() {
               {userInfo.name?.charAt(0)?.toUpperCase() || 'U'}
             </div>
             <h1 style={{ margin: '0 0 8px 0', fontSize: '24px', fontWeight: '600' }}>
-              {userInfo.name || 'Kullanıcı'}
+              {userInfo.name ? decodeURIComponent(escape(userInfo.name)) : 'Kullanıcı'}
             </h1>
             <p style={{ margin: '0', opacity: '0.9', fontSize: '16px' }}>
               {userInfo.email}
@@ -457,90 +496,90 @@ export default function ProfilePage() {
           </div>
 
           {/* Profil İçeriği */}
-          <div style={{ padding: '32px' }}>
+          <div style={{ padding: isMobile ? '20px 16px' : '32px' }}>
             {isEditing ? (
               /* Düzenleme Formu */
               <form onSubmit={(e) => { e.preventDefault(); console.log('Form submitted!'); handleSave(); }}>
-                <h3 style={{ margin: '0 0 24px 0', color: '#1e293b', fontSize: '20px' }}>
+                <h3 style={{ margin: '0 0 24px 0', color: '#1e293b', fontSize: isMobile ? '18px' : '20px' }}>
                   Profil Bilgilerini Düzenle
                 </h3>
                 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? '12px' : '16px', marginBottom: isMobile ? '12px' : '16px' }}>
                   <div>
-                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500', color: '#374151' }}>
+                    <label style={{ display: 'block', marginBottom: isMobile ? '6px' : '8px', fontWeight: '500', color: '#374151', fontSize: isMobile ? '13px' : '14px' }}>
                       Ad
                     </label>
-                                         <input
-                       type="text"
-                       name="firstName"
-                       value={editForm.firstName}
-                       onChange={handleChange}
-                       style={{
-                         width: '100%',
-                         padding: '12px',
-                         borderRadius: '8px',
-                         border: '1px solid #d1d5db',
-                         fontSize: '16px'
-                       }}
-                     />
+                    <input
+                      type="text"
+                      name="firstName"
+                      value={editForm.firstName}
+                      onChange={handleChange}
+                      style={{
+                        width: '100%',
+                        padding: isMobile ? '10px' : '12px',
+                        borderRadius: '8px',
+                        border: '1px solid #d1d5db',
+                        fontSize: isMobile ? '14px' : '16px'
+                      }}
+                    />
                   </div>
                   <div>
-                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500', color: '#374151' }}>
+                    <label style={{ display: 'block', marginBottom: isMobile ? '6px' : '8px', fontWeight: '500', color: '#374151', fontSize: isMobile ? '13px' : '14px' }}>
                       Soyad
                     </label>
-                                         <input
-                       type="text"
-                       name="lastName"
-                       value={editForm.lastName}
-                       onChange={handleChange}
-                       style={{
-                         width: '100%',
-                         padding: '12px',
-                         borderRadius: '8px',
-                         border: '1px solid #d1d5db',
-                         fontSize: '16px'
-                       }}
-                     />
+                    <input
+                      type="text"
+                      name="lastName"
+                      value={editForm.lastName}
+                      onChange={handleChange}
+                      style={{
+                        width: '100%',
+                        padding: isMobile ? '10px' : '12px',
+                        borderRadius: '8px',
+                        border: '1px solid #d1d5db',
+                        fontSize: isMobile ? '14px' : '16px'
+                      }}
+                    />
                   </div>
                 </div>
 
-                <div style={{ marginBottom: '16px' }}>
-                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500', color: '#374151' }}>
+                <div style={{ marginBottom: isMobile ? '12px' : '16px' }}>
+                  <label style={{ display: 'block', marginBottom: isMobile ? '6px' : '8px', fontWeight: '500', color: '#374151', fontSize: isMobile ? '13px' : '14px' }}>
                     E-posta
                   </label>
-                                     <input
-                     type="email"
-                     name="email"
-                     value={editForm.email}
-                     onChange={handleChange}
-                     style={{
-                       width: '100%',
-                       padding: '12px',
-                       borderRadius: '8px',
-                       border: '1px solid #d1d5db',
-                       fontSize: '16px'
-                     }}
-                   />
+                  <input
+                    type="email"
+                    name="email"
+                    value={editForm.email}
+                    onChange={handleChange}
+                    style={{
+                      width: '100%',
+                      padding: isMobile ? '10px' : '12px',
+                      borderRadius: '8px',
+                      border: '1px solid #d1d5db',
+                      fontSize: isMobile ? '14px' : '16px'
+                    }}
+                  />
                 </div>
 
-                <div style={{ marginBottom: '24px' }}>
-                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500', color: '#374151' }}>
+                <div style={{ marginBottom: isMobile ? '20px' : '24px' }}>
+                  <label style={{ display: 'block', marginBottom: isMobile ? '6px' : '8px', fontWeight: '500', color: '#374151', fontSize: isMobile ? '13px' : '14px' }}>
                     Telefon
                   </label>
-                                     <input
-                     type="tel"
-                     name="phone"
-                     value={editForm.phone}
-                     onChange={handleChange}
-                     placeholder="(5XX) XXX XX XX"
-                     style={{
-                       width: '100%',
-                       padding: '12px',
-                       borderRadius: '8px',
-                       border: '1px solid #d1d5db',
-                       fontSize: '16px'
-                     }}
-                   />
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={editForm.phone}
+                    onChange={handleChange}
+                    placeholder="(5XX) XXX XX XX"
+                    style={{
+                      width: '100%',
+                      padding: isMobile ? '10px' : '12px',
+                      borderRadius: '8px',
+                      border: '1px solid #d1d5db',
+                      fontSize: isMobile ? '14px' : '16px'
+                    }}
+                  />
                 </div>
 
                 {message && (
@@ -556,7 +595,7 @@ export default function ProfilePage() {
                   </div>
                 )}
 
-                <div style={{ display: 'flex', gap: '12px' }}>
+                <div style={{ display: 'flex', gap: '12px', flexDirection: isMobile ? 'column' : 'row' }}>
                   <button
                     type="button"
                     onClick={() => { console.log('Kaydet clicked!'); handleSave(); }}
@@ -569,7 +608,7 @@ export default function ProfilePage() {
                       fontSize: '16px',
                       fontWeight: '500',
                       cursor: 'pointer',
-                      flex: 1
+                      flex: isMobile ? 'none' : 1
                     }}
                   >
                     Kaydet
@@ -585,7 +624,7 @@ export default function ProfilePage() {
                       fontSize: '16px',
                       fontWeight: '500',
                       cursor: 'pointer',
-                      flex: 1
+                      flex: isMobile ? 'none' : 1
                     }}
                   >
                     İptal
@@ -595,8 +634,8 @@ export default function ProfilePage() {
             ) : (
               /* Görüntüleme Modu */
               <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                  <h3 style={{ margin: '0', color: '#1e293b', fontSize: '20px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: isMobile ? '16px' : '24px' }}>
+                  <h3 style={{ margin: '0', color: '#1e293b', fontSize: isMobile ? '18px' : '20px' }}>
                     Hesap Bilgileri
                   </h3>
                   <button
@@ -606,8 +645,8 @@ export default function ProfilePage() {
                       color: 'white',
                       border: 'none',
                       borderRadius: '8px',
-                      padding: '8px 16px',
-                      fontSize: '14px',
+                      padding: isMobile ? '6px 12px' : '8px 16px',
+                      fontSize: isMobile ? '12px' : '14px',
                       fontWeight: '500',
                       cursor: 'pointer'
                     }}
@@ -616,56 +655,56 @@ export default function ProfilePage() {
                   </button>
                 </div>
 
-                <div style={{ display: 'grid', gap: '16px' }}>
+                <div style={{ display: 'grid', gap: isMobile ? '12px' : '16px' }}>
                   <div style={{ 
                     display: 'grid', 
-                    gridTemplateColumns: '1fr 1fr', 
-                    gap: '16px' 
+                    gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', 
+                    gap: isMobile ? '12px' : '16px' 
                   }}>
                     <div style={{ 
-                      padding: '16px', 
+                      padding: isMobile ? '12px' : '16px', 
                       background: '#f8fafc', 
                       borderRadius: '8px',
                       border: '1px solid #e2e8f0'
                     }}>
-                      <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '4px' }}>Ad</div>
-                      <div style={{ fontSize: '16px', color: '#1e293b', fontWeight: '500' }}>
-                        {userInfo.name?.split(' ')[0] || 'Belirtilmemiş'}
+                      <div style={{ fontSize: isMobile ? '11px' : '12px', color: '#64748b', marginBottom: isMobile ? '2px' : '4px' }}>Ad</div>
+                      <div style={{ fontSize: isMobile ? '14px' : '16px', color: '#1e293b', fontWeight: '500' }}>
+                        {userInfo.name ? decodeURIComponent(escape(userInfo.name)).split(' ')[0] : 'Belirtilmemiş'}
                       </div>
                     </div>
                     <div style={{ 
-                      padding: '16px', 
+                      padding: isMobile ? '12px' : '16px', 
                       background: '#f8fafc', 
                       borderRadius: '8px',
                       border: '1px solid #e2e8f0'
                     }}>
-                      <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '4px' }}>Soyad</div>
-                      <div style={{ fontSize: '16px', color: '#1e293b', fontWeight: '500' }}>
-                        {userInfo.name?.split(' ').slice(1).join(' ') || 'Belirtilmemiş'}
+                      <div style={{ fontSize: isMobile ? '11px' : '12px', color: '#64748b', marginBottom: isMobile ? '2px' : '4px' }}>Soyad</div>
+                      <div style={{ fontSize: isMobile ? '14px' : '16px', color: '#1e293b', fontWeight: '500' }}>
+                        {userInfo.name ? decodeURIComponent(escape(userInfo.name)).split(' ').slice(1).join(' ') : 'Belirtilmemiş'}
                       </div>
                     </div>
                   </div>
 
                   <div style={{ 
-                    padding: '16px', 
+                    padding: isMobile ? '12px' : '16px', 
                     background: '#f8fafc', 
                     borderRadius: '8px',
                     border: '1px solid #e2e8f0'
                   }}>
-                    <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '4px' }}>E-posta</div>
-                    <div style={{ fontSize: '16px', color: '#1e293b', fontWeight: '500' }}>
+                    <div style={{ fontSize: isMobile ? '11px' : '12px', color: '#64748b', marginBottom: isMobile ? '2px' : '4px' }}>E-posta</div>
+                    <div style={{ fontSize: isMobile ? '14px' : '16px', color: '#1e293b', fontWeight: '500' }}>
                       {userInfo.email || 'Belirtilmemiş'}
                     </div>
                   </div>
 
                   <div style={{ 
-                    padding: '16px', 
+                    padding: isMobile ? '12px' : '16px', 
                     background: '#f8fafc', 
                     borderRadius: '8px',
                     border: '1px solid #e2e8f0'
                   }}>
-                    <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '4px' }}>Cep Telefonu</div>
-                    <div style={{ fontSize: '16px', color: '#1e293b', fontWeight: '500' }}>
+                    <div style={{ fontSize: isMobile ? '11px' : '12px', color: '#64748b', marginBottom: isMobile ? '2px' : '4px' }}>Cep Telefonu</div>
+                    <div style={{ fontSize: isMobile ? '14px' : '16px', color: '#1e293b', fontWeight: '500' }}>
                       {userInfo.phone ? userInfo.phone : 'Belirtilmemiş'}
                     </div>
                   </div>
@@ -678,14 +717,14 @@ export default function ProfilePage() {
         {/* Hızlı Erişim Kartları */}
         <div style={{ 
           display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
+          gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(250px, 1fr))', 
           gap: '16px',
           marginBottom: '24px'
         }}>
           <Link href="/orders" style={{ textDecoration: 'none' }}>
             <div style={{ 
               background: 'white',
-              padding: '24px',
+              padding: isMobile ? '20px 16px' : '24px',
               borderRadius: '12px',
               boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
               cursor: 'pointer',
@@ -712,7 +751,7 @@ export default function ProfilePage() {
           <Link href="/notifications" style={{ textDecoration: 'none' }}>
             <div style={{ 
               background: 'white',
-              padding: '24px',
+              padding: isMobile ? '20px 16px' : '24px',
               borderRadius: '12px',
               boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
               cursor: 'pointer',
@@ -740,7 +779,7 @@ export default function ProfilePage() {
             <Link href="/admin" style={{ textDecoration: 'none' }}>
               <div style={{ 
                 background: 'white',
-                padding: '24px',
+                padding: isMobile ? '20px 16px' : '24px',
                 borderRadius: '12px',
                 boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
                 cursor: 'pointer',

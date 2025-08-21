@@ -32,12 +32,12 @@ export async function GET(request: NextRequest) {
     returnUrl: returnUrl
   });
   
-  // Facebook OAuth URL'ini oluştur
+  // Facebook OAuth URL'ini oluştur (sadece public_profile scope'u)
   const facebookAuthUrl = `https://www.facebook.com/v18.0/dialog/oauth?` +
     `client_id=${facebookAppId}&` +
     `redirect_uri=${encodeURIComponent(facebookRedirectUri)}&` +
     `response_type=code&` +
-    `scope=${encodeURIComponent('public_profile,email')}&` +
+    `scope=${encodeURIComponent('public_profile')}&` +
     `state=${encodeURIComponent(state)}`;
 
   console.log('Facebook OAuth URL created:', facebookAuthUrl);

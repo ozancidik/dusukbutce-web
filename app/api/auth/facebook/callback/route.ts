@@ -147,14 +147,17 @@ export async function GET(request: NextRequest) {
 
     console.log('Facebook OAuth: Fetching user data...');
     
-    // Facebook'dan kullanıcı bilgilerini al (email dahil)
-    const userResponse = await fetch(`https://graph.facebook.com/v18.0/me?fields=id,name,email&access_token=${tokenData.access_token}`);
+    // Facebook'dan kullanıcı bilgilerini al (sadece id ve name)
+    const userResponse = await fetch(`https://graph.facebook.com/v18.0/me?fields=id,name&access_token=${tokenData.access_token}`);
 
     const userData = await userResponse.json();
-    console.log('Facebook OAuth: User data received:', { id: userData.id, name: userData.name, hasEmail: !!userData.email });
+    console.log('Facebook OAuth: User data received:', { id: userData.id, name: userData.name });
 
-    // Email bilgisi varsa kullan, yoksa geçici email oluştur
-    const userEmail = userData.email || `fb_${userData.id}@dusukbutce.com`;
+    // Türkçe karakterleri düzgün decode et
+    const userName = decodeURIComponent(escape(userData.name));
+    
+    // Email bilgisi olmadığı için geçici email oluştur
+    const userEmail = `fb_${userData.id}@dusukbutce.com`;
 
     // MongoDB'ye bağlan (cache ile)
     await connectDB();
@@ -167,7 +170,7 @@ export async function GET(request: NextRequest) {
       // Yeni kullanıcı oluştur
       user = new User({
         email: userEmail,
-        name: userData.name,
+        name: userName,
         password: 'facebook-oauth-' + Math.random().toString(36).substr(2, 9), // Geçici şifre
         isAdmin: false,
         isActive: true,
