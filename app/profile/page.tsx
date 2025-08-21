@@ -36,6 +36,20 @@ export default function ProfilePage() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // Güvenli Türkçe karakter decode fonksiyonu
+  const safeDecodeName = (name: string): string => {
+    if (!name) return '';
+    
+    try {
+      // Önce escape ile encode et, sonra decode et
+      return decodeURIComponent(escape(name));
+    } catch (error) {
+      console.warn('Karakter decode hatası:', error);
+      // Hata durumunda orijinal ismi döndür
+      return name;
+    }
+  };
+
   // Telefon numarasını formatlayan yardımcı fonksiyon
   const formatPhoneNumber = (phone: string): string => {
     if (!phone) return '';
@@ -97,7 +111,7 @@ export default function ProfilePage() {
     setUserInfo(userData);
     
     // İsim ve soyisimi ayır
-    const nameParts = userData.name ? decodeURIComponent(escape(userData.name)).split(' ') : ['', ''];
+    const nameParts = userData.name ? safeDecodeName(userData.name).split(' ') : ['', ''];
     setEditForm({
       firstName: nameParts[0] || '',
       lastName: nameParts.slice(1).join(' ') || '',
@@ -173,7 +187,7 @@ export default function ProfilePage() {
     setIsEditing(false);
     if (!userInfo) return;
     
-    const nameParts = userInfo.name ? decodeURIComponent(escape(userInfo.name)).split(' ') : ['', ''];
+    const nameParts = userInfo.name ? safeDecodeName(userInfo.name).split(' ') : ['', ''];
     setEditForm({
       firstName: nameParts[0] || '',
       lastName: nameParts.slice(1).join(' ') || '',
@@ -448,7 +462,7 @@ export default function ProfilePage() {
               {userInfo.name?.charAt(0)?.toUpperCase() || 'U'}
             </div>
             <h1 style={{ margin: '0 0 8px 0', fontSize: '24px', fontWeight: '600' }}>
-              {userInfo.name ? decodeURIComponent(escape(userInfo.name)) : 'Kullanıcı'}
+              {userInfo.name ? safeDecodeName(userInfo.name) : 'Kullanıcı'}
             </h1>
             <p style={{ margin: '0', opacity: '0.9', fontSize: '16px' }}>
               {userInfo.email}
@@ -669,7 +683,7 @@ export default function ProfilePage() {
                     }}>
                       <div style={{ fontSize: isMobile ? '11px' : '12px', color: '#64748b', marginBottom: isMobile ? '2px' : '4px' }}>Ad</div>
                       <div style={{ fontSize: isMobile ? '14px' : '16px', color: '#1e293b', fontWeight: '500' }}>
-                        {userInfo.name ? decodeURIComponent(escape(userInfo.name)).split(' ')[0] : 'Belirtilmemiş'}
+                        {userInfo.name ? safeDecodeName(userInfo.name).split(' ')[0] : 'Belirtilmemiş'}
                       </div>
                     </div>
                     <div style={{ 
@@ -680,7 +694,7 @@ export default function ProfilePage() {
                     }}>
                       <div style={{ fontSize: isMobile ? '11px' : '12px', color: '#64748b', marginBottom: isMobile ? '2px' : '4px' }}>Soyad</div>
                       <div style={{ fontSize: isMobile ? '14px' : '16px', color: '#1e293b', fontWeight: '500' }}>
-                        {userInfo.name ? decodeURIComponent(escape(userInfo.name)).split(' ').slice(1).join(' ') : 'Belirtilmemiş'}
+                        {userInfo.name ? safeDecodeName(userInfo.name).split(' ').slice(1).join(' ') : 'Belirtilmemiş'}
                       </div>
                     </div>
                   </div>
