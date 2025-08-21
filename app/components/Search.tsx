@@ -264,29 +264,71 @@ export default function Search() {
     
     // Simulate API delay
     setTimeout(() => {
+      const searchLower = searchQuery.toLowerCase();
+      
+      // Genel kategori araması (satılık, ilan, kategori gibi kelimeler için)
+      let generalResults: SearchResult[] = [];
+      
+      if (searchLower.includes('satılık') || searchLower.includes('satilik') || searchLower.includes('ilan')) {
+        generalResults.push({
+          id: 'satilik-ilanlar-genel',
+          title: 'Satılık İlanlar (Tüm Kategoriler)',
+          category: 'Genel Kategori',
+          price: 0,
+          image: '📋',
+          url: '/satilik-ilanlar',
+          type: 'satilik-ilanlar' as const
+        });
+      }
+      
+      if (searchLower.includes('kategori') || searchLower.includes('category')) {
+        generalResults.push({
+          id: 'kategoriler-genel',
+          title: 'Tüm Kategoriler',
+          category: 'Genel Kategori',
+          price: 0,
+          image: '📂',
+          url: '/bize-sat',
+          type: 'bize-sat' as const
+        });
+      }
+      
+      if (searchLower.includes('bize') || searchLower.includes('sat')) {
+        generalResults.push({
+          id: 'bize-sat-genel',
+          title: 'Bize Sat (Tüm Kategoriler)',
+          category: 'Genel Kategori',
+          price: 0,
+          image: '💰',
+          url: '/bize-sat',
+          type: 'bize-sat' as const
+        });
+      }
+
       // Ürün araması
       const filteredProducts = mockProducts.filter(product =>
-        product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.category.toLowerCase().includes(searchQuery.toLowerCase())
+        product.title.toLowerCase().includes(searchLower) ||
+        product.category.toLowerCase().includes(searchLower)
       );
 
       // Kategori araması (keywords dahil)
       const filteredSatilikIlanlar = satilikIlanlarCategories.filter(category =>
-        category.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        category.name.toLowerCase().includes(searchLower) ||
         category.keywords.some(keyword => 
-          keyword.toLowerCase().includes(searchQuery.toLowerCase())
+          keyword.toLowerCase().includes(searchLower)
         )
       );
 
       const filteredBizeSat = bizeSatCategories.filter(category =>
-        category.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        category.name.toLowerCase().includes(searchLower) ||
         category.keywords.some(keyword => 
-          keyword.toLowerCase().includes(searchQuery.toLowerCase())
+          keyword.toLowerCase().includes(searchLower)
         )
       );
 
-      // Sonuçları birleştir
+      // Sonuçları birleştir (genel sonuçlar önce)
       const allResults: SearchResult[] = [
+        ...generalResults,
         ...filteredProducts.map(product => ({
           ...product,
           type: 'product' as const
