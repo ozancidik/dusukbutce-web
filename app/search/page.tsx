@@ -444,9 +444,8 @@ export default function SearchPage() {
           <p style={{
             fontSize: isMobile ? '16px' : '18px',
             color: '#6b7280',
-            margin: '0',
-            maxWidth: isMobile ? '100%' : '500px',
-            margin: '0 auto'
+            margin: '0 auto',
+            maxWidth: isMobile ? '100%' : '500px'
           }}>
             "{query}" için {results.length} sonuç bulundu
           </p>
