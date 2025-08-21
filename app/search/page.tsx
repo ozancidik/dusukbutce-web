@@ -1,8 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+
+function SearchResults() {
+  const searchParams = useSearchParams();
+  const query = searchParams.get('q') || '';
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
 
 interface SearchResult {
   id: string;
@@ -747,5 +754,33 @@ export default function SearchPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={
+      <div style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <div style={{
+          background: 'white',
+          padding: '40px',
+          borderRadius: '16px',
+          textAlign: 'center'
+        }}>
+          <div style={{ fontSize: '48px', marginBottom: '16px' }}>⏳</div>
+          <div style={{ fontSize: '20px', fontWeight: '600', color: '#374151' }}>
+            Sayfa yükleniyor...
+          </div>
+        </div>
+      </div>
+    }>
+      <SearchResults />
+    </Suspense>
   );
 }
