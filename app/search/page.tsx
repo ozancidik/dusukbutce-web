@@ -4,13 +4,6 @@ import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
-function SearchResults() {
-  const searchParams = useSearchParams();
-  const query = searchParams.get('q') || '';
-  const [results, setResults] = useState<SearchResult[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [isMobile, setIsMobile] = useState(false);
-
 interface SearchResult {
   id: string;
   title: string;
@@ -21,7 +14,7 @@ interface SearchResult {
   type?: 'product' | 'satilik-ilanlar' | 'bize-sat';
 }
 
-export default function SearchPage() {
+function SearchResults() {
   const searchParams = useSearchParams();
   const query = searchParams.get('q') || '';
   const [results, setResults] = useState<SearchResult[]>([]);
