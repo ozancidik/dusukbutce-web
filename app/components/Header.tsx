@@ -66,6 +66,7 @@ export default function Header() {
             maxWidth: "1000px",
             position: "relative",
             margin: "0 24px",
+            zIndex: 10001,
           }}>
             <Search />
           </div>
@@ -231,6 +232,8 @@ export default function Header() {
           {/* Bottom Row: Search Bar */}
           <div style={{
             width: "100%",
+            position: "relative",
+            zIndex: 10001,
           }}>
             <Search />
           </div>

@@ -337,7 +337,7 @@ export default function Search() {
   };
 
   return (
-    <div ref={searchRef} style={{ position: 'relative', width: '100%' }}>
+    <div ref={searchRef} style={{ position: 'relative', width: '100%', zIndex: 10000 }}>
       <div style={{ position: 'relative' }}>
         <input
           type="text"
@@ -381,7 +381,7 @@ export default function Search() {
           border: '1px solid #e2e8f0',
           borderRadius: '8px',
           boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-          zIndex: 1000,
+          zIndex: 9999999,
           maxHeight: '400px',
           overflowY: 'auto',
           marginTop: '4px'
@@ -546,7 +546,7 @@ export default function Search() {
           border: '1px solid #e2e8f0',
           borderRadius: '8px',
           boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-          zIndex: 1000,
+          zIndex: 9999999,
           padding: '20px',
           textAlign: 'center',
           marginTop: '4px'
