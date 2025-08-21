@@ -31,7 +31,7 @@ const faqData: FAQItem[] = [
   },
   {
     question: "Ürün garantisi var mı?",
-    answer: "Evet, tüm ürünlerimizde üretici garantisi bulunmaktadır. Garanti süreleri ürün kategorisine göre değişiklik göstermektedir. Detaylar için ürün sayfasını inceleyebilirsiniz.",
+    answer: "2. el ürünlerde garanti durumu ürüne göre değişiklik göstermektedir. Bazı ürünlerde orijinal üretici garantisi devam ediyor olabilir, bazılarında ise garanti süresi dolmuş olabilir. Her ürünün detay sayfasında garanti bilgisi belirtilmektedir. Ayrıca satıcılar tarafından verilen ek garanti seçenekleri de mevcut olabilir.",
     category: "garanti"
   },
   {
