@@ -138,7 +138,7 @@ export default function RootLayout({
         className={`${inter.variable} ${robotoMono.variable} antialiased`}
         suppressHydrationWarning
       >
-        <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+        <div style={{ display: "flex", flexDirection: "column" }}>
           <Header />
           <Breadcrumb />
           <main style={{ flex: 1 }}>

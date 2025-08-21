@@ -28,7 +28,6 @@ html, body {
 }
 
 body {
-  min-height: 100vh;
   min-width: 100vw;
   display: flex;
   flex-direction: column;
@@ -38,7 +37,6 @@ body {
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
 }
 
 .small-placeholder::placeholder {

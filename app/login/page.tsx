@@ -361,7 +361,7 @@ export default function LoginPage() {
           alignItems: "flex-start",
           justifyContent: "center",
           background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%)",
-          padding: "80px 20px 20px 20px",
+          padding: "60px 20px 40px 20px",
         }}
       >
       <div
@@ -374,7 +374,7 @@ export default function LoginPage() {
           maxWidth: "400px",
         }}
       >
-        <div style={{ textAlign: "center", marginBottom: "32px" }}>
+        <div style={{ textAlign: "center", marginBottom: "24px", marginTop: "-20px" }}>
           <h1 style={{ 
             color: isAdminForm ? "#7c3aed" : "#2563eb", 
             fontSize: "28px", 
@@ -704,7 +704,7 @@ export default function LoginPage() {
           </button>
         </div>
 
-        <div style={{ textAlign: "center", marginTop: "24px" }}>
+        <div style={{ textAlign: "center", marginTop: "16px" }}>
           <p style={{ color: "#64748b", margin: "0 0 16px 0" }}>
             Hesabınız yok mu?{" "}
             <Link
