@@ -7,6 +7,18 @@ export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const code = searchParams.get('code');
   const error = searchParams.get('error');
+  const state = searchParams.get('state');
+  
+  // State'den returnUrl'i al
+  let returnUrl = '/profile';
+  if (state) {
+    try {
+      const stateData = JSON.parse(decodeURIComponent(state));
+      returnUrl = stateData.returnUrl || '/profile';
+    } catch (e) {
+      console.error('State parse error:', e);
+    }
+  }
 
   if (error) {
     return new Response(`
@@ -66,24 +78,24 @@ export async function GET(request: NextRequest) {
       throw new Error('Access token alınamadı');
     }
 
-    // Facebook'dan kullanıcı bilgilerini al
-    const userResponse = await fetch(`https://graph.facebook.com/v18.0/me?fields=id,name&access_token=${tokenData.access_token}`);
+    // Facebook'dan kullanıcı bilgilerini al (email dahil)
+    const userResponse = await fetch(`https://graph.facebook.com/v18.0/me?fields=id,name,email&access_token=${tokenData.access_token}`);
 
     const userData = await userResponse.json();
 
-    // Email bilgisi olmayabilir, geçici email oluştur
-    const tempEmail = `fb_${userData.id}@dusukbutce.com`;
+    // Email bilgisi varsa kullan, yoksa geçici email oluştur
+    const userEmail = userData.email || `fb_${userData.id}@dusukbutce.com`;
 
     // MongoDB'ye bağlan (cache ile)
     await connectDB();
 
     // Kullanıcıyı bul veya oluştur
-    let user = await User.findOne({ email: tempEmail });
+    let user = await User.findOne({ email: userEmail });
 
     if (!user) {
       // Yeni kullanıcı oluştur
       user = new User({
-        email: tempEmail,
+        email: userEmail,
         name: userData.name,
         password: 'facebook-oauth-' + Math.random().toString(36).substr(2, 9), // Geçici şifre
         isAdmin: false,

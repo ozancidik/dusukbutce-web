@@ -284,13 +284,85 @@ export default function LoginPage() {
     }
   };
 
-  // Facebook ile giriş (geçici olarak devre dışı)
+  // Facebook ile giriş
   const handleFacebookLogin = async () => {
-    setError("Facebook OAuth henüz yapılandırılmadı. Lütfen email/şifre ile giriş yapın.");
-    
-    // Eğer Facebook OAuth aktif olursa, burada da returnUrl kullanılacak
-    // const returnUrl = new URLSearchParams(window.location.search).get('returnUrl') || '/';
-    // router.push(returnUrl);
+    try {
+      setSocialLoading("facebook");
+      setError("");
+      
+      // Return URL'i al
+      const returnUrl = new URLSearchParams(window.location.search).get('returnUrl') || '/profile';
+      
+      // Facebook OAuth URL'ini aç
+      const facebookAuthUrl = `/api/auth/facebook?returnUrl=${encodeURIComponent(returnUrl)}`;
+      
+      // Popup window aç
+      const popup = window.open(
+        facebookAuthUrl,
+        'facebook-login',
+        'width=500,height=600,scrollbars=yes,resizable=yes'
+      );
+      
+      // Popup mesajlarını dinle
+      const handleMessage = (event: MessageEvent) => {
+        if (event.origin !== window.location.origin) return;
+        
+        if (event.data.type === 'FACEBOOK_LOGIN_SUCCESS') {
+          const user = event.data.user;
+          
+          // Kullanıcı bilgilerini localStorage'a kaydet
+          localStorage.setItem('userLoggedIn', 'true');
+          localStorage.setItem('userEmail', user.email);
+          localStorage.setItem('userName', user.name);
+          localStorage.setItem('userId', user.id);
+          localStorage.setItem('userIsAdmin', user.isAdmin.toString());
+          
+          // Custom event tetikle
+          window.dispatchEvent(new Event('localStorageChange'));
+          
+          // Popup'ı kapat
+          if (popup) popup.close();
+          
+          // Loading'i kapat
+          setSocialLoading("");
+          
+          // Başarı mesajı göster
+          setLoginSuccess(true);
+          setRedirectMessage("Facebook ile giriş başarılı! Yönlendiriliyorsunuz...");
+          
+          // 2 saniye sonra yönlendir
+          setTimeout(() => {
+            router.push(returnUrl);
+          }, 2000);
+          
+          // Event listener'ı kaldır
+          window.removeEventListener('message', handleMessage);
+          
+        } else if (event.data.type === 'FACEBOOK_LOGIN_ERROR') {
+          setError(event.data.error || 'Facebook ile giriş yapılırken bir hata oluştu.');
+          setSocialLoading("");
+          
+          if (popup) popup.close();
+          window.removeEventListener('message', handleMessage);
+        }
+      };
+      
+      window.addEventListener('message', handleMessage);
+      
+      // Popup kapandığında loading'i kapat
+      const checkClosed = setInterval(() => {
+        if (popup && popup.closed) {
+          setSocialLoading("");
+          clearInterval(checkClosed);
+          window.removeEventListener('message', handleMessage);
+        }
+      }, 1000);
+      
+    } catch (error) {
+      console.error('Facebook login error:', error);
+      setError("Facebook ile giriş yapılırken bir hata oluştu.");
+      setSocialLoading("");
+    }
   };
 
   // Success state'inde loading ekranı göster
