@@ -69,9 +69,8 @@ export default function OrdersPage() {
             color: "#64748b",
             fontSize: isMobile ? "16px" : "18px",
             fontWeight: "500",
-            margin: "0",
-            maxWidth: isMobile ? "100%" : "500px",
-            margin: "0 auto"
+            margin: "0 auto",
+            maxWidth: isMobile ? "100%" : "500px"
           }}>
             Tüm siparişlerinizi ve sipariş geçmişinizi buradan takip edebilirsiniz
           </p>
