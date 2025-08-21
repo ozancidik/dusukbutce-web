@@ -1,10 +1,61 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import Search from "./Search";
 
 export default function Header() {
+  const [userInfo, setUserInfo] = useState<{
+    isLoggedIn: boolean;
+    name: string;
+    isAdmin: boolean;
+  }>({
+    isLoggedIn: false,
+    name: '',
+    isAdmin: false
+  });
+
+  // Kullanıcı giriş durumunu kontrol et
+  useEffect(() => {
+    const checkUserStatus = () => {
+      const userLoggedIn = localStorage.getItem('userLoggedIn') || sessionStorage.getItem('userLoggedIn');
+      const userName = localStorage.getItem('userName') || sessionStorage.getItem('userName');
+      const userIsAdmin = localStorage.getItem('userIsAdmin') || sessionStorage.getItem('userIsAdmin');
+      
+      console.log('Header - User status check:', { userLoggedIn, userName, userIsAdmin });
+      
+      setUserInfo({
+        isLoggedIn: userLoggedIn === 'true',
+        name: userName || '',
+        isAdmin: userIsAdmin === 'true'
+      });
+    };
+
+    // İlk kontrol
+    checkUserStatus();
+
+    // localStorage değişikliklerini dinle
+    const handleStorageChange = () => {
+      checkUserStatus();
+    };
+
+    // Custom event'leri dinle
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('localStorageChange', handleStorageChange);
+    
+    // Profile güncelleme event'ini dinle
+    window.addEventListener('profileUpdated', handleStorageChange);
+
+    // Periyodik kontrol ekle (her 2 saniyede bir)
+    const interval = setInterval(checkUserStatus, 2000);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('localStorageChange', handleStorageChange);
+      window.removeEventListener('profileUpdated', handleStorageChange);
+      clearInterval(interval);
+    };
+  }, []);
   return (
     <>
       <style jsx>{`
@@ -78,31 +129,91 @@ export default function Header() {
               gap: "16px",
               flexShrink: 0,
             }}>
-              <Link href="/login" style={{ textDecoration: "none" }}>
-                <button style={{
-                  background: "#2563eb",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "8px",
-                  padding: "12px 20px",
-                  fontWeight: "600",
-                  cursor: "pointer",
-                  fontSize: "14px",
-                  width: "140px",
-                  height: "44px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  whiteSpace: "nowrap",
-                  gap: "8px",
-                }}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="12" cy="8" r="5" stroke="currentColor" strokeWidth="2" fill="none"/>
-                    <path d="M20 21C20 16.5817 16.4183 13 12 13C7.58172 13 4 16.5817 4 21" stroke="currentColor" strokeWidth="2" fill="none"/>
-                  </svg>
-                  Giriş Yap
-                </button>
-              </Link>
+              {userInfo.isLoggedIn ? (
+                <Link href="/profile" style={{ textDecoration: "none" }}>
+                  <button style={{
+                    background: "#10b981",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "8px",
+                    padding: "12px 20px",
+                    fontWeight: "600",
+                    cursor: "pointer",
+                    fontSize: "14px",
+                    width: "auto",
+                    minWidth: "140px",
+                    maxWidth: "200px",
+                    height: "48px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    whiteSpace: "nowrap",
+                    gap: "8px",
+                    minHeight: "48px",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="8" r="5" stroke="currentColor" strokeWidth="2" fill="none"/>
+                      <path d="M20 21C20 16.5817 16.4183 13 12 13C7.58172 13 4 16.5817 4 21" stroke="currentColor" strokeWidth="2" fill="none"/>
+                    </svg>
+                    <span style={{
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                      maxWidth: "100px"
+                    }}>
+                      {userInfo.name ? (() => {
+                        if (userInfo.name.length <= 20) return userInfo.name;
+                        
+                        // İsim ve soyisimi ayrı ayrı kısalt
+                        const nameParts = userInfo.name.split(' ');
+                        if (nameParts.length >= 2) {
+                          const firstName = nameParts[0];
+                          const lastName = nameParts[nameParts.length - 1];
+                          if (firstName.length + lastName.length + 1 <= 20) {
+                            return `${firstName} ${lastName}`;
+                          } else if (firstName.length <= 18) {
+                            return `${firstName} ${lastName.charAt(0)}.`;
+                          } else {
+                            return `${firstName.substring(0, 18)}...`;
+                          }
+                        } else {
+                          return userInfo.name.substring(0, 20) + '...';
+                        }
+                      })() : 'Profil'
+                      }
+                    </span>
+                  </button>
+                </Link>
+              ) : (
+                <Link href="/login" style={{ textDecoration: "none" }}>
+                  <button style={{
+                    background: "#2563eb",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "8px",
+                    padding: "12px 20px",
+                    fontWeight: "600",
+                    cursor: "pointer",
+                    fontSize: "14px",
+                    width: "140px",
+                    height: "48px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    whiteSpace: "nowrap",
+                    gap: "8px",
+                    minHeight: "48px",
+                  }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="8" r="5" stroke="currentColor" strokeWidth="2" fill="none"/>
+                      <path d="M20 21C20 16.5817 16.4183 13 12 13C7.58172 13 4 16.5817 4 21" stroke="currentColor" strokeWidth="2" fill="none"/>
+                    </svg>
+                    Giriş Yap
+                  </button>
+                </Link>
+              )}
               <Link href="/sepet" style={{ textDecoration: "none" }}>
                 <button style={{
                   background: "#2563eb",
@@ -114,12 +225,13 @@ export default function Header() {
                   cursor: "pointer",
                   fontSize: "14px",
                   width: "140px",
-                  height: "44px",
+                  height: "48px",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   whiteSpace: "nowrap",
                   gap: "8px",
+                  minHeight: "48px",
                 }}>
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M2 3H4.5L6.5 8H19L17.5 12H8.5L7 17H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
@@ -163,35 +275,67 @@ export default function Header() {
                 alignItems: "center",
                 gap: "16px"
               }}>
-                <Link href="/login" style={{ textDecoration: "none", textAlign: "center" }}>
-                  <button style={{
-                    background: "#2563eb",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "50%",
-                    width: "44px",
-                    height: "44px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    cursor: "pointer",
-                    marginBottom: "4px"
-                  }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <circle cx="12" cy="8" r="5" stroke="currentColor" strokeWidth="2" fill="none"/>
-                      <path d="M20 21C20 16.5817 16.4183 13 12 13C7.58172 13 4 16.5817 4 21" stroke="currentColor" strokeWidth="2" fill="none"/>
-                    </svg>
-                  </button>
-                  <div style={{
-                    fontSize: "12px",
-                    color: "white",
-                    fontWeight: "500",
-                    textAlign: "center",
-                    marginLeft: "-2px"
-                  }}>
-                    Giriş Yap
-                  </div>
-                </Link>
+                {userInfo.isLoggedIn ? (
+                  <Link href="/profile" style={{ textDecoration: "none", textAlign: "center" }}>
+                    <button style={{
+                      background: "#10b981",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "50%",
+                      width: "44px",
+                      height: "44px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      cursor: "pointer",
+                      marginBottom: "4px"
+                    }}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="8" r="5" stroke="currentColor" strokeWidth="2" fill="none"/>
+                        <path d="M20 21C20 16.5817 16.4183 13 12 13C7.58172 13 4 16.5817 4 21" stroke="currentColor" strokeWidth="2" fill="none"/>
+                      </svg>
+                    </button>
+                    <div style={{
+                      fontSize: "12px",
+                      color: "white",
+                      fontWeight: "500",
+                      textAlign: "center",
+                      marginLeft: "-2px"
+                    }}>
+                      Profil
+                    </div>
+                  </Link>
+                ) : (
+                  <Link href="/login" style={{ textDecoration: "none", textAlign: "center" }}>
+                    <button style={{
+                      background: "#2563eb",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "50%",
+                      width: "44px",
+                      height: "44px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      cursor: "pointer",
+                      marginBottom: "4px"
+                    }}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="8" r="5" stroke="currentColor" strokeWidth="2" fill="none"/>
+                        <path d="M20 21C20 16.5817 16.4183 13 12 13C7.58172 13 4 16.5817 4 21" stroke="currentColor" strokeWidth="2" fill="none"/>
+                      </svg>
+                    </button>
+                    <div style={{
+                      fontSize: "12px",
+                      color: "white",
+                      fontWeight: "500",
+                      textAlign: "center",
+                      marginLeft: "-2px"
+                    }}>
+                      Giriş Yap
+                    </div>
+                  </Link>
+                )}
                 <Link href="/sepet" style={{ textDecoration: "none", textAlign: "center" }}>
                   <button style={{
                     background: "#2563eb",

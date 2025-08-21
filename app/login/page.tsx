@@ -201,11 +201,23 @@ export default function LoginPage() {
     setError("");
     
     try {
-      // Google OAuth popup açma
-      const width = 500;
-      const height = 600;
-      const left = window.screenX + (window.outerWidth - width) / 2;
-      const top = window.screenY + (window.outerHeight - height) / 2;
+      // Google OAuth popup açma (mobil uyumlu)
+      let width, height, left, top;
+      
+      // Mobil cihaz kontrolü
+      if (window.innerWidth <= 768) {
+        // Mobil için tam ekran popup
+        width = window.screen.width;
+        height = window.screen.height;
+        left = 0;
+        top = 0;
+      } else {
+        // Desktop için ortalanmış popup
+        width = 500;
+        height = 600;
+        left = window.screenX + (window.outerWidth - width) / 2;
+        top = window.screenY + (window.outerHeight - height) / 2;
+      }
       
       const popup = window.open(
         '/api/auth/google',
@@ -296,11 +308,28 @@ export default function LoginPage() {
       // Facebook OAuth URL'ini aç
       const facebookAuthUrl = `/api/auth/facebook?returnUrl=${encodeURIComponent(returnUrl)}`;
       
-      // Popup window aç
+      // Popup window'u ekranın ortasında aç (mobil uyumlu)
+      let width, height, left, top;
+      
+      // Mobil cihaz kontrolü
+      if (window.innerWidth <= 768) {
+        // Mobil için tam ekran popup
+        width = window.screen.width;
+        height = window.screen.height;
+        left = 0;
+        top = 0;
+      } else {
+        // Desktop için ortalanmış popup
+        width = 500;
+        height = 600;
+        left = (window.screen.width - width) / 2;
+        top = (window.screen.height - height) / 2;
+      }
+      
       const popup = window.open(
         facebookAuthUrl,
         'facebook-login',
-        'width=500,height=600,scrollbars=yes,resizable=yes'
+        `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`
       );
       
       // Popup mesajlarını dinle
