@@ -66,9 +66,8 @@ export default function TermsPage() {
             color: "#64748b",
             fontSize: isMobile ? "16px" : "18px",
             fontWeight: "500",
-            margin: "0",
-            maxWidth: isMobile ? "100%" : "500px",
-            margin: "0 auto"
+            margin: "0 auto",
+            maxWidth: isMobile ? "100%" : "500px"
           }}>
             Düşük Bütçe platformunu kullanarak aşağıdaki şartları kabul etmiş sayılırsınız
           </p>
