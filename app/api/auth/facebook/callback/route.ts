@@ -4,6 +4,68 @@ import { NextResponse } from "next/server";
 import User from '@/models/User';
 
 export async function GET(request: NextRequest) {
+  // Facebook OAuth yapılandırmasını kontrol et
+  const facebookAppId = process.env.FACEBOOK_APP_ID;
+  const facebookAppSecret = process.env.FACEBOOK_APP_SECRET;
+  const facebookRedirectUri = process.env.FACEBOOK_REDIRECT_URI;
+  
+  if (!facebookAppId || facebookAppId === 'your-facebook-app-id') {
+    console.error('Facebook OAuth Error: FACEBOOK_APP_ID environment variable is not set');
+    return new Response(`
+      <html>
+        <body>
+          <script>
+            window.opener.postMessage({
+              type: 'FACEBOOK_LOGIN_ERROR',
+              error: 'Facebook OAuth yapılandırılmamış. Lütfen sistem yöneticisi ile iletişime geçin.'
+            }, window.location.origin);
+            window.close();
+          </script>
+        </body>
+      </html>
+    `, {
+      headers: { 'Content-Type': 'text/html' }
+    });
+  }
+  
+  if (!facebookAppSecret || facebookAppSecret === 'your-facebook-app-secret') {
+    console.error('Facebook OAuth Error: FACEBOOK_APP_SECRET environment variable is not set');
+    return new Response(`
+      <html>
+        <body>
+          <script>
+            window.opener.postMessage({
+              type: 'FACEBOOK_LOGIN_ERROR',
+              error: 'Facebook OAuth yapılandırılmamış. Lütfen sistem yöneticisi ile iletişime geçin.'
+            }, window.location.origin);
+            window.close();
+          </script>
+        </body>
+      </html>
+    `, {
+      headers: { 'Content-Type': 'text/html' }
+    });
+  }
+  
+  if (!facebookRedirectUri) {
+    console.error('Facebook OAuth Error: FACEBOOK_REDIRECT_URI environment variable is not set');
+    return new Response(`
+      <html>
+        <body>
+          <script>
+            window.opener.postMessage({
+              type: 'FACEBOOK_LOGIN_ERROR',
+              error: 'Facebook OAuth yapılandırılmamış. Lütfen sistem yöneticisi ile iletişime geçin.'
+            }, window.location.origin);
+            window.close();
+          </script>
+        </body>
+      </html>
+    `, {
+      headers: { 'Content-Type': 'text/html' }
+    });
+  }
+
   const searchParams = request.nextUrl.searchParams;
   const code = searchParams.get('code');
   const error = searchParams.get('error');
@@ -21,13 +83,14 @@ export async function GET(request: NextRequest) {
   }
 
   if (error) {
+    console.error('Facebook OAuth error from Facebook:', error);
     return new Response(`
       <html>
         <body>
           <script>
             window.opener.postMessage({
               type: 'FACEBOOK_LOGIN_ERROR',
-              error: 'Facebook ile giriş yapılırken bir hata oluştu.'
+              error: 'Facebook ile giriş yapılırken bir hata oluştu: ${error}'
             }, window.location.origin);
             window.close();
           </script>
@@ -39,6 +102,7 @@ export async function GET(request: NextRequest) {
   }
 
   if (!code) {
+    console.error('Facebook OAuth error: No authorization code received');
     return new Response(`
       <html>
         <body>
@@ -57,6 +121,8 @@ export async function GET(request: NextRequest) {
   }
 
   try {
+    console.log('Facebook OAuth: Exchanging code for access token...');
+    
     // Facebook'dan access token al
     const tokenResponse = await fetch('https://graph.facebook.com/v18.0/oauth/access_token', {
       method: 'POST',
@@ -64,24 +130,28 @@ export async function GET(request: NextRequest) {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: new URLSearchParams({
-        client_id: process.env.FACEBOOK_APP_ID || 'your-facebook-app-id',
-        client_secret: process.env.FACEBOOK_APP_SECRET || 'your-facebook-app-secret',
+        client_id: facebookAppId,
+        client_secret: facebookAppSecret,
         code: code,
         grant_type: 'authorization_code',
-        redirect_uri: process.env.FACEBOOK_REDIRECT_URI || 'http://localhost:3000/api/auth/facebook/callback',
+        redirect_uri: facebookRedirectUri,
       }),
     });
 
     const tokenData = await tokenResponse.json();
+    console.log('Facebook OAuth: Token response received:', { success: !!tokenData.access_token, error: tokenData.error });
 
     if (!tokenData.access_token) {
-      throw new Error('Access token alınamadı');
+      throw new Error(`Access token alınamadı: ${tokenData.error?.message || 'Bilinmeyen hata'}`);
     }
 
+    console.log('Facebook OAuth: Fetching user data...');
+    
     // Facebook'dan kullanıcı bilgilerini al (email dahil)
     const userResponse = await fetch(`https://graph.facebook.com/v18.0/me?fields=id,name,email&access_token=${tokenData.access_token}`);
 
     const userData = await userResponse.json();
+    console.log('Facebook OAuth: User data received:', { id: userData.id, name: userData.name, hasEmail: !!userData.email });
 
     // Email bilgisi varsa kullan, yoksa geçici email oluştur
     const userEmail = userData.email || `fb_${userData.id}@dusukbutce.com`;
@@ -93,6 +163,7 @@ export async function GET(request: NextRequest) {
     let user = await User.findOne({ email: userEmail });
 
     if (!user) {
+      console.log('Facebook OAuth: Creating new user...');
       // Yeni kullanıcı oluştur
       user = new User({
         email: userEmail,
@@ -102,8 +173,13 @@ export async function GET(request: NextRequest) {
         isActive: true,
       });
       await user.save();
+      console.log('Facebook OAuth: New user created successfully');
+    } else {
+      console.log('Facebook OAuth: Existing user found');
     }
 
+    console.log('Facebook OAuth: Login successful, sending success message');
+    
     // Başarılı giriş sayfası
     return new Response(`
       <html>
@@ -134,7 +210,7 @@ export async function GET(request: NextRequest) {
           <script>
             window.opener.postMessage({
               type: 'FACEBOOK_LOGIN_ERROR',
-              error: 'Facebook ile giriş yapılırken bir hata oluştu.'
+              error: 'Facebook ile giriş yapılırken bir hata oluştu: ${error instanceof Error ? error.message : 'Bilinmeyen hata'}'
             }, window.location.origin);
             window.close();
           </script>
