@@ -19,7 +19,7 @@ export default function BizeSatPage() {
   }, []);
 
   const leftCategories = [
-    { name: 'Dizüstü (Notebook)', path: '/bize-sat/dizustu', icon: '💻' },
+    { name: 'Dizüstü (Notebook)', path: '/bize-sat/notebook', icon: '💻' },
     { name: 'Masaüstü (Kasa)', path: '/bize-sat/masaustu', icon: '🖥️' },
     { name: 'Ekran Kartı', path: '/bize-sat/ekran-karti', icon: '🎮' },
     { name: 'İşlemci', path: '/bize-sat/islemci', icon: '⚡' },

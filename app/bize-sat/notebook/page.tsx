@@ -568,10 +568,10 @@ export default function NotebookPage() {
                   >
                     <option value="">Seçiniz</option>
                     <option value="SSD(SATA)">SSD(SATA)</option>
-                    <option value="SSD(PCIe NVMe)">SSD(PCIe NVMe)</option>
+                    <option value="SSD(NVMe)">SSD(NVMe)</option>
                     <option value="HDD">HDD</option>
                     <option value="SSD(SATA)+HDD">SSD(SATA)+HDD</option>
-                    <option value="SSD(PCIe NVMe)+HDD">SSD(PCIe NVMe)+HDD</option>
+                    <option value="SSD(NVMe)+HDD">SSD(NVMe)+HDD</option>
                   </select>
                 </div>
               </div>
