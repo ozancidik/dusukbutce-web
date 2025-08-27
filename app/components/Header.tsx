@@ -98,7 +98,7 @@ export default function Header() {
       `}</style>
       <header style={{
         position: "static",
-        zIndex: 1000,
+        zIndex: 10001,
         background: "#94a3b8",
         boxShadow: "0 2px 20px rgba(0, 0, 0, 0.1)",
         borderBottom: "1px solid #e2e8f0",
@@ -261,7 +261,7 @@ export default function Header() {
                       border: "1px solid #e2e8f0",
                       borderRadius: "8px",
                       boxShadow: "0 10px 25px rgba(0, 0, 0, 0.15)",
-                      zIndex: 1000,
+                      zIndex: 10002,
                       marginTop: "4px",
                       overflow: "hidden"
                     }}>
@@ -417,7 +417,7 @@ export default function Header() {
                     </div>
                   </Link>
                 ) : (
-                  <div style={{ position: "relative" }} data-dropdown>
+                  <div style={{ position: "relative", display: "flex", justifyContent: "flex-end", flexDirection: "column", alignItems: "center" }} data-dropdown>
                     <button 
                       onClick={() => setShowDropdown(!showDropdown)}
                       style={{
@@ -443,8 +443,7 @@ export default function Header() {
                       fontSize: "12px",
                       color: "white",
                       fontWeight: "500",
-                      textAlign: "center",
-                      marginLeft: "-2px"
+                      textAlign: "center"
                     }}>
                       Giriş
                     </div>
@@ -454,16 +453,17 @@ export default function Header() {
                       <div style={{
                         position: "absolute",
                         top: "100%",
-                        right: "0",
+                        right: "-60px",
                         background: "white",
                         border: "1px solid #e2e8f0",
                         borderRadius: "8px",
                         boxShadow: "0 10px 25px rgba(0, 0, 0, 0.15)",
-                        zIndex: 1000,
+                        zIndex: 10002,
                         marginTop: "4px",
                         overflow: "hidden",
                         minWidth: "160px",
-                        transform: "translateX(calc(100% - 44px))"
+                        maxWidth: "200px",
+                        width: "auto"
                       }}>
                         <Link href="/login" style={{ textDecoration: "none" }}>
                           <div style={{
