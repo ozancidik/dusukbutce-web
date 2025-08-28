@@ -14,6 +14,20 @@ export default function Header() {
     name: '',
     isAdmin: false
   });
+
+  // Güvenli Türkçe karakter decode fonksiyonu (profile sayfasından alındı)
+  const safeDecodeName = (name: string): string => {
+    if (!name) return '';
+    
+    try {
+      // Önce escape ile encode et, sonra decode et
+      return decodeURIComponent(escape(name));
+    } catch (error) {
+      console.warn('Karakter decode hatası:', error);
+      // Hata durumunda orijinal ismi döndür
+      return name;
+    }
+  };
   
   const [showDropdown, setShowDropdown] = useState(false);
 
@@ -184,25 +198,28 @@ export default function Header() {
                       maxWidth: "100px"
                     }}>
                       {userInfo.name ? (() => {
-                        if (userInfo.name.length <= 20) return userInfo.name;
-                        
-                        // İsim ve soyisimi ayrı ayrı kısalt
-                        const nameParts = userInfo.name.split(' ');
-                        if (nameParts.length >= 2) {
-                          const firstName = nameParts[0];
-                          const lastName = nameParts[nameParts.length - 1];
-                          if (firstName.length + lastName.length + 1 <= 20) {
-                            return `${firstName} ${lastName}`;
-                          } else if (firstName.length <= 18) {
-                            return `${firstName} ${lastName.charAt(0)}.`;
-                          } else {
-                            return `${firstName.substring(0, 18)}...`;
-                          }
+                        let displayName = '';
+                        if (userInfo.name.length <= 20) {
+                          displayName = userInfo.name;
                         } else {
-                          return userInfo.name.substring(0, 20) + '...';
+                          // İsim ve soyisimi ayrı ayrı kısalt
+                          const nameParts = userInfo.name.split(' ');
+                          if (nameParts.length >= 2) {
+                            const firstName = nameParts[0];
+                            const lastName = nameParts[nameParts.length - 1];
+                            if (firstName.length + lastName.length + 1 <= 20) {
+                              displayName = `${firstName} ${lastName}`;
+                            } else if (firstName.length <= 18) {
+                              displayName = `${firstName} ${lastName.charAt(0)}.`;
+                            } else {
+                              displayName = `${firstName.substring(0, 18)}...`;
+                            }
+                          } else {
+                            displayName = userInfo.name.substring(0, 20);
+                          }
                         }
-                      })() : 'Profil'
-                      }
+                        return safeDecodeName(displayName);
+                      })() : 'Giriş Yap'}
                     </span>
                   </button>
                 </Link>
