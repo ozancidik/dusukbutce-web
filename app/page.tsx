@@ -178,59 +178,126 @@ export default function HomePage() {
       >
 
 
-        {/* Ana başlık */}
-        <div style={{ 
-          display: "flex", 
-          flexDirection: "column", 
-          alignItems: "center", 
-          marginTop: isIPhoneSE ? "0" : (isMobile ? "10px" : "0"),
-          marginBottom: isIPhoneSE ? "0" : "32px",
+        {/* 2. El Bölümü */}
+        <div style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          marginBottom: "32px",
           textAlign: "center",
           position: "relative",
           zIndex: 1,
-          backgroundColor: isIPhoneSE ? "transparent" : (isMobile ? "rgba(255,255,255,0.9)" : "transparent"),
-          padding: isIPhoneSE ? "0" : (isMobile ? "10px" : "0"),
-          borderRadius: isIPhoneSE ? "0" : (isMobile ? "8px" : "0"),
-          width: isIPhoneSE ? "100%" : "auto",
-          border: isIPhoneSE ? "none" : "none",
-          boxShadow: isIPhoneSE ? "none" : "none"
+          backgroundColor: "rgba(255,255,255,0.95)",
+          padding: isMobile ? "20px 16px" : "24px 32px",
+          borderRadius: "16px",
+          width: "100%",
+          maxWidth: isMobile ? "400px" : "600px",
+          border: "2px solid #e2e8f0",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.1)",
+          backdropFilter: "blur(10px)"
         }}>
-          
-          {!isIPhoneSE && (
-            <h1 style={{ 
-              margin: 0, 
-              color: "#2563eb",
-              fontSize: isMobile ? "20px" : "32px",
-              fontWeight: "700",
-              lineHeight: isMobile ? "1.2" : "1.1",
-              position: "relative",
-              zIndex: 1,
-              textShadow: "0 1px 2px rgba(0,0,0,0.1)",
-              backgroundColor: isMobile ? "rgba(255,255,255,0.8)" : "transparent",
-              padding: isMobile ? "5px 10px" : "0",
-              borderRadius: isMobile ? "4px" : "0",
-              border: isMobile ? "1px solid #2563eb" : "none",
-              marginTop: "0",
-              marginBottom: "0",
-              width: "auto"
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            marginBottom: "16px"
+          }}>
+            <div style={{
+              width: "48px",
+              height: "48px",
+              borderRadius: "50%",
+              background: "linear-gradient(135deg, #3b82f6, #1d4ed8)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: "0 4px 16px rgba(59, 130, 246, 0.3)"
             }}>
-              {isMobile ? (
-                <>
-                  <div>Düşük Bütçe,</div>
-                  <div>Yüksek Performans</div>
-                </>
-              ) : (
-                "Düşük Bütçe, Yüksek Performans"
-              )}
-            </h1>
-          )}
-        <p style={{ 
-          color: "#64748b", 
-          marginTop: "12px",
-          fontSize: isMobile ? "16px" : "18px",
-        }}>
-          En uygun fiyatlı ürünleri keşfet!
-        </p>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M2 17L12 22L22 17" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M2 12L12 17L22 12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <h2 style={{
+              margin: 0,
+              color: "#1e293b",
+              fontSize: isMobile ? "20px" : "24px",
+              fontWeight: "700",
+              lineHeight: "1.2"
+            }}>
+              2. Elde Tek Adres
+            </h2>
+          </div>
+          
+          <p style={{
+            color: "#475569",
+            margin: "0 0 16px 0",
+            fontSize: isMobile ? "16px" : "18px",
+            lineHeight: "1.6",
+            maxWidth: "500px"
+          }}>
+            Aynı gün ürününü teslim alalım
+          </p>
+          
+          <div style={{
+            display: "flex",
+            flexDirection: isMobile ? "column" : "row",
+            gap: "16px",
+            width: "100%",
+            justifyContent: "center",
+            alignItems: "stretch"
+          }}>
+            <div style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "12px 16px",
+              backgroundColor: "#f1f5f9",
+              borderRadius: "8px",
+              border: "1px solid #e2e8f0"
+            }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <span style={{ color: "#374151", fontSize: "14px", fontWeight: "500" }}>
+                Güvenli Alım
+              </span>
+            </div>
+            
+            <div style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "12px 16px",
+              backgroundColor: "#f1f5f9",
+              borderRadius: "8px",
+              border: "1px solid #e2e8f0"
+            }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 7L10 17L5 12" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <span style={{ color: "#374151", fontSize: "14px", fontWeight: "500" }}>
+                Kalite Garantisi
+              </span>
+            </div>
+            
+            <div style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "12px 16px",
+              backgroundColor: "#f1f5f9",
+              borderRadius: "8px",
+              border: "1px solid #e2e8f0"
+            }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <span style={{ color: "#374151", fontSize: "14px", fontWeight: "500" }}>
+                Hızlı İşlem
+              </span>
+            </div>
+          </div>
         </div>
 
 
