@@ -83,6 +83,11 @@ export default function Header() {
   
   const [showDropdown, setShowDropdown] = useState(false);
   const [lastActivity, setLastActivity] = useState<number>(Date.now());
+  
+  // Kullanıcı aktivitesini takip et - useRef'i component seviyesinde tanımla
+  const updateActivityRef = useRef(() => {
+    setLastActivity(Date.now());
+  });
 
   // Kullanıcı giriş durumunu kontrol et
   useEffect(() => {
@@ -141,11 +146,6 @@ export default function Header() {
     // Periyodik kontrol ekle (her 2 saniyede bir)
     const interval = setInterval(checkUserStatus, 2000);
 
-    // Kullanıcı aktivitesini takip et
-    const updateActivityRef = useRef(() => {
-      setLastActivity(Date.now());
-    });
-    
     // Aktivite event'lerini dinle
     const activityEvents = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
     activityEvents.forEach(event => {
