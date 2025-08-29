@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import Search from "./Search";
@@ -142,7 +142,9 @@ export default function Header() {
     const interval = setInterval(checkUserStatus, 2000);
 
     // Kullanıcı aktivitesini takip et
-    const updateActivity = () => setLastActivity(Date.now());
+    const updateActivity = useCallback(() => {
+      setLastActivity(Date.now());
+    }, []);
     
     // Aktivite event'lerini dinle
     const activityEvents = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
@@ -161,7 +163,7 @@ export default function Header() {
         document.removeEventListener(event, updateActivity, true);
       });
     };
-  }, [lastActivity]);
+  }, []);
 
   // Dropdown dışına tıklandığında kapat
   useEffect(() => {
