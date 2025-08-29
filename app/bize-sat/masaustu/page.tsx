@@ -60,10 +60,14 @@ export default function DesktopPage() {
   }, []);
 
   const handleInputChange = (field: string, value: any) => {
-    setFormData(prev => ({
-      ...prev,
+    const newData = {
+      ...formData,
       [field]: value
-    }));
+    };
+    setFormData(newData);
+    
+    // Form verilerini localStorage'a kaydet
+    localStorage.setItem('desktopFormData', JSON.stringify(newData));
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {

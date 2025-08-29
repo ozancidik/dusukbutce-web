@@ -53,10 +53,14 @@ export default function TabletPage() {
   }, []);
 
   const handleInputChange = (field: string, value: any) => {
-    setFormData(prev => ({
-      ...prev,
+    const newData = {
+      ...formData,
       [field]: value
-    }));
+    };
+    setFormData(newData);
+    
+    // Form verilerini localStorage'a kaydet
+    localStorage.setItem('tabletFormData', JSON.stringify(newData));
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
