@@ -50,10 +50,14 @@ export default function GamingWheelPage() {
   }, []);
 
   const handleInputChange = (field: string, value: any) => {
-    setFormData(prev => ({
-      ...prev,
+    const newData = {
+      ...formData,
       [field]: value
-    }));
+    };
+    setFormData(newData);
+    
+    // Form verilerini localStorage'a kaydet
+    localStorage.setItem('gamingWheelFormData', JSON.stringify(newData));
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,10 +71,14 @@ export default function GamingWheelPage() {
           if (e.target?.result) {
             newImages.push(e.target.result as string);
             if (newImages.length === files.length) {
-              setFormData(prev => ({
-                ...prev,
-                images: [...prev.images, ...newImages]
-              }));
+              const newData = {
+                ...formData,
+                images: [...formData.images, ...newImages]
+              };
+              setFormData(newData);
+              
+              // Form verilerini localStorage'a kaydet
+              localStorage.setItem('gamingWheelFormData', JSON.stringify(newData));
             }
           }
         };
@@ -80,10 +88,14 @@ export default function GamingWheelPage() {
   };
 
   const removeImage = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      images: prev.images.filter((_, i) => i !== index)
-    }));
+    const newData = {
+      ...formData,
+      images: formData.images.filter((_, i) => i !== index)
+    };
+    setFormData(newData);
+    
+    // Form verilerini localStorage'a kaydet
+    localStorage.setItem('gamingWheelFormData', JSON.stringify(newData));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -104,6 +116,10 @@ export default function GamingWheelPage() {
 
       if (response.ok) {
         setShowSuccessModal(true);
+        
+        // Form verilerini localStorage'dan temizle
+        localStorage.removeItem('gamingWheelFormData');
+        
         setFormData({
           brand: '',
           model: '',
