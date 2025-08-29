@@ -748,7 +748,7 @@ export default function HeadphonesPage() {
           ) : (
             <button
               type="button"
-                              onClick={() => router.push(`/login?returnUrl=${encodeURIComponent('/bize-sat/headphones')}`)}
+                              onClick={() => router.push(`/login?returnUrl=${encodeURIComponent('/bize-sat/kulaklik')}`)}
               style={{
                 width: '100%',
                 background: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',

@@ -720,7 +720,7 @@ export default function AudioSystemPage() {
           ) : (
             <button
               type="button"
-                              onClick={() => router.push(`/login?returnUrl=${encodeURIComponent('/bize-sat/audio-system')}`)}
+                              onClick={() => router.push(`/login?returnUrl=${encodeURIComponent('/bize-sat/ses-sistemi')}`)}
               style={{
                 width: '100%',
                 background: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',

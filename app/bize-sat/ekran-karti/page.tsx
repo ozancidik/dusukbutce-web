@@ -1455,7 +1455,7 @@ export default function GraphicsCardPage() {
           ) : (
             <button
               type="button"
-                              onClick={() => router.push(`/login?returnUrl=${encodeURIComponent('/bize-sat/graphics-card')}`)}
+                              onClick={() => router.push(`/login?returnUrl=${encodeURIComponent('/bize-sat/ekran-karti')}`)}
               style={{
                 width: '100%',
                 background: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',
