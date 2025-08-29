@@ -32,10 +32,17 @@ export default function LoginPage() {
         return;
       }
       
-      // Normal kullanıcı giriş yapmışsa profile sayfasına yönlendir
+      // Normal kullanıcı giriş yapmışsa returnUrl kontrolü yap
       if (userLoggedIn === "true" && userEmail) {
-        console.log("👤 Kullanıcı giriş yapmış, profil sayfasına yönlendiriliyor...");
-        router.push("/profile");
+        // returnUrl parametresi varsa oraya yönlendir
+        const returnUrl = new URLSearchParams(window.location.search).get('returnUrl');
+        if (returnUrl) {
+          console.log("👤 Kullanıcı giriş yapmış, returnUrl'e yönlendiriliyor:", returnUrl);
+          router.push(decodeURIComponent(returnUrl));
+        } else {
+          console.log("👤 Kullanıcı giriş yapmış, profil sayfasına yönlendiriliyor...");
+          router.push("/profile");
+        }
         return;
       }
       
