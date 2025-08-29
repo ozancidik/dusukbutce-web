@@ -28,8 +28,61 @@ export default function Header() {
       return name;
     }
   };
+
+  // Otomatik logout fonksiyonu
+  const handleAutoLogout = (reason: string) => {
+    console.log('Auto logout:', reason);
+    
+    // Remember Me değerlerini sakla
+    const rememberedEmail = localStorage.getItem('rememberedEmail');
+    const rememberMe = localStorage.getItem('rememberMe');
+    
+    // Tüm kullanıcı verilerini temizle
+    localStorage.removeItem('userLoggedIn');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('userEmail');
+    localStorage.removeItem('userPhone');
+    localStorage.removeItem('adminLoggedIn');
+    localStorage.removeItem('adminEmail');
+    localStorage.removeItem('loginTime');
+    localStorage.removeItem('rememberMe');
+    
+    sessionStorage.removeItem('userLoggedIn');
+    sessionStorage.removeItem('userId');
+    sessionStorage.removeItem('userName');
+    sessionStorage.removeItem('userEmail');
+    sessionStorage.removeItem('userPhone');
+    sessionStorage.removeItem('adminLoggedIn');
+    sessionStorage.removeItem('adminEmail');
+    sessionStorage.removeItem('loginTime');
+    sessionStorage.removeItem('rememberMe');
+    
+    // Remember Me değerlerini geri yükle
+    if (rememberedEmail && rememberMe === 'true') {
+      localStorage.setItem('rememberedEmail', rememberedEmail);
+      localStorage.setItem('rememberMe', rememberMe);
+    }
+    
+    // Kullanıcı durumunu güncelle
+    setUserInfo({
+      isLoggedIn: false,
+      name: '',
+      isAdmin: false
+    });
+    
+    // Dropdown'ı kapat
+    setShowDropdown(false);
+    
+    // Kullanıcıya bilgi ver
+    alert(`Otomatik çıkış: ${reason}`);
+    
+    // Profile sayfasında kal (ana sayfaya yönlendirme yok)
+    // Kullanıcı manuel olarak ana sayfaya gidebilir
+  };
   
   const [showDropdown, setShowDropdown] = useState(false);
+  const [lastActivity, setLastActivity] = useState<number>(Date.now());
 
   // Kullanıcı giriş durumunu kontrol et
   useEffect(() => {
@@ -37,8 +90,31 @@ export default function Header() {
       const userLoggedIn = localStorage.getItem('userLoggedIn') || sessionStorage.getItem('userLoggedIn');
       const userName = localStorage.getItem('userName') || sessionStorage.getItem('userName');
       const userIsAdmin = localStorage.getItem('userIsAdmin') || sessionStorage.getItem('adminLoggedIn');
+      const loginTime = localStorage.getItem('loginTime') || sessionStorage.getItem('loginTime');
+      const rememberMe = localStorage.getItem('rememberMe') === 'true';
       
-      console.log('Header - User status check:', { userLoggedIn, userName, userIsAdmin });
+      console.log('Header - User status check:', { userLoggedIn, userName, userIsAdmin, loginTime, rememberMe });
+      
+      // Session timeout kontrolü (24 saat normal, 30 gün remember me)
+      if (loginTime) {
+        const loginTimestamp = parseInt(loginTime);
+        const currentTime = Date.now();
+        const sessionDuration = rememberMe ? 30 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000; // 30 gün veya 24 saat
+        
+        if (currentTime - loginTimestamp > sessionDuration) {
+          console.log('Session expired, logging out...');
+          handleAutoLogout(`Session süresi doldu (${rememberMe ? '30 gün' : '24 saat'})`);
+          return;
+        }
+      }
+      
+      // Inactive timeout kontrolü (60 dakika)
+      const inactiveDuration = 60 * 60 * 1000; // 60 dakika
+      if (Date.now() - lastActivity > inactiveDuration) {
+        console.log('User inactive for 60 minutes, logging out...');
+        handleAutoLogout('60 dakika hareketsizlik nedeniyle çıkış yapıldı');
+        return;
+      }
       
       setUserInfo({
         isLoggedIn: userLoggedIn === 'true',
@@ -65,13 +141,27 @@ export default function Header() {
     // Periyodik kontrol ekle (her 2 saniyede bir)
     const interval = setInterval(checkUserStatus, 2000);
 
+    // Kullanıcı aktivitesini takip et
+    const updateActivity = () => setLastActivity(Date.now());
+    
+    // Aktivite event'lerini dinle
+    const activityEvents = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
+    activityEvents.forEach(event => {
+      document.addEventListener(event, updateActivity, true);
+    });
+
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('localStorageChange', handleStorageChange);
       window.removeEventListener('profileUpdated', handleStorageChange);
       clearInterval(interval);
+      
+      // Aktivite event listener'larını temizle
+      activityEvents.forEach(event => {
+        document.removeEventListener(event, updateActivity, true);
+      });
     };
-  }, []);
+  }, [lastActivity]);
 
   // Dropdown dışına tıklandığında kapat
   useEffect(() => {

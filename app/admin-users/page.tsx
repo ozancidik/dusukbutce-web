@@ -268,8 +268,9 @@ export default function AdminUsersPage() {
                 // Header'a logout mesajı gönder
                 window.dispatchEvent(new CustomEvent('logout'));
                 
-                // Sayfayı tamamen yenile ve anasayfaya git
-                window.location.href = '/';
+                // Admin-users sayfasında kal (ana sayfaya yönlendirme yok)
+                // Sayfayı yenile
+                window.location.reload();
               }}
               style={{
                 background: '#dc2626',

@@ -373,9 +373,19 @@ export default function ProfilePage() {
       return;
     }
     
+    // Remember Me değerlerini sakla
+    const rememberedEmail = localStorage.getItem('rememberedEmail');
+    const rememberMe = localStorage.getItem('rememberMe');
+    
     // Tüm localStorage ve sessionStorage'ı temizle
     localStorage.clear();
     sessionStorage.clear();
+    
+    // Remember Me değerlerini geri yükle
+    if (rememberedEmail && rememberMe === 'true') {
+      localStorage.setItem('rememberedEmail', rememberedEmail);
+      localStorage.setItem('rememberMe', rememberMe);
+    }
     
     // Custom event'i tetikle
     window.dispatchEvent(new Event('localStorageChange'));
@@ -383,8 +393,9 @@ export default function ProfilePage() {
     // Header'a logout mesajı gönder
     window.dispatchEvent(new CustomEvent('logout'));
     
-    // Sayfayı yenile ve ana sayfaya yönlendir
-    window.location.href = '/';
+    // Profile sayfasında kal (ana sayfaya yönlendirme yok)
+    // Sayfayı yenile
+    window.location.reload();
   };
 
   if (!userInfo) {

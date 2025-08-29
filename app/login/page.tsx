@@ -14,6 +14,7 @@ export default function LoginPage() {
   const [loginSuccess, setLoginSuccess] = useState(false);
   const [redirectMessage, setRedirectMessage] = useState("");
   const [loginAttempts, setLoginAttempts] = useState(0);
+  const [rememberMe, setRememberMe] = useState(false);
   const router = useRouter();
 
   // Kullanıcı ve admin giriş kontrolü
@@ -84,6 +85,17 @@ export default function LoginPage() {
     setLoginAttempts(parseInt(attempts));
   }, []);
 
+  // Remember Me için email hatırlama
+  React.useEffect(() => {
+    const rememberedEmail = localStorage.getItem("rememberedEmail");
+    const rememberMe = localStorage.getItem("rememberMe");
+    
+    if (rememberedEmail && rememberMe === "true") {
+      setEmail(rememberedEmail);
+      setRememberMe(true);
+    }
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -125,6 +137,7 @@ export default function LoginPage() {
           userName: data.user.name,
           userId: data.user.id,
           loginTime: loginTime.toString(),
+          rememberMe: rememberMe.toString(),
           token: data.token || "login-token-" + Math.random().toString(36).substr(2, 9),
           user: JSON.stringify({
             id: data.user.id,
@@ -143,6 +156,17 @@ export default function LoginPage() {
         Object.entries(userData).forEach(([key, value]) => {
           sessionStorage.setItem(key, value);
         });
+        
+        // Remember Me değerini de kaydet
+        localStorage.setItem("rememberMe", rememberMe.toString());
+        sessionStorage.setItem("rememberMe", rememberMe.toString());
+        
+        // Remember Me işaretliyse email'i hatırla
+        if (rememberMe) {
+          localStorage.setItem("rememberedEmail", data.user.email);
+        } else {
+          localStorage.removeItem("rememberedEmail");
+        }
         
         // Custom event'i tetikle
         window.dispatchEvent(new Event('localStorageChange'));
@@ -256,6 +280,13 @@ export default function LoginPage() {
           Object.entries(userDataToStore).forEach(([key, value]) => {
             sessionStorage.setItem(key, value);
           });
+          
+          // Remember Me işaretliyse email'i hatırla
+          if (rememberMe) {
+            localStorage.setItem("rememberedEmail", userData.email);
+            localStorage.setItem("rememberMe", "true");
+            sessionStorage.setItem("rememberMe", "true");
+          }
           
           // Custom event'i tetikle
           window.dispatchEvent(new Event('localStorageChange'));
@@ -619,6 +650,32 @@ export default function LoginPage() {
                 )}
               </button>
             </div>
+          </div>
+
+          {/* Remember Me Checkbox */}
+          <div style={{ marginBottom: "24px" }}>
+            <label
+              style={{
+                display: "flex",
+                alignItems: "center",
+                cursor: "pointer",
+                fontSize: "14px",
+                color: "#374151",
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                style={{
+                  marginRight: "8px",
+                  width: "16px",
+                  height: "16px",
+                  accentColor: isAdminForm ? "#7c3aed" : "#2563eb",
+                }}
+              />
+              <span>Beni Hatırla</span>
+            </label>
           </div>
 
           {error && (

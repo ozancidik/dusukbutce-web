@@ -116,8 +116,9 @@ export default function AdminPage() {
     // Header'a logout mesajı gönder
     window.dispatchEvent(new CustomEvent('logout'));
     
-    // Sayfayı tamamen yenile ve anasayfaya git
-    window.location.href = '/';
+    // Admin sayfasında kal (ana sayfaya yönlendirme yok)
+    // Sayfayı yenile
+    window.location.reload();
   };
 
   const fetchSubmissions = async () => {
