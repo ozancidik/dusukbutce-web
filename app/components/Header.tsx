@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import Search from "./Search";
@@ -142,14 +142,14 @@ export default function Header() {
     const interval = setInterval(checkUserStatus, 2000);
 
     // Kullanıcı aktivitesini takip et
-    const updateActivity = useCallback(() => {
+    const updateActivityRef = useRef(() => {
       setLastActivity(Date.now());
-    }, []);
+    });
     
     // Aktivite event'lerini dinle
     const activityEvents = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
     activityEvents.forEach(event => {
-      document.addEventListener(event, updateActivity, true);
+      document.addEventListener(event, updateActivityRef.current, true);
     });
 
     return () => {
@@ -160,7 +160,7 @@ export default function Header() {
       
       // Aktivite event listener'larını temizle
       activityEvents.forEach(event => {
-        document.removeEventListener(event, updateActivity, true);
+        document.removeEventListener(event, updateActivityRef.current, true);
       });
     };
   }, []);

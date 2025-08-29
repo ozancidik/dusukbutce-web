@@ -153,8 +153,17 @@ export async function GET(request: NextRequest) {
     const userData = await userResponse.json();
     console.log('Facebook OAuth: User data received:', { id: userData.id, name: userData.name });
 
-    // Türkçe karakterleri düzgün decode et
-    const userName = decodeURIComponent(escape(userData.name));
+    // Türkçe karakterleri güvenli şekilde işle
+    let userName = userData.name;
+    try {
+      // Eğer name encode edilmişse decode et
+      if (userName && userName.includes('%')) {
+        userName = decodeURIComponent(userName);
+      }
+    } catch (error) {
+      console.warn('Facebook OAuth: Name decode hatası, orijinal isim kullanılıyor:', error);
+      userName = userData.name;
+    }
     
     // Email bilgisi olmadığı için geçici email oluştur
     const userEmail = `fb_${userData.id}@dusukbutce.com`;
