@@ -36,6 +36,18 @@ export default function SsdPage() {
     checkMobile();
     window.addEventListener('resize', checkMobile);
     
+    // localStorage'dan kaydedilmiş form verilerini yükle
+    const savedFormData = localStorage.getItem('ssdFormData');
+    if (savedFormData) {
+      try {
+        const parsedData = JSON.parse(savedFormData);
+        setFormData(parsedData);
+        console.log('📝 Kaydedilmiş SSD form verileri yüklendi');
+      } catch (error) {
+        console.error('Form verileri yüklenirken hata:', error);
+      }
+    }
+    
     return () => {
       window.removeEventListener('resize', checkMobile);
     };

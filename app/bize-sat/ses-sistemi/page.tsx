@@ -32,6 +32,18 @@ export default function AudioSystemPage() {
     checkMobile();
     window.addEventListener('resize', checkMobile);
     
+    // localStorage'dan kaydedilmiş form verilerini yükl
+    const savedFormData = localStorage.getItem('audioSystemFormData');
+    if (savedFormData) {
+      try {
+        const parsedData = JSON.parse(savedFormData);
+        setFormData(parsedData);
+        console.log('📝 Kaydedilmiş ses sistemi form verileri yüklendi');
+      } catch (error) {
+        console.error('Form verileri yüklenirken hata:', error);
+      }
+    }
+    
     return () => {
       window.removeEventListener('resize', checkMobile);
     };

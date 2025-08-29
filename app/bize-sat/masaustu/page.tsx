@@ -42,6 +42,18 @@ export default function DesktopPage() {
     checkMobile();
     window.addEventListener('resize', checkMobile);
     
+    // localStorage'dan kaydedilmiş form verilerini yükle
+    const savedFormData = localStorage.getItem('desktopFormData');
+    if (savedFormData) {
+      try {
+        const parsedData = JSON.parse(savedFormData);
+        setFormData(parsedData);
+        console.log('📝 Kaydedilmiş masaüstü form verileri yüklendi');
+      } catch (error) {
+        console.error('Form verileri yüklenirken hata:', error);
+      }
+    }
+    
     return () => {
       window.removeEventListener('resize', checkMobile);
     };

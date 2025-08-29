@@ -34,6 +34,18 @@ export default function CasePage() {
     checkMobile();
     window.addEventListener('resize', checkMobile);
     
+    // localStorage'dan kaydedilmiş form verilerini yükle
+    const savedFormData = localStorage.getItem('caseFormData');
+    if (savedFormData) {
+      try {
+        const parsedData = JSON.parse(savedFormData);
+        setFormData(parsedData);
+        console.log('📝 Kaydedilmiş kasa form verileri yüklendi');
+      } catch (error) {
+        console.error('Form verileri yüklenirken hata:', error);
+      }
+    }
+    
     return () => {
       window.removeEventListener('resize', checkMobile);
     };
