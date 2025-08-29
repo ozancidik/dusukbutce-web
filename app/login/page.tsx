@@ -189,13 +189,24 @@ export default function LoginPage() {
             router.push("/admin");
           }, 2000);
         } else {
-          // Normal kullanıcı yönlendirmesi - profile sayfasına git
-          setLoginSuccess(true);
-          setRedirectMessage("Giriş başarılı! Profil sayfasına yönlendiriliyor...");
+          // Normal kullanıcı yönlendirmesi - returnUrl varsa oraya, yoksa profile sayfasına git
+          const returnUrl = new URLSearchParams(window.location.search).get('returnUrl');
           
-          setTimeout(() => {
-            router.push("/profile");
-          }, 2000);
+          if (returnUrl) {
+            setLoginSuccess(true);
+            setRedirectMessage("Giriş başarılı! Yönlendiriliyorsunuz...");
+            
+            setTimeout(() => {
+              router.push(decodeURIComponent(returnUrl));
+            }, 2000);
+          } else {
+            setLoginSuccess(true);
+            setRedirectMessage("Giriş başarılı! Profil sayfasına yönlendiriliyor...");
+            
+            setTimeout(() => {
+              router.push("/profile");
+            }, 2000);
+          }
         }
       } else {
         // Hata durumunda rate limiting'i artır
