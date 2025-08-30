@@ -2,9 +2,12 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import Search from "./Search";
+import dynamic from "next/dynamic";
 
-export default function Header() {
+const Search = dynamic(() => import("./Search"), { ssr: false });
+
+function HeaderComponent() {
+  const [isClient, setIsClient] = useState(false);
   const [userInfo, setUserInfo] = useState<{
     isLoggedIn: boolean;
     name: string;
@@ -33,35 +36,42 @@ export default function Header() {
   const handleAutoLogout = (reason: string) => {
     console.log('Auto logout:', reason);
     
-    // Remember Me değerlerini sakla
-    const rememberedEmail = localStorage.getItem('rememberedEmail');
-    const rememberMe = localStorage.getItem('rememberMe');
+    // Client-side'da olduğumuzdan emin ol
+    if (typeof window === 'undefined') return;
     
-    // Tüm kullanıcı verilerini temizle
-    localStorage.removeItem('userLoggedIn');
-    localStorage.removeItem('userId');
-    localStorage.removeItem('userName');
-    localStorage.removeItem('userEmail');
-    localStorage.removeItem('userPhone');
-    localStorage.removeItem('adminLoggedIn');
-    localStorage.removeItem('adminEmail');
-    localStorage.removeItem('loginTime');
-    localStorage.removeItem('rememberMe');
-    
-    sessionStorage.removeItem('userLoggedIn');
-    sessionStorage.removeItem('userId');
-    sessionStorage.removeItem('userName');
-    sessionStorage.removeItem('userEmail');
-    sessionStorage.removeItem('userPhone');
-    sessionStorage.removeItem('adminLoggedIn');
-    sessionStorage.removeItem('adminEmail');
-    sessionStorage.removeItem('loginTime');
-    sessionStorage.removeItem('rememberMe');
-    
-    // Remember Me değerlerini geri yükle
-    if (rememberedEmail && rememberMe === 'true') {
-      localStorage.setItem('rememberedEmail', rememberedEmail);
-      localStorage.setItem('rememberMe', rememberMe);
+    try {
+      // Remember Me değerlerini sakla
+      const rememberedEmail = localStorage.getItem('rememberedEmail');
+      const rememberMe = localStorage.getItem('rememberMe');
+      
+      // Tüm kullanıcı verilerini temizle
+      localStorage.removeItem('userLoggedIn');
+      localStorage.removeItem('userId');
+      localStorage.removeItem('userName');
+      localStorage.removeItem('userEmail');
+      localStorage.removeItem('userPhone');
+      localStorage.removeItem('adminLoggedIn');
+      localStorage.removeItem('adminEmail');
+      localStorage.removeItem('loginTime');
+      localStorage.removeItem('rememberMe');
+      
+      sessionStorage.removeItem('userLoggedIn');
+      sessionStorage.removeItem('userId');
+      sessionStorage.removeItem('userName');
+      sessionStorage.removeItem('userEmail');
+      sessionStorage.removeItem('userPhone');
+      sessionStorage.removeItem('adminLoggedIn');
+      sessionStorage.removeItem('adminEmail');
+      sessionStorage.removeItem('loginTime');
+      sessionStorage.removeItem('rememberMe');
+      
+      // Remember Me değerlerini geri yükle
+      if (rememberedEmail && rememberMe === 'true') {
+        localStorage.setItem('rememberedEmail', rememberedEmail);
+        localStorage.setItem('rememberMe', rememberMe);
+      }
+    } catch (error) {
+      console.warn('Storage access error during logout:', error);
     }
     
     // Kullanıcı durumunu güncelle
@@ -74,62 +84,78 @@ export default function Header() {
     // Dropdown'ı kapat
     setShowDropdown(false);
     
-    // Kullanıcıya bilgi ver
-    alert(`Otomatik çıkış: ${reason}`);
-    
-    // Profile sayfasında kal (ana sayfaya yönlendirme yok)
-    // Kullanıcı manuel olarak ana sayfaya gidebilir
+    // Sessizce logout yap, popup gösterme
+    console.log('User logged out automatically:', reason);
   };
   
   const [showDropdown, setShowDropdown] = useState(false);
-  const [lastActivity, setLastActivity] = useState<number>(Date.now());
+  const [lastActivity, setLastActivity] = useState<number>(0);
   
   // Kullanıcı aktivitesini takip et - useRef'i component seviyesinde tanımla
   const updateActivityRef = useRef(() => {
     setLastActivity(Date.now());
   });
 
+
+
   // Kullanıcı giriş durumunu kontrol et
   useEffect(() => {
+    setIsClient(true);
+    // Client-side'da olduğumuzdan emin ol
+    if (typeof window === 'undefined') return;
+    
     const checkUserStatus = () => {
-      const userLoggedIn = localStorage.getItem('userLoggedIn') || sessionStorage.getItem('userLoggedIn');
-      const userName = localStorage.getItem('userName') || sessionStorage.getItem('userName');
-      const userIsAdmin = localStorage.getItem('userIsAdmin') || sessionStorage.getItem('adminLoggedIn');
-      const loginTime = localStorage.getItem('loginTime') || sessionStorage.getItem('loginTime');
-      const rememberMe = localStorage.getItem('rememberMe') === 'true';
-      
-      console.log('Header - User status check:', { userLoggedIn, userName, userIsAdmin, loginTime, rememberMe });
-      
-      // Session timeout kontrolü (24 saat normal, 30 gün remember me)
-      if (loginTime) {
-        const loginTimestamp = parseInt(loginTime);
-        const currentTime = Date.now();
-        const sessionDuration = rememberMe ? 30 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000; // 30 gün veya 24 saat
+      try {
+        const userLoggedIn = localStorage.getItem('userLoggedIn') || sessionStorage.getItem('userLoggedIn');
+        const userName = localStorage.getItem('userName') || sessionStorage.getItem('userName');
+        const userIsAdmin = localStorage.getItem('userIsAdmin') || sessionStorage.getItem('adminLoggedIn');
+        const loginTime = localStorage.getItem('loginTime') || sessionStorage.getItem('loginTime');
+        const rememberMe = localStorage.getItem('rememberMe') === 'true';
         
-        if (currentTime - loginTimestamp > sessionDuration) {
-          console.log('Session expired, logging out...');
-          handleAutoLogout(`Session süresi doldu (${rememberMe ? '30 gün' : '24 saat'})`);
+        console.log('Header - User status check:', { userLoggedIn, userName, userIsAdmin, loginTime, rememberMe });
+        
+        // Session timeout kontrolü (24 saat normal, 30 gün remember me)
+        if (loginTime) {
+          const loginTimestamp = parseInt(loginTime);
+          const currentTime = Date.now();
+          const sessionDuration = rememberMe ? 30 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000; // 30 gün veya 24 saat
+          
+          if (currentTime - loginTimestamp > sessionDuration) {
+            console.log('Session expired, logging out...');
+            handleAutoLogout(`Session süresi doldu (${rememberMe ? '30 gün' : '24 saat'})`);
+            return;
+          }
+        }
+        
+        // Inactive timeout kontrolü (60 dakika)
+        const inactiveDuration = 60 * 60 * 1000; // 60 dakika
+        if (Date.now() - lastActivity > inactiveDuration) {
+          console.log('User inactive for 60 minutes, logging out...');
+          handleAutoLogout('60 dakika hareketsizlik nedeniyle çıkış yapıldı');
           return;
         }
+        
+        setUserInfo({
+          isLoggedIn: userLoggedIn === 'true',
+          name: userName || '',
+          isAdmin: userIsAdmin === 'true'
+        });
+      } catch (error) {
+        console.warn('Storage access error:', error);
+        // Hata durumunda default değerleri kullan
+        setUserInfo({
+          isLoggedIn: false,
+          name: '',
+          isAdmin: false
+        });
       }
-      
-      // Inactive timeout kontrolü (60 dakika)
-      const inactiveDuration = 60 * 60 * 1000; // 60 dakika
-      if (Date.now() - lastActivity > inactiveDuration) {
-        console.log('User inactive for 60 minutes, logging out...');
-        handleAutoLogout('60 dakika hareketsizlik nedeniyle çıkış yapıldı');
-        return;
-      }
-      
-      setUserInfo({
-        isLoggedIn: userLoggedIn === 'true',
-        name: userName || '',
-        isAdmin: userIsAdmin === 'true'
-      });
     };
 
     // İlk kontrol
     checkUserStatus();
+    
+    // lastActivity'yi başlat (hydration hatasını önlemek için)
+    setLastActivity(Date.now());
 
     // localStorage değişikliklerini dinle
     const handleStorageChange = () => {
@@ -182,6 +208,26 @@ export default function Header() {
       document.removeEventListener('click', handleClickOutside);
     };
   }, [showDropdown]);
+
+  // Server-side'da basit header göster
+  if (!isClient) {
+    return (
+      <header style={{
+        position: "static",
+        zIndex: 10001,
+        background: "#94a3b8",
+        boxShadow: "0 2px 20px rgba(0, 0, 0, 0.1)",
+        borderBottom: "1px solid #e2e8f0",
+        height: "92px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center"
+      }}>
+        <div style={{ color: "white", fontSize: "16px" }}>Yükleniyor...</div>
+      </header>
+    );
+  }
+
   return (
     <>
       <style jsx>{`
@@ -208,7 +254,8 @@ export default function Header() {
         background: "#94a3b8",
         boxShadow: "0 2px 20px rgba(0, 0, 0, 0.1)",
         borderBottom: "1px solid #e2e8f0",
-      }}>
+      }}
+      suppressHydrationWarning={true}>
         <div style={{
           maxWidth: "1600px",
           margin: "0 auto",
@@ -676,6 +723,10 @@ export default function Header() {
           </div>
         </div>
       </header>
+
+
     </>
   );
 }
+
+export default HeaderComponent;
