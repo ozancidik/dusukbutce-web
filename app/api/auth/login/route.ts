@@ -19,6 +19,15 @@ export async function POST(request: NextRequest) {
       );
     }
     
+    // Kullanıcının local auth provider'ı var mı kontrol et
+    const hasLocalProvider = user.authProviders?.some((p: any) => p.provider === 'local');
+    if (!hasLocalProvider) {
+      return NextResponse.json(
+        { success: false, message: 'Bu email adresi ile şifreli giriş yapılamaz. Google veya Facebook ile giriş yapın.' },
+        { status: 401 }
+      );
+    }
+    
     // Şifreyi kontrol et
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {

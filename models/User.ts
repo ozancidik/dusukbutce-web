@@ -43,6 +43,11 @@ const userSchema = new mongoose.Schema({
     type: Boolean, 
     default: true 
   },
+  authProviders: [{
+    provider: { type: String, enum: ['local', 'google', 'facebook'], required: true },
+    providerId: { type: String },
+    connectedAt: { type: Date, default: Date.now }
+  }],
   resetPasswordToken: { 
     type: String 
   },

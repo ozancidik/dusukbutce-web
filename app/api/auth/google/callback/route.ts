@@ -92,7 +92,7 @@ export async function GET(request: NextRequest) {
     // MongoDB'ye bağlan
     await connectDB();
 
-    // Kullanıcıyı bul veya oluştur
+    // Kullanıcıyı email ile bul
     let user = await User.findOne({ email: userData.email });
 
     if (!user) {
@@ -100,12 +100,28 @@ export async function GET(request: NextRequest) {
       user = new User({
         email: userData.email,
         name: userData.name,
-        password: 'google-oauth-' + Math.random().toString(36).substr(2, 9), // Geçici şifre
-        isAdmin: false,
-        isActive: true,
+        password: '', // Google kullanıcıları için şifre yok
+        authProviders: [{
+          provider: 'google',
+          providerId: userData.id,
+          connectedAt: new Date()
+        }]
       });
-      await user.save();
+    } else {
+      // Mevcut kullanıcıya Google provider'ı ekle (eğer yoksa)
+      const hasGoogleProvider = user.authProviders?.some((p: any) => p.provider === 'google');
+      if (!hasGoogleProvider) {
+        if (!user.authProviders) user.authProviders = [];
+        user.authProviders.push({
+          provider: 'google',
+          providerId: userData.id,
+          connectedAt: new Date()
+        });
+      }
     }
+
+    // Kullanıcıyı kaydet
+    await user.save();
 
     // Başarılı giriş sayfası
     return new Response(`

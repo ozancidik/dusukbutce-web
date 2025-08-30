@@ -66,6 +66,11 @@ export async function POST(request: NextRequest) {
       email: sanitizedEmail,
       password: hashedPassword,
       name: sanitizedName,
+      authProviders: [{
+        provider: 'local',
+        providerId: null,
+        connectedAt: new Date()
+      }]
     });
 
     await user.save();

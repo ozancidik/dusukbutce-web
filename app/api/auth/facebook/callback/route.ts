@@ -165,13 +165,25 @@ export async function GET(request: NextRequest) {
       userName = userData.name;
     }
     
-    // Email bilgisi olmadığı için geçici email oluştur
-    const userEmail = `fb_${userData.id}@dusukbutce.com`;
+    // Facebook'tan email bilgisi al (eğer varsa)
+    let userEmail = `fb_${userData.id}@dusukbutce.com`;
+    
+    // Email fields'ı ekleyerek tekrar deneyelim
+    try {
+      const emailResponse = await fetch(`https://graph.facebook.com/v18.0/me?fields=id,name,email&access_token=${tokenData.access_token}`);
+      const emailData = await emailResponse.json();
+      if (emailData.email) {
+        userEmail = emailData.email;
+        console.log('Facebook OAuth: Email found:', userEmail);
+      }
+    } catch (error) {
+      console.warn('Facebook OAuth: Email fetch failed, using fallback:', error);
+    }
 
-    // MongoDB'ye bağlan (cache ile)
+    // MongoDB'ye bağlan
     await connectDB();
 
-    // Kullanıcıyı bul veya oluştur
+    // Kullanıcıyı email ile bul
     let user = await User.findOne({ email: userEmail });
 
     if (!user) {
@@ -180,14 +192,28 @@ export async function GET(request: NextRequest) {
       user = new User({
         email: userEmail,
         name: userName,
-        password: 'facebook-oauth-' + Math.random().toString(36).substr(2, 9), // Geçici şifre
-        isAdmin: false,
-        isActive: true,
+        password: '', // Facebook kullanıcıları için şifre yok
+        authProviders: [{
+          provider: 'facebook',
+          providerId: userData.id,
+          connectedAt: new Date()
+        }]
       });
       await user.save();
       console.log('Facebook OAuth: New user created successfully');
     } else {
       console.log('Facebook OAuth: Existing user found');
+      // Mevcut kullanıcıya Facebook provider'ı ekle (eğer yoksa)
+      const hasFacebookProvider = user.authProviders?.some((p: any) => p.provider === 'facebook');
+      if (!hasFacebookProvider) {
+        if (!user.authProviders) user.authProviders = [];
+        user.authProviders.push({
+          provider: 'facebook',
+          providerId: userData.id,
+          connectedAt: new Date()
+        });
+        await user.save();
+      }
     }
 
     console.log('Facebook OAuth: Login successful, sending success message');
