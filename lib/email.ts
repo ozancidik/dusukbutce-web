@@ -20,7 +20,8 @@ export async function sendPasswordResetEmail(email: string, resetToken: string, 
 
     // E-posta içeriği
     const mailOptions = {
-      from: process.env.GMAIL_USER,
+      from: 'destek@dusukbutce.com',
+      replyTo: 'destek@dusukbutce.com',
       to: email,
       subject: 'Şifre Sıfırlama - Düşük Bütçe',
       html: `

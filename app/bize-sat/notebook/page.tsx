@@ -9,6 +9,7 @@ export default function NotebookPage() {
   const [isMobile, setIsMobile] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showImageSizeWarning, setShowImageSizeWarning] = useState(false);
   const [formData, setFormData] = useState({
     brand: '',
     model: '',
@@ -43,14 +44,20 @@ export default function NotebookPage() {
     window.addEventListener('resize', checkMobile);
     
     // localStorage'dan kaydedilmiş form verilerini yükle
-    const savedFormData = localStorage.getItem('notebookFormData');
-    if (savedFormData) {
-      try {
+    try {
+      const savedFormData = localStorage.getItem('notebookFormData');
+      if (savedFormData) {
         const parsedData = JSON.parse(savedFormData);
         setFormData(parsedData);
         console.log('📝 Kaydedilmiş form verileri yüklendi');
-      } catch (error) {
-        console.error('Form verileri yüklenirken hata:', error);
+      }
+    } catch (error) {
+      console.warn('localStorage\'dan veri yüklenirken hata:', error);
+      // localStorage'ı temizle
+      try {
+        localStorage.removeItem('notebookFormData');
+      } catch (innerError) {
+        console.error('localStorage temizlenemedi:', innerError);
       }
     }
     
@@ -66,8 +73,19 @@ export default function NotebookPage() {
         [field]: value
       };
       
-      // Form verilerini localStorage'a kaydet
-      localStorage.setItem('notebookFormData', JSON.stringify(newData));
+      // Form verilerini localStorage'a kaydet (hata yakalama ile)
+      try {
+        localStorage.setItem('notebookFormData', JSON.stringify(newData));
+      } catch (error) {
+        console.warn('localStorage quota hatası, veriler kaydedilemedi:', error);
+        // Resimleri olmadan kaydetmeyi dene
+        const dataWithoutImages = { ...newData, images: [] };
+        try {
+          localStorage.setItem('notebookFormData', JSON.stringify(dataWithoutImages));
+        } catch (innerError) {
+          console.error('localStorage tamamen dolu:', innerError);
+        }
+      }
       
       return newData;
     });
@@ -78,28 +96,103 @@ export default function NotebookPage() {
     if (files) {
       const newImages: string[] = [];
       
-      Array.from(files).forEach(file => {
+      Array.from(files).forEach(async (file) => {
+        // Resim boyutunu kontrol et (max 2MB)
+        if (file.size > 2 * 1024 * 1024) {
+          setShowImageSizeWarning(true);
+          return;
+        }
+        
         const reader = new FileReader();
-        reader.onload = (e) => {
+        reader.onload = async (e) => {
           if (e.target?.result) {
-            newImages.push(e.target.result as string);
-            if (newImages.length === files.length) {
-              setFormData(prev => {
-                const newData = {
-                  ...prev,
-                  images: [...prev.images, ...newImages]
-                };
-                
-                // Form verilerini localStorage'a kaydet
-                localStorage.setItem('notebookFormData', JSON.stringify(newData));
-                
-                return newData;
-              });
+            try {
+              // Base64 string'i sıkıştır
+              const base64String = e.target.result as string;
+              const compressedImage = await compressImage(base64String);
+              
+              newImages.push(compressedImage);
+              if (newImages.length === files.length) {
+                setFormData(prev => {
+                  const newData = {
+                    ...prev,
+                    images: [...prev.images, ...newImages]
+                  };
+                  
+                  // Form verilerini localStorage'a kaydet (hata yakalama ile)
+                  try {
+                    localStorage.setItem('notebookFormData', JSON.stringify(newData));
+                  } catch (error) {
+                    console.warn('localStorage quota hatası, veriler kaydedilemedi:', error);
+                    // Eski resimleri temizle
+                    const dataWithoutImages = { ...newData, images: [] };
+                    try {
+                      localStorage.setItem('notebookFormData', JSON.stringify(dataWithoutImages));
+                    } catch (innerError) {
+                      console.error('localStorage tamamen dolu:', innerError);
+                    }
+                  }
+                  
+                  return newData;
+                });
+              }
+            } catch (error) {
+              console.error('Resim işleme hatası:', error);
+              // Hata durumunda orijinal resmi kullan
+              newImages.push(e.target.result as string);
             }
           }
         };
         reader.readAsDataURL(file);
       });
+    }
+  };
+
+  // Resim sıkıştırma fonksiyonu
+  const compressImage = (base64String: string): string => {
+    try {
+      // Canvas kullanarak resmi sıkıştır
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      return new Promise((resolve) => {
+        img.onload = () => {
+          // Maksimum boyutları belirle
+          const maxWidth = 800;
+          const maxHeight = 600;
+          
+          let { width, height } = img;
+          
+          // Boyutları orantılı olarak küçült
+          if (width > height) {
+            if (width > maxWidth) {
+              height = (height * maxWidth) / width;
+              width = maxWidth;
+            }
+          } else {
+            if (height > maxHeight) {
+              width = (width * maxHeight) / height;
+              height = maxHeight;
+            }
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          
+          // Resmi çiz ve sıkıştır
+          ctx?.drawImage(img, 0, 0, width, height);
+          
+          // Kaliteyi düşür (0.7 = %70 kalite)
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+          resolve(compressedBase64);
+        };
+        
+        img.src = base64String;
+      });
+    } catch (error) {
+      console.warn('Resim sıkıştırma hatası:', error);
+      return base64String; // Hata durumunda orijinal resmi döndür
     }
   };
 
@@ -110,8 +203,19 @@ export default function NotebookPage() {
         images: prev.images.filter((_, i) => i !== index)
       };
       
-      // Form verilerini localStorage'a kaydet
-      localStorage.setItem('notebookFormData', JSON.stringify(newData));
+      // Form verilerini localStorage'a kaydet (hata yakalama ile)
+      try {
+        localStorage.setItem('notebookFormData', JSON.stringify(newData));
+      } catch (error) {
+        console.warn('localStorage quota hatası, veriler kaydedilemedi:', error);
+        // Resimleri olmadan kaydetmeyi dene
+        const dataWithoutImages = { ...newData, images: [] };
+        try {
+          localStorage.setItem('notebookFormData', JSON.stringify(dataWithoutImages));
+        } catch (innerError) {
+          console.error('localStorage tamamen dolu:', innerError);
+        }
+      }
       
       return newData;
     });
@@ -209,6 +313,47 @@ export default function NotebookPage() {
             Dizüstü bilgisayarınızı satın, en iyi fiyatı alın
           </p>
         </div>
+
+        {/* Login Required Button - Moved to header/form gap */}
+        {!isLoggedIn && (
+          <div style={{
+            background: 'white',
+            borderRadius: '16px',
+            padding: isMobile ? '20px' : '24px',
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1)',
+            marginBottom: '24px',
+            border: '1px solid #e5e7eb',
+            textAlign: 'center'
+          }}>
+            <button
+              type="button"
+              onClick={() => router.push(`/login?returnUrl=${encodeURIComponent('/bize-sat/notebook')}`)}
+              style={{
+                width: '100%',
+                background: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '12px',
+                padding: '16px',
+                fontSize: '16px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                boxShadow: '0 4px 12px rgba(220, 38, 38, 0.3)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 6px 20px rgba(220, 38, 38, 0.4)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.3)';
+              }}
+            >
+              TEKLİF ALABİLMEK İÇİN GİRİŞ YAPMALISINIZ
+            </button>
+          </div>
+        )}
 
         {/* Form */}
         <form onSubmit={handleSubmit} style={{
@@ -1065,7 +1210,7 @@ export default function NotebookPage() {
           </div>
 
           {/* Submit Button */}
-          {isLoggedIn ? (
+          {isLoggedIn && (
             <button
               type="submit"
               disabled={isSubmitting}
@@ -1097,22 +1242,110 @@ export default function NotebookPage() {
             >
               {isSubmitting ? 'Gönderiliyor...' : 'TEKLİF AL'}
             </button>
-          ) : (
+          )}
+        </form>
+      </div>
+
+      {/* Image Size Warning Popup */}
+      {showImageSizeWarning && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.8)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          padding: '20px',
+          animation: 'fadeIn 0.3s ease-out'
+        }}>
+          <div style={{
+            background: 'white',
+            borderRadius: '20px',
+            padding: '32px',
+            textAlign: 'center',
+            maxWidth: '450px',
+            width: '100%',
+            boxShadow: '0 25px 50px rgba(0, 0, 0, 0.25)',
+            border: '1px solid #e5e7eb',
+            animation: 'slideUp 0.3s ease-out',
+            transform: 'translateY(0)'
+          }}>
+            {/* Warning Icon */}
+            <div style={{
+              background: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)',
+              width: '80px',
+              height: '80px',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '40px',
+              color: 'white',
+              margin: '0 auto 20px',
+              boxShadow: '0 8px 25px rgba(245, 158, 11, 0.3)'
+            }}>
+              ⚠️
+            </div>
+            
+            {/* Title */}
+            <h3 style={{
+              fontSize: '22px',
+              fontWeight: '700',
+              color: '#1f2937',
+              margin: '0 0 12px 0',
+              lineHeight: '1.3'
+            }}>
+              Resim Boyutu Çok Büyük
+            </h3>
+            
+            {/* Description */}
+            <p style={{
+              fontSize: '16px',
+              color: '#6b7280',
+              margin: '0 0 20px 0',
+              lineHeight: '1.6'
+            }}>
+              Seçtiğiniz resim 2MB'dan büyük. Lütfen daha küçük boyutlu bir resim seçin.
+            </p>
+            
+            {/* Info Box */}
+            <div style={{
+              background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
+              padding: '16px',
+              borderRadius: '12px',
+              border: '1px solid #fbbf24',
+              margin: '0 0 24px 0'
+            }}>
+              <p style={{
+                fontSize: '14px',
+                color: '#92400e',
+                margin: 0,
+                lineHeight: '1.5',
+                fontWeight: '500'
+              }}>
+                💡 <strong>Önerilen:</strong> 800x600px boyutunda, 2MB altı resimler
+              </p>
+            </div>
+            
+            {/* Action Button */}
             <button
-              type="button"
-              onClick={() => router.push(`/login?returnUrl=${encodeURIComponent('/bize-sat/notebook')}`)}
+              onClick={() => setShowImageSizeWarning(false)}
               style={{
-                width: '100%',
                 background: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',
                 color: 'white',
                 border: 'none',
                 borderRadius: '12px',
-                padding: '16px',
+                padding: '14px 28px',
                 fontSize: '16px',
                 fontWeight: '600',
                 cursor: 'pointer',
-                transition: 'all 0.2s',
-                boxShadow: '0 4px 12px rgba(220, 38, 38, 0.3)'
+                transition: 'all 0.2s ease',
+                boxShadow: '0 4px 15px rgba(220, 38, 38, 0.3)',
+                minWidth: '120px'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-2px)';
@@ -1120,14 +1353,14 @@ export default function NotebookPage() {
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.3)';
+                e.currentTarget.style.boxShadow = '0 4px 15px rgba(220, 38, 38, 0.3)';
               }}
             >
-              TEKLİF ALABİLMEK İÇİN GİRİŞ YAPMALISINIZ
+              Anladım
             </button>
-          )}
-        </form>
-      </div>
+          </div>
+        </div>
+      )}
 
       {/* Success Modal */}
       {showSuccessModal && (

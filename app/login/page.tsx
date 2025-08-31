@@ -321,7 +321,7 @@ export default function LoginPage() {
           
           // returnUrl'e göre yönlendir
           const returnUrl = new URLSearchParams(window.location.search).get('returnUrl') || '/';
-          router.push(returnUrl);
+          router.push(decodeURIComponent(returnUrl));
         } else if (event.data.type === 'GOOGLE_LOGIN_ERROR') {
           setError(event.data.error || "Google ile giriş yapılırken bir hata oluştu.");
           popup?.close();
@@ -410,7 +410,7 @@ export default function LoginPage() {
           
           // 2 saniye sonra yönlendir
           setTimeout(() => {
-            router.push(returnUrl);
+            router.push(decodeURIComponent(returnUrl));
           }, 2000);
           
           // Event listener'ı kaldır
