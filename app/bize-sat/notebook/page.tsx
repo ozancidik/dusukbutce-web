@@ -149,7 +149,7 @@ export default function NotebookPage() {
   };
 
   // Resim sıkıştırma fonksiyonu
-  const compressImage = (base64String: string): string => {
+  const compressImage = (base64String: string): Promise<string> => {
     try {
       // Canvas kullanarak resmi sıkıştır
       const canvas = document.createElement('canvas');
@@ -192,7 +192,7 @@ export default function NotebookPage() {
       });
     } catch (error) {
       console.warn('Resim sıkıştırma hatası:', error);
-      return base64String; // Hata durumunda orijinal resmi döndür
+      return Promise.resolve(base64String); // Hata durumunda orijinal resmi döndür
     }
   };
 
