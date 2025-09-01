@@ -896,7 +896,7 @@ export default function LoginPage() {
           </p>
           
           <Link
-            href="/forgot-password"
+            href="/sifremi-unuttum"
             style={{
               color: "#2563eb",
               textDecoration: "underline",

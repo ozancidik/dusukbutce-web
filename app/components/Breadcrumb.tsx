@@ -99,7 +99,7 @@ export default function Breadcrumb() {
       displayName = 'Admin Kullanıcılar';
     } else if (segment === 'access-denied') {
       displayName = 'Erişim Reddedildi';
-    } else if (segment === 'forgot-password') {
+    } else if (segment === 'sifremi-unuttum') {
       displayName = 'Şifremi Unuttum';
     } else if (segment === 'privacy-policy') {
       displayName = 'Gizlilik Politikası';

@@ -173,7 +173,7 @@ function ResetPasswordContent() {
             {message}
           </p>
           
-          <Link href="/forgot-password" style={{ textDecoration: 'none' }}>
+          <Link href="/sifremi-unuttum" style={{ textDecoration: 'none' }}>
             <button style={{
               background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
               color: 'white',

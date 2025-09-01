@@ -10,7 +10,7 @@ const navLinks = [
   { href: "/cart", label: "Sepet" },
   { href: "/orders", label: "Siparişler" },
   { href: "/profile", label: "Profil" },
-  { href: "/forgot-password", label: "Şifremi Unuttum" },
+      { href: "/sifremi-unuttum", label: "Şifremi Unuttum" },
   { href: "/notifications", label: "Bildirimler" },
 ];
 
