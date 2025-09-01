@@ -352,7 +352,7 @@ export default function LoginPage() {
       setError("");
       
       // Return URL'i al
-      const returnUrl = new URLSearchParams(window.location.search).get('returnUrl') || '/profile';
+      const returnUrl = new URLSearchParams(window.location.search).get('returnUrl') || '/';
       
       // Facebook OAuth URL'ini aç
       const facebookAuthUrl = `/api/auth/facebook?returnUrl=${encodeURIComponent(returnUrl)}`;

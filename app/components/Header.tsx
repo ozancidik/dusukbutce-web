@@ -334,7 +334,7 @@ function HeaderComponent() {
                       marginTop: "4px",
                       overflow: "hidden"
                     }}>
-                      <Link href="/login" style={{ textDecoration: "none" }}>
+                      <Link href="/login?returnUrl=%2F" style={{ textDecoration: "none" }}>
                         <div style={{
                           padding: "12px 16px",
                           color: "#374151",
@@ -534,7 +534,7 @@ function HeaderComponent() {
                         maxWidth: "200px",
                         width: "auto"
                       }}>
-                        <Link href="/login" style={{ textDecoration: "none" }}>
+                        <Link href="/login?returnUrl=%2F" style={{ textDecoration: "none" }}>
                           <div style={{
                             padding: "12px 16px",
                             color: "#374151",
