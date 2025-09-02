@@ -5,7 +5,11 @@ import { useAuth } from '../../hooks/useAuth';
 
 export default function NotebookPage() {
   const router = useRouter();
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, isLoading } = useAuth();
+  
+
+  
+
   const [isMobile, setIsMobile] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -297,6 +301,7 @@ export default function NotebookPage() {
           border: '1px solid #e5e7eb',
           textAlign: 'center'
         }}>
+
           <h1 style={{
             fontSize: isMobile ? '24px' : '32px',
             fontWeight: '700',

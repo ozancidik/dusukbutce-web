@@ -32,7 +32,7 @@ export default function BizeSatPage() {
   const rightCategories = [
     { name: 'Monitör', path: '/bize-sat/monitor', icon: '🖥️' },
     { name: 'Klavye', path: '/bize-sat/klavye', icon: '⌨️' },
-    { name: 'Mouse', path: '/bize-sat/fare', icon: '🖱️' },
+    { name: 'Mouse', path: '/bize-sat/mouse', icon: '🖱️' },
     { name: 'Tablet', path: '/bize-sat/tablet', icon: '📱' },
     { name: 'Kulaklık', path: '/bize-sat/kulaklik', icon: '🎧' },
     { name: 'Ses Sistemi', path: '/bize-sat/ses-sistemi', icon: '🔊' },

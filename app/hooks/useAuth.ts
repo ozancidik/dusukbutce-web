@@ -28,7 +28,8 @@ export const useAuth = () => {
           userId = sessionStorage.getItem('userId');
         }
         
-        if ((token && userData) || (userLoggedIn === 'true' && userEmail)) {
+        // Sadece userLoggedIn === 'true' ve userEmail varsa giriş yapmış say
+        if (userLoggedIn === 'true' && userEmail) {
           setIsLoggedIn(true);
           
           if (userData) {
