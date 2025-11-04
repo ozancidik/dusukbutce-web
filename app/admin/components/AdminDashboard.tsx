@@ -160,14 +160,21 @@ export default function AdminDashboard({
         
         {showModal && selectedSubmission && (
           <ActionModal
-            isOpen={showModal}
-            onClose={() => {
+            showModal={showModal}
+            selectedSubmission={selectedSubmission}
+            modalType={modalType as any}
+            isMobile={isMobile}
+            onSubmit={async (data: any) => {
+              await onActionSubmit(data.action, selectedSubmission._id, data.notes);
               setShowModal(false);
               setSelectedSubmission(null);
               setModalType('');
             }}
-            submission={selectedSubmission}
-            onActionSubmit={onActionSubmit}
+            onCancel={() => {
+              setShowModal(false);
+              setSelectedSubmission(null);
+              setModalType('');
+            }}
           />
         )}
         
@@ -203,6 +210,7 @@ export default function AdminDashboard({
               setDetailSubmission(null);
             }}
             submission={detailSubmission}
+            isMobile={isMobile}
           />
         )}
         
