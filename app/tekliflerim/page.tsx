@@ -1,0 +1,2730 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+
+// Simple JWT decode function
+function decodeJWT(token: string) {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    return JSON.parse(jsonPayload);
+  } catch (error) {
+    return null;
+  }
+}
+
+interface Offer {
+  amount: number;
+  notes: string;
+  date: string;
+}
+
+interface Submission {
+  _id: string;
+  category: string;
+  brand: string;
+  model: string;
+  processor?: string;
+  graphicsCard?: string;
+  wattValue?: string;
+  ram?: string;
+  storage?: string;
+  refreshRate?: string;
+  screenSize?: string;
+  batteryHealth?: string;
+  cosmeticCondition: string;
+  screenStatus?: string;
+  deadPixelCount?: string;
+  hasBox: boolean;
+  hasInvoice: boolean;
+  invoiceDate?: string;
+  quantity: number;
+  createdAt: string;
+  status: string;
+  adminNotes?: string;
+  images: string[];
+  offer?: Offer;
+  listing?: {
+    price: number;
+    title: string;
+    description: string;
+    date: string;
+  };
+  rejectionReason?: string;
+  rejectedAt?: string;
+  customerResponse?: {
+    action: 'accepted' | 'rejected';
+    note?: string;
+    reason?: string;
+    date: string;
+  };
+}
+
+export default function TekliflerimPage() {
+  const [submissions, setSubmissions] = useState<Submission[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
+  const [showActionModal, setShowActionModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
+  const [actionType, setActionType] = useState<'accept' | 'reject' | 'delete' | null>(null);
+  const [actionNote, setActionNote] = useState('');
+  const [deliveryMethod, setDeliveryMethod] = useState<'kargo' | 'evden' | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showReofferModal, setShowReofferModal] = useState(false);
+  const [reofferNote, setReofferNote] = useState('');
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupType, setPopupType] = useState<'success' | 'error'>('success');
+  const [popupTitle, setPopupTitle] = useState('');
+  const [popupMessage, setPopupMessage] = useState('');
+  const [currentSubmissionId, setCurrentSubmissionId] = useState<string | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    fetchSubmissions();
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  const fetchSubmissions = async () => {
+    try {
+      // Get userId from localStorage token
+      let userId = null;
+      try {
+        const token = localStorage.getItem('token');
+        if (token) {
+          const decoded = decodeJWT(token);
+          userId = decoded?.userId;
+          console.log('🔍 Token decoded userId:', userId);
+        }
+      } catch (error) {
+        console.log('No valid token found');
+      }
+
+      const url = userId ? `/api/submissions?userId=${userId}` : '/api/submissions';
+      console.log('🔍 Fetching submissions from:', url);
+      const response = await fetch(url);
+      const data = await response.json();
+      
+      console.log('🔍 API response:', data);
+      console.log('🔍 Submissions count:', data.submissions?.length || 0);
+      
+      if (response.ok) {
+        setSubmissions(data.submissions || []);
+      } else {
+        console.error('Veri çekme hatası:', data.error);
+      }
+    } catch (error) {
+      console.error('API hatası:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleString('tr-TR', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  const formatPrice = (price: number) => {
+    return `₺${price.toLocaleString('tr-TR')}`;
+  };
+
+  const getStatusText = (status: string) => {
+    return getStatusInfo(status).text;
+  };
+
+  const getStatusInfo = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return { color: '#f59e0b', text: 'Beklemede', icon: '⏳' };
+      case 'offered':
+        return { color: '#3b82f6', text: 'Teklif Verildi', icon: '💰' };
+      case 'listed':
+        return { color: '#059669', text: 'Listelendi', icon: '📋' };
+      case 'rejected':
+        return { color: '#dc2626', text: 'Reddedildi', icon: '❌' };
+      case 'approved':
+        return { color: '#059669', text: 'Onaylandı', icon: '✅' };
+      case 'accepted':
+        return { color: '#059669', text: 'Kabul Edildi', icon: '✅' };
+      case 'customer_accepted':
+        return { color: '#059669', text: 'Sizin Tarafınızdan Kabul Edildi', icon: '✅' };
+      case 'customer_rejected':
+        return { color: '#dc2626', text: 'Sizin Tarafınızdan Reddedildi', icon: '❌' };
+      default:
+        return { color: '#6b7280', text: 'Bilinmeyen', icon: '❓' };
+    }
+  };
+
+  const handleAction = (submission: Submission, type: 'accept' | 'reject' | 'delete') => {
+    setSelectedSubmission(submission);
+    setActionType(type);
+    setActionNote('');
+    if (type === 'delete') {
+      setShowDeleteModal(true);
+    } else {
+      setShowActionModal(true);
+    }
+  };
+
+  const handleSubmitAction = async () => {
+    if (!selectedSubmission || !actionType) return;
+
+    try {
+      const response = await fetch(`/api/submissions/${selectedSubmission._id}/response`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: actionType === 'accept' ? 'accepted' : 'rejected',
+          note: actionNote,
+          reason: actionType === 'reject' ? actionNote : undefined,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Update local state immediately
+        setSubmissions(prev => 
+          prev.map(sub => 
+            sub._id === selectedSubmission._id 
+              ? { 
+                  ...sub, 
+                  customerResponse: {
+                    action: actionType === 'accept' ? 'accepted' : 'rejected',
+                    note: actionNote,
+                    reason: actionType === 'reject' ? actionNote : undefined,
+                    date: new Date().toISOString(),
+                  },
+                  status: actionType === 'accept' ? 'accepted' : 'customer_rejected'
+                }
+              : sub
+          )
+        );
+        
+        setShowActionModal(false);
+        setSelectedSubmission(null);
+        setActionType(null);
+        setActionNote('');
+        
+        // Show success message and redirect
+        if (actionType === 'accept') {
+          // Müşteri teklifi kabul ettiğinde teslimat seçenekleri modalını aç
+          setCurrentSubmissionId(selectedSubmission._id);
+          setShowSuccessModal(true);
+        } else {
+          setShowRejectModal(true);
+        }
+      } else {
+        setPopupType('error');
+        setPopupTitle('Hata Oluştu');
+        setPopupMessage(result.message);
+        setShowPopup(true);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setPopupType('error');
+      setPopupTitle('Hata Oluştu');
+      setPopupMessage('Bir hata oluştu!');
+      setShowPopup(true);
+    }
+  };
+
+  const handleDeleteSubmission = async () => {
+    if (!selectedSubmission) return;
+
+    try {
+      // Get token for authorization
+      const token = localStorage.getItem('token');
+      
+      const response = await fetch(`/api/submissions?id=${selectedSubmission._id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` }),
+        },
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Remove from local state
+        setSubmissions(prev => prev.filter(sub => sub._id !== selectedSubmission._id));
+        
+        setShowDeleteModal(false);
+        setSelectedSubmission(null);
+        setActionType(null);
+        
+        setPopupType('success');
+        setPopupTitle('Başarılı');
+        setPopupMessage('Teklif başarıyla silindi!');
+        setShowPopup(true);
+      } else {
+        setPopupType('error');
+        setPopupTitle('Hata Oluştu');
+        setPopupMessage(result.message);
+        setShowPopup(true);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setPopupType('error');
+      setPopupTitle('Hata Oluştu');
+      setPopupMessage('Bir hata oluştu!');
+      setShowPopup(true);
+    }
+  };
+
+  const handleReofferSubmission = async () => {
+    if (!selectedSubmission || !reofferNote.trim()) {
+      setPopupType('error');
+      setPopupTitle('Hata');
+      setPopupMessage('Lütfen açıklama/talep alanını doldurun!');
+      setShowPopup(true);
+      return;
+    }
+
+    try {
+      // Get token for authorization
+      const token = localStorage.getItem('token');
+      
+      const response = await fetch(`/api/submissions/${selectedSubmission._id}/reoffer`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` }),
+        },
+        body: JSON.stringify({
+          reofferNote: reofferNote.trim(),
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Update local state - reset status to pending
+        setSubmissions(prev => 
+          prev.map(sub => 
+            sub._id === selectedSubmission._id 
+              ? { 
+                  ...sub, 
+                  status: 'pending',
+                  rejectionReason: undefined,
+                  rejectedAt: undefined,
+                  customerResponse: undefined,
+                  adminNotes: `YENİDEN TEKLİF TALEBİ: ${reofferNote.trim()}`
+                }
+              : sub
+          )
+        );
+        
+        setShowReofferModal(false);
+        setSelectedSubmission(null);
+        setReofferNote('');
+        
+        setPopupType('success');
+        setPopupTitle('Başarılı');
+        setPopupMessage('Yeniden teklif talebiniz gönderildi. En kısa sürede talebiniz değerlendirilecektir.');
+        setShowPopup(true);
+      } else {
+        setPopupType('error');
+        setPopupTitle('Hata Oluştu');
+        setPopupMessage(result.message || 'Bilinmeyen hata!');
+        setShowPopup(true);
+      }
+    } catch (error) {
+      console.error('Reoffer Error:', error);
+      setPopupType('error');
+      setPopupTitle('Hata Oluştu');
+      setPopupMessage(error instanceof Error ? error.message : 'Bir hata oluştu!');
+      setShowPopup(true);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div style={{ 
+        padding: isMobile ? '20px' : '40px', 
+        textAlign: 'center',
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%)'
+      }}>
+        <h2 style={{
+          fontSize: isMobile ? '20px' : '24px',
+          color: '#374151'
+        }}>
+          Yükleniyor...
+        </h2>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ 
+      padding: isMobile ? '20px 12px' : '40px', 
+      maxWidth: isMobile ? '100%' : '1200px', 
+      margin: '0 auto', 
+      background: 'linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%)',
+      minHeight: '100vh'
+    }}>
+      <div style={{
+        textAlign: 'center',
+        marginBottom: isMobile ? '30px' : '40px'
+      }}>
+        <div style={{
+          background: 'white',
+          borderRadius: '16px',
+          padding: isMobile ? '24px 20px' : '32px 40px',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+          border: '1px solid #e5e7eb'
+        }}>
+          <h1 style={{
+            fontSize: isMobile ? '28px' : '36px',
+            fontWeight: '800',
+            background: 'linear-gradient(135deg, #1f2937 0%, #374151 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            marginBottom: '12px'
+          }}>
+            Tekliflerim
+          </h1>
+          <p style={{
+            fontSize: isMobile ? '16px' : '18px',
+            color: '#6b7280',
+            margin: '0 0 20px 0',
+            lineHeight: '1.6'
+          }}>
+            Satış talepleriniz ve tekliflerinizi yönetin
+          </p>
+          
+          {/* Stats */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            gap: isMobile ? '16px' : '24px',
+            flexWrap: 'wrap'
+          }}>
+            <div style={{
+              background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)',
+              padding: isMobile ? '12px 16px' : '16px 24px',
+              borderRadius: '12px',
+              border: '1px solid #bae6fd'
+            }}>
+              <div style={{
+                fontSize: isMobile ? '20px' : '24px',
+                fontWeight: '700',
+                color: '#0369a1'
+              }}>
+                {submissions.length}
+              </div>
+              <div style={{
+                fontSize: isMobile ? '12px' : '14px',
+                color: '#0284c7',
+                fontWeight: '500'
+              }}>
+                Toplam Talep
+              </div>
+            </div>
+            
+            <div style={{
+              background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
+              padding: isMobile ? '12px 16px' : '16px 24px',
+              borderRadius: '12px',
+              border: '1px solid #bbf7d0'
+            }}>
+              <div style={{
+                fontSize: isMobile ? '20px' : '24px',
+                fontWeight: '700',
+                color: '#166534'
+              }}>
+                {submissions.filter(s => s.status === 'offered').length}
+              </div>
+              <div style={{
+                fontSize: isMobile ? '12px' : '14px',
+                color: '#16a34a',
+                fontWeight: '500'
+              }}>
+                Teklif Bekleyen
+              </div>
+            </div>
+            
+            <div style={{
+              background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
+              padding: isMobile ? '12px 16px' : '16px 24px',
+              borderRadius: '12px',
+              border: '1px solid #fcd34d'
+            }}>
+              <div style={{
+                fontSize: isMobile ? '20px' : '24px',
+                fontWeight: '700',
+                color: '#92400e'
+              }}>
+                {submissions.filter(s => s.customerResponse?.action === 'accepted').length}
+              </div>
+              <div style={{
+                fontSize: isMobile ? '12px' : '14px',
+                color: '#d97706',
+                fontWeight: '500'
+              }}>
+                Kabul Edilen
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {submissions.length === 0 ? (
+        <div style={{
+          textAlign: 'center',
+          padding: isMobile ? '40px 20px' : '60px 40px',
+          background: 'white',
+          borderRadius: '12px',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)'
+        }}>
+          <div style={{
+            fontSize: isMobile ? '48px' : '64px',
+            marginBottom: '16px'
+          }}>
+            📝
+          </div>
+          <h3 style={{
+            fontSize: isMobile ? '18px' : '20px',
+            fontWeight: '600',
+            color: '#374151',
+            marginBottom: '8px'
+          }}>
+            Henüz talebiniz yok
+          </h3>
+          <p style={{
+            fontSize: isMobile ? '14px' : '16px',
+            color: '#6b7280',
+            marginBottom: '24px'
+          }}>
+            Satış talebi oluşturmak için aşağıdaki butona tıklayın
+          </p>
+          <button
+            onClick={() => router.push('/bize-sat')}
+            style={{
+              background: 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              padding: isMobile ? '12px 24px' : '16px 32px',
+              fontSize: isMobile ? '14px' : '16px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+              boxShadow: '0 4px 12px rgba(37, 99, 235, 0.3)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 6px 20px rgba(37, 99, 235, 0.4)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(37, 99, 235, 0.3)';
+            }}
+          >
+            Satış Talebi Oluştur
+          </button>
+        </div>
+      ) : (
+        <div style={{
+          display: 'grid',
+          gap: isMobile ? '16px' : '24px'
+        }}>
+          {submissions.map((submission) => (
+            <div key={submission._id} style={{
+              background: 'white',
+              borderRadius: '12px',
+              padding: isMobile ? '20px' : '24px',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
+              border: '1px solid #e5e7eb'
+            }}>
+              {/* Header */}
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'flex-start',
+                marginBottom: '16px',
+                flexWrap: 'wrap',
+                gap: '12px'
+              }}>
+                <div>
+                  <h3 style={{
+                    fontSize: isMobile ? '16px' : '18px',
+                    fontWeight: '600',
+                    color: '#1f2937',
+                    margin: '0 0 4px 0'
+                  }}>
+                    {submission.brand} {submission.model}
+                  </h3>
+                  <p style={{
+                    fontSize: isMobile ? '12px' : '14px',
+                    color: '#6b7280',
+                    margin: 0
+                  }}>
+                    Talep Tarihi: {formatDate(submission.createdAt)}
+                  </p>
+                </div>
+                <div style={{
+                  background: getStatusInfo(submission.status).color,
+                  color: 'white',
+                  padding: isMobile ? '6px 12px' : '8px 16px',
+                  borderRadius: '20px',
+                  fontSize: isMobile ? '12px' : '14px',
+                  fontWeight: '500',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}>
+                  <span>{getStatusInfo(submission.status).icon}</span>
+                  <span>{getStatusText(submission.status)}</span>
+                </div>
+              </div>
+
+              {/* Product Details */}
+              <div style={{
+                background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+                borderRadius: '8px',
+                padding: isMobile ? '16px' : '20px',
+                marginBottom: '16px',
+                border: '1px solid #e2e8f0'
+              }}>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginBottom: '12px'
+                }}>
+                  <div style={{
+                    background: '#64748b',
+                    color: 'white',
+                    width: '28px',
+                    height: '28px',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '14px',
+                    fontWeight: 'bold',
+                    marginRight: '10px'
+                  }}>
+                    💻
+                  </div>
+                  <h4 style={{
+                    fontSize: isMobile ? '14px' : '16px',
+                    fontWeight: '600',
+                    color: '#334155',
+                    margin: 0
+                  }}>
+                    Ürün Özellikleri
+                  </h4>
+                </div>
+                
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(180px, 1fr))',
+                  gap: isMobile ? '12px' : '16px'
+                }}>
+                  {/* Marka & Model - En Önemli */}
+                  <div style={{
+                    background: 'white',
+                    padding: '12px',
+                    borderRadius: '6px',
+                    border: '1px solid #e2e8f0'
+                  }}>
+                    <span style={{ fontSize: isMobile ? '11px' : '12px', color: '#64748b', fontWeight: '500' }}>MARKA & MODEL</span>
+                    <div style={{ 
+                      fontSize: isMobile ? '15px' : '16px', 
+                      fontWeight: '600', 
+                      color: '#1e293b',
+                      marginTop: '4px'
+                    }}>
+                      {submission.brand} {submission.model}
+                    </div>
+                  </div>
+
+                  {/* İşlemci - Kritik */}
+                  {submission.processor && (
+                    <div style={{
+                      background: 'white',
+                      padding: '12px',
+                      borderRadius: '6px',
+                      border: '1px solid #e2e8f0'
+                    }}>
+                      <span style={{ fontSize: isMobile ? '11px' : '12px', color: '#64748b', fontWeight: '500' }}>İŞLEMCİ</span>
+                      <div style={{ 
+                        fontSize: isMobile ? '14px' : '15px', 
+                        fontWeight: '500', 
+                        color: '#1e293b',
+                        marginTop: '4px'
+                      }}>
+                        {submission.processor}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Ekran Kartı - Kritik */}
+                  {submission.graphicsCard && (
+                    <div style={{
+                      background: 'white',
+                      padding: '12px',
+                      borderRadius: '6px',
+                      border: '1px solid #e2e8f0'
+                    }}>
+                      <span style={{ fontSize: isMobile ? '11px' : '12px', color: '#64748b', fontWeight: '500' }}>EKRAN KARTI</span>
+                      <div style={{ 
+                        fontSize: isMobile ? '14px' : '15px', 
+                        fontWeight: '500', 
+                        color: '#1e293b',
+                        marginTop: '4px'
+                      }}>
+                        {submission.graphicsCard}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* RAM - Önemli */}
+                  {submission.ram && (
+                    <div style={{
+                      background: 'white',
+                      padding: '12px',
+                      borderRadius: '6px',
+                      border: '1px solid #e2e8f0'
+                    }}>
+                      <span style={{ fontSize: isMobile ? '11px' : '12px', color: '#64748b', fontWeight: '500' }}>RAM</span>
+                      <div style={{ 
+                        fontSize: isMobile ? '14px' : '15px', 
+                        fontWeight: '500', 
+                        color: '#1e293b',
+                        marginTop: '4px'
+                      }}>
+                        {submission.ram}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Depolama - Önemli */}
+                  {submission.storage && (
+                    <div style={{
+                      background: 'white',
+                      padding: '12px',
+                      borderRadius: '6px',
+                      border: '1px solid #e2e8f0'
+                    }}>
+                      <span style={{ fontSize: isMobile ? '11px' : '12px', color: '#64748b', fontWeight: '500' }}>DEPOLAMA</span>
+                      <div style={{ 
+                        fontSize: isMobile ? '14px' : '15px', 
+                        fontWeight: '500', 
+                        color: '#1e293b',
+                        marginTop: '4px'
+                      }}>
+                        {submission.storage}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Durum - Kritik */}
+                  <div style={{
+                    background: 'white',
+                    padding: '12px',
+                    borderRadius: '6px',
+                    border: '1px solid #e2e8f0'
+                  }}>
+                    <span style={{ fontSize: isMobile ? '11px' : '12px', color: '#64748b', fontWeight: '500' }}>DURUM</span>
+                    <div style={{ 
+                      fontSize: isMobile ? '14px' : '15px', 
+                      fontWeight: '500', 
+                      color: '#1e293b',
+                      marginTop: '4px'
+                    }}>
+                      {submission.cosmeticCondition}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Offer Section */}
+              {submission.status === 'offered' && (
+                <div style={{
+                  background: 'linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)',
+                  borderRadius: '8px',
+                  padding: isMobile ? '16px' : '20px',
+                  marginBottom: '16px',
+                  border: '1px solid #93c5fd'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    marginBottom: '12px'
+                  }}>
+                    <div style={{
+                      background: '#2563eb',
+                      color: 'white',
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '16px',
+                      fontWeight: 'bold',
+                      marginRight: '12px'
+                    }}>
+                      💰
+                    </div>
+                    <div>
+                      <h4 style={{
+                        fontSize: isMobile ? '16px' : '18px',
+                        fontWeight: '600',
+                        color: '#1e40af',
+                        margin: 0
+                      }}>
+                        💰 Teklifiniz
+                      </h4>
+                      <p style={{
+                        fontSize: isMobile ? '12px' : '14px',
+                        color: '#1e40af',
+                        margin: '4px 0 0 0',
+                        opacity: 0.8
+                      }}>
+                        Size özel fiyat teklifimiz
+                      </p>
+                    </div>
+                  </div>
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(200px, 1fr))',
+                    gap: '16px'
+                  }}>
+                    <div>
+                      <span style={{ fontSize: isMobile ? '12px' : '14px', color: '#1e40af', fontWeight: '600' }}>Teklif Tutarı:</span>
+                      <div style={{ 
+                        fontSize: isMobile ? '20px' : '24px', 
+                        fontWeight: '700', 
+                        color: '#1e40af',
+                        marginTop: '8px',
+                        background: 'rgba(255, 255, 255, 0.3)',
+                        padding: '12px 16px',
+                        borderRadius: '8px',
+                        textAlign: 'center',
+                        border: '2px solid rgba(255, 255, 255, 0.5)'
+                      }}>
+                        {submission.offer?.amount ? formatPrice(submission.offer.amount) : 'Belirtilmemiş'}
+                      </div>
+                    </div>
+                    <div>
+                      <span style={{ fontSize: isMobile ? '12px' : '14px', color: '#1e40af', fontWeight: '600' }}>Teklif Tarihi:</span>
+                      <div style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        fontWeight: '500', 
+                        color: '#1e40af',
+                        marginTop: '8px',
+                        background: 'rgba(255, 255, 255, 0.2)',
+                        padding: '8px 12px',
+                        borderRadius: '6px'
+                      }}>
+                        {formatDate(submission.createdAt)}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div style={{ marginTop: '16px' }}>
+                    <span style={{ fontSize: isMobile ? '12px' : '14px', color: '#1e40af', fontWeight: '600' }}>Teklif Notları:</span>
+                    <div style={{ 
+                      fontSize: isMobile ? '14px' : '16px', 
+                      color: '#1e40af',
+                      marginTop: '8px',
+                      background: 'rgba(255, 255, 255, 0.2)',
+                      padding: '16px',
+                      borderRadius: '8px',
+                      lineHeight: '1.6',
+                      border: '1px solid rgba(255, 255, 255, 0.3)'
+                    }}>
+                      {submission.offer?.notes || 'Not bulunmuyor'}
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div style={{
+                    display: 'flex',
+                    gap: '12px',
+                    marginTop: '20px',
+                    flexWrap: 'wrap'
+                  }}>
+                    <button
+                      onClick={() => submission.status === 'offered' ? handleAction(submission, 'accept') : null}
+                      disabled={submission.status !== 'offered'}
+                      style={{
+                        background: submission.status === 'offered' 
+                          ? 'linear-gradient(135deg, #059669 0%, #10b981 100%)'
+                          : 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        padding: isMobile ? '12px 20px' : '14px 24px',
+                        fontSize: isMobile ? '14px' : '16px',
+                        fontWeight: '600',
+                        cursor: submission.status === 'offered' ? 'pointer' : 'not-allowed',
+                        transition: 'all 0.2s',
+                        boxShadow: submission.status === 'offered' 
+                          ? '0 4px 12px rgba(5, 150, 105, 0.3)'
+                          : '0 2px 4px rgba(0, 0, 0, 0.1)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        opacity: submission.status === 'offered' ? 1 : 0.6
+                      }}
+                      onMouseEnter={(e) => {
+                        if (submission.status === 'offered') {
+                          e.currentTarget.style.transform = 'translateY(-2px)';
+                          e.currentTarget.style.boxShadow = '0 6px 20px rgba(5, 150, 105, 0.4)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (submission.status === 'offered') {
+                          e.currentTarget.style.transform = 'translateY(0)';
+                          e.currentTarget.style.boxShadow = '0 4px 12px rgba(5, 150, 105, 0.3)';
+                        }
+                      }}
+                    >
+                      ✅ Teklifi Kabul Et
+                    </button>
+                    <button
+                      onClick={() => submission.status === 'offered' ? handleAction(submission, 'reject') : null}
+                      disabled={submission.status !== 'offered'}
+                      style={{
+                        background: submission.status === 'offered' 
+                          ? 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)'
+                          : 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        padding: isMobile ? '12px 20px' : '14px 24px',
+                        fontSize: isMobile ? '14px' : '16px',
+                        fontWeight: '600',
+                        cursor: submission.status === 'offered' ? 'pointer' : 'not-allowed',
+                        transition: 'all 0.2s',
+                        boxShadow: submission.status === 'offered' 
+                          ? '0 4px 12px rgba(220, 38, 38, 0.3)'
+                          : '0 2px 4px rgba(0, 0, 0, 0.1)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        opacity: submission.status === 'offered' ? 1 : 0.6
+                      }}
+                      onMouseEnter={(e) => {
+                        if (submission.status === 'offered') {
+                          e.currentTarget.style.transform = 'translateY(-2px)';
+                          e.currentTarget.style.boxShadow = '0 6px 20px rgba(220, 38, 38, 0.4)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (submission.status === 'offered') {
+                          e.currentTarget.style.transform = 'translateY(0)';
+                          e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.3)';
+                        }
+                      }}
+                    >
+                      ❌ Teklifi Reddet
+                    </button>
+                  </div>
+                  
+                  {/* Status Info */}
+                  {submission.status !== 'offered' && (
+                    <div style={{
+                      marginTop: '12px',
+                      padding: '12px 16px',
+                      background: submission.status === 'customer_accepted' 
+                        ? 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)'
+                        : submission.status === 'customer_rejected'
+                        ? 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)'
+                        : 'linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%)',
+                      borderRadius: '8px',
+                      border: submission.status === 'customer_accepted' 
+                        ? '1px solid #6ee7b7'
+                        : submission.status === 'customer_rejected'
+                        ? '1px solid #fca5a5'
+                        : '1px solid #d1d5db',
+                      textAlign: 'center'
+                    }}>
+                      <p style={{
+                        margin: 0,
+                        fontSize: isMobile ? '14px' : '16px',
+                        color: submission.status === 'customer_accepted' 
+                          ? '#047857'
+                          : submission.status === 'customer_rejected'
+                          ? '#b91c1c'
+                          : '#6b7280',
+                        fontWeight: '500'
+                      }}>
+                        {submission.status === 'customer_accepted' 
+                          ? '✅ Bu teklif zaten kabul edilmiş'
+                          : submission.status === 'customer_rejected'
+                          ? '❌ Bu teklif zaten reddedilmiş'
+                          : '⏳ Bu teklif henüz değerlendirilmedi'}
+                      </p>
+                    </div>
+                  )}
+                  
+                  {/* Customer Response Section */}
+                  {submission.customerResponse && (
+                    <div style={{
+                      background: submission.customerResponse.action === 'accepted' 
+                        ? 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)'
+                        : 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)',
+                      borderRadius: '8px',
+                      padding: isMobile ? '16px' : '20px',
+                      marginTop: '16px',
+                      border: submission.customerResponse.action === 'accepted' 
+                        ? '1px solid #6ee7b7'
+                        : '1px solid #fca5a5'
+                    }}>
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        marginBottom: '12px'
+                      }}>
+                        <div style={{
+                          background: submission.customerResponse.action === 'accepted' ? '#059669' : '#dc2626',
+                          color: 'white',
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '50%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '16px',
+                          fontWeight: 'bold',
+                          marginRight: '12px'
+                        }}>
+                          {submission.customerResponse.action === 'accepted' ? '✅' : '❌'}
+                        </div>
+                        <h4 style={{
+                          fontSize: isMobile ? '16px' : '18px',
+                          fontWeight: '600',
+                          color: submission.customerResponse.action === 'accepted' ? '#065f46' : '#991b1b',
+                          margin: 0
+                        }}>
+                          {submission.customerResponse.action === 'accepted' ? 'Teklif Kabul Edildi' : 'Teklif Reddedildi'}
+                        </h4>
+                      </div>
+                      
+                      <div style={{
+                        fontSize: isMobile ? '14px' : '16px',
+                        color: submission.customerResponse.action === 'accepted' ? '#047857' : '#b91c1c',
+                        marginBottom: '8px'
+                      }}>
+                        <strong>Tarih:</strong> {formatDate(submission.customerResponse.date)}
+                      </div>
+                      
+                      {submission.customerResponse.note && (
+                        <div style={{
+                          fontSize: isMobile ? '14px' : '16px',
+                          color: submission.customerResponse.action === 'accepted' ? '#047857' : '#b91c1c',
+                          marginBottom: '8px'
+                        }}>
+                          <strong>Not:</strong> {submission.customerResponse.note}
+                        </div>
+                      )}
+                      
+                      {submission.customerResponse.reason && (
+                        <div style={{
+                          fontSize: isMobile ? '14px' : '16px',
+                          color: submission.customerResponse.action === 'accepted' ? '#047857' : '#b91c1c'
+                        }}>
+                          <strong>Sebep:</strong> {submission.customerResponse.reason}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Listing Section */}
+              {submission.listing && (
+                <div style={{
+                  background: 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)',
+                  borderRadius: '8px',
+                  padding: isMobile ? '16px' : '20px',
+                  marginBottom: '16px',
+                  border: '1px solid #6ee7b7'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    marginBottom: '12px'
+                  }}>
+                    <div style={{
+                      background: '#059669',
+                      color: 'white',
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '16px',
+                      fontWeight: 'bold',
+                      marginRight: '12px'
+                    }}>
+                      📋
+                    </div>
+                    <h4 style={{
+                      fontSize: isMobile ? '16px' : '18px',
+                      fontWeight: '600',
+                      color: '#065f46',
+                      margin: 0
+                    }}>
+                      İlan Detayları
+                    </h4>
+                  </div>
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(200px, 1fr))',
+                    gap: '12px'
+                  }}>
+                    <div>
+                      <span style={{ fontSize: isMobile ? '12px' : '14px', color: '#065f46' }}>İlan Başlığı:</span>
+                      <div style={{ fontSize: isMobile ? '14px' : '16px', fontWeight: '500', color: '#065f46' }}>
+                        {submission.listing.title}
+                      </div>
+                    </div>
+                    <div>
+                      <span style={{ fontSize: isMobile ? '12px' : '14px', color: '#065f46' }}>İlan Fiyatı:</span>
+                      <div style={{ 
+                        fontSize: isMobile ? '18px' : '20px', 
+                        fontWeight: '700', 
+                        color: '#065f46',
+                        marginTop: '4px'
+                      }}>
+                        {formatPrice(submission.listing.price)}
+                      </div>
+                    </div>
+                  </div>
+                  {submission.listing.description && (
+                    <div style={{ marginTop: '12px' }}>
+                      <span style={{ fontSize: isMobile ? '12px' : '14px', color: '#065f46' }}>Açıklama:</span>
+                      <div style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#065f46',
+                        marginTop: '4px'
+                      }}>
+                        {submission.listing.description}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Rejection Section */}
+              {submission.rejectionReason && (
+                <div style={{
+                  background: 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)',
+                  borderRadius: '8px',
+                  padding: isMobile ? '16px' : '20px',
+                  marginBottom: '16px',
+                  border: '1px solid #fca5a5'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    marginBottom: '12px'
+                  }}>
+                    <div style={{
+                      background: '#dc2626',
+                      color: 'white',
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '16px',
+                      fontWeight: 'bold',
+                      marginRight: '12px'
+                    }}>
+                      ❌
+                    </div>
+                    <h4 style={{
+                      fontSize: isMobile ? '16px' : '18px',
+                      fontWeight: '600',
+                      color: '#991b1b',
+                      margin: 0
+                    }}>
+                      Reddetme Sebebi
+                    </h4>
+                  </div>
+                  <div style={{ 
+                    fontSize: isMobile ? '14px' : '16px', 
+                    color: '#991b1b',
+                    marginBottom: '16px'
+                  }}>
+                    {submission.rejectionReason}
+                  </div>
+                  
+                  {/* Action Buttons for Rejected Submissions */}
+                  <div style={{
+                    display: 'flex',
+                    gap: '12px',
+                    justifyContent: 'center',
+                    flexWrap: 'wrap'
+                  }}>
+                    <button
+                      onClick={() => handleAction(submission, 'delete')}
+                      style={{
+                        background: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        padding: isMobile ? '10px 20px' : '12px 24px',
+                        fontSize: isMobile ? '14px' : '16px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        boxShadow: '0 4px 12px rgba(220, 38, 38, 0.3)'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                        e.currentTarget.style.boxShadow = '0 6px 20px rgba(220, 38, 38, 0.4)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.3)';
+                      }}
+                    >
+                      🗑️ Teklifi Sil
+                    </button>
+                    <button
+                      onClick={() => {
+                        setSelectedSubmission(submission);
+                        setReofferNote('');
+                        setShowReofferModal(true);
+                      }}
+                      style={{
+                        background: 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        padding: isMobile ? '10px 20px' : '12px 24px',
+                        fontSize: isMobile ? '14px' : '16px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        boxShadow: '0 4px 12px rgba(37, 99, 235, 0.3)'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                        e.currentTarget.style.boxShadow = '0 6px 20px rgba(37, 99, 235, 0.4)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(37, 99, 235, 0.3)';
+                      }}
+                    >
+                      🔄 Yeniden Teklif Al
+                    </button>
+                  </div>
+                </div>
+              )}
+
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Action Modal */}
+      {showActionModal && selectedSubmission && actionType && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.8)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          padding: '20px',
+          animation: 'fadeIn 0.3s ease-out'
+        }}>
+          <div style={{
+            background: 'white',
+            borderRadius: '16px',
+            padding: isMobile ? '24px' : '32px',
+            width: '100%',
+            maxWidth: isMobile ? '100%' : '550px',
+            maxHeight: '90vh',
+            overflow: 'auto',
+            boxShadow: '0 25px 50px rgba(0, 0, 0, 0.25), 0 10px 20px rgba(0, 0, 0, 0.15)',
+            animation: 'slideInUp 0.3s ease-out',
+            position: 'relative'
+          }}>
+            {/* Close Button */}
+            <button
+              onClick={() => {
+                setShowActionModal(false);
+                setSelectedSubmission(null);
+                setActionType(null);
+                setActionNote('');
+              }}
+              style={{
+                position: 'absolute',
+                top: '16px',
+                right: '16px',
+                background: '#f3f4f6',
+                border: 'none',
+                borderRadius: '50%',
+                width: '32px',
+                height: '32px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                fontSize: '18px',
+                color: '#6b7280',
+                transition: 'all 0.2s'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = '#e5e7eb';
+                e.currentTarget.style.color = '#374151';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = '#f3f4f6';
+                e.currentTarget.style.color = '#6b7280';
+              }}
+            >
+              ✕
+            </button>
+
+            {/* Header */}
+            <div style={{
+              textAlign: 'center',
+              marginBottom: '24px',
+              paddingTop: '8px'
+            }}>
+              <div style={{
+                width: '64px',
+                height: '64px',
+                borderRadius: '50%',
+                background: actionType === 'accept' 
+                  ? 'linear-gradient(135deg, #059669 0%, #10b981 100%)'
+                  : 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 16px',
+                fontSize: '28px',
+                boxShadow: '0 8px 16px rgba(0, 0, 0, 0.1)'
+              }}>
+                {actionType === 'accept' ? '✅' : '❌'}
+              </div>
+              <h2 style={{
+                fontSize: isMobile ? '20px' : '24px',
+                fontWeight: '700',
+                color: '#1f2937',
+                margin: '0 0 8px 0'
+              }}>
+                {actionType === 'accept' ? 'Teklifi Kabul Et' : 'Teklifi Reddet'}
+              </h2>
+              <p style={{
+                fontSize: isMobile ? '14px' : '16px',
+                color: '#6b7280',
+                margin: 0,
+                lineHeight: '1.5'
+              }}>
+                {actionType === 'accept' 
+                  ? 'Bu teklifi kabul etmek istediğinizden emin misiniz?' 
+                  : 'Bu teklifi reddetmek istediğinizden emin misiniz?'}
+              </p>
+            </div>
+
+            {/* Product Info */}
+            <div style={{
+              background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+              borderRadius: '12px',
+              padding: '20px',
+              marginBottom: '24px',
+              border: '1px solid #e2e8f0'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                marginBottom: '12px'
+              }}>
+                <div style={{
+                  background: '#64748b',
+                  color: 'white',
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '16px',
+                  fontWeight: 'bold',
+                  marginRight: '12px'
+                }}>
+                  💻
+                </div>
+                <h3 style={{
+                  fontSize: isMobile ? '16px' : '18px',
+                  fontWeight: '600',
+                  color: '#334155',
+                  margin: 0
+                }}>
+                  Ürün Bilgileri
+                </h3>
+              </div>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
+                gap: '12px'
+              }}>
+                <div>
+                  <span style={{ fontSize: isMobile ? '12px' : '14px', color: '#64748b', fontWeight: '500' }}>Marka & Model:</span>
+                  <div style={{ fontSize: isMobile ? '14px' : '16px', fontWeight: '600', color: '#1e293b' }}>
+                    {selectedSubmission.brand} {selectedSubmission.model}
+                  </div>
+                </div>
+                <div>
+                  <span style={{ fontSize: isMobile ? '12px' : '14px', color: '#64748b', fontWeight: '500' }}>Teklif Tutarı:</span>
+                  <div style={{ fontSize: isMobile ? '14px' : '16px', fontWeight: '600', color: '#1e293b' }}>
+                    {selectedSubmission.offer?.amount ? formatPrice(selectedSubmission.offer.amount) : 'Belirtilmemiş'}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Note Input */}
+            <div style={{ marginBottom: '24px' }}>
+              <label style={{
+                display: 'block',
+                marginBottom: '12px',
+                fontSize: isMobile ? '14px' : '16px',
+                fontWeight: '600',
+                color: '#374151'
+              }}>
+                {actionType === 'accept' ? 'Kabul Notu (Opsiyonel):' : 'Reddetme Sebebi:'}
+              </label>
+              <textarea
+                value={actionNote}
+                onChange={(e) => setActionNote(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '16px',
+                  border: '2px solid #e5e7eb',
+                  borderRadius: '12px',
+                  fontSize: isMobile ? '14px' : '16px',
+                  boxSizing: 'border-box',
+                  minHeight: '100px',
+                  resize: 'vertical',
+                  transition: 'border-color 0.2s',
+                  fontFamily: 'inherit'
+                }}
+                placeholder={actionType === 'accept' 
+                  ? 'Kabul notunuzu yazabilirsiniz (opsiyonel)...' 
+                  : 'Reddetme sebebinizi yazın...'}
+                onFocus={(e) => {
+                  e.target.style.borderColor = actionType === 'accept' ? '#10b981' : '#ef4444';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = '#e5e7eb';
+                }}
+              />
+            </div>
+
+            {/* Action Buttons */}
+            <div style={{
+              display: 'flex',
+              gap: '12px',
+              justifyContent: 'center',
+              flexWrap: 'wrap'
+            }}>
+              <button
+                onClick={() => {
+                  setShowActionModal(false);
+                  setSelectedSubmission(null);
+                  setActionType(null);
+                  setActionNote('');
+                }}
+                style={{
+                  background: '#f3f4f6',
+                  color: '#374151',
+                  border: '2px solid #e5e7eb',
+                  borderRadius: '12px',
+                  padding: isMobile ? '14px 24px' : '16px 32px',
+                  fontSize: isMobile ? '14px' : '16px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  minWidth: '120px'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#e5e7eb';
+                  e.currentTarget.style.borderColor = '#d1d5db';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = '#f3f4f6';
+                  e.currentTarget.style.borderColor = '#e5e7eb';
+                }}
+              >
+                İptal
+              </button>
+              <button
+                onClick={handleSubmitAction}
+                style={{
+                  background: actionType === 'accept' 
+                    ? 'linear-gradient(135deg, #059669 0%, #10b981 100%)'
+                    : 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '12px',
+                  padding: isMobile ? '14px 24px' : '16px 32px',
+                  fontSize: isMobile ? '14px' : '16px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  boxShadow: actionType === 'accept' 
+                    ? '0 4px 12px rgba(5, 150, 105, 0.3)'
+                    : '0 4px 12px rgba(220, 38, 38, 0.3)',
+                  minWidth: '120px'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = actionType === 'accept' 
+                    ? '0 6px 20px rgba(5, 150, 105, 0.4)'
+                    : '0 6px 20px rgba(220, 38, 38, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = actionType === 'accept' 
+                    ? '0 4px 12px rgba(5, 150, 105, 0.3)'
+                    : '0 4px 12px rgba(220, 38, 38, 0.3)';
+                }}
+              >
+                {actionType === 'accept' ? '✅ Kabul Et' : '❌ Reddet'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && selectedSubmission && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.8)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          padding: '20px',
+          animation: 'fadeIn 0.3s ease-out'
+        }}>
+          <div style={{
+            background: 'white',
+            borderRadius: '16px',
+            padding: isMobile ? '24px' : '32px',
+            width: '100%',
+            maxWidth: isMobile ? '100%' : '450px',
+            boxShadow: '0 25px 50px rgba(0, 0, 0, 0.25), 0 10px 20px rgba(0, 0, 0, 0.15)',
+            animation: 'slideInUp 0.3s ease-out',
+            position: 'relative'
+          }}>
+            {/* Close Button */}
+            <button
+              onClick={() => {
+                setShowDeleteModal(false);
+                setSelectedSubmission(null);
+                setActionType(null);
+              }}
+              style={{
+                position: 'absolute',
+                top: '16px',
+                right: '16px',
+                background: '#f3f4f6',
+                border: 'none',
+                borderRadius: '50%',
+                width: '32px',
+                height: '32px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                fontSize: '18px',
+                color: '#6b7280',
+                transition: 'all 0.2s'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = '#e5e7eb';
+                e.currentTarget.style.color = '#374151';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = '#f3f4f6';
+                e.currentTarget.style.color = '#6b7280';
+              }}
+            >
+              ✕
+            </button>
+
+            {/* Header */}
+            <div style={{
+              textAlign: 'center',
+              marginBottom: '24px',
+              paddingTop: '8px'
+            }}>
+              <div style={{
+                width: '64px',
+                height: '64px',
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 16px',
+                fontSize: '28px',
+                boxShadow: '0 8px 16px rgba(0, 0, 0, 0.1)',
+                border: '2px solid #fecaca'
+              }}>
+                ⚠️
+              </div>
+              <h2 style={{
+                fontSize: isMobile ? '20px' : '24px',
+                fontWeight: '700',
+                color: '#1f2937',
+                margin: '0 0 8px 0'
+              }}>
+                Teklifi Sil
+              </h2>
+              <p style={{
+                fontSize: isMobile ? '14px' : '16px',
+                color: '#6b7280',
+                margin: 0,
+                lineHeight: '1.5'
+              }}>
+                Bu teklifi kalıcı olarak silmek istediğinizden emin misiniz?
+              </p>
+            </div>
+
+            {/* Product Info */}
+            <div style={{
+              background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+              borderRadius: '12px',
+              padding: '20px',
+              marginBottom: '24px',
+              border: '1px solid #e2e8f0'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                marginBottom: '12px'
+              }}>
+                <div style={{
+                  background: '#64748b',
+                  color: 'white',
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '16px',
+                  fontWeight: 'bold',
+                  marginRight: '12px'
+                }}>
+                  💻
+                </div>
+                <h3 style={{
+                  fontSize: isMobile ? '16px' : '18px',
+                  fontWeight: '600',
+                  color: '#334155',
+                  margin: 0
+                }}>
+                  Silinecek Teklif
+                </h3>
+              </div>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
+                gap: '12px'
+              }}>
+                <div>
+                  <span style={{ fontSize: isMobile ? '12px' : '14px', color: '#64748b', fontWeight: '500' }}>Marka & Model:</span>
+                  <div style={{ fontSize: isMobile ? '14px' : '16px', fontWeight: '600', color: '#1e293b' }}>
+                    {selectedSubmission.brand} {selectedSubmission.model}
+                  </div>
+                </div>
+                <div>
+                  <span style={{ fontSize: isMobile ? '12px' : '14px', color: '#64748b', fontWeight: '500' }}>Durum:</span>
+                  <div style={{ fontSize: isMobile ? '14px' : '16px', fontWeight: '600', color: '#dc2626' }}>
+                    Reddedildi
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Warning Message */}
+            <div style={{
+              background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)',
+              border: '1px solid #fecaca',
+              borderRadius: '12px',
+              padding: '16px',
+              marginBottom: '24px'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '12px'
+              }}>
+                <span style={{
+                  fontSize: '20px',
+                  color: '#dc2626',
+                  marginTop: '2px'
+                }}>
+                  ⚠️
+                </span>
+                <div>
+                  <p style={{
+                    fontSize: isMobile ? '13px' : '14px',
+                    color: '#991b1b',
+                    margin: '0 0 4px 0',
+                    fontWeight: '600'
+                  }}>
+                    Bu işlem geri alınamaz!
+                  </p>
+                  <p style={{
+                    fontSize: isMobile ? '12px' : '13px',
+                    color: '#7f1d1d',
+                    margin: 0,
+                    lineHeight: '1.4'
+                  }}>
+                    Bu teklif ve ilgili tüm veriler kalıcı olarak silinecektir.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div style={{
+              display: 'flex',
+              gap: '12px',
+              justifyContent: 'center',
+              flexWrap: 'wrap'
+            }}>
+              <button
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setSelectedSubmission(null);
+                  setActionType(null);
+                }}
+                style={{
+                  background: '#f3f4f6',
+                  color: '#374151',
+                  border: '2px solid #e5e7eb',
+                  borderRadius: '12px',
+                  padding: isMobile ? '14px 24px' : '16px 32px',
+                  fontSize: isMobile ? '14px' : '16px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  minWidth: '120px'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#e5e7eb';
+                  e.currentTarget.style.borderColor = '#d1d5db';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = '#f3f4f6';
+                  e.currentTarget.style.borderColor = '#e5e7eb';
+                }}
+              >
+                İptal
+              </button>
+              <button
+                onClick={handleDeleteSubmission}
+                style={{
+                  background: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '12px',
+                  padding: isMobile ? '14px 24px' : '16px 32px',
+                  fontSize: isMobile ? '14px' : '16px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  boxShadow: '0 4px 12px rgba(220, 38, 38, 0.3)',
+                  minWidth: '120px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(220, 38, 38, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.3)';
+                }}
+              >
+                🗑️ Sil
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          padding: '20px'
+        }}>
+          <div style={{
+            background: 'white',
+            borderRadius: '20px',
+            padding: isMobile ? '24px' : '32px',
+            maxWidth: '500px',
+            width: '100%',
+            maxHeight: '90vh',
+            overflow: 'auto',
+            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)',
+            position: 'relative',
+            border: '1px solid #e5e7eb'
+          }}>
+            {/* Close Button */}
+            <button
+              onClick={() => setShowSuccessModal(false)}
+              style={{
+                position: 'absolute',
+                top: '16px',
+                right: '16px',
+                background: '#f3f4f6',
+                border: 'none',
+                borderRadius: '50%',
+                width: '32px',
+                height: '32px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                fontSize: '18px',
+                color: '#6b7280',
+                transition: 'all 0.2s'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = '#e5e7eb';
+                e.currentTarget.style.color = '#374151';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = '#f3f4f6';
+                e.currentTarget.style.color = '#6b7280';
+              }}
+            >
+              ✕
+            </button>
+
+            {/* Header */}
+            <div style={{
+              textAlign: 'center',
+              marginBottom: '32px',
+              paddingTop: '8px'
+            }}>
+              <div style={{
+                width: '80px',
+                height: '80px',
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 20px',
+                fontSize: '36px',
+                boxShadow: '0 8px 16px rgba(16, 185, 129, 0.3)',
+                border: '3px solid #ffffff'
+              }}>
+                ✅
+              </div>
+              <h2 style={{
+                fontSize: isMobile ? '24px' : '28px',
+                fontWeight: '700',
+                color: '#065f46',
+                margin: '0 0 12px 0'
+              }}>
+                Tebrikler! 🎉
+              </h2>
+              <p style={{
+                fontSize: isMobile ? '16px' : '18px',
+                color: '#047857',
+                margin: '0',
+                lineHeight: '1.5'
+              }}>
+                Teklifiniz başarıyla kabul edildi!
+              </p>
+            </div>
+
+            {/* Delivery Options */}
+            <div style={{
+              background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
+              borderRadius: '16px',
+              padding: '24px',
+              marginBottom: '24px',
+              border: '2px solid #bbf7d0'
+            }}>
+              <h3 style={{
+                fontSize: isMobile ? '18px' : '20px',
+                fontWeight: '600',
+                color: '#065f46',
+                margin: '0 0 16px 0',
+                textAlign: 'center'
+              }}>
+                Teslimat Seçenekleri
+              </h3>
+              
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px'
+              }}>
+                {/* Kargo Option */}
+                <label style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '16px',
+                  background: deliveryMethod === 'kargo' ? '#ffffff' : 'rgba(255, 255, 255, 0.7)',
+                  borderRadius: '12px',
+                  border: deliveryMethod === 'kargo' ? '2px solid #10b981' : '2px solid #bbf7d0',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  boxShadow: deliveryMethod === 'kargo' ? '0 4px 12px rgba(16, 185, 129, 0.2)' : 'none'
+                }}>
+                  <input
+                    type="radio"
+                    name="delivery"
+                    value="kargo"
+                    checked={deliveryMethod === 'kargo'}
+                    onChange={(e) => setDeliveryMethod(e.target.value as 'kargo')}
+                    style={{
+                      marginRight: '12px',
+                      width: '18px',
+                      height: '18px',
+                      accentColor: '#10b981'
+                    }}
+                  />
+                  <div style={{ flex: 1 }}>
+                    <div style={{
+                      fontSize: isMobile ? '16px' : '18px',
+                      fontWeight: '600',
+                      color: '#065f46',
+                      marginBottom: '4px'
+                    }}>
+                      📦 Kargo ile göndereceğim
+                    </div>
+                    <div style={{
+                      fontSize: isMobile ? '14px' : '15px',
+                      color: '#047857'
+                    }}>
+                      Ürününüzü kargo ile gönderin, kargo ücreti tarafımızca karşılanır
+                    </div>
+                  </div>
+                </label>
+
+                {/* Evden Teslim Option */}
+                <label style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '16px',
+                  background: deliveryMethod === 'evden' ? '#ffffff' : 'rgba(255, 255, 255, 0.7)',
+                  borderRadius: '12px',
+                  border: deliveryMethod === 'evden' ? '2px solid #10b981' : '2px solid #bbf7d0',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  boxShadow: deliveryMethod === 'evden' ? '0 4px 12px rgba(16, 185, 129, 0.2)' : 'none'
+                }}>
+                  <input
+                    type="radio"
+                    name="delivery"
+                    value="evden"
+                    checked={deliveryMethod === 'evden'}
+                    onChange={(e) => setDeliveryMethod(e.target.value as 'evden')}
+                    style={{
+                      marginRight: '12px',
+                      width: '18px',
+                      height: '18px',
+                      accentColor: '#10b981'
+                    }}
+                  />
+                  <div style={{ flex: 1 }}>
+                    <div style={{
+                      fontSize: isMobile ? '16px' : '18px',
+                      fontWeight: '600',
+                      color: '#065f46',
+                      marginBottom: '4px'
+                    }}>
+                      🏠 Evimden teslim alınsın
+                    </div>
+                    <div style={{
+                      fontSize: isMobile ? '14px' : '15px',
+                      color: '#047857'
+                    }}>
+                      İstanbul için geçerli - Adresinizden ürünü teslim alırız
+                    </div>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div style={{
+              display: 'flex',
+              gap: '12px',
+              justifyContent: 'center'
+            }}>
+              <button
+                onClick={() => setShowSuccessModal(false)}
+                style={{
+                  background: '#f3f4f6',
+                  color: '#374151',
+                  border: 'none',
+                  borderRadius: '12px',
+                  padding: isMobile ? '14px 24px' : '16px 32px',
+                  fontSize: isMobile ? '14px' : '16px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  minWidth: '120px'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#e5e7eb';
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = '#f3f4f6';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
+              >
+                Kapat
+              </button>
+              <button
+                onClick={() => {
+                  if (deliveryMethod) {
+                    // Teslimat seçimi yapıldı, işlemi tamamla
+                    setShowSuccessModal(false);
+                    setDeliveryMethod(null);
+                    
+                    if (deliveryMethod === 'kargo' || deliveryMethod === 'evden') {
+                      // Teklif teslimat sayfasına yönlendir
+                      window.location.href = `/teklif-teslimat?submissionId=${currentSubmissionId}&status=accepted`;
+                    }
+                  } else {
+                    alert('Lütfen bir teslimat seçeneği seçin');
+                  }
+                }}
+                style={{
+                  background: deliveryMethod ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : '#9ca3af',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '12px',
+                  padding: isMobile ? '14px 24px' : '16px 32px',
+                  fontSize: isMobile ? '14px' : '16px',
+                  fontWeight: '600',
+                  cursor: deliveryMethod ? 'pointer' : 'not-allowed',
+                  transition: 'all 0.2s',
+                  minWidth: '120px',
+                  boxShadow: deliveryMethod ? '0 4px 12px rgba(16, 185, 129, 0.3)' : 'none'
+                }}
+                onMouseEnter={(e) => {
+                  if (deliveryMethod) {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(16, 185, 129, 0.4)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (deliveryMethod) {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.3)';
+                  }
+                }}
+              >
+                Onayla
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reject Modal */}
+      {showRejectModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.8)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          padding: '20px',
+          animation: 'fadeIn 0.3s ease-out'
+        }}>
+          <div style={{
+            background: 'white',
+            borderRadius: '20px',
+            padding: isMobile ? '24px' : '32px',
+            maxWidth: '500px',
+            width: '100%',
+            maxHeight: '90vh',
+            overflow: 'auto',
+            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)',
+            position: 'relative',
+            border: '1px solid #e5e7eb',
+            animation: 'slideInUp 0.3s ease-out'
+          }}>
+            {/* Close Button */}
+            <button
+              onClick={() => setShowRejectModal(false)}
+              style={{
+                position: 'absolute',
+                top: '16px',
+                right: '16px',
+                background: '#f3f4f6',
+                border: 'none',
+                borderRadius: '50%',
+                width: '32px',
+                height: '32px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                fontSize: '18px',
+                color: '#6b7280',
+                transition: 'all 0.2s'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = '#e5e7eb';
+                e.currentTarget.style.color = '#374151';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = '#f3f4f6';
+                e.currentTarget.style.color = '#6b7280';
+              }}
+            >
+              ✕
+            </button>
+
+            {/* Header */}
+            <div style={{
+              textAlign: 'center',
+              marginBottom: '32px',
+              paddingTop: '8px'
+            }}>
+              <div style={{
+                width: '80px',
+                height: '80px',
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 20px',
+                fontSize: '36px',
+                boxShadow: '0 8px 16px rgba(239, 68, 68, 0.3)',
+                border: '3px solid #ffffff'
+              }}>
+                ❌
+              </div>
+              <h2 style={{
+                fontSize: isMobile ? '24px' : '28px',
+                fontWeight: '700',
+                color: '#991b1b',
+                margin: '0 0 12px 0'
+              }}>
+                Teklif Reddedildi
+              </h2>
+              <p style={{
+                fontSize: isMobile ? '16px' : '18px',
+                color: '#b91c1c',
+                margin: '0',
+                lineHeight: '1.5'
+              }}>
+                Teklifiniz başarıyla reddedildi!
+              </p>
+            </div>
+
+            {/* Info Message */}
+            <div style={{
+              background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)',
+              borderRadius: '16px',
+              padding: '24px',
+              marginBottom: '24px',
+              border: '2px solid #fecaca'
+            }}>
+              <h3 style={{
+                fontSize: isMobile ? '18px' : '20px',
+                fontWeight: '600',
+                color: '#991b1b',
+                margin: '0 0 16px 0',
+                textAlign: 'center'
+              }}>
+                Ne Olacak?
+              </h3>
+              
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px'
+              }}>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '12px',
+                  background: 'rgba(255, 255, 255, 0.7)',
+                  borderRadius: '8px'
+                }}>
+                  <div style={{
+                    width: '24px',
+                    height: '24px',
+                    borderRadius: '50%',
+                    background: '#dc2626',
+                    color: 'white',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '12px',
+                    fontWeight: 'bold'
+                  }}>
+                    1
+                  </div>
+                  <div style={{
+                    fontSize: isMobile ? '14px' : '16px',
+                    color: '#991b1b',
+                    fontWeight: '500'
+                  }}>
+                    Bu teklif artık geçerli değil
+                  </div>
+                </div>
+
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '12px',
+                  background: 'rgba(255, 255, 255, 0.7)',
+                  borderRadius: '8px'
+                }}>
+                  <div style={{
+                    width: '24px',
+                    height: '24px',
+                    borderRadius: '50%',
+                    background: '#dc2626',
+                    color: 'white',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '12px',
+                    fontWeight: 'bold'
+                  }}>
+                    2
+                  </div>
+                  <div style={{
+                    fontSize: isMobile ? '14px' : '16px',
+                    color: '#991b1b',
+                    fontWeight: '500'
+                  }}>
+                    Yeniden teklif almak için tekrar form doldurabilirsiniz
+                  </div>
+                </div>
+
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '12px',
+                  background: 'rgba(255, 255, 255, 0.7)',
+                  borderRadius: '8px'
+                }}>
+                  <div style={{
+                    width: '24px',
+                    height: '24px',
+                    borderRadius: '50%',
+                    background: '#dc2626',
+                    color: 'white',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '12px',
+                    fontWeight: 'bold'
+                  }}>
+                    3
+                  </div>
+                  <div style={{
+                    fontSize: isMobile ? '14px' : '16px',
+                    color: '#991b1b',
+                    fontWeight: '500'
+                  }}>
+                    Başka ürünlerinizi de satabilirsiniz
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div style={{
+              display: 'flex',
+              gap: '12px',
+              justifyContent: 'center'
+            }}>
+              <button
+                onClick={() => setShowRejectModal(false)}
+                style={{
+                  background: '#f3f4f6',
+                  color: '#374151',
+                  border: 'none',
+                  borderRadius: '12px',
+                  padding: isMobile ? '14px 24px' : '16px 32px',
+                  fontSize: isMobile ? '14px' : '16px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  minWidth: '120px'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#e5e7eb';
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = '#f3f4f6';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
+              >
+                Tamam
+              </button>
+              <button
+                onClick={() => {
+                  setShowRejectModal(false);
+                  router.push('/bize-sat');
+                }}
+                style={{
+                  background: 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '12px',
+                  padding: isMobile ? '14px 24px' : '16px 32px',
+                  fontSize: isMobile ? '14px' : '16px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  minWidth: '120px',
+                  boxShadow: '0 4px 12px rgba(37, 99, 235, 0.3)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(37, 99, 235, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(37, 99, 235, 0.3)';
+                }}
+              >
+                Yeni Ürün Sat
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reoffer Modal */}
+      {showReofferModal && selectedSubmission && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.8)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          padding: '20px',
+          animation: 'fadeIn 0.3s ease-out'
+        }}>
+          <div style={{
+            background: 'white',
+            borderRadius: '20px',
+            padding: isMobile ? '24px' : '32px',
+            maxWidth: '600px',
+            width: '100%',
+            maxHeight: '90vh',
+            overflow: 'auto',
+            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)',
+            position: 'relative',
+            border: '1px solid #e5e7eb',
+            animation: 'slideInUp 0.3s ease-out'
+          }}>
+            {/* Close Button */}
+            <button
+              onClick={() => {
+                setShowReofferModal(false);
+                setSelectedSubmission(null);
+                setReofferNote('');
+              }}
+              style={{
+                position: 'absolute',
+                top: '16px',
+                right: '16px',
+                background: 'rgba(220, 38, 38, 0.9)',
+                border: '2px solid white',
+                borderRadius: '50%',
+                width: '40px',
+                height: '40px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                fontSize: '20px',
+                color: 'white',
+                transition: 'all 0.2s',
+                zIndex: 1001
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(185, 28, 28, 1)';
+                e.currentTarget.style.color = 'white';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(220, 38, 38, 0.9)';
+                e.currentTarget.style.color = 'white';
+              }}
+            >
+              ✕
+            </button>
+
+            {/* Header */}
+            <div style={{
+              textAlign: 'center',
+              marginBottom: '32px',
+              paddingTop: '8px'
+            }}>
+              <div style={{
+                width: '80px',
+                height: '80px',
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 20px',
+                fontSize: '36px',
+                boxShadow: '0 8px 16px rgba(59, 130, 246, 0.3)',
+                border: '3px solid #ffffff'
+              }}>
+                🔄
+              </div>
+              <h2 style={{
+                fontSize: isMobile ? '24px' : '28px',
+                fontWeight: '700',
+                color: '#1e40af',
+                margin: '0 0 12px 0'
+              }}>
+                Yeniden Teklif Al
+              </h2>
+              <p style={{
+                fontSize: isMobile ? '16px' : '18px',
+                color: '#3b82f6',
+                margin: '0',
+                lineHeight: '1.5'
+              }}>
+                Bu ürün için yeniden teklif talebinde bulunun
+              </p>
+            </div>
+
+            {/* Product Info */}
+            <div style={{
+              background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+              borderRadius: '16px',
+              padding: '24px',
+              marginBottom: '24px',
+              border: '2px solid #e2e8f0'
+            }}>
+              <h3 style={{
+                fontSize: isMobile ? '18px' : '20px',
+                fontWeight: '600',
+                color: '#334155',
+                margin: '0 0 16px 0',
+                textAlign: 'center'
+              }}>
+                Ürün Bilgileri
+              </h3>
+              
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
+                gap: '16px'
+              }}>
+                <div>
+                  <span style={{ fontSize: isMobile ? '12px' : '14px', color: '#64748b', fontWeight: '500' }}>Marka & Model:</span>
+                  <div style={{ fontSize: isMobile ? '14px' : '16px', fontWeight: '600', color: '#1e293b' }}>
+                    {selectedSubmission.brand} {selectedSubmission.model}
+                  </div>
+                </div>
+                <div>
+                  <span style={{ fontSize: isMobile ? '12px' : '14px', color: '#64748b', fontWeight: '500' }}>Önceki Durum:</span>
+                  <div style={{ fontSize: isMobile ? '14px' : '16px', fontWeight: '600', color: '#dc2626' }}>
+                    Reddedildi
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Note Input */}
+            <div style={{ marginBottom: '32px' }}>
+              <label style={{
+                display: 'block',
+                marginBottom: '12px',
+                fontSize: isMobile ? '16px' : '18px',
+                fontWeight: '600',
+                color: '#374151'
+              }}>
+                Açıklama/Talep:
+              </label>
+              <textarea
+                value={reofferNote}
+                onChange={(e) => setReofferNote(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '16px',
+                  border: '2px solid #e5e7eb',
+                  borderRadius: '12px',
+                  fontSize: isMobile ? '14px' : '16px',
+                  boxSizing: 'border-box',
+                  minHeight: '120px',
+                  resize: 'vertical',
+                  transition: 'border-color 0.2s',
+                  fontFamily: 'inherit'
+                }}
+                placeholder="Neden yeniden teklif almak istediğinizi açıklayın..."
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#3b82f6';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = '#e5e7eb';
+                }}
+              />
+            </div>
+
+
+            {/* Action Buttons */}
+            <div style={{
+              display: 'flex',
+              gap: '12px',
+              justifyContent: 'center',
+              flexWrap: 'wrap'
+            }}>
+              <button
+                onClick={() => {
+                  setShowReofferModal(false);
+                  setSelectedSubmission(null);
+                  setReofferNote('');
+                }}
+                style={{
+                  background: '#f3f4f6',
+                  color: '#374151',
+                  border: '2px solid #e5e7eb',
+                  borderRadius: '12px',
+                  padding: isMobile ? '14px 24px' : '16px 32px',
+                  fontSize: isMobile ? '14px' : '16px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  minWidth: '120px'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#e5e7eb';
+                  e.currentTarget.style.borderColor = '#d1d5db';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = '#f3f4f6';
+                  e.currentTarget.style.borderColor = '#e5e7eb';
+                }}
+              >
+                İptal
+              </button>
+              <button
+                onClick={handleReofferSubmission}
+                style={{
+                  background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '12px',
+                  padding: isMobile ? '14px 24px' : '16px 32px',
+                  fontSize: isMobile ? '14px' : '16px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  minWidth: '120px',
+                  boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(59, 130, 246, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.3)';
+                }}
+              >
+                🔄 Yeniden Teklif Al
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* General Popup */}
+      {showPopup && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          padding: '20px'
+        }}>
+          <div style={{
+            background: 'white',
+            borderRadius: '16px',
+            padding: isMobile ? '24px' : '32px',
+            maxWidth: '400px',
+            width: '100%',
+            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)',
+            position: 'relative',
+            border: '1px solid #e5e7eb'
+          }}>
+            <button
+              onClick={() => setShowPopup(false)}
+              style={{
+                position: 'absolute',
+                top: '16px',
+                right: '16px',
+                background: 'rgba(220, 38, 38, 0.9)',
+                border: '2px solid white',
+                borderRadius: '50%',
+                width: '32px',
+                height: '32px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                fontSize: '16px',
+                color: 'white',
+                transition: 'all 0.2s'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(185, 28, 28, 1)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(220, 38, 38, 0.9)';
+              }}
+            >
+              ✕
+            </button>
+
+            <div style={{
+              textAlign: 'center',
+              paddingTop: '8px'
+            }}>
+              <div style={{
+                width: '60px',
+                height: '60px',
+                borderRadius: '50%',
+                background: popupType === 'success' 
+                  ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+                  : 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 16px',
+                fontSize: '24px',
+                boxShadow: popupType === 'success' 
+                  ? '0 8px 16px rgba(16, 185, 129, 0.3)'
+                  : '0 8px 16px rgba(239, 68, 68, 0.3)'
+              }}>
+                {popupType === 'success' ? '✅' : '❌'}
+              </div>
+              <h3 style={{
+                fontSize: isMobile ? '18px' : '20px',
+                fontWeight: '700',
+                color: popupType === 'success' ? '#065f46' : '#991b1b',
+                margin: '0 0 8px 0'
+              }}>
+                {popupTitle}
+              </h3>
+              <p style={{
+                fontSize: isMobile ? '14px' : '16px',
+                color: popupType === 'success' ? '#047857' : '#b91c1c',
+                margin: 0,
+                lineHeight: '1.5'
+              }}>
+                {popupMessage}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+} 

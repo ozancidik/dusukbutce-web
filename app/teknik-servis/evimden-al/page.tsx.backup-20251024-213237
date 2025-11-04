@@ -1,0 +1,217 @@
+"use client";
+import React, { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
+import EvimdenAlHeader from './components/EvimdenAlHeader';
+import PersonalInfoSection from './components/PersonalInfoSection';
+import AddressSection from './components/AddressSection';
+import DeviceInfoSection from './components/DeviceInfoSection';
+import AppointmentSection from './components/AppointmentSection';
+import NotesSection from './components/NotesSection';
+import SubmitButton from './components/SubmitButton';
+import BackButton from './components/BackButton';
+import SuccessModal from './components/SuccessModal';
+
+function EvimdenAlPageContent() {
+  const [isMobile, setIsMobile] = useState(false);
+  const [selectedService, setSelectedService] = useState<any>(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    phone: '',
+    email: '',
+    address: '',
+    city: '',
+    district: '',
+    serviceType: '',
+    deviceInfo: '',
+    problemDescription: '',
+    preferredDate: '',
+    preferredTime: '',
+    notes: ''
+  });
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
+  }, []);
+
+  useEffect(() => {
+    const serviceId = searchParams.get('service');
+    if (serviceId) {
+      const services = [
+        { id: '1', name: 'PC Onarım', icon: '🖥️' },
+        { id: '2', name: 'Laptop Tamiri', icon: '💻' },
+        { id: '3', name: 'Format Atma', icon: '💾' },
+        { id: '4', name: 'Parça Montajı', icon: '🔧' },
+        { id: '5', name: 'Telefon Onarım', icon: '📱' },
+        { id: '6', name: 'Tablet Tamiri', icon: '📱' },
+        { id: '7', name: 'PC Toplama', icon: '⚙️' },
+        { id: '8', name: 'Veri Kurtarma', icon: '💿' }
+      ];
+      const service = services.find(s => s.id === serviceId);
+      if (service) {
+        setSelectedService(service);
+        setFormData(prev => ({ ...prev, serviceType: service.name }));
+      }
+    }
+  }, [searchParams]);
+
+  const handleInputChange = (e: any) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+    
+    try {
+      const response = await fetch('/api/technical-service-submissions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          deliveryMethod: 'evimden-al'
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setShowSuccessModal(true);
+        // Formu sıfırla
+        setFormData({
+          name: '',
+          phone: '',
+          email: '',
+          address: '',
+          city: '',
+          district: '',
+          serviceType: selectedService?.name || '',
+          deviceInfo: '',
+          problemDescription: '',
+          preferredDate: '',
+          preferredTime: '',
+          notes: ''
+        });
+      } else {
+        alert('Bir hata oluştu: ' + result.message);
+      }
+    } catch (error) {
+      console.error('Form gönderilirken hata:', error);
+      alert('Form gönderilirken bir hata oluştu. Lütfen tekrar deneyin.');
+    }
+  };
+
+  const handleAddressRedirect = () => {
+    // Kullanıcıyı adres sayfasına yönlendir
+    window.location.href = '/profile';
+  };
+
+
+  return (
+    <div style={{
+      background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+      minHeight: '100vh',
+      padding: isMobile ? '20px 12px' : '40px'
+    }}>
+      <div style={{
+        maxWidth: '800px',
+        margin: '0 auto'
+      }}>
+        <EvimdenAlHeader isMobile={isMobile} selectedService={selectedService} />
+
+        {/* Form */}
+        <div style={{
+          background: 'white',
+          borderRadius: '16px',
+          padding: '32px',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+          border: '1px solid #e5e7eb'
+        }}>
+          <h2 style={{
+            fontSize: isMobile ? '20px' : '24px',
+            fontWeight: '700',
+            color: '#1f2937',
+            margin: '0 0 24px 0',
+            textAlign: 'center'
+          }}>
+            Teknik Servis Talebi
+          </h2>
+
+          <form onSubmit={handleSubmit}>
+            <PersonalInfoSection 
+              isMobile={isMobile} 
+              formData={formData} 
+              handleInputChange={handleInputChange} 
+            />
+
+            <AddressSection 
+              isMobile={isMobile} 
+              formData={formData} 
+              handleInputChange={handleInputChange} 
+            />
+
+            <DeviceInfoSection 
+              formData={formData} 
+              handleInputChange={handleInputChange} 
+            />
+
+            <AppointmentSection 
+              isMobile={isMobile} 
+              formData={formData} 
+              handleInputChange={handleInputChange} 
+            />
+
+            <NotesSection 
+              formData={formData} 
+              handleInputChange={handleInputChange} 
+            />
+
+            <SubmitButton />
+          </form>
+        </div>
+
+        <BackButton />
+      </div>
+
+      <SuccessModal 
+        isMobile={isMobile}
+        showSuccessModal={showSuccessModal}
+        setShowSuccessModal={setShowSuccessModal}
+        handleAddressRedirect={handleAddressRedirect}
+      />
+
+      <style jsx>{`
+        @keyframes modalSlideIn {
+          from {
+            opacity: 0;
+            transform: scale(0.9) translateY(-20px);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+          }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+export default function EvimdenAlPage() {
+  return (
+    <Suspense fallback={<div>Yükleniyor...</div>}>
+      <EvimdenAlPageContent />
+    </Suspense>
+  );
+}

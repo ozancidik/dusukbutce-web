@@ -1,0 +1,168 @@
+"use client";
+import React, { useState } from "react";
+import Link from "next/link";
+import FavoritesHeader from './components/FavoritesHeader';
+import FavoritesControls from './components/FavoritesControls';
+import FavoritesGrid from './components/FavoritesGrid';
+import FavoritesEmpty from './components/FavoritesEmpty';
+import FavoritesHelp from './components/FavoritesHelp';
+import FavoritesFooter from './components/FavoritesFooter';
+
+interface FavoriteProduct {
+  id: number;
+  name: string;
+  category: string;
+  price: number;
+  originalPrice?: number;
+  brand: string;
+  image: string;
+  isInStock: boolean;
+  addedDate: string;
+}
+
+const sampleFavorites: FavoriteProduct[] = [
+  {
+    id: 1,
+    name: "ASUS ROG Strix G15 Gaming Laptop",
+    category: "Gaming Laptop",
+    price: 25999,
+    originalPrice: 28999,
+    brand: "ASUS",
+    image: "💻",
+    isInStock: true,
+    addedDate: "2024-08-15"
+  },
+  {
+    id: 2,
+    name: "MSI RTX 4070 Gaming X Trio",
+    category: "Ekran Kartı",
+    price: 18999,
+    brand: "MSI",
+    image: "🎮",
+    isInStock: true,
+    addedDate: "2024-08-14"
+  },
+  {
+    id: 3,
+    name: "Samsung 970 EVO Plus 1TB SSD",
+    category: "SSD",
+    price: 899,
+    originalPrice: 1199,
+    brand: "Samsung",
+    image: "💾",
+    isInStock: false,
+    addedDate: "2024-08-13"
+  },
+  {
+    id: 4,
+    name: "Logitech G Pro X Superlight",
+    category: "Gaming Mouse",
+    price: 2499,
+    brand: "Logitech",
+    image: "🖱️",
+    isInStock: true,
+    addedDate: "2024-08-12"
+  },
+  {
+    id: 5,
+    name: "LG 27GL850-B Gaming Monitor",
+    category: "Monitör",
+    price: 8999,
+    originalPrice: 10999,
+    brand: "LG",
+    image: "🖥️",
+    isInStock: true,
+    addedDate: "2024-08-11"
+  }
+];
+
+export default function FavoritesPage() {
+  const [favorites, setFavorites] = useState<FavoriteProduct[]>(sampleFavorites);
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [sortBy, setSortBy] = useState("date");
+
+
+  const filteredFavorites = favorites.filter(product => {
+    if (selectedCategory === "all") return true;
+    return product.category.toLowerCase().includes(selectedCategory.replace("-", " "));
+  });
+
+  const sortedFavorites = [...filteredFavorites].sort((a, b) => {
+    switch (sortBy) {
+      case "price":
+        return a.price - b.price;
+      case "price-desc":
+        return b.price - a.price;
+      case "name":
+        return a.name.localeCompare(b.name);
+      case "date":
+      default:
+        return new Date(b.addedDate).getTime() - new Date(a.addedDate).getTime();
+    }
+  });
+
+  const removeFromFavorites = (productId: number) => {
+    setFavorites(favorites.filter(p => p.id !== productId));
+  };
+
+  const clearAllFavorites = () => {
+    if (confirm('Tüm favorileri silmek istediğinizden emin misiniz?')) {
+      setFavorites([]);
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('tr-TR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  const getDiscountPercentage = (originalPrice: number, currentPrice: number) => {
+    return Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
+  };
+
+  return (
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%)',
+      padding: '20px'
+    }}>
+      <div style={{
+        maxWidth: '1200px',
+        margin: '0 auto',
+        padding: '40px 20px',
+        background: 'white',
+        borderRadius: '16px',
+        boxShadow: '0 4px 32px rgba(0, 0, 0, 0.1)'
+      }}>
+        <FavoritesHeader />
+        
+        <FavoritesControls
+          favoritesCount={favorites.length}
+          selectedCategory={selectedCategory}
+          setSelectedCategory={setSelectedCategory}
+          sortBy={sortBy}
+          setSortBy={setSortBy}
+          onClearAll={clearAllFavorites}
+        />
+
+        {sortedFavorites.length > 0 ? (
+          <FavoritesGrid
+            products={sortedFavorites}
+            onRemove={removeFromFavorites}
+            formatDate={formatDate}
+            getDiscountPercentage={getDiscountPercentage}
+          />
+        ) : (
+          <FavoritesEmpty />
+        )}
+
+        <FavoritesHelp />
+        <FavoritesFooter />
+      </div>
+    </div>
+  );
+}

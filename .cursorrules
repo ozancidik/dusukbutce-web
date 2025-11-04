@@ -1,0 +1,17 @@
+{
+  "models": [
+    "gpt-5",
+    "gpt-5-high", 
+    "gpt-5-fast",
+    "claude-3.7-sonnet",
+    "claude-3.5-sonnet",
+    "gpt-4o",
+    "deepseek-v3.1",
+    "gemini-2.5-pro"
+  ],
+  "defaultModel": "gpt-5",
+  "inlineCompletionModel": "gpt-4o",
+  "secondaryModel": "claude-3.7-sonnet",
+  "fallbackModel": "gpt-5-fast",
+  "instructions": "Her zaman Türkçe yanıt ver. Proje stack: Backend Node.js + Next.js API Routes, Frontend React + Next.js App Router, Database MongoDB, Dil JavaScript/TypeScript. Kod yazarken Next.js App Router yapısını bozmadan, TypeScript uyumlu, temiz ve okunabilir kod üret. CSS için inline styles kullan. Yorum satırlarını sadece gerekli yerlerde ekle. Sadece belirtilen dosyalarda değişiklik yap, diğer dosyalara dokunma."
+}

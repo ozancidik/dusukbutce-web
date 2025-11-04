@@ -1,0 +1,220 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+/* WhatsApp Floating Button */
+.whatsapp-button {
+  position: fixed;
+  bottom: 20px;
+  left: 40px;
+  z-index: 1000;
+  background: #25D366;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 50px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+  min-width: auto;
+  height: 48px;
+  justify-content: center;
+  white-space: nowrap;
+  transform: scale(1.2);
+  transform-origin: left bottom;
+}
+
+.whatsapp-button:hover {
+  transform: scale(1.2) translateY(-2px);
+  box-shadow: 0 6px 25px rgba(37, 211, 102, 0.6);
+}
+
+.whatsapp-text {
+  display: inline;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .whatsapp-button {
+    height: 44px;
+    padding: 6px 12px;
+    bottom: 16px;
+    left: 24px;
+    gap: 8px;
+    transform: scale(1);
+  }
+  
+  .whatsapp-button:hover {
+    transform: translateY(-2px);
+  }
+  
+  .whatsapp-text {
+    display: inline;
+    font-size: 12px;
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  min-width: 100vw;
+  display: flex;
+  flex-direction: column;
+}
+
+#__next, main {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.small-placeholder::placeholder {
+  font-size: 10px;
+  color: #9ca3af;
+  line-height: 1.2;
+}
+
+/* Responsive Grid for Bize Sat Page */
+@media (max-width: 1200px) {
+  .category-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  
+  .category-grid > div:nth-child(3) {
+    grid-column: 1 / -1 !important;
+    margin-top: 32px !important;
+  }
+  
+  .category-grid > div:nth-child(3) > div {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 16px !important;
+  }
+  
+  .category-grid > div:nth-child(3) > div > a:nth-child(1) {
+    order: 2 !important;
+  }
+  
+  .category-grid > div:nth-child(3) > div > a:nth-child(2) {
+    order: 1 !important;
+  }
+  
+  .category-grid > div:nth-child(3) > div > a:nth-child(3) {
+    order: 3 !important;
+  }
+}
+
+/* Galaxy Z Fold 5, Samsung Galaxy A51/71 and very narrow screens */
+@media (max-width: 450px) {
+  .category-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .category-grid > div:nth-child(3) {
+    grid-column: 1 !important;
+    margin-top: 0 !important;
+  }
+  
+  .category-grid > div:nth-child(3) > div {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  
+  .category-grid > div:nth-child(3) > div > a:nth-child(1),
+  .category-grid > div:nth-child(3) > div > a:nth-child(2),
+  .category-grid > div:nth-child(3) > div > a:nth-child(3) {
+    order: unset !important;
+  }
+}
+
+/* Modal Animasyonları */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
