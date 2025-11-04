@@ -2,14 +2,18 @@
 import React from "react";
 import Link from "next/link";
 
-export default function Logo() {
+interface LogoProps {
+  isMobile?: boolean;
+}
+
+export default function Logo({ isMobile = false }: LogoProps) {
   return (
     <Link href="/" style={{ textDecoration: "none", flexShrink: 0 }}>
       <img 
         src="/logo-copy.png" 
         alt="Düşük Bütçe" 
-        width={160} 
-        height={60} 
+        width={isMobile ? 120 : 160} 
+        height={isMobile ? 45 : 60} 
         style={{ 
           objectFit: "contain",
           cursor: "pointer",
