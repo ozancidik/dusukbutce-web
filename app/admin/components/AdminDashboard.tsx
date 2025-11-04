@@ -22,8 +22,8 @@ interface AdminDashboardProps {
   setModalType: (type: any) => void;
   showDeleteModal: boolean;
   setShowDeleteModal: (show: boolean) => void;
-  deleteModalType: string | null;
-  setDeleteModalType: (type: any) => void;
+  deleteModalType: 'single' | 'all' | null;
+  setDeleteModalType: (type: 'single' | 'all' | null) => void;
   deleteTargetId: string | null;
   setDeleteTargetId: (id: string | null) => void;
   showToast: boolean;
