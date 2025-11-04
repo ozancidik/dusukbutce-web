@@ -1,0 +1,1076 @@
+"use client";
+import React, { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+
+export default function LoginPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [socialLoading, setSocialLoading] = useState("");
+  const [isAdminForm, setIsAdminForm] = useState(false);
+  const [loginSuccess, setLoginSuccess] = useState(false);
+  const [redirectMessage, setRedirectMessage] = useState("");
+  const [loginAttempts, setLoginAttempts] = useState(0);
+  const [rememberMe, setRememberMe] = useState(false);
+  const [isResendingEmail, setIsResendingEmail] = useState(false);
+  const [emailVerificationError, setEmailVerificationError] = useState(false);
+  const [isEmailSent, setIsEmailSent] = useState(false);
+  const router = useRouter();
+
+  // Kullanıcı ve admin giriş kontrolü
+  React.useEffect(() => {
+    const checkUserStatus = () => {
+      const adminLoggedIn = localStorage.getItem("adminLoggedIn") || sessionStorage.getItem("adminLoggedIn");
+      const adminEmail = localStorage.getItem("adminEmail") || sessionStorage.getItem("adminEmail");
+      const userLoggedIn = localStorage.getItem("userLoggedIn") || sessionStorage.getItem("userLoggedIn");
+      const userEmail = localStorage.getItem("userEmail") || sessionStorage.getItem("userEmail");
+      
+      // Admin bilgileri varsa ve geçerliyse yönlendir
+      if (adminLoggedIn === "true" && adminEmail) {
+        console.log("🔒 Admin giriş yapmış, admin paneline yönlendiriliyor...");
+        router.push("/admin");
+        return;
+      }
+      
+      // Normal kullanıcı giriş yapmışsa returnUrl kontrolü yap
+      if (userLoggedIn === "true" && userEmail) {
+        // returnUrl parametresi varsa oraya yönlendir
+        const returnUrl = new URLSearchParams(window.location.search).get('returnUrl');
+        if (returnUrl) {
+          console.log("👤 Kullanıcı giriş yapmış, returnUrl'e yönlendiriliyor:", returnUrl);
+          router.push(decodeURIComponent(returnUrl));
+        } else {
+          console.log("👤 Kullanıcı giriş yapmış, profil sayfasına yönlendiriliyor...");
+          router.push("/profile");
+        }
+        return;
+      }
+      
+      // Hiçbir giriş yoksa login sayfasında kal
+      console.log("🔓 Giriş yapılmamış, login sayfasında kalınıyor...");
+    };
+
+    // İlk kontrol
+    checkUserStatus();
+
+    // localStorage değişikliklerini dinle
+    const handleStorageChange = () => {
+      const adminLoggedIn = localStorage.getItem("adminLoggedIn") || sessionStorage.getItem("adminLoggedIn");
+      const adminEmail = localStorage.getItem("adminEmail") || sessionStorage.getItem("adminEmail");
+      const userLoggedIn = localStorage.getItem("userLoggedIn") || sessionStorage.getItem("userLoggedIn");
+      const userEmail = localStorage.getItem("userEmail") || sessionStorage.getItem("userEmail");
+      
+      // Herhangi bir giriş yapıldıysa kontrol et
+      if ((adminLoggedIn === "true" && adminEmail) || (userLoggedIn === "true" && userEmail)) {
+        checkUserStatus();
+      }
+    };
+
+    // Custom event'leri dinle
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('localStorageChange', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('localStorageChange', handleStorageChange);
+    };
+  }, [router]);
+
+  // Smart form detection - sadece gerçek admin email'leri için
+  React.useEffect(() => {
+    // Sadece gerçek admin email formatları için admin form tespiti
+    if (email.includes("@admin.") || email.includes("admin@")) {
+      setIsAdminForm(true);
+    } else {
+      setIsAdminForm(false);
+    }
+  }, [email]);
+
+  // Rate limiting kontrolü - sadece gerçek yanlış şifre girişlerinde göster
+  React.useEffect(() => {
+    const attempts = localStorage.getItem("loginAttempts") || "0";
+    const lastAttemptTime = localStorage.getItem("lastLoginAttempt");
+    const now = Date.now();
+    
+    // 15 dakika geçmişse sayacı sıfırla
+    if (lastAttemptTime) {
+      const timeDiff = now - parseInt(lastAttemptTime);
+      if (timeDiff >= 15 * 60 * 1000) { // 15 dakika
+        localStorage.setItem("loginAttempts", "0");
+        localStorage.removeItem("lastLoginAttempt");
+        setLoginAttempts(0);
+      } else {
+        // Sadece gerçek yanlış şifre girişi varsa göster
+        const isRealPasswordAttempt = localStorage.getItem("isRealPasswordAttempt") === "true";
+        if (isRealPasswordAttempt) {
+          setLoginAttempts(parseInt(attempts));
+        } else {
+          // Gerçek yanlış şifre girişi değilse sayacı sıfırla
+          localStorage.setItem("loginAttempts", "0");
+          localStorage.removeItem("lastLoginAttempt");
+          setLoginAttempts(0);
+        }
+      }
+    } else {
+      setLoginAttempts(0);
+    }
+  }, []);
+
+  // Remember Me için email hatırlama
+  React.useEffect(() => {
+    const rememberedEmail = localStorage.getItem("rememberedEmail");
+    const rememberMe = localStorage.getItem("rememberMe");
+    
+    if (rememberedEmail && rememberMe === "true") {
+      setEmail(rememberedEmail);
+      setRememberMe(true);
+    }
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Rate limiting kontrolü
+    if (loginAttempts >= 5) {
+      const lastAttemptTime = localStorage.getItem("lastLoginAttempt");
+      const now = Date.now();
+      const timeDiff = now - (lastAttemptTime ? parseInt(lastAttemptTime) : 0);
+      
+      if (timeDiff < 15 * 60 * 1000) { // 15 dakika bekleme süresi
+        const remainingTime = Math.ceil((15 * 60 * 1000 - timeDiff) / (60 * 1000));
+        setError(`Çok fazla giriş denemesi. Lütfen ${remainingTime} dakika bekleyin.`);
+        return;
+      } else {
+        // Süre dolmuş, sıfırla
+        localStorage.setItem("loginAttempts", "0");
+        setLoginAttempts(0);
+      }
+    }
+    
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      
+      const data = await res.json();
+      
+      if (data.success) {
+        // Kullanıcı bilgilerini hem localStorage hem sessionStorage'a kaydet
+        const loginTime = Date.now();
+        const userData = {
+          userLoggedIn: "true",
+          userEmail: data.user.email,
+          userName: data.user.name,
+          userId: data.user.id,
+          userPhone: data.user.phone || '',
+          userBirthDate: data.user.birthDate || '',
+          userIsAdmin: data.user.isAdmin.toString(),
+          loginTime: loginTime.toString(),
+          rememberMe: rememberMe.toString(),
+          token: data.token || "login-token-" + Math.random().toString(36).substr(2, 9),
+          user: JSON.stringify({
+            id: data.user.id,
+            email: data.user.email,
+            name: data.user.name,
+            phone: data.user.phone || '',
+            birthDate: data.user.birthDate || '',
+            isAdmin: data.user.isAdmin
+          })
+        };
+        
+        // localStorage'a kaydet
+        Object.entries(userData).forEach(([key, value]) => {
+          localStorage.setItem(key, value);
+        });
+        
+        // sessionStorage'a da kaydet (gizli sekme desteği için)
+        Object.entries(userData).forEach(([key, value]) => {
+          sessionStorage.setItem(key, value);
+        });
+        
+        // Remember Me değerini de kaydet
+        localStorage.setItem("rememberMe", rememberMe.toString());
+        sessionStorage.setItem("rememberMe", rememberMe.toString());
+        
+        // Remember Me işaretliyse email'i hatırla
+        if (rememberMe) {
+          localStorage.setItem("rememberedEmail", data.user.email);
+        } else {
+          localStorage.removeItem("rememberedEmail");
+        }
+        
+        // Custom event'i tetikle
+        window.dispatchEvent(new Event('localStorageChange'));
+        
+        // Rate limiting'i sıfırla
+        localStorage.setItem("loginAttempts", "0");
+        localStorage.removeItem("lastLoginAttempt");
+        localStorage.removeItem("isRealPasswordAttempt");
+        setLoginAttempts(0);
+        
+        if (data.user.isAdmin) {
+          localStorage.setItem("adminLoggedIn", "true");
+          localStorage.setItem("adminEmail", data.user.email);
+          localStorage.setItem("adminToken", data.token);
+          sessionStorage.setItem("adminLoggedIn", "true");
+          sessionStorage.setItem("adminEmail", data.user.email);
+          sessionStorage.setItem("adminToken", data.token);
+          
+          // Admin giriş sonrası özel mesaj ve yönlendirme
+          setLoginSuccess(true);
+          setRedirectMessage("Admin giriş başarılı! Admin paneline yönlendiriliyor...");
+          
+          // Loading'i hemen durdur
+          setIsLoading(false);
+          
+          setTimeout(() => {
+            router.push("/admin");
+          }, 1500); // 2 saniyeden 1.5 saniyeye düşürdük
+        } else {
+          // Normal kullanıcı yönlendirmesi - returnUrl varsa oraya, yoksa profile sayfasına git
+          const returnUrl = new URLSearchParams(window.location.search).get('returnUrl');
+          
+          if (returnUrl) {
+            setLoginSuccess(true);
+            setRedirectMessage("Giriş başarılı! Yönlendiriliyorsunuz...");
+            
+            setTimeout(() => {
+              router.push(decodeURIComponent(returnUrl));
+            }, 2000);
+          } else {
+            setLoginSuccess(true);
+            setRedirectMessage("Giriş başarılı! Profil sayfasına yönlendiriliyor...");
+            
+            setTimeout(() => {
+              router.push("/profile");
+            }, 2000);
+          }
+        }
+      } else {
+        // Email doğrulama hatası ise rate limiting'i artırma ve sayacı sıfırla
+        if (data.requiresVerification) {
+          setEmailVerificationError(true);
+          setError(data.message || "Email adresinizi doğrulamanız gerekiyor. Email kutunuzu kontrol edin.");
+          // Email doğrulama hatası durumunda sayacı sıfırla
+          localStorage.setItem("loginAttempts", "0");
+          localStorage.removeItem("lastLoginAttempt");
+          localStorage.removeItem("isRealPasswordAttempt");
+          setLoginAttempts(0);
+        } else {
+          // Sadece yanlış şifre hatası için rate limiting'i artır
+          if (data.message && data.message.includes("Email veya şifre hatalı")) {
+            const newAttempts = loginAttempts + 1;
+            localStorage.setItem("loginAttempts", newAttempts.toString());
+            localStorage.setItem("lastLoginAttempt", Date.now().toString());
+            localStorage.setItem("isRealPasswordAttempt", "true");
+            setLoginAttempts(newAttempts);
+          } else {
+            // Diğer hatalar için sayacı sıfırla
+            localStorage.setItem("loginAttempts", "0");
+            localStorage.removeItem("lastLoginAttempt");
+            localStorage.removeItem("isRealPasswordAttempt");
+            setLoginAttempts(0);
+          }
+          
+          setError(data.message || "Giriş yapılırken bir hata oluştu.");
+        }
+      }
+    } catch (err) {
+      // Bağlantı hatası durumunda sayacı sıfırla (gerçek yanlış şifre değil)
+      localStorage.setItem("loginAttempts", "0");
+      localStorage.removeItem("lastLoginAttempt");
+      localStorage.removeItem("isRealPasswordAttempt");
+      setLoginAttempts(0);
+      
+      setError("Bağlantı hatası oluştu.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Email doğrulama için tekrar mail gönder
+  const handleResendVerificationEmail = async () => {
+    if (!email) {
+      setError("Lütfen email adresinizi girin.");
+      return;
+    }
+
+    setIsResendingEmail(true);
+    setError("");
+
+    try {
+      const res = await fetch('/api/auth/resend-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      
+      const data = await res.json();
+      
+      if (data.success) {
+        setError("Doğrulama e-postası gönderildi. Lütfen gelen kutunuzu kontrol edin.");
+        setEmailVerificationError(false);
+        setIsEmailSent(true);
+        
+        // 5 saniye sonra başarı mesajını temizle
+        setTimeout(() => {
+          setError("");
+          setIsEmailSent(false);
+        }, 5000);
+      } else {
+        setError(data.error || "E-posta gönderilemedi. Lütfen tekrar deneyin.");
+        setIsEmailSent(false);
+      }
+    } catch (err) {
+      setError("Bağlantı hatası oluştu.");
+    } finally {
+      setIsResendingEmail(false);
+    }
+  };
+
+  // Google ile giriş
+  const handleGoogleLogin = async () => {
+    setSocialLoading("google");
+    setError("");
+    
+    try {
+      // Google OAuth popup açma (mobil uyumlu)
+      let width, height, left, top;
+      
+      // Mobil cihaz kontrolü
+      if (window.innerWidth <= 768) {
+        // Mobil için tam ekran popup
+        width = window.screen.width;
+        height = window.screen.height;
+        left = 0;
+        top = 0;
+      } else {
+        // Desktop için ortalanmış popup
+        width = 500;
+        height = 600;
+        left = window.screenX + (window.outerWidth - width) / 2;
+        top = window.screenY + (window.outerHeight - height) / 2;
+      }
+      
+      const popup = window.open(
+        '/api/auth/google',
+        'google-login',
+        `width=${width},height=${height},left=${left},top=${top}`
+      );
+
+      // Popup mesajlarını dinle
+      const handleMessage = (event: MessageEvent) => {
+        if (event.origin !== window.location.origin) return;
+        
+        if (event.data.type === 'GOOGLE_LOGIN_SUCCESS') {
+          const userData = event.data.user;
+          const token = event.data.token;
+          const loginTime = Date.now();
+          const userDataToStore = {
+            userLoggedIn: "true",
+            userEmail: userData.email,
+            userName: userData.name,
+            userId: userData.id,
+            userPhone: userData.phone || '',
+            userBirthDate: userData.birthDate || '',
+            userIsAdmin: userData.isAdmin.toString(),
+            loginTime: loginTime.toString(),
+            token: token,
+            user: JSON.stringify({
+              id: userData.id,
+              email: userData.email,
+              name: userData.name,
+              phone: userData.phone || '',
+              birthDate: userData.birthDate || '',
+              isAdmin: userData.isAdmin
+            })
+          };
+          
+          // localStorage'a kaydet
+          Object.entries(userDataToStore).forEach(([key, value]) => {
+            localStorage.setItem(key, value);
+          });
+          
+          // sessionStorage'a da kaydet (gizli sekme desteği için)
+          Object.entries(userDataToStore).forEach(([key, value]) => {
+            sessionStorage.setItem(key, value);
+          });
+          
+          // Remember Me işaretliyse email'i hatırla
+          if (rememberMe) {
+            localStorage.setItem("rememberedEmail", userData.email);
+            localStorage.setItem("rememberMe", "true");
+            sessionStorage.setItem("rememberMe", "true");
+          }
+          
+          // Custom event'i tetikle
+          window.dispatchEvent(new Event('localStorageChange'));
+          
+          if (userData.isAdmin) {
+            localStorage.setItem("adminLoggedIn", "true");
+            localStorage.setItem("adminEmail", userData.email);
+            localStorage.setItem("adminToken", token);
+            sessionStorage.setItem("adminLoggedIn", "true");
+            sessionStorage.setItem("adminEmail", userData.email);
+            sessionStorage.setItem("adminToken", token);
+          }
+          
+          popup?.close();
+          window.removeEventListener('message', handleMessage);
+          
+          // returnUrl'e göre yönlendir
+          const returnUrl = new URLSearchParams(window.location.search).get('returnUrl') || '/';
+          router.push(decodeURIComponent(returnUrl));
+        } else if (event.data.type === 'GOOGLE_LOGIN_ERROR') {
+          setError(event.data.error || "Google ile giriş yapılırken bir hata oluştu.");
+          popup?.close();
+          window.removeEventListener('message', handleMessage);
+        }
+      };
+
+      window.addEventListener('message', handleMessage);
+      
+      // Popup kapandığında loading'i durdur
+      const checkClosed = setInterval(() => {
+        try {
+          if (popup?.closed) {
+            clearInterval(checkClosed);
+            setSocialLoading("");
+          }
+        } catch (e) {
+          // Cross-Origin-Opener-Policy hatası için
+          clearInterval(checkClosed);
+          setSocialLoading("");
+        }
+      }, 1000);
+      
+    } catch (err) {
+      setError("Google ile giriş yapılırken bir hata oluştu.");
+      setSocialLoading("");
+    }
+  };
+
+  // Facebook ile giriş
+  const handleFacebookLogin = async () => {
+    try {
+      setSocialLoading("facebook");
+      setError("");
+      
+      // Return URL'i al
+      const returnUrl = new URLSearchParams(window.location.search).get('returnUrl') || '/';
+      
+      // Facebook OAuth URL'ini aç
+      const facebookAuthUrl = `/api/auth/facebook?returnUrl=${encodeURIComponent(returnUrl)}`;
+      
+      // Popup window'u ekranın ortasında aç (mobil uyumlu)
+      let width, height, left, top;
+      
+      // Mobil cihaz kontrolü
+      if (window.innerWidth <= 768) {
+        // Mobil için tam ekran popup
+        width = window.screen.width;
+        height = window.screen.height;
+        left = 0;
+        top = 0;
+      } else {
+        // Desktop için ortalanmış popup
+        width = 500;
+        height = 600;
+        left = (window.screen.width - width) / 2;
+        top = (window.screen.height - height) / 2;
+      }
+      
+      const popup = window.open(
+        facebookAuthUrl,
+        'facebook-login',
+        `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`
+      );
+      
+      // Popup mesajlarını dinle
+      const handleMessage = (event: MessageEvent) => {
+        if (event.origin !== window.location.origin) return;
+        
+        if (event.data.type === 'FACEBOOK_LOGIN_SUCCESS') {
+          const user = event.data.user;
+          const token = event.data.token;
+          
+          // Kullanıcı bilgilerini localStorage'a kaydet
+          localStorage.setItem('userLoggedIn', 'true');
+          localStorage.setItem('userEmail', user.email);
+          localStorage.setItem('userName', user.name);
+          localStorage.setItem('userId', user.id);
+          localStorage.setItem('userPhone', user.phone || '');
+          localStorage.setItem('userBirthDate', user.birthDate || '');
+          localStorage.setItem('userIsAdmin', user.isAdmin.toString());
+          localStorage.setItem('token', token);
+          
+          // Admin ise admin bilgilerini de kaydet
+          if (user.isAdmin) {
+            localStorage.setItem('adminLoggedIn', 'true');
+            localStorage.setItem('adminEmail', user.email);
+            localStorage.setItem('adminToken', token);
+            sessionStorage.setItem('adminLoggedIn', 'true');
+            sessionStorage.setItem('adminEmail', user.email);
+            sessionStorage.setItem('adminToken', token);
+          }
+          
+          // Custom event tetikle
+          window.dispatchEvent(new Event('localStorageChange'));
+          
+          // Popup'ı kapat
+          if (popup) popup.close();
+          
+          // Loading'i kapat
+          setSocialLoading("");
+          
+          // Başarı mesajı göster
+          setLoginSuccess(true);
+          setRedirectMessage("Facebook ile giriş başarılı! Yönlendiriliyorsunuz...");
+          
+          // 2 saniye sonra yönlendir
+          setTimeout(() => {
+            router.push(decodeURIComponent(returnUrl));
+          }, 2000);
+          
+          // Event listener'ı kaldır
+          window.removeEventListener('message', handleMessage);
+          
+        } else if (event.data.type === 'FACEBOOK_LOGIN_ERROR') {
+          setError(event.data.error || 'Facebook ile giriş yapılırken bir hata oluştu.');
+          setSocialLoading("");
+          
+          if (popup) popup.close();
+          window.removeEventListener('message', handleMessage);
+        }
+      };
+      
+      window.addEventListener('message', handleMessage);
+      
+      // Popup kapandığında loading'i kapat
+      const checkClosed = setInterval(() => {
+        if (popup && popup.closed) {
+          setSocialLoading("");
+          clearInterval(checkClosed);
+          window.removeEventListener('message', handleMessage);
+        }
+      }, 1000);
+      
+    } catch (error) {
+      console.error('Facebook login error:', error);
+      setError("Facebook ile giriş yapılırken bir hata oluştu.");
+      setSocialLoading("");
+    }
+  };
+
+  // Success state'inde loading ekranı göster
+  if (loginSuccess) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%)",
+          padding: "20px",
+        }}
+      >
+        <div
+          style={{
+            background: "white",
+            padding: "40px",
+            borderRadius: "16px",
+            boxShadow: "0 4px 32px rgba(0, 0, 0, 0.1)",
+            textAlign: "center",
+            maxWidth: "400px",
+          }}
+        >
+          <div style={{ fontSize: "48px", marginBottom: "16px" }}>
+            {isAdminForm ? "⚙️" : "✅"}
+          </div>
+          <h2 style={{ 
+            color: isAdminForm ? "#7c3aed" : "#10b981", 
+            fontSize: "24px", 
+            fontWeight: "600", 
+            margin: "0 0 16px 0" 
+          }}>
+            {isAdminForm ? "Admin Giriş Başarılı!" : "Giriş Başarılı!"}
+          </h2>
+          <p style={{ 
+            color: "#64748b", 
+            margin: "0 0 24px 0",
+            fontSize: "16px"
+          }}>
+            {redirectMessage}
+          </p>
+          <div style={{
+            width: "40px",
+            height: "40px",
+            border: `3px solid ${isAdminForm ? "#7c3aed" : "#10b981"}`,
+            borderTop: "3px solid transparent",
+            borderRadius: "50%",
+            margin: "0 auto",
+            animation: "spin 1s linear infinite"
+          }}></div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <style jsx>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "flex-start",
+          justifyContent: "center",
+          background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%)",
+          padding: "60px 20px 40px 20px",
+        }}
+      >
+      <div
+        style={{
+          background: "white",
+          padding: "40px",
+          borderRadius: "16px",
+          boxShadow: "0 4px 32px rgba(0, 0, 0, 0.1)",
+          width: "100%",
+          maxWidth: "400px",
+        }}
+      >
+        <div style={{ textAlign: "center", marginBottom: "24px", marginTop: "-20px" }}>
+          <h1 style={{ 
+            color: isAdminForm ? "#7c3aed" : "#2563eb", 
+            fontSize: "28px", 
+            fontWeight: "700", 
+            margin: "0 0 8px 0" 
+          }}>
+            {isAdminForm ? "⚙️ Admin Girişi" : "Giriş Yap"}
+          </h1>
+          <p style={{ color: "#64748b", margin: 0 }}>
+            {isAdminForm ? "Admin hesabınıza giriş yapın" : "Hesabınıza giriş yapın"}
+          </p>
+          {isAdminForm && (
+            <div style={{
+              background: "rgba(124, 58, 237, 0.1)",
+              border: "1px solid rgba(124, 58, 237, 0.3)",
+              borderRadius: "8px",
+              padding: "12px",
+              marginTop: "16px",
+              fontSize: "14px",
+              color: "#7c3aed"
+            }}>
+              🔒 Admin girişi tespit edildi - Güvenlik kontrolleri aktif
+            </div>
+          )}
+        </div>
+
+        <form onSubmit={handleSubmit}>
+          <div style={{ marginBottom: "20px" }}>
+            <label
+              htmlFor="email"
+              style={{
+                display: "block",
+                marginBottom: "8px",
+                color: "#374151",
+                fontWeight: "600",
+                fontSize: "14px",
+              }}
+            >
+              Email
+            </label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder={isAdminForm ? "admin@example.com" : "ornek@email.com"}
+              required
+              style={{
+                width: "100%",
+                padding: "12px 16px",
+                border: "2px solid #e2e8f0",
+                borderRadius: "8px",
+                fontSize: "16px",
+                boxSizing: "border-box",
+                transition: "border-color 0.2s",
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = isAdminForm ? "#7c3aed" : "#2563eb";
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = "#e2e8f0";
+              }}
+            />
+          </div>
+
+          <div style={{ marginBottom: "24px" }}>
+            <label
+              htmlFor="password"
+              style={{
+                display: "block",
+                marginBottom: "8px",
+                color: "#374151",
+                fontWeight: "600",
+                fontSize: "14px",
+              }}
+            >
+              Şifre
+            </label>
+            <div style={{ position: "relative" }}>
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="off"
+                required
+                style={{
+                  width: "100%",
+                  padding: "12px 16px",
+                  paddingRight: "48px",
+                  border: "2px solid #e2e8f0",
+                  borderRadius: "8px",
+                  fontSize: "16px",
+                  boxSizing: "border-box",
+                  transition: "border-color 0.2s",
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = isAdminForm ? "#7c3aed" : "#2563eb";
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = "#e2e8f0";
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: "absolute",
+                  right: "12px",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  padding: "4px",
+                  borderRadius: "4px",
+                  transition: "background-color 0.2s",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#374151",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "#f3f4f6";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "transparent";
+                }}
+                title={showPassword ? "Şifreyi gizle" : "Şifreyi göster"}
+              >
+                {showPassword ? (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                    <line x1="1" y1="1" x2="23" y2="23"/>
+                  </svg>
+                ) : (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* Remember Me Checkbox */}
+          <div style={{ marginBottom: "24px" }}>
+            <label
+              style={{
+                display: "flex",
+                alignItems: "center",
+                cursor: "pointer",
+                fontSize: "14px",
+                color: "#374151",
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                style={{
+                  marginRight: "8px",
+                  width: "16px",
+                  height: "16px",
+                  accentColor: isAdminForm ? "#7c3aed" : "#2563eb",
+                }}
+              />
+              <span>Beni Hatırla</span>
+            </label>
+          </div>
+
+          {error && (
+            <div
+              style={{
+                background: isEmailSent ? "#f0fdf4" : emailVerificationError ? "#fef3c7" : "#fef2f2",
+                color: isEmailSent ? "#166534" : emailVerificationError ? "#d97706" : "#dc2626",
+                padding: "12px",
+                borderRadius: "8px",
+                marginBottom: "20px",
+                fontSize: "14px",
+                border: isEmailSent ? "1px solid #bbf7d0" : emailVerificationError ? "1px solid #fed7aa" : "1px solid #fecaca",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <span>{error}</span>
+              {emailVerificationError && !isEmailSent && (
+                <button
+                  type="button"
+                  onClick={handleResendVerificationEmail}
+                  disabled={isResendingEmail}
+                  style={{
+                    background: "transparent",
+                    border: "1px solid #d97706",
+                    color: "#d97706",
+                    padding: "4px 8px",
+                    borderRadius: "4px",
+                    fontSize: "12px",
+                    cursor: isResendingEmail ? "not-allowed" : "pointer",
+                    marginLeft: "8px",
+                    opacity: isResendingEmail ? 0.7 : 1,
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isResendingEmail) {
+                      e.currentTarget.style.background = "#d97706";
+                      e.currentTarget.style.color = "white";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isResendingEmail) {
+                      e.currentTarget.style.background = "transparent";
+                      e.currentTarget.style.color = "#d97706";
+                    }
+                  }}
+                >
+                  {isResendingEmail ? "Gönderiliyor..." : "Tekrar Mail Gönder"}
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Rate Limiting Uyarısı - sadece email doğrulama hatası yoksa göster */}
+          {loginAttempts > 0 && !emailVerificationError && (
+            <div
+              style={{
+                background: "#fef3c7",
+                color: "#d97706",
+                padding: "12px",
+                borderRadius: "8px",
+                marginBottom: "20px",
+                fontSize: "14px",
+                border: "1px solid #fed7aa",
+              }}
+            >
+              ⚠️ {loginAttempts}/5 giriş denemesi kullanıldı. 5 deneme sonrası 15 dakika bekleme süresi aktif.
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={isLoading}
+            style={{
+              width: "100%",
+              padding: "14px",
+              background: isAdminForm ? "#7c3aed" : "#2563eb",
+              color: "white",
+              border: "none",
+              borderRadius: "8px",
+              fontSize: "16px",
+              fontWeight: "600",
+              cursor: isLoading ? "not-allowed" : "pointer",
+              opacity: isLoading ? 0.7 : 1,
+              transition: "background 0.2s",
+            }}
+            onMouseEnter={(e) => {
+              if (!isLoading) {
+                e.currentTarget.style.background = isAdminForm ? "#6d28d9" : "#1d4ed8";
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isLoading) {
+                e.currentTarget.style.background = isAdminForm ? "#7c3aed" : "#2563eb";
+              }
+            }}
+          >
+            {isLoading ? (isAdminForm ? "Admin girişi yapılıyor..." : "Giriş yapılıyor...") : (isAdminForm ? "Admin Girişi" : "Giriş Yap")}
+          </button>
+        </form>
+
+        {/* Sosyal Medya ile Giriş */}
+        <div style={{ marginTop: "24px" }}>
+          <div style={{ 
+            display: "flex", 
+            alignItems: "center", 
+            marginBottom: "16px" 
+          }}>
+            <div style={{ 
+              flex: 1, 
+              height: "1px", 
+              background: "#e2e8f0" 
+            }}></div>
+            <span style={{ 
+              padding: "0 16px", 
+              color: "#64748b", 
+              fontSize: "14px",
+              fontWeight: "500"
+            }}>
+              veya
+            </span>
+            <div style={{ 
+              flex: 1, 
+              height: "1px", 
+              background: "#e2e8f0" 
+            }}></div>
+          </div>
+
+          {/* Google ile Giriş */}
+          <button
+            type="button"
+            onClick={handleGoogleLogin}
+            disabled={socialLoading === "google"}
+            style={{
+              width: "100%",
+              padding: "12px 16px",
+              background: "white",
+              color: "#374151",
+              border: "2px solid #e2e8f0",
+              borderRadius: "8px",
+              fontSize: "16px",
+              fontWeight: "600",
+              cursor: socialLoading === "google" ? "not-allowed" : "pointer",
+              marginBottom: "12px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "12px",
+              transition: "all 0.2s",
+              opacity: socialLoading === "google" ? 0.7 : 1,
+            }}
+            onMouseEnter={(e) => {
+              if (socialLoading !== "google") {
+                e.currentTarget.style.borderColor = "#2563eb";
+                e.currentTarget.style.background = "#f8fafc";
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (socialLoading !== "google") {
+                e.currentTarget.style.borderColor = "#e2e8f0";
+                e.currentTarget.style.background = "white";
+              }
+            }}
+          >
+            {socialLoading === "google" ? (
+              <div style={{ width: "20px", height: "20px", border: "2px solid #e2e8f0", borderTop: "2px solid #2563eb", borderRadius: "50%", animation: "spin 1s linear infinite" }}></div>
+            ) : (
+              <svg width="20" height="20" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+              </svg>
+            )}
+            {socialLoading === "google" ? "Giriş yapılıyor..." : "Google ile Giriş Yap"}
+          </button>
+
+          {/* Facebook ile Giriş */}
+          <button
+            type="button"
+            onClick={handleFacebookLogin}
+            disabled={socialLoading === "facebook"}
+            style={{
+              width: "100%",
+              padding: "12px 16px",
+              background: "#1877f2",
+              color: "white",
+              border: "none",
+              borderRadius: "8px",
+              fontSize: "16px",
+              fontWeight: "600",
+              cursor: socialLoading === "facebook" ? "not-allowed" : "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "12px",
+              transition: "background 0.2s",
+              opacity: socialLoading === "facebook" ? 0.7 : 1,
+            }}
+            onMouseEnter={(e) => {
+              if (socialLoading !== "facebook") {
+                e.currentTarget.style.background = "#166fe5";
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (socialLoading !== "facebook") {
+                e.currentTarget.style.background = "#1877f2";
+              }
+            }}
+          >
+            {socialLoading === "facebook" ? (
+              <div style={{ width: "20px", height: "20px", border: "2px solid rgba(255,255,255,0.3)", borderTop: "2px solid white", borderRadius: "50%", animation: "spin 1s linear infinite" }}></div>
+            ) : (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              </svg>
+            )}
+            {socialLoading === "facebook" ? "Giriş yapılıyor..." : "Facebook ile Giriş Yap"}
+          </button>
+        </div>
+
+        <div style={{ textAlign: "center", marginTop: "16px" }}>
+          <p style={{ color: "#64748b", margin: "0 0 16px 0" }}>
+            Hesabınız yok mu?{" "}
+            <Link
+              href="/register"
+              style={{
+                color: "#2563eb",
+                textDecoration: "underline",
+                fontWeight: "600",
+              }}
+            >
+              Kayıt olun
+            </Link>
+          </p>
+          
+          <Link
+            href="/sifremi-unuttum"
+            style={{
+              color: "#2563eb",
+              textDecoration: "underline",
+              fontSize: "14px",
+              fontWeight: "700",
+            }}
+          >
+            Şifremi unuttum
+          </Link>
+        </div>
+      </div>
+    </div>
+    </>
+  );
+} 

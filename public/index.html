@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Düşük Bütçe</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background-color: #f0f4f8;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 3rem;
+            color: #2563eb;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .subtitle {
+            font-size: 1.2rem;
+            color: #374151;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .card h3 {
+            margin-bottom: 15px;
+        }
+        .card p {
+            color: #6b7280;
+            margin-bottom: 20px;
+        }
+        .btn {
+            display: inline-block;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .btn-green { background-color: #22c55e; }
+        .btn-blue { background-color: #2563eb; }
+        .btn-yellow { background-color: #f59e0b; }
+        .footer {
+            margin-top: 40px;
+            font-size: 14px;
+            color: #6b7280;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Düşük Bütçe</h1>
+        <p class="subtitle">En Uygun Fiyatlı Bilgisayar, Laptop ve Elektronik Ürünler</p>
+        
+        <div class="grid">
+            <div class="card">
+                <h3 style="color: #22c55e;">Bize Sat</h3>
+                <p>Eski elektronik ürünlerinizi değerlendirin</p>
+                <a href="/bize-sat" class="btn btn-green">Satış Yap</a>
+            </div>
+            
+            <div class="card">
+                <h3 style="color: #2563eb;">Bizden Al</h3>
+                <p>Uygun fiyatlı ürünler keşfedin</p>
+                <a href="/bizden-al" class="btn btn-blue">Alışveriş Yap</a>
+            </div>
+            
+            <div class="card">
+                <h3 style="color: #f59e0b;">Teknik Servis</h3>
+                <p>Profesyonel teknik servis hizmeti</p>
+                <a href="/teknik-servis" class="btn btn-yellow">Servis Al</a>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Zaman: <span id="time"></span></p>
+            <p>Site çalışıyor! 🎉</p>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('time').textContent = new Date().toLocaleString();
+    </script>
+</body>
+</html>
+

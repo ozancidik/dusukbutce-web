@@ -1,0 +1,3024 @@
+"use client";
+import React, { useEffect } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import ActionModal from './components/ActionModal';
+import LoadingSpinner from './components/LoadingSpinner';
+import AdminMainHeader from './components/AdminMainHeader';
+import { useAdminState } from './hooks/useAdminState';
+import { fetchSubmissions, submitAction, deleteAllSubmissions, deleteSingleSubmission, formatDate } from './utils/api';
+import { Submission } from './types';
+
+export default function AdminPage() {
+  const {
+    // Data
+    submissions,
+    setSubmissions,
+    loading,
+    setLoading,
+    error,
+    setError,
+    
+    // Auth
+    isAuthenticated,
+    setIsAuthenticated,
+    
+    // UI State
+    isMobile,
+    setIsMobile,
+    selectedSubmission,
+    setSelectedSubmission,
+    
+    // Modals
+    showModal,
+    setShowModal,
+    modalType,
+    setModalType,
+    showDeleteModal,
+    setShowDeleteModal,
+    deleteModalType,
+    setDeleteModalType,
+    deleteTargetId,
+    setDeleteTargetId,
+    
+    // Toast
+    showToast,
+    setShowToast,
+    toastMessage,
+    setToastMessage,
+    toastType,
+    setToastType,
+    
+    // Actions
+    isDeletingAll,
+    setIsDeletingAll,
+    selectedCategory,
+    setSelectedCategory,
+  } = useAdminState();
+  const router = useRouter();
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    const checkAdminStatus = () => {
+      const adminLoggedIn = localStorage.getItem('adminLoggedIn') || sessionStorage.getItem('adminLoggedIn');
+      const adminEmail = localStorage.getItem('adminEmail') || sessionStorage.getItem('adminEmail');
+      
+      if (!adminLoggedIn || !adminEmail) {
+        console.log("🔒 Admin giriş yapılmamış, anasayfaya yönlendiriliyor...");
+        router.push('/');
+        return;
+      }
+      setIsAuthenticated(true);
+      loadSubmissions();
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    // İlk admin durumu kontrolü
+    checkAdminStatus();
+    
+    // localStorage değişikliklerini dinle
+    const handleStorageChange = () => {
+      checkAdminStatus();
+    };
+    
+    // Custom event'leri dinle
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('localStorageChange', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('localStorageChange', handleStorageChange);
+    };
+  }, [router]);
+
+  const handleLogout = () => {
+    // Sadece admin bilgilerini temizle
+    localStorage.removeItem('adminLoggedIn');
+    localStorage.removeItem('adminEmail');
+    sessionStorage.removeItem('adminLoggedIn');
+    sessionStorage.removeItem('adminEmail');
+    
+    // Custom event'i tetikle
+    window.dispatchEvent(new Event('localStorageChange'));
+    
+    // Header'a logout mesajı gönder
+    window.dispatchEvent(new CustomEvent('logout'));
+    
+    // Admin sayfasında kal (ana sayfaya yönlendirme yok)
+    // Sayfayı yenile
+    window.location.reload();
+  };
+
+  const loadSubmissions = async () => {
+    try {
+      setError(null);
+      const { submissions: data, error: apiError } = await fetchSubmissions();
+      
+      if (apiError) {
+        setError(apiError);
+        setSubmissions([]);
+      } else {
+        setSubmissions(data);
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Bağlantı hatası';
+      console.error('API hatası:', errorMessage);
+      setError(errorMessage);
+      setSubmissions([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Filtrelenmiş submission'ları hesapla
+  const filteredSubmissions = selectedCategory === 'all' 
+    ? submissions 
+    : submissions.filter(submission => submission.category === selectedCategory);
+
+
+  const handleAction = (submission: Submission, action: 'offer' | 'listing' | 'reject') => {
+    setSelectedSubmission(submission);
+    setModalType(action);
+    setShowModal(true);
+  };
+
+  const showToastMessage = (message: string, type: 'success' | 'error') => {
+    setToastMessage(message);
+    setToastType(type);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 4000);
+  };
+
+  const handleSubmitAction = async (formData: any) => {
+    if (!selectedSubmission || !modalType) return;
+
+    const result = await submitAction(selectedSubmission._id, modalType, formData);
+
+    if (result.success) {
+      // Submissions listesini güncelle
+      await loadSubmissions();
+      setShowModal(false);
+      setSelectedSubmission(null);
+      setModalType(null);
+      
+      // Teklif verildiğinde özel popup göster
+      if (modalType === 'offer') {
+        setToastMessage('Teklifiniz kullanıcıya iletildi!');
+        setToastType('success');
+        setShowToast(true);
+      } else {
+        // Diğer işlemler için normal mesaj
+        const actionText = modalType === 'listing' ? 'İlan' : 
+                          modalType === 'reject' ? 'Reddetme' : 'İşlem';
+        showToastMessage(`${actionText} başarıyla tamamlandı!`, 'success');
+      }
+    } else {
+      showToastMessage(`Hata: ${result.message}`, 'error');
+    }
+  };
+
+  const handleDeleteAllSubmissions = () => {
+    setDeleteModalType('all');
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteSubmission = (submissionId: string) => {
+    setDeleteModalType('single');
+    setDeleteTargetId(submissionId);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (deleteModalType === 'all') {
+      setIsDeletingAll(true);
+      const result = await deleteAllSubmissions();
+      
+      if (result.success) {
+        showToastMessage(result.message, 'success');
+        setSubmissions([]); // UI'dan da temizle
+      } else {
+        showToastMessage(result.message, 'error');
+      }
+      setIsDeletingAll(false);
+    } else if (deleteModalType === 'single' && deleteTargetId) {
+      const result = await deleteSingleSubmission(deleteTargetId);
+      
+      if (result.success) {
+        showToastMessage(result.message, 'success');
+        // UI'dan da temizle
+        setSubmissions(prev => prev.filter(sub => sub._id !== deleteTargetId));
+      } else {
+        showToastMessage(result.message, 'error');
+      }
+    }
+
+    // Modal'ı kapat
+    setShowDeleteModal(false);
+    setDeleteModalType(null);
+    setDeleteTargetId(null);
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
+    setDeleteModalType(null);
+    setDeleteTargetId(null);
+  };
+
+  if (!isAuthenticated) {
+    return null;
+  }
+
+  if (loading) {
+    return <LoadingSpinner isMobile={isMobile} />;
+  }
+
+  if (error) {
+    return (
+      <div style={{ 
+        padding: isMobile ? '20px' : '40px', 
+        textAlign: 'center',
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #374151 0%, #6b7280 50%, #4b5563 100%)'
+      }}>
+        <div style={{
+          background: 'white',
+          borderRadius: '16px',
+          padding: '32px',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
+          maxWidth: '500px',
+          margin: '0 auto'
+        }}>
+          <div style={{
+            fontSize: '48px',
+            marginBottom: '16px'
+          }}>
+            ❌
+          </div>
+          <h2 style={{
+            fontSize: isMobile ? '20px' : '24px',
+            color: '#dc2626',
+            margin: '0 0 16px 0'
+          }}>
+            Veri Yüklenirken Hata Oluştu
+          </h2>
+          <p style={{
+            fontSize: '16px',
+            color: '#6b7280',
+            margin: '0 0 24px 0',
+            lineHeight: '1.5'
+          }}>
+            {error}
+          </p>
+          <button 
+            onClick={fetchSubmissions}
+            style={{
+              background: '#3b82f6',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              padding: '12px 24px',
+              fontWeight: '600',
+              fontSize: '16px',
+              cursor: 'pointer',
+              transition: 'background 0.2s'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = '#2563eb';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = '#3b82f6';
+            }}
+          >
+            🔄 Tekrar Dene
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ 
+      background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+      minHeight: '100vh',
+      padding: isMobile ? '20px 12px' : '40px'
+    }}>
+      {/* Header */}
+      <div style={{
+        maxWidth: isMobile ? '100%' : '1400px',
+        margin: '0 auto',
+        position: 'relative'
+      }}>
+        <div style={{
+          background: 'white',
+          borderRadius: '16px',
+          padding: isMobile ? '24px' : '32px',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1)',
+          marginBottom: '32px',
+          border: '1px solid #e5e7eb'
+        }}>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '16px'
+          }}>
+            <div>
+              <h1 style={{
+                fontSize: isMobile ? '24px' : '32px',
+                fontWeight: '700',
+                color: '#1f2937',
+                margin: '0 0 8px 0',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px'
+              }}>
+                <div style={{
+                  background: 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)',
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '24px',
+                  color: 'white',
+                  boxShadow: '0 4px 12px rgba(37, 99, 235, 0.3)'
+                }}>
+                  💻
+                </div>
+                Admin Paneli
+              </h1>
+              <p style={{
+                fontSize: isMobile ? '14px' : '16px',
+                color: '#6b7280',
+                margin: 0
+              }}>
+                Tüm kategorilerdeki satış taleplerini yönetin ve teklifler verin
+              </p>
+              <div style={{
+                marginTop: '12px',
+                display: 'flex',
+                gap: '12px',
+                flexWrap: 'wrap'
+              }}>
+                <Link href="/satilik-ilanlar" style={{ textDecoration: 'none' }}>
+                  <button style={{
+                    background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '8px 16px',
+                    fontSize: isMobile ? '12px' : '14px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    boxShadow: '0 2px 8px rgba(5, 150, 105, 0.3)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-1px)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(5, 150, 105, 0.4)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(5, 150, 105, 0.3)';
+                  }}
+                  >
+                    📋 İlanları Görüntüle
+                  </button>
+                </Link>
+
+                <Link href="/admin/urunler" style={{ textDecoration: 'none' }}>
+                  <button style={{
+                    background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '8px 16px',
+                    fontSize: isMobile ? '12px' : '14px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    boxShadow: '0 2px 8px rgba(5, 150, 105, 0.3)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-1px)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(5, 150, 105, 0.4)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(5, 150, 105, 0.3)';
+                  }}
+                  >
+                    📦 Ürün Kataloğu
+                  </button>
+                </Link>
+
+                <Link href="/admin/stok" style={{ textDecoration: 'none' }}>
+                  <button style={{
+                    background: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '8px 16px',
+                    fontSize: isMobile ? '12px' : '14px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    boxShadow: '0 2px 8px rgba(245, 158, 11, 0.3)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-1px)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(245, 158, 11, 0.4)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(245, 158, 11, 0.3)';
+                  }}
+                  >
+                    📊 Stok Takip
+                  </button>
+                </Link>
+
+                <Link href="/admin/kategori" style={{ textDecoration: 'none' }}>
+                  <button style={{
+                    background: 'linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '8px 16px',
+                    fontSize: isMobile ? '12px' : '14px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    boxShadow: '0 2px 8px rgba(139, 92, 246, 0.3)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-1px)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(139, 92, 246, 0.4)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(139, 92, 246, 0.3)';
+                  }}
+                  >
+                    🏷️ Kategori Yönetimi
+                  </button>
+                </Link>
+
+                <Link href="/admin/fiyat" style={{ textDecoration: 'none' }}>
+                  <button style={{
+                    background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '8px 16px',
+                    fontSize: isMobile ? '12px' : '14px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    boxShadow: '0 2px 8px rgba(5, 150, 105, 0.3)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-1px)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(5, 150, 105, 0.4)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(5, 150, 105, 0.3)';
+                  }}
+                  >
+                    💰 Fiyat Yönetimi
+                  </button>
+                </Link>
+
+                <Link href="/admin/gorsel" style={{ textDecoration: 'none' }}>
+                  <button style={{
+                    background: 'linear-gradient(135deg, #ec4899 0%, #f472b6 100%)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '8px 16px',
+                    fontSize: isMobile ? '12px' : '14px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    boxShadow: '0 2px 8px rgba(236, 72, 153, 0.3)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-1px)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(236, 72, 153, 0.4)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(236, 72, 153, 0.3)';
+                  }}
+                  >
+                    🖼️ Görsel Yönetimi
+                  </button>
+                </Link>
+
+                <Link href="/admin-users" style={{ textDecoration: 'none' }}>
+                  <button style={{
+                    background: 'linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '8px 16px',
+                    fontSize: isMobile ? '12px' : '14px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    boxShadow: '0 2px 8px rgba(124, 58, 237, 0.3)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-1px)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(124, 58, 237, 0.4)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(124, 58, 237, 0.3)';
+                  }}
+                  >
+                    👥 Admin Kullanıcılar
+                  </button>
+                </Link>
+                
+                <button
+                  onClick={handleDeleteAllSubmissions}
+                  disabled={isDeletingAll}
+                  style={{
+                    background: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '8px 16px',
+                    fontSize: isMobile ? '12px' : '14px',
+                    fontWeight: '600',
+                    cursor: isDeletingAll ? 'not-allowed' : 'pointer',
+                    transition: 'all 0.2s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    boxShadow: '0 2px 8px rgba(220, 38, 38, 0.3)',
+                    opacity: isDeletingAll ? 0.7 : 1
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isDeletingAll) {
+                      e.currentTarget.style.transform = 'translateY(-1px)';
+                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.4)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isDeletingAll) {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = '0 2px 8px rgba(220, 38, 38, 0.3)';
+                    }
+                  }}
+                >
+                  {isDeletingAll ? '🗑️ Siliniyor...' : '🗑️ Tüm İlanları Sil'}
+                </button>
+              </div>
+            </div>
+            
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px'
+            }}>
+              <div style={{
+                background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
+                color: 'white',
+                padding: isMobile ? '8px 16px' : '12px 20px',
+                borderRadius: '8px',
+                fontSize: isMobile ? '12px' : '14px',
+                fontWeight: '600',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}>
+                <div style={{
+                  width: '8px',
+                  height: '8px',
+                  borderRadius: '50%',
+                  background: 'white',
+                  animation: 'pulse 2s infinite'
+                }}></div>
+                {(submissions || []).length} Talep
+              </div>
+              
+              <button
+                onClick={handleLogout}
+                style={{
+                  background: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: isMobile ? '8px 12px' : '10px 16px',
+                  fontSize: isMobile ? '12px' : '14px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  boxShadow: '0 4px 12px rgba(220, 38, 38, 0.3)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(220, 38, 38, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.3)';
+                }}
+              >
+                🚪 Çıkış
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Kategori Filtresi */}
+      <div style={{
+        maxWidth: isMobile ? '100%' : '1400px',
+        margin: '0 auto 24px auto'
+      }}>
+        <div style={{
+          background: 'white',
+          borderRadius: '12px',
+          padding: isMobile ? '16px' : '20px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          border: '1px solid #e5e7eb'
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            flexWrap: 'wrap'
+          }}>
+            <span style={{
+              fontSize: isMobile ? '14px' : '16px',
+              fontWeight: '600',
+              color: '#374151'
+            }}>
+              Kategori Filtresi:
+            </span>
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              style={{
+                padding: '8px 12px',
+                borderRadius: '8px',
+                border: '1px solid #d1d5db',
+                fontSize: isMobile ? '14px' : '16px',
+                background: 'white',
+                cursor: 'pointer'
+              }}
+            >
+              <option value="all">Tüm Kategoriler</option>
+              <option value="notebook">Dizüstü Bilgisayar</option>
+              <option value="desktop">Masaüstü Bilgisayar</option>
+              <option value="graphics-card">Ekran Kartı</option>
+              <option value="processor">İşlemci</option>
+              <option value="monitor">Monitör</option>
+              <option value="keyboard">Klavye</option>
+              <option value="mouse">Fare</option>
+              <option value="headphones">Kulaklık</option>
+              <option value="ram">RAM</option>
+              <option value="ssd">SSD</option>
+              <option value="tablet">Tablet</option>
+              <option value="audio-system">Ses Sistemi</option>
+              <option value="case">Kasa</option>
+              <option value="cooler">Soğutucu</option>
+              <option value="gaming-wheel">Gaming Direksiyon</option>
+              <option value="sound-system">Ses Sistemi</option>
+            </select>
+            <span style={{
+              fontSize: isMobile ? '12px' : '14px',
+              color: '#6b7280'
+            }}>
+              {(filteredSubmissions || []).length} talep bulundu
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {(filteredSubmissions || []).length === 0 ? (
+        <div style={{
+          textAlign: 'center',
+          padding: isMobile ? '40px 20px' : '80px 40px',
+          background: 'white',
+          borderRadius: '12px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+        }}>
+          <h3 style={{
+            fontSize: isMobile ? '18px' : '24px',
+            color: '#374151',
+            marginBottom: '16px'
+          }}>
+            Henüz talep bulunmuyor
+          </h3>
+          <p style={{
+            color: '#6b7280',
+            fontSize: isMobile ? '14px' : '16px'
+          }}>
+            Müşterilerden gelen talepler burada görünecek.
+          </p>
+        </div>
+      ) : (
+        <div style={{
+          display: 'grid',
+          gap: isMobile ? '20px' : '24px',
+          maxWidth: isMobile ? '100%' : '1400px',
+          margin: '0 auto'
+        }}>
+          {(filteredSubmissions || []).map((submission) => (
+            <div key={submission._id} style={{
+              background: 'white',
+              borderRadius: '16px',
+              padding: isMobile ? '24px' : '32px',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1)',
+              border: '1px solid #e5e7eb',
+              transition: 'all 0.2s',
+              position: 'relative',
+              overflow: 'hidden'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.1), 0 4px 10px rgba(0, 0, 0, 0.05)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1)';
+            }}
+            >
+              {/* Status Badge */}
+              <div style={{
+                position: 'absolute',
+                top: '8px',
+                right: '8px',
+                background: (() => {
+                  switch (submission.status) {
+                    case 'pending': return 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)';
+                    case 'offered': return 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)';
+                    case 'listed': return 'linear-gradient(135deg, #059669 0%, #10b981 100%)';
+                    case 'rejected': return 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)';
+                    case 'accepted': return 'linear-gradient(135deg, #059669 0%, #10b981 100%)';
+                    case 'customer_rejected': return 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)';
+                    default: return 'linear-gradient(135deg, #6b7280 0%, #9ca3af 100%)';
+                  }
+                })(),
+                color: 'white',
+                padding: '4px 10px',
+                borderRadius: '16px',
+                fontSize: isMobile ? '10px' : '11px',
+                fontWeight: '600',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+                zIndex: 10
+              }}>
+                {(() => {
+                  switch (submission.status) {
+                    case 'pending': return '⏳ Beklemede';
+                    case 'offered': return '💰 Teklif Verildi';
+                    case 'listed': return '📋 İlan Oluşturuldu';
+                    case 'rejected': return '❌ Reddedildi';
+                    case 'accepted': return '✅ Kabul Edildi';
+                    case 'customer_rejected': return '❌ Müşteri Reddetti';
+                    default: return submission.status;
+                  }
+                })()}
+              </div>
+              {/* Başlık ve Tarih */}
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'flex-start',
+                marginBottom: isMobile ? '12px' : '16px',
+                marginTop: isMobile ? '20px' : '24px',
+                flexDirection: isMobile ? 'column' : 'row',
+                gap: isMobile ? '8px' : '0'
+              }}>
+                <div>
+                  <h3 style={{
+                    fontSize: isMobile ? '18px' : '20px',
+                    fontWeight: '600',
+                    color: '#374151',
+                    margin: '0 0 4px 0'
+                  }}>
+                    {submission.brand} {submission.model}
+                  </h3>
+                  <span style={{
+                    fontSize: isMobile ? '12px' : '14px',
+                    color: '#6b7280',
+                    background: '#f1f5f9',
+                    padding: '4px 8px',
+                    borderRadius: '6px',
+                    textTransform: 'capitalize'
+                  }}>
+                    {submission.category === 'graphics-card' ? 'Ekran Kartı' :
+                     submission.category === 'notebook' ? 'Dizüstü Bilgisayar' :
+                     submission.category === 'desktop' ? 'Masaüstü Bilgisayar' :
+                     submission.category === 'processor' ? 'İşlemci' :
+                     submission.category === 'monitor' ? 'Monitör' :
+                     submission.category === 'keyboard' ? 'Klavye' :
+                     submission.category === 'mouse' ? 'Fare' :
+                     submission.category === 'headphones' ? 'Kulaklık' :
+                     submission.category === 'ram' ? 'RAM' :
+                     submission.category === 'ssd' ? 'SSD' :
+                     submission.category === 'tablet' ? 'Tablet' :
+                     submission.category === 'audio-system' ? 'Ses Sistemi' :
+                     submission.category === 'case' ? 'Kasa' :
+                     submission.category === 'cooler' ? 'Soğutucu' :
+                     submission.category === 'gaming-wheel' ? 'Gaming Direksiyon' :
+                     submission.category === 'sound-system' ? 'Ses Sistemi' :
+                     submission.category}
+                  </span>
+                </div>
+                <span style={{
+                  fontSize: isMobile ? '12px' : '14px',
+                  color: '#6b7280',
+                  background: '#f3f4f6',
+                  padding: isMobile ? '4px 8px' : '6px 12px',
+                  borderRadius: '6px'
+                }}>
+                  {formatDate(submission.createdAt)}
+                </span>
+              </div>
+
+              {/* Cihaz Bilgileri - Üst Bölüm */}
+              <div style={{
+                background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+                borderRadius: '12px',
+                padding: isMobile ? '16px' : '20px',
+                marginBottom: isMobile ? '16px' : '20px',
+                border: '1px solid #e2e8f0'
+              }}>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginBottom: isMobile ? '12px' : '16px'
+                }}>
+                  <div style={{
+                    background: '#3b82f6',
+                    color: 'white',
+                    width: isMobile ? '32px' : '40px',
+                    height: isMobile ? '32px' : '40px',
+                    borderRadius: '8px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginRight: '12px'
+                  }}>
+                    <span style={{ fontSize: isMobile ? '16px' : '20px' }}>💻</span>
+                  </div>
+                  <div>
+                    <h4 style={{
+                      fontSize: isMobile ? '16px' : '18px',
+                      fontWeight: '600',
+                      color: '#1e293b',
+                      margin: 0
+                    }}>
+                      Cihaz Bilgileri
+                    </h4>
+                    <p style={{
+                      fontSize: isMobile ? '12px' : '14px',
+                      color: '#64748b',
+                      margin: 0
+                    }}>
+                      Ürünün teknik özellikleri ve detayları
+                    </p>
+                  </div>
+                </div>
+                
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
+                  gap: isMobile ? '12px' : '16px'
+                }}>
+        {submission.category === 'notebook' && (
+          <>
+            {console.log('🔍 Admin panel - Notebook data:', {
+              processorBrand: submission.processorBrand,
+              ramType: submission.ramType,
+              storageType: submission.storageType,
+              graphicsCardWatt: submission.graphicsCardWatt
+            })}
+            <div>
+              <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                Marka:
+              </strong>
+              <span style={{ 
+                fontSize: isMobile ? '14px' : '16px', 
+                color: '#6b7280',
+                marginLeft: '8px'
+              }}>
+                {submission.brand || 'Belirtilmemiş'}
+              </span>
+            </div>
+            <div>
+              <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                Model:
+              </strong>
+              <span style={{ 
+                fontSize: isMobile ? '14px' : '16px', 
+                color: '#6b7280',
+                marginLeft: '8px'
+              }}>
+                {submission.model || 'Belirtilmemiş'}
+              </span>
+            </div>
+            <div>
+              <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                İşlemci:
+              </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.processor}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        İşlemci Markası:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.processorBrand || 'Belirtilmemiş'}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Ekran Kartı:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.graphicsCard}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Ekran Kartı Watt:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.graphicsCardWatt || 'Belirtilmemiş'}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        RAM:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.ram}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        RAM Tipi:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.ramType || 'Belirtilmemiş'}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Depolama:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.storage}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Depolama Tipi:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.storageType || 'Belirtilmemiş'}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Ekran Boyutu:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.screenSize || 'Belirtilmemiş'}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Yenileme Hızı:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.refreshRate || 'Belirtilmemiş'}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Pil Durumu:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.batteryHealth || 'Belirtilmemiş'}
+                      </span>
+                    </div>
+                    {submission.description && (
+                      <div style={{ gridColumn: '1 / -1' }}>
+                        <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                          Açıklama:
+                        </strong>
+                        <span style={{ 
+                          fontSize: isMobile ? '14px' : '16px', 
+                          color: '#6b7280',
+                          marginLeft: '8px'
+                        }}>
+                          {submission.description}
+                        </span>
+                      </div>
+                    )}
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Garanti:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: submission.hasWarranty ? '#059669' : '#dc2626',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.hasWarranty ? (submission.warrantyDuration || 'Var') : 'Yok'}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Fatura Tarihi:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#374151',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.invoiceDate || 'Belirtilmemiş'}
+                      </span>
+                    </div>
+                  </>
+                )}
+                </div>
+              </div>
+        {submission.category === 'processor' && (
+          <>
+            <div>
+              <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                Marka:
+              </strong>
+              <span style={{ 
+                fontSize: isMobile ? '14px' : '16px', 
+                color: '#6b7280',
+                marginLeft: '8px'
+              }}>
+                {submission.brand || 'Belirtilmemiş'}
+              </span>
+            </div>
+            <div>
+              <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                Model:
+              </strong>
+              <span style={{ 
+                fontSize: isMobile ? '14px' : '16px', 
+                color: '#6b7280',
+                marginLeft: '8px'
+              }}>
+                {submission.model || 'Belirtilmemiş'}
+              </span>
+            </div>
+            <div>
+              <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                İşlemci:
+              </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.processor}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Stok Fan:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.stokFan || 'Belirtilmemiş'}
+                      </span>
+                    </div>
+                    {submission.description && (
+                      <div style={{ gridColumn: '1 / -1' }}>
+                        <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                          Açıklama:
+                        </strong>
+                        <span style={{ 
+                          fontSize: isMobile ? '14px' : '16px', 
+                          color: '#6b7280',
+                          marginLeft: '8px'
+                        }}>
+                          {submission.description}
+                        </span>
+                      </div>
+                    )}
+                  </>
+                )}
+                {submission.category === 'monitor' && (
+                  <>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Marka:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.brand || 'Belirtilmemiş'}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Model:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.model || 'Belirtilmemiş'}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Ekran Boyutu:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.screenSize || 'Belirtilmemiş'}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Çözünürlük:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.resolution || 'Belirtilmemiş'}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Yenileme Hızı:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.refreshRate || 'Belirtilmemiş'}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Panel Tipi:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.panelType || 'Belirtilmemiş'}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Yanıt Süresi:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.responseTime || 'Belirtilmemiş'}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Portlar:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.ports || 'Belirtilmemiş'}
+                      </span>
+                    </div>
+                    {submission.description && (
+                      <div style={{ gridColumn: '1 / -1' }}>
+                        <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                          Açıklama:
+                        </strong>
+                        <span style={{ 
+                          fontSize: isMobile ? '14px' : '16px', 
+                          color: '#6b7280',
+                          marginLeft: '8px'
+                        }}>
+                          {submission.description}
+                        </span>
+                      </div>
+                    )}
+                  </>
+                )}
+                {submission.category === 'ram' && (
+                  <>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Marka:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.brand || 'Belirtilmemiş'}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Model:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.model || 'Belirtilmemiş'}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Kapasite:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.capacity || 'Belirtilmemiş'}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Hız:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.speed || 'Belirtilmemiş'}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Tip:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.type || 'Belirtilmemiş'}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Gecikme:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.latency || 'Belirtilmemiş'}
+                      </span>
+                    </div>
+                    {submission.description && (
+                      <div style={{ gridColumn: '1 / -1' }}>
+                        <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                          Açıklama:
+                        </strong>
+                        <span style={{ 
+                          fontSize: isMobile ? '14px' : '16px', 
+                          color: '#6b7280',
+                          marginLeft: '8px'
+                        }}>
+                          {submission.description}
+                        </span>
+                      </div>
+                    )}
+                  </>
+                )}
+                {submission.category === 'ssd' && (
+                  <>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Marka:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.brand || 'Belirtilmemiş'}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Model:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.model || 'Belirtilmemiş'}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Kapasite:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.capacity || 'Belirtilmemiş'}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Tip:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.type || 'Belirtilmemiş'}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Okuma Hızı:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.readSpeed || 'Belirtilmemiş'}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Yazma Hızı:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.writeSpeed || 'Belirtilmemiş'}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Interface:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.interface || 'Belirtilmemiş'}
+                      </span>
+                    </div>
+                    {submission.description && (
+                      <div style={{ gridColumn: '1 / -1' }}>
+                        <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                          Açıklama:
+                        </strong>
+                        <span style={{ 
+                          fontSize: isMobile ? '14px' : '16px', 
+                          color: '#6b7280',
+                          marginLeft: '8px'
+                        }}>
+                          {submission.description}
+                        </span>
+                      </div>
+                    )}
+                  </>
+                )}
+                {submission.category !== 'graphics-card' && submission.category !== 'playstation' && submission.category !== 'xbox' && submission.category !== 'nintendo' && submission.category !== 'notebook' && submission.category !== 'processor' && submission.category !== 'monitor' && submission.category !== 'ram' && submission.category !== 'ssd' && (
+                  <>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Marka:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.brand || 'Belirtilmemiş'}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Model:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.model || 'Belirtilmemiş'}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        İşlemci:
+                      </strong>
+                    <span style={{ 
+                      fontSize: isMobile ? '14px' : '16px', 
+                      color: '#6b7280',
+                      marginLeft: '8px'
+                    }}>
+                      {submission.processor}
+                    </span>
+                    </div>
+                  </>
+                )}
+                {submission.category === 'graphics-card' && (
+                  <>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Bellek:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.memory} {submission.memoryType}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Core Clock:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.coreClock}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Boost Clock:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.boostClock}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Güç Tüketimi:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.powerConsumption}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Portlar:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.ports}
+                      </span>
+                    </div>
+                  </>
+                )}
+                {submission.category !== 'graphics-card' && submission.category !== 'playstation' && submission.category !== 'xbox' && submission.category !== 'nintendo' && submission.category !== 'notebook' && (
+                  <div>
+                    <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                      Ekran Kartı:
+                    </strong>
+                    <span style={{ 
+                      fontSize: isMobile ? '14px' : '16px', 
+                      color: '#6b7280',
+                      marginLeft: '8px'
+                    }}>
+                      {submission.graphicsCard}
+                    </span>
+                  </div>
+                )}
+                {submission.category !== 'graphics-card' && submission.category !== 'playstation' && submission.category !== 'xbox' && submission.category !== 'nintendo' && submission.category !== 'notebook' && (
+                  <>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        RAM:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.ram}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Depolama:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.storage}
+                      </span>
+                    </div>
+                  </>
+                )}
+                {submission.category !== 'graphics-card' && submission.category !== 'notebook' && submission.wattValue && (
+                  <div>
+                    <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                      Watt:
+                    </strong>
+                    <span style={{ 
+                      fontSize: isMobile ? '14px' : '16px', 
+                      color: '#6b7280',
+                      marginLeft: '8px'
+                    }}>
+                      {submission.wattValue}
+                    </span>
+                  </div>
+                )}
+                {submission.category !== 'graphics-card' && submission.category !== 'notebook' && submission.refreshRate && (
+                  <div>
+                    <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                      Tazeleme Hızı:
+                    </strong>
+                    <span style={{ 
+                      fontSize: isMobile ? '14px' : '16px', 
+                      color: '#6b7280',
+                      marginLeft: '8px'
+                    }}>
+                      {submission.refreshRate}
+                    </span>
+                  </div>
+                )}
+
+              {/* Kullanıcı Profil Bilgileri - Orta Bölüm */}
+              {submission.userId && submission.userId.name && (
+                <div style={{
+                  background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
+                  border: '1px solid #f59e0b',
+                  borderRadius: '12px',
+                  padding: isMobile ? '16px' : '20px',
+                  marginBottom: isMobile ? '16px' : '20px',
+                  boxShadow: '0 4px 12px rgba(245, 158, 11, 0.15)'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    marginBottom: isMobile ? '12px' : '16px'
+                  }}>
+                    <div style={{
+                      background: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)',
+                      color: 'white',
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '18px',
+                      fontWeight: 'bold',
+                      marginRight: '12px',
+                      boxShadow: '0 4px 12px rgba(14, 165, 233, 0.3)'
+                    }}>
+                      👤
+                    </div>
+                    <div>
+                      <h4 style={{
+                        fontSize: isMobile ? '16px' : '18px',
+                        fontWeight: '700',
+                        color: '#92400e',
+                        margin: '0 0 4px 0'
+                      }}>
+                        Kullanıcı Profil Bilgileri
+                      </h4>
+                      <p style={{
+                        fontSize: isMobile ? '12px' : '14px',
+                        color: '#92400e',
+                        margin: 0,
+                        opacity: 0.8
+                      }}>
+                        Talep sahibinin detaylı bilgileri
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
+                    gap: isMobile ? '12px' : '16px'
+                  }}>
+                    {/* Ad Soyad */}
+                    <div style={{
+                      background: 'white',
+                      padding: '12px',
+                      borderRadius: '8px',
+                      border: '1px solid #bae6fd',
+                      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+                    }}>
+                      <div style={{
+                        fontSize: isMobile ? '11px' : '12px',
+                        color: '#0369a1',
+                        fontWeight: '600',
+                        marginBottom: '4px',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px'
+                      }}>
+                        AD SOYAD
+                      </div>
+                      <div style={{
+                        fontSize: isMobile ? '14px' : '16px',
+                        fontWeight: '600',
+                        color: '#0c4a6e'
+                      }}>
+                        {submission.userId.name}
+                      </div>
+                    </div>
+
+                    {/* E-posta */}
+                    <div style={{
+                      background: 'white',
+                      padding: '12px',
+                      borderRadius: '8px',
+                      border: '1px solid #bae6fd',
+                      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+                    }}>
+                      <div style={{
+                        fontSize: isMobile ? '11px' : '12px',
+                        color: '#0369a1',
+                        fontWeight: '600',
+                        marginBottom: '4px',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px'
+                      }}>
+                        E-POSTA
+                      </div>
+                      <div style={{
+                        fontSize: isMobile ? '13px' : '14px',
+                        color: '#0c4a6e',
+                        wordBreak: 'break-all'
+                      }}>
+                        {submission.userId.email}
+                      </div>
+                    </div>
+
+                    {/* Telefon */}
+                    <div style={{
+                      background: 'white',
+                      padding: '12px',
+                      borderRadius: '8px',
+                      border: '1px solid #bae6fd',
+                      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+                    }}>
+                      <div style={{
+                        fontSize: isMobile ? '11px' : '12px',
+                        color: '#0369a1',
+                        fontWeight: '600',
+                        marginBottom: '4px',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px'
+                      }}>
+                        TELEFON
+                      </div>
+                      <div style={{
+                        fontSize: isMobile ? '14px' : '16px',
+                        fontWeight: '600',
+                        color: '#0c4a6e'
+                      }}>
+                        {submission.userId.phone || 'Belirtilmemiş'}
+                      </div>
+                    </div>
+
+                    {/* Kullanıcı ID */}
+                    <div style={{
+                      background: 'white',
+                      padding: '12px',
+                      borderRadius: '8px',
+                      border: '1px solid #bae6fd',
+                      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+                    }}>
+                      <div style={{
+                        fontSize: isMobile ? '11px' : '12px',
+                        color: '#0369a1',
+                        fontWeight: '600',
+                        marginBottom: '4px',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px'
+                      }}>
+                        KULLANICI ID
+                      </div>
+                      <div style={{
+                        fontSize: isMobile ? '12px' : '13px',
+                        color: '#64748b',
+                        fontFamily: 'monospace',
+                        wordBreak: 'break-all'
+                      }}>
+                        {submission.userId._id || 'User ID bulunamadı'}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* İletişim Butonları */}
+                  <div style={{
+                    marginTop: '16px',
+                    display: 'flex',
+                    gap: '8px',
+                    flexWrap: 'wrap'
+                  }}>
+                    {submission.userId.email && (
+                      <a
+                        href={`mailto:${submission.userId.email}`}
+                        style={{
+                          background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
+                          color: 'white',
+                          textDecoration: 'none',
+                          padding: isMobile ? '8px 12px' : '10px 16px',
+                          borderRadius: '6px',
+                          fontSize: isMobile ? '12px' : '14px',
+                          fontWeight: '600',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          transition: 'all 0.2s',
+                          boxShadow: '0 2px 8px rgba(5, 150, 105, 0.3)'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.transform = 'translateY(-1px)';
+                          e.currentTarget.style.boxShadow = '0 4px 12px rgba(5, 150, 105, 0.4)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = 'translateY(0)';
+                          e.currentTarget.style.boxShadow = '0 2px 8px rgba(5, 150, 105, 0.3)';
+                        }}
+                      >
+                        📧 E-posta Gönder
+                      </a>
+                    )}
+                    
+                    {submission.userId.phone && (
+                      <a
+                        href={`tel:${submission.userId.phone}`}
+                        style={{
+                          background: 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)',
+                          color: 'white',
+                          textDecoration: 'none',
+                          padding: isMobile ? '8px 12px' : '10px 16px',
+                          borderRadius: '6px',
+                          fontSize: isMobile ? '12px' : '14px',
+                          fontWeight: '600',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          transition: 'all 0.2s',
+                          boxShadow: '0 2px 8px rgba(37, 99, 235, 0.3)'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.transform = 'translateY(-1px)';
+                          e.currentTarget.style.boxShadow = '0 4px 12px rgba(37, 99, 235, 0.4)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = 'translateY(0)';
+                          e.currentTarget.style.boxShadow = '0 2px 8px rgba(37, 99, 235, 0.3)';
+                        }}
+                      >
+                        📞 Ara
+                      </a>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* PlayStation Özel Alanları */}
+              {submission.category === 'playstation' && (
+                <div style={{
+                  backgroundColor: '#f0f9ff',
+                  border: '1px solid #bae6fd',
+                  borderRadius: '8px',
+                  padding: isMobile ? '12px' : '16px',
+                  marginBottom: isMobile ? '12px' : '16px'
+                }}>
+                  <h4 style={{
+                    fontSize: isMobile ? '14px' : '16px',
+                    fontWeight: '600',
+                    color: '#0369a1',
+                    marginBottom: isMobile ? '8px' : '12px',
+                    borderBottom: '1px solid #bae6fd',
+                    paddingBottom: '4px'
+                  }}>
+                    🎮 PlayStation Bilgileri
+                  </h4>
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
+                    gap: isMobile ? '6px' : '8px'
+                  }}>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '12px' : '14px', color: '#6b7280' }}>
+                        Model:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '12px' : '14px', 
+                        color: '#374151',
+                        marginLeft: '6px'
+                      }}>
+                        {submission.model || 'Belirtilmemiş'}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '12px' : '14px', color: '#6b7280' }}>
+                        Durum:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '12px' : '14px', 
+                        color: '#374151',
+                        marginLeft: '6px'
+                      }}>
+                        {submission.condition || 'Belirtilmemiş'}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '12px' : '14px', color: '#6b7280' }}>
+                        Depolama:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '12px' : '14px', 
+                        color: '#374151',
+                        marginLeft: '6px'
+                      }}>
+                        {submission.storageCapacity || 'Belirtilmemiş'}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '12px' : '14px', color: '#6b7280' }}>
+                        Aksesuarlar:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '12px' : '14px', 
+                        color: '#374151',
+                        marginLeft: '6px'
+                      }}>
+                        {submission.accessories || 'Belirtilmemiş'}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '12px' : '14px', color: '#6b7280' }}>
+                        Miktar:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '12px' : '14px', 
+                        color: '#374151',
+                        marginLeft: '6px'
+                      }}>
+                        {submission.quantity || '1'} adet
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '12px' : '14px', color: '#6b7280' }}>
+                        Garanti:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '12px' : '14px', 
+                        color: submission.hasWarranty ? '#059669' : '#dc2626',
+                        marginLeft: '6px'
+                      }}>
+                        {submission.hasWarranty ? (submission.warrantyDuration || 'Var') : 'Yok'}
+                      </span>
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '12px' : '14px', color: '#6b7280' }}>
+                        Fatura Tarihi:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '12px' : '14px', 
+                        color: '#374151',
+                        marginLeft: '6px'
+                      }}>
+                        {submission.invoiceDate || 'Belirtilmemiş'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Durum ve Fiziksel Bilgiler - Alt Bölüm */}
+              <div style={{
+                background: 'linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%)',
+                borderRadius: '12px',
+                padding: isMobile ? '16px' : '20px',
+                marginBottom: isMobile ? '16px' : '20px',
+                border: '1px solid #d1d5db'
+              }}>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginBottom: isMobile ? '12px' : '16px'
+                }}>
+                  <div style={{
+                    background: '#6b7280',
+                    color: 'white',
+                    width: isMobile ? '32px' : '40px',
+                    height: isMobile ? '32px' : '40px',
+                    borderRadius: '8px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginRight: '12px'
+                  }}>
+                    <span style={{ fontSize: isMobile ? '16px' : '20px' }}>📦</span>
+                  </div>
+                  <div>
+                    <h4 style={{
+                      fontSize: isMobile ? '16px' : '18px',
+                      fontWeight: '600',
+                      color: '#374151',
+                      margin: 0
+                    }}>
+                      Durum ve Fiziksel Bilgiler
+                    </h4>
+                    <p style={{
+                      fontSize: isMobile ? '12px' : '14px',
+                      color: '#6b7280',
+                      margin: 0
+                    }}>
+                      Ürünün fiziksel durumu ve belgeleri
+                    </p>
+                  </div>
+                </div>
+                
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
+                  gap: isMobile ? '12px' : '16px'
+                }}>
+                <div>
+                  <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                    Kozmetik Durum:
+                  </strong>
+                  <span style={{ 
+                    fontSize: isMobile ? '14px' : '16px', 
+                    color: '#6b7280',
+                    marginLeft: '8px'
+                  }}>
+                    {submission.cosmeticCondition}
+                  </span>
+                </div>
+                <div>
+                  <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                    Kutu:
+                  </strong>
+                  <span style={{ 
+                    fontSize: isMobile ? '14px' : '16px', 
+                    color: submission.hasBox ? '#059669' : '#dc2626',
+                    marginLeft: '8px'
+                  }}>
+                    {submission.hasBox ? 'Var' : 'Yok'}
+                  </span>
+                </div>
+                <div>
+                  <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                    Fatura:
+                  </strong>
+                  <span style={{ 
+                    fontSize: isMobile ? '14px' : '16px', 
+                    color: submission.hasInvoice ? '#059669' : '#dc2626',
+                    marginLeft: '8px'
+                  }}>
+                    {submission.hasInvoice ? 'Var' : 'Yok'}
+                  </span>
+                </div>
+                <div>
+                  <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                    Resim Sayısı:
+                  </strong>
+                  <span style={{ 
+                    fontSize: isMobile ? '14px' : '16px', 
+                    color: '#6b7280',
+                    marginLeft: '8px'
+                  }}>
+                    {(submission.images || []).length} adet
+                  </span>
+                </div>
+                </div>
+              </div>
+
+              {/* Ekran Kartı Özel Alanları */}
+              {submission.category === 'graphics-card' && (
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
+                  gap: isMobile ? '8px' : '12px',
+                  marginBottom: isMobile ? '12px' : '16px',
+                  padding: '12px',
+                  backgroundColor: '#f8fafc',
+                  borderRadius: '8px',
+                  border: '1px solid #e2e8f0'
+                }}>
+                  <div>
+                    <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                      Marka:
+                    </strong>
+                    <span style={{ 
+                      fontSize: isMobile ? '14px' : '16px', 
+                      color: '#6b7280',
+                      marginLeft: '8px'
+                    }}>
+                      {submission.brand || 'Belirtilmemiş'}
+                    </span>
+                  </div>
+                  <div>
+                    <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                      Model:
+                    </strong>
+                    <span style={{ 
+                      fontSize: isMobile ? '14px' : '16px', 
+                      color: '#6b7280',
+                      marginLeft: '8px'
+                    }}>
+                      {submission.model || 'Belirtilmemiş'}
+                    </span>
+                  </div>
+                  {submission.chipSet && (
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Chipset:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.chipSet}
+                      </span>
+                    </div>
+                  )}
+                  {submission.dviOutput && (
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        DVI Çıkış:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.dviOutput}
+                      </span>
+                    </div>
+                  )}
+                  {submission.furmarkResult && (
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Furmark Sonucu:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.furmarkResult}
+                      </span>
+                    </div>
+                  )}
+                  {submission.opened && (
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Açıldı mı:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.opened}
+                      </span>
+                    </div>
+                  )}
+                  {submission.thermalPadChanged && (
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Termal Pad Değişti:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.thermalPadChanged}
+                      </span>
+                    </div>
+                  )}
+                  {submission.miningUsed && (
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Mining Kullanıldı:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.miningUsed}
+                      </span>
+                    </div>
+                  )}
+                  {submission.miningDuration && (
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Mining Süresi:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.miningDuration}
+                      </span>
+                    </div>
+                  )}
+                  {submission.warrantySticker && (
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Garanti Etiketi:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.warrantySticker}
+                      </span>
+                    </div>
+                  )}
+                  {submission.coilWhine && (
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Coil Whine:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.coilWhine}
+                      </span>
+                    </div>
+                  )}
+                  {submission.oxidation && (
+                    <div>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Oksidasyon:
+                      </strong>
+                      <span style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginLeft: '8px'
+                      }}>
+                        {submission.oxidation}
+                      </span>
+                    </div>
+                  )}
+                  {submission.description && (
+                    <div style={{ gridColumn: isMobile ? '1' : '1 / -1' }}>
+                      <strong style={{ fontSize: isMobile ? '14px' : '16px', color: '#374151' }}>
+                        Açıklama:
+                      </strong>
+                      <div style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: '#6b7280',
+                        marginTop: '4px',
+                        padding: '8px',
+                        backgroundColor: 'white',
+                        borderRadius: '4px',
+                        border: '1px solid #e2e8f0'
+                      }}>
+                        {submission.description}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Resimler */}
+              {(submission.images || []).length > 0 && (
+                <div style={{ marginTop: isMobile ? '12px' : '16px' }}>
+                  <strong style={{ 
+                    fontSize: isMobile ? '14px' : '16px', 
+                    color: '#374151',
+                    display: 'block',
+                    marginBottom: isMobile ? '8px' : '12px'
+                  }}>
+                    Ürün Fotoğrafları:
+                  </strong>
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: isMobile ? 'repeat(6, 1fr)' : 'repeat(12, 1fr)',
+                    gap: isMobile ? '4px' : '6px',
+                    maxWidth: '100%'
+                  }}>
+                    {(submission.images || []).map((image, imgIndex) => {
+                      // Base64 string kontrolü
+                      if (typeof image === 'string' && image.startsWith('data:image')) {
+                        return (
+                          <div key={imgIndex} style={{
+                            border: '1px solid #e5e7eb',
+                            borderRadius: '6px',
+                            overflow: 'hidden',
+                            background: '#f9fafb',
+                            aspectRatio: '1',
+                            position: 'relative'
+                          }}>
+                            {/* Fotoğraf Numarası */}
+                            <div style={{
+                              position: 'absolute',
+                              top: '2px',
+                              right: '2px',
+                              background: 'rgba(0, 0, 0, 0.7)',
+                              color: 'white',
+                              borderRadius: '6px',
+                              padding: '1px 3px',
+                              fontSize: isMobile ? '8px' : '9px',
+                              fontWeight: '600',
+                              zIndex: 1
+                            }}>
+                              {imgIndex + 1}
+                            </div>
+                            <img
+                              src={image}
+                              alt={`Ürün resmi ${imgIndex + 1}`}
+                              style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                                cursor: 'pointer',
+                                transition: 'transform 0.2s'
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = 'scale(1.05)';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = 'scale(1)';
+                              }}
+                                                          onClick={() => {
+                              // Resmi büyük göster
+                              const modal = document.createElement('div');
+                              modal.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px;';
+                              
+                              // Güvenli modal kapatma fonksiyonu
+                              const closeModal = () => {
+                                if (modal.parentNode) {
+                                  document.body.removeChild(modal);
+                                }
+                              };
+                              
+                              modal.onclick = closeModal;
+                              
+                              // X butonu oluştur
+                              const closeBtn = document.createElement('button');
+                              closeBtn.innerHTML = '✕';
+                              closeBtn.style.cssText = 'position: absolute; top: -15px; right: -15px; background: rgba(255, 255, 255, 0.95); border: 2px solid #fff; border-radius: 50%; width: 35px; height: 35px; font-size: 16px; font-weight: bold; color: #333; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 1001; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);';
+                              closeBtn.onmouseenter = () => {
+                                closeBtn.style.background = 'rgba(255, 255, 255, 1)';
+                                closeBtn.style.transform = 'scale(1.1)';
+                              };
+                              closeBtn.onmouseleave = () => {
+                                closeBtn.style.background = 'rgba(255, 255, 255, 0.9)';
+                                closeBtn.style.transform = 'scale(1)';
+                              };
+                              closeBtn.onclick = (e) => {
+                                e.stopPropagation();
+                                closeModal();
+                              };
+                              
+                              // Resim container'ı oluştur
+                              const imgContainer = document.createElement('div');
+                              imgContainer.style.cssText = 'position: relative; display: inline-block;';
+                              
+                              const img = document.createElement('img');
+                              img.src = image;
+                              img.style.cssText = 'max-width: 90%; max-height: 90%; object-fit: contain; border-radius: 8px; display: block;';
+                              img.onclick = (e) => e.stopPropagation();
+                              
+                              imgContainer.appendChild(img);
+                              imgContainer.appendChild(closeBtn);
+                              modal.appendChild(imgContainer);
+                              document.body.appendChild(modal);
+                            }}
+                            />
+                          </div>
+                        );
+                      }
+                      
+                      // Geçersiz format
+                      return (
+                        <div key={imgIndex} style={{
+                          border: '1px solid #e5e7eb',
+                          borderRadius: '6px',
+                          overflow: 'hidden',
+                          background: '#f9fafb',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          aspectRatio: '1',
+                          position: 'relative'
+                        }}>
+                          <span style={{
+                            fontSize: isMobile ? '7px' : '8px',
+                            color: '#6b7280',
+                            textAlign: 'center',
+                            padding: '4px'
+                          }}>
+                            Hata
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Müşteri Yanıtı - En Alt Bölüm */}
+              {submission.customerResponse && (
+                <div style={{
+                  background: submission.customerResponse.action === 'accepted' 
+                    ? 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)'
+                    : 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)',
+                  borderRadius: '12px',
+                  padding: isMobile ? '16px' : '20px',
+                  marginBottom: '16px',
+                  border: submission.customerResponse.action === 'accepted' 
+                    ? '1px solid #6ee7b7'
+                    : '1px solid #fca5a5',
+                  boxShadow: submission.customerResponse.action === 'accepted' 
+                    ? '0 4px 12px rgba(16, 185, 129, 0.15)'
+                    : '0 4px 12px rgba(239, 68, 68, 0.15)'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    marginBottom: '12px'
+                  }}>
+                    <div style={{
+                      background: submission.customerResponse.action === 'accepted' ? '#059669' : '#dc2626',
+                      color: 'white',
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '16px',
+                      fontWeight: 'bold',
+                      marginRight: '12px'
+                    }}>
+                      {submission.customerResponse.action === 'accepted' ? '✅' : '❌'}
+                    </div>
+                    <h4 style={{
+                      fontSize: isMobile ? '16px' : '18px',
+                      fontWeight: '600',
+                      color: submission.customerResponse.action === 'accepted' ? '#065f46' : '#991b1b',
+                      margin: 0
+                    }}>
+                      Müşteri Yanıtı
+                    </h4>
+                  </div>
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(200px, 1fr))',
+                    gap: '12px'
+                  }}>
+                    <div>
+                      <span style={{ 
+                        fontSize: isMobile ? '12px' : '14px', 
+                        color: submission.customerResponse.action === 'accepted' ? '#065f46' : '#991b1b',
+                        fontWeight: '500'
+                      }}>
+                        Durum:
+                      </span>
+                      <div style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        fontWeight: '600',
+                        color: submission.customerResponse.action === 'accepted' ? '#065f46' : '#991b1b',
+                        marginTop: '4px'
+                      }}>
+                        {submission.customerResponse.action === 'accepted' ? 'Teklif Kabul Edildi' : 'Teklif Reddedildi'}
+                      </div>
+                    </div>
+                    <div>
+                      <span style={{ 
+                        fontSize: isMobile ? '12px' : '14px', 
+                        color: submission.customerResponse.action === 'accepted' ? '#065f46' : '#991b1b',
+                        fontWeight: '500'
+                      }}>
+                        Tarih:
+                      </span>
+                      <div style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        fontWeight: '500',
+                        color: submission.customerResponse.action === 'accepted' ? '#065f46' : '#991b1b',
+                        marginTop: '4px'
+                      }}>
+                        {formatDate(submission.customerResponse.date)}
+                      </div>
+                    </div>
+                  </div>
+                  {(submission.customerResponse.note || submission.customerResponse.reason) && (
+                    <div style={{ marginTop: '12px' }}>
+                      <span style={{ 
+                        fontSize: isMobile ? '12px' : '14px', 
+                        color: submission.customerResponse.action === 'accepted' ? '#065f46' : '#991b1b',
+                        fontWeight: '500'
+                      }}>
+                        {submission.customerResponse.action === 'accepted' ? 'Not:' : 'Sebep:'}
+                      </span>
+                      <div style={{ 
+                        fontSize: isMobile ? '14px' : '16px', 
+                        color: submission.customerResponse.action === 'accepted' ? '#065f46' : '#991b1b',
+                        marginTop: '4px',
+                        fontStyle: 'italic',
+                        lineHeight: '1.5'
+                      }}>
+                        {submission.customerResponse.note || submission.customerResponse.reason}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Aksiyon Butonları */}
+              <div style={{
+                display: 'flex',
+                gap: isMobile ? '12px' : '16px',
+                flexWrap: 'wrap',
+                marginTop: '20px'
+              }}>
+                <button
+                  onClick={() => handleAction(submission, 'offer')}
+                  disabled={submission.status !== 'pending'}
+                  style={{
+                    background: submission.status === 'pending'
+                      ? 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)'
+                      : 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '12px',
+                    padding: isMobile ? '12px 16px' : '14px 20px',
+                    fontSize: isMobile ? '13px' : '14px',
+                    cursor: submission.status === 'pending' ? 'pointer' : 'not-allowed',
+                    fontWeight: '600',
+                    transition: 'all 0.2s',
+                    opacity: submission.status === 'pending' ? 1 : 0.6,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    boxShadow: submission.status === 'pending'
+                      ? '0 4px 12px rgba(37, 99, 235, 0.3)'
+                      : '0 2px 4px rgba(0, 0, 0, 0.1)'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (submission.status === 'pending') {
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.boxShadow = '0 6px 20px rgba(37, 99, 235, 0.4)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (submission.status === 'pending') {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(37, 99, 235, 0.3)';
+                    }
+                  }}
+                >
+                  💰 {submission.status === 'offered' ? 'Teklif Verildi' : 'Teklif Ver'}
+                </button>
+                <button
+                  onClick={() => submission.status === 'accepted' ? handleAction(submission, 'listing') : null}
+                  disabled={submission.status !== 'accepted'}
+                  style={{
+                    background: submission.status === 'accepted'
+                      ? 'linear-gradient(135deg, #059669 0%, #10b981 100%)'
+                      : submission.status === 'listed'
+                      ? 'linear-gradient(135deg, #059669 0%, #10b981 100%)'
+                      : 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '12px',
+                    padding: isMobile ? '12px 16px' : '14px 20px',
+                    fontSize: isMobile ? '13px' : '14px',
+                    cursor: submission.status === 'accepted' ? 'pointer' : 'not-allowed',
+                    fontWeight: '600',
+                    transition: 'all 0.2s',
+                    opacity: submission.status === 'accepted' ? 1 : 0.6,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    boxShadow: submission.status === 'accepted'
+                      ? '0 4px 12px rgba(5, 150, 105, 0.3)'
+                      : '0 2px 4px rgba(0, 0, 0, 0.1)'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (submission.status === 'accepted') {
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.boxShadow = '0 6px 20px rgba(5, 150, 105, 0.4)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (submission.status === 'accepted') {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(5, 150, 105, 0.3)';
+                    }
+                  }}
+                >
+                  📋 {submission.status === 'listed' ? '✅ İlan Oluşturuldu' : 'İlan Oluştur'}
+                </button>
+                <button
+                  onClick={() => handleAction(submission, 'reject')}
+                  disabled={submission.status !== 'pending' && submission.status !== 'offered'}
+                  style={{
+                    background: (submission.status === 'pending' || submission.status === 'offered')
+                      ? 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)'
+                      : 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '12px',
+                    padding: isMobile ? '12px 16px' : '14px 20px',
+                    fontSize: isMobile ? '13px' : '14px',
+                    cursor: (submission.status === 'pending' || submission.status === 'offered') ? 'pointer' : 'not-allowed',
+                    fontWeight: '600',
+                    transition: 'all 0.2s',
+                    opacity: (submission.status === 'pending' || submission.status === 'offered') ? 1 : 0.6,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    boxShadow: (submission.status === 'pending' || submission.status === 'offered')
+                      ? '0 4px 12px rgba(220, 38, 38, 0.3)'
+                      : '0 2px 4px rgba(0, 0, 0, 0.1)'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (submission.status === 'pending' || submission.status === 'offered') {
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.boxShadow = '0 6px 20px rgba(220, 38, 38, 0.4)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (submission.status === 'pending' || submission.status === 'offered') {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.3)';
+                    }
+                  }}
+                >
+                  ❌ {submission.status === 'rejected' ? 'Reddedildi' : 'Reddet'}
+                </button>
+                <button
+                  onClick={() => handleDeleteSubmission(submission._id)}
+                  style={{
+                    background: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '12px',
+                    padding: isMobile ? '12px 16px' : '14px 20px',
+                    fontSize: isMobile ? '13px' : '14px',
+                    cursor: 'pointer',
+                    fontWeight: '600',
+                    transition: 'all 0.2s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    boxShadow: '0 4px 12px rgba(220, 38, 38, 0.3)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(220, 38, 38, 0.4)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.3)';
+                  }}
+                >
+                  🗑️ Sil
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Toast Notification */}
+      {showToast && (
+        <div style={{
+          position: 'fixed',
+          top: isMobile ? '20px' : '40px',
+          right: isMobile ? '20px' : '40px',
+          background: toastType === 'success' 
+            ? 'linear-gradient(135deg, #059669 0%, #10b981 100%)'
+            : 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',
+          color: 'white',
+          padding: isMobile ? '16px 20px' : '20px 24px',
+          borderRadius: '12px',
+          boxShadow: '0 10px 25px rgba(0, 0, 0, 0.2), 0 4px 10px rgba(0, 0, 0, 0.1)',
+          zIndex: 10000,
+          maxWidth: isMobile ? 'calc(100vw - 40px)' : '400px',
+          transform: 'translateX(0)',
+          animation: 'slideInRight 0.3s ease-out',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px'
+        }}>
+          <div style={{
+            width: '24px',
+            height: '24px',
+            borderRadius: '50%',
+            background: 'rgba(255, 255, 255, 0.2)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '14px',
+            fontWeight: 'bold'
+          }}>
+            {toastType === 'success' ? '✓' : '✕'}
+          </div>
+          <div>
+            <div style={{
+              fontSize: isMobile ? '14px' : '16px',
+              fontWeight: '600',
+              marginBottom: '2px'
+            }}>
+              {toastType === 'success' ? 'Başarılı!' : 'Hata!'}
+            </div>
+            <div style={{
+              fontSize: isMobile ? '13px' : '14px',
+              opacity: 0.9,
+              lineHeight: '1.4'
+            }}>
+              {toastMessage}
+            </div>
+          </div>
+          <button
+            onClick={() => setShowToast(false)}
+            style={{
+              background: 'rgba(255, 255, 255, 0.2)',
+              border: 'none',
+              borderRadius: '50%',
+              width: '24px',
+              height: '24px',
+              color: 'white',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '12px',
+              fontWeight: 'bold',
+              marginLeft: 'auto'
+            }}
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      {/* Action Modal */}
+      <ActionModal
+        showModal={showModal}
+        selectedSubmission={selectedSubmission}
+        modalType={modalType}
+        isMobile={isMobile}
+        onSubmit={handleSubmitAction}
+        onCancel={() => {
+          setShowModal(false);
+          setSelectedSubmission(null);
+          setModalType(null);
+        }}
+      />
+
+      {/* Silme Onay Modalı */}
+      {showDeleteModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          padding: '20px'
+        }}>
+          <div style={{
+            background: 'white',
+            borderRadius: '16px',
+            padding: isMobile ? '24px' : '32px',
+            width: '100%',
+            maxWidth: isMobile ? '100%' : '450px',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+            border: '1px solid #e5e7eb'
+          }}>
+            {/* İkon ve Başlık */}
+            <div style={{
+              textAlign: 'center',
+              marginBottom: '24px'
+            }}>
+              <div style={{
+                width: '64px',
+                height: '64px',
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 16px auto',
+                border: '2px solid #fecaca'
+              }}>
+                <span style={{
+                  fontSize: '32px',
+                  color: '#dc2626'
+                }}>
+                  ⚠️
+                </span>
+              </div>
+              <h2 style={{
+                fontSize: isMobile ? '20px' : '24px',
+                fontWeight: '700',
+                color: '#1f2937',
+                margin: '0 0 8px 0'
+              }}>
+                {deleteModalType === 'all' ? 'Tüm İlanları Sil' : 'İlanı Sil'}
+              </h2>
+              <p style={{
+                fontSize: isMobile ? '14px' : '16px',
+                color: '#6b7280',
+                margin: 0,
+                lineHeight: '1.5'
+              }}>
+                {deleteModalType === 'all' 
+                  ? `Tüm ilanları (${(submissions || []).length} adet) kalıcı olarak silmek istediğinizden emin misiniz?`
+                  : 'Bu ilanı kalıcı olarak silmek istediğinizden emin misiniz?'
+                }
+              </p>
+            </div>
+
+            {/* Uyarı Mesajı */}
+            <div style={{
+              background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)',
+              border: '1px solid #fecaca',
+              borderRadius: '12px',
+              padding: '16px',
+              marginBottom: '24px'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '12px'
+              }}>
+                <span style={{
+                  fontSize: '20px',
+                  color: '#dc2626',
+                  marginTop: '2px'
+                }}>
+                  ⚠️
+                </span>
+                <div>
+                  <p style={{
+                    fontSize: isMobile ? '13px' : '14px',
+                    color: '#991b1b',
+                    margin: '0 0 4px 0',
+                    fontWeight: '600'
+                  }}>
+                    Bu işlem geri alınamaz!
+                  </p>
+                  <p style={{
+                    fontSize: isMobile ? '12px' : '13px',
+                    color: '#7f1d1d',
+                    margin: 0,
+                    lineHeight: '1.4'
+                  }}>
+                    {deleteModalType === 'all' 
+                      ? 'Tüm ilanlar ve ilgili veriler kalıcı olarak silinecektir.'
+                      : 'Bu ilan ve ilgili veriler kalıcı olarak silinecektir.'
+                    }
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Butonlar */}
+            <div style={{
+              display: 'flex',
+              gap: '12px',
+              justifyContent: 'center'
+            }}>
+              <button
+                onClick={cancelDelete}
+                disabled={isDeletingAll}
+                style={{
+                  background: 'white',
+                  color: '#374151',
+                  border: '2px solid #d1d5db',
+                  borderRadius: '12px',
+                  padding: isMobile ? '12px 20px' : '14px 24px',
+                  fontSize: isMobile ? '14px' : '16px',
+                  fontWeight: '600',
+                  cursor: isDeletingAll ? 'not-allowed' : 'pointer',
+                  transition: 'all 0.2s',
+                  opacity: isDeletingAll ? 0.6 : 1,
+                  minWidth: '120px'
+                }}
+                onMouseEnter={(e) => {
+                  if (!isDeletingAll) {
+                    e.currentTarget.style.borderColor = '#9ca3af';
+                    e.currentTarget.style.background = '#f9fafb';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isDeletingAll) {
+                    e.currentTarget.style.borderColor = '#d1d5db';
+                    e.currentTarget.style.background = 'white';
+                  }
+                }}
+              >
+                İptal
+              </button>
+              <button
+                onClick={confirmDelete}
+                disabled={isDeletingAll}
+                style={{
+                  background: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '12px',
+                  padding: isMobile ? '12px 20px' : '14px 24px',
+                  fontSize: isMobile ? '14px' : '16px',
+                  fontWeight: '600',
+                  cursor: isDeletingAll ? 'not-allowed' : 'pointer',
+                  transition: 'all 0.2s',
+                  opacity: isDeletingAll ? 0.7 : 1,
+                  minWidth: '120px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px'
+                }}
+                onMouseEnter={(e) => {
+                  if (!isDeletingAll) {
+                    e.currentTarget.style.transform = 'translateY(-1px)';
+                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(220, 38, 38, 0.4)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isDeletingAll) {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.3)';
+                  }
+                }}
+              >
+                {isDeletingAll ? (
+                  <>
+                    <div style={{
+                      width: '16px',
+                      height: '16px',
+                      border: '2px solid rgba(255,255,255,0.3)',
+                      borderTop: '2px solid white',
+                      borderRadius: '50%',
+                      animation: 'spin 1s linear infinite'
+                    }}></div>
+                    Siliniyor...
+                  </>
+                ) : (
+                  <>
+                    🗑️
+                    {deleteModalType === 'all' ? 'Tümünü Sil' : 'Sil'}
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+

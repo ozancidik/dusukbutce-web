@@ -1,0 +1,665 @@
+"use client";
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import LoginHeader from "./components/LoginHeader";
+import LoginForm from "./components/LoginForm";
+import SocialLoginButtons from "./components/SocialLoginButtons";
+import LoginSuccess from "./components/LoginSuccess";
+import RegisterLink from "./components/RegisterLink";
+
+export default function LoginPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [socialLoading, setSocialLoading] = useState("");
+  const [isAdminForm, setIsAdminForm] = useState(false);
+  const [loginSuccess, setLoginSuccess] = useState(false);
+  const [redirectMessage, setRedirectMessage] = useState("");
+  const [loginAttempts, setLoginAttempts] = useState(0);
+  const [rememberMe, setRememberMe] = useState(false);
+  const [isResendingEmail, setIsResendingEmail] = useState(false);
+  const [emailVerificationError, setEmailVerificationError] = useState(false);
+  const [isEmailSent, setIsEmailSent] = useState(false);
+  const router = useRouter();
+
+  // Kullanıcı ve admin giriş kontrolü
+  React.useEffect(() => {
+    const checkUserStatus = () => {
+      const adminLoggedIn = localStorage.getItem("adminLoggedIn") || sessionStorage.getItem("adminLoggedIn");
+      const adminEmail = localStorage.getItem("adminEmail") || sessionStorage.getItem("adminEmail");
+      const adminToken = localStorage.getItem("adminToken") || sessionStorage.getItem("adminToken");
+      const userLoggedIn = localStorage.getItem("userLoggedIn") || sessionStorage.getItem("userLoggedIn");
+      const userEmail = localStorage.getItem("userEmail") || sessionStorage.getItem("userEmail");
+      
+      console.log("🔍 Login sayfası - Storage kontrol:", {
+        adminLoggedIn,
+        adminEmail: adminEmail ? "var" : "yok",
+        adminToken: adminToken ? "var" : "yok",
+        userLoggedIn,
+        userEmail: userEmail ? "var" : "yok"
+      });
+      
+      // Admin bilgileri varsa VE token varsa yönlendir
+      if (adminLoggedIn === "true" && adminEmail && adminToken) {
+        console.log("🔒 Admin giriş yapmış (token var), admin paneline yönlendiriliyor...");
+        router.push("/admin");
+        return;
+      }
+      
+      // Admin bilgileri eksikse temizle
+      if (adminLoggedIn === "true" && (!adminEmail || !adminToken)) {
+        console.log("⚠️ Admin bilgileri eksik, temizleniyor...");
+        localStorage.removeItem("adminLoggedIn");
+        localStorage.removeItem("adminEmail");
+        localStorage.removeItem("adminToken");
+        sessionStorage.removeItem("adminLoggedIn");
+        sessionStorage.removeItem("adminEmail");
+        sessionStorage.removeItem("adminToken");
+      }
+      
+      // Normal kullanıcı giriş yapmışsa returnUrl kontrolü yap
+      if (userLoggedIn === "true" && userEmail) {
+        // returnUrl parametresi varsa oraya yönlendir
+        const returnUrl = new URLSearchParams(window.location.search).get('returnUrl');
+        if (returnUrl) {
+          console.log("👤 Kullanıcı giriş yapmış, returnUrl'e yönlendiriliyor:", returnUrl);
+          router.push(decodeURIComponent(returnUrl));
+        } else {
+          console.log("👤 Kullanıcı giriş yapmış, anasayfaya yönlendiriliyor...");
+          router.push("/");
+        }
+        return;
+      }
+      
+      // Hiçbir giriş yoksa login sayfasında kal
+      console.log("🔓 Giriş yapılmamış, login sayfasında kalınıyor...");
+    };
+
+    // İlk kontrol
+    checkUserStatus();
+
+    // localStorage değişikliklerini dinle
+    const handleStorageChange = () => {
+      const adminLoggedIn = localStorage.getItem("adminLoggedIn") || sessionStorage.getItem("adminLoggedIn");
+      const adminEmail = localStorage.getItem("adminEmail") || sessionStorage.getItem("adminEmail");
+      const userLoggedIn = localStorage.getItem("userLoggedIn") || sessionStorage.getItem("userLoggedIn");
+      const userEmail = localStorage.getItem("userEmail") || sessionStorage.getItem("userEmail");
+      
+      // Herhangi bir giriş yapıldıysa kontrol et
+      if ((adminLoggedIn === "true" && adminEmail) || (userLoggedIn === "true" && userEmail)) {
+        checkUserStatus();
+      }
+    };
+
+    // Custom event'leri dinle
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('localStorageChange', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('localStorageChange', handleStorageChange);
+    };
+  }, [router]);
+
+  // Smart form detection - sadece gerçek admin email'leri için
+  React.useEffect(() => {
+    // Sadece gerçek admin email formatları için admin form tespiti
+    if (email.includes("@admin.") || email.includes("admin@")) {
+      setIsAdminForm(true);
+    } else {
+      setIsAdminForm(false);
+    }
+  }, [email]);
+
+  // Rate limiting kontrolü - sadece gerçek yanlış şifre girişlerinde göster
+  React.useEffect(() => {
+    const attempts = localStorage.getItem("loginAttempts") || "0";
+    const lastAttemptTime = localStorage.getItem("lastLoginAttempt");
+    const now = Date.now();
+    
+    // 15 dakika geçmişse sayacı sıfırla
+    if (lastAttemptTime) {
+      const timeDiff = now - parseInt(lastAttemptTime);
+      if (timeDiff >= 15 * 60 * 1000) { // 15 dakika
+        localStorage.setItem("loginAttempts", "0");
+        localStorage.removeItem("lastLoginAttempt");
+        setLoginAttempts(0);
+      } else {
+        // Sadece gerçek yanlış şifre girişi varsa göster
+        const isRealPasswordAttempt = localStorage.getItem("isRealPasswordAttempt") === "true";
+        if (isRealPasswordAttempt) {
+          setLoginAttempts(parseInt(attempts));
+        } else {
+          // Gerçek yanlış şifre girişi değilse sayacı sıfırla
+          localStorage.setItem("loginAttempts", "0");
+          localStorage.removeItem("lastLoginAttempt");
+          setLoginAttempts(0);
+        }
+      }
+    } else {
+      setLoginAttempts(0);
+    }
+  }, []);
+
+  // Remember Me için email hatırlama
+  React.useEffect(() => {
+    const rememberedEmail = localStorage.getItem("rememberedEmail");
+    const rememberMe = localStorage.getItem("rememberMe");
+    
+    if (rememberedEmail && rememberMe === "true") {
+      setEmail(rememberedEmail);
+      setRememberMe(true);
+    }
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Rate limiting kontrolü
+    if (loginAttempts >= 5) {
+      const lastAttemptTime = localStorage.getItem("lastLoginAttempt");
+      const now = Date.now();
+      const timeDiff = now - (lastAttemptTime ? parseInt(lastAttemptTime) : 0);
+      
+      if (timeDiff < 15 * 60 * 1000) { // 15 dakika bekleme süresi
+        const remainingTime = Math.ceil((15 * 60 * 1000 - timeDiff) / (60 * 1000));
+        setError(`Çok fazla giriş denemesi. Lütfen ${remainingTime} dakika bekleyin.`);
+        return;
+      } else {
+        // Süre dolmuş, sıfırla
+        localStorage.setItem("loginAttempts", "0");
+        setLoginAttempts(0);
+      }
+    }
+    
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      
+      const data = await res.json();
+      
+      if (data.success) {
+        // Kullanıcı bilgilerini hem localStorage hem sessionStorage'a kaydet
+        const loginTime = Date.now();
+        const userData = {
+          userLoggedIn: "true",
+          userEmail: data.user.email,
+          userName: data.user.name,
+          userId: data.user.id,
+          userPhone: data.user.phone || '',
+          userBirthDate: data.user.birthDate || '',
+          userIsAdmin: data.user.isAdmin.toString(),
+          loginTime: loginTime.toString(),
+          rememberMe: rememberMe.toString(),
+          token: data.token || "login-token-" + Math.random().toString(36).substr(2, 9),
+          user: JSON.stringify({
+            id: data.user.id,
+            email: data.user.email,
+            name: data.user.name,
+            phone: data.user.phone || '',
+            birthDate: data.user.birthDate || '',
+            isAdmin: data.user.isAdmin
+          })
+        };
+        
+        // localStorage'a kaydet
+        Object.entries(userData).forEach(([key, value]) => {
+          localStorage.setItem(key, value);
+        });
+        
+        // sessionStorage'a da kaydet (gizli sekme desteği için)
+        Object.entries(userData).forEach(([key, value]) => {
+          sessionStorage.setItem(key, value);
+        });
+        
+        // Remember Me değerini de kaydet
+        localStorage.setItem("rememberMe", rememberMe.toString());
+        sessionStorage.setItem("rememberMe", rememberMe.toString());
+        
+        // Remember Me işaretliyse email'i hatırla
+        if (rememberMe) {
+          localStorage.setItem("rememberedEmail", data.user.email);
+        } else {
+          localStorage.removeItem("rememberedEmail");
+        }
+        
+        // Custom event'i tetikle
+        window.dispatchEvent(new Event('localStorageChange'));
+        
+        // Rate limiting'i sıfırla
+        localStorage.setItem("loginAttempts", "0");
+        localStorage.removeItem("lastLoginAttempt");
+        localStorage.removeItem("isRealPasswordAttempt");
+        setLoginAttempts(0);
+        
+        if (data.user.isAdmin) {
+          localStorage.setItem("adminLoggedIn", "true");
+          localStorage.setItem("adminEmail", data.user.email);
+          localStorage.setItem("adminToken", data.token);
+          sessionStorage.setItem("adminLoggedIn", "true");
+          sessionStorage.setItem("adminEmail", data.user.email);
+          sessionStorage.setItem("adminToken", data.token);
+          
+          // Cookie'ye de kaydet (middleware için)
+          document.cookie = `adminToken=${data.token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
+          
+          // Admin giriş sonrası özel mesaj ve yönlendirme
+          setLoginSuccess(true);
+          setRedirectMessage("Admin giriş başarılı! Admin paneline yönlendiriliyor...");
+          
+          // Loading'i hemen durdur
+          setIsLoading(false);
+          
+          setTimeout(() => {
+            router.push("/admin");
+          }, 1500); // 2 saniyeden 1.5 saniyeye düşürdük
+        } else {
+          // Normal kullanıcı yönlendirmesi - returnUrl varsa oraya, yoksa profile sayfasına git
+          const returnUrl = new URLSearchParams(window.location.search).get('returnUrl');
+          
+          if (returnUrl) {
+            setLoginSuccess(true);
+            setRedirectMessage("Giriş başarılı! Yönlendiriliyorsunuz...");
+            
+            setTimeout(() => {
+              router.push(decodeURIComponent(returnUrl));
+            }, 2000);
+          } else {
+            setLoginSuccess(true);
+            setRedirectMessage("Giriş başarılı! Anasayfaya yönlendiriliyor...");
+            
+            setTimeout(() => {
+              router.push("/");
+            }, 2000);
+          }
+        }
+      } else {
+        // Email doğrulama hatası ise rate limiting'i artırma ve sayacı sıfırla
+        if (data.requiresVerification) {
+          setEmailVerificationError(true);
+          setError(data.message || "Email adresinizi doğrulamanız gerekiyor. Email kutunuzu kontrol edin.");
+          // Email doğrulama hatası durumunda sayacı sıfırla
+          localStorage.setItem("loginAttempts", "0");
+          localStorage.removeItem("lastLoginAttempt");
+          localStorage.removeItem("isRealPasswordAttempt");
+          setLoginAttempts(0);
+        } else {
+          // Sadece yanlış şifre hatası için rate limiting'i artır
+          if (data.message && data.message.includes("Email veya şifre hatalı")) {
+            const newAttempts = loginAttempts + 1;
+            localStorage.setItem("loginAttempts", newAttempts.toString());
+            localStorage.setItem("lastLoginAttempt", Date.now().toString());
+            localStorage.setItem("isRealPasswordAttempt", "true");
+            setLoginAttempts(newAttempts);
+          } else {
+            // Diğer hatalar için sayacı sıfırla
+            localStorage.setItem("loginAttempts", "0");
+            localStorage.removeItem("lastLoginAttempt");
+            localStorage.removeItem("isRealPasswordAttempt");
+            setLoginAttempts(0);
+          }
+          
+          setError(data.message || "Giriş yapılırken bir hata oluştu.");
+        }
+      }
+    } catch (err) {
+      // Bağlantı hatası durumunda sayacı sıfırla (gerçek yanlış şifre değil)
+      localStorage.setItem("loginAttempts", "0");
+      localStorage.removeItem("lastLoginAttempt");
+      localStorage.removeItem("isRealPasswordAttempt");
+      setLoginAttempts(0);
+      
+      setError("Bağlantı hatası oluştu.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Email doğrulama için tekrar mail gönder
+  const handleResendVerificationEmail = async () => {
+    if (!email) {
+      setError("Lütfen email adresinizi girin.");
+      return;
+    }
+
+    setIsResendingEmail(true);
+    setError("");
+
+    try {
+      const res = await fetch('/api/auth/resend-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      
+      const data = await res.json();
+      
+      if (data.success) {
+        setError("Doğrulama e-postası gönderildi. Lütfen gelen kutunuzu kontrol edin.");
+        setEmailVerificationError(false);
+        setIsEmailSent(true);
+        
+        // 5 saniye sonra başarı mesajını temizle
+        setTimeout(() => {
+          setError("");
+          setIsEmailSent(false);
+        }, 5000);
+      } else {
+        setError(data.error || "E-posta gönderilemedi. Lütfen tekrar deneyin.");
+        setIsEmailSent(false);
+      }
+    } catch (err) {
+      setError("Bağlantı hatası oluştu.");
+    } finally {
+      setIsResendingEmail(false);
+    }
+  };
+
+  // Google ile giriş
+  const handleGoogleLogin = async () => {
+    setSocialLoading("google");
+    setError("");
+    
+    try {
+      // Google OAuth popup açma (mobil uyumlu)
+      let width, height, left, top;
+      
+      // Mobil cihaz kontrolü
+      if (window.innerWidth <= 768) {
+        // Mobil için tam ekran popup
+        width = window.screen.width;
+        height = window.screen.height;
+        left = 0;
+        top = 0;
+      } else {
+        // Desktop için ortalanmış popup
+        width = 500;
+        height = 600;
+        left = window.screenX + (window.outerWidth - width) / 2;
+        top = window.screenY + (window.outerHeight - height) / 2;
+      }
+      
+      const popup = window.open(
+        '/api/auth/google',
+        'google-login',
+        `width=${width},height=${height},left=${left},top=${top}`
+      );
+
+      // Popup mesajlarını dinle
+      const handleMessage = (event: MessageEvent) => {
+        if (event.origin !== window.location.origin) return;
+        
+        if (event.data.type === 'GOOGLE_LOGIN_SUCCESS') {
+          const userData = event.data.user;
+          const token = event.data.token;
+          const loginTime = Date.now();
+          const userDataToStore = {
+            userLoggedIn: "true",
+            userEmail: userData.email,
+            userName: userData.name,
+            userId: userData.id,
+            userPhone: userData.phone || '',
+            userBirthDate: userData.birthDate || '',
+            userIsAdmin: userData.isAdmin.toString(),
+            loginTime: loginTime.toString(),
+            token: token,
+            user: JSON.stringify({
+              id: userData.id,
+              email: userData.email,
+              name: userData.name,
+              phone: userData.phone || '',
+              birthDate: userData.birthDate || '',
+              isAdmin: userData.isAdmin
+            })
+          };
+          
+          // localStorage'a kaydet
+          Object.entries(userDataToStore).forEach(([key, value]) => {
+            localStorage.setItem(key, value);
+          });
+          
+          // sessionStorage'a da kaydet (gizli sekme desteği için)
+          Object.entries(userDataToStore).forEach(([key, value]) => {
+            sessionStorage.setItem(key, value);
+          });
+          
+          // Remember Me işaretliyse email'i hatırla
+          if (rememberMe) {
+            localStorage.setItem("rememberedEmail", userData.email);
+            localStorage.setItem("rememberMe", "true");
+            sessionStorage.setItem("rememberMe", "true");
+          }
+          
+          // Custom event'i tetikle
+          window.dispatchEvent(new Event('localStorageChange'));
+          
+          if (userData.isAdmin) {
+            localStorage.setItem("adminLoggedIn", "true");
+            localStorage.setItem("adminEmail", userData.email);
+            localStorage.setItem("adminToken", token);
+            sessionStorage.setItem("adminLoggedIn", "true");
+            sessionStorage.setItem("adminEmail", userData.email);
+            sessionStorage.setItem("adminToken", token);
+          }
+          
+          popup?.close();
+          window.removeEventListener('message', handleMessage);
+          
+          // returnUrl'e göre yönlendir
+          const returnUrl = new URLSearchParams(window.location.search).get('returnUrl') || '/';
+          router.push(decodeURIComponent(returnUrl));
+        } else if (event.data.type === 'GOOGLE_LOGIN_ERROR') {
+          setError(event.data.error || "Google ile giriş yapılırken bir hata oluştu.");
+          popup?.close();
+          window.removeEventListener('message', handleMessage);
+        }
+      };
+
+      window.addEventListener('message', handleMessage);
+      
+      // Popup kapandığında loading'i durdur
+      const checkClosed = setInterval(() => {
+        try {
+          if (popup?.closed) {
+            clearInterval(checkClosed);
+            setSocialLoading("");
+          }
+        } catch (e) {
+          // Cross-Origin-Opener-Policy hatası için
+          clearInterval(checkClosed);
+          setSocialLoading("");
+        }
+      }, 1000);
+      
+    } catch (err) {
+      setError("Google ile giriş yapılırken bir hata oluştu.");
+      setSocialLoading("");
+    }
+  };
+
+  // Facebook ile giriş
+  const handleFacebookLogin = async () => {
+    try {
+      setSocialLoading("facebook");
+      setError("");
+      
+      // Return URL'i al
+      const returnUrl = new URLSearchParams(window.location.search).get('returnUrl') || '/';
+      
+      // Facebook OAuth URL'ini aç
+      const facebookAuthUrl = `/api/auth/facebook?returnUrl=${encodeURIComponent(returnUrl)}`;
+      
+      // Popup window'u ekranın ortasında aç (mobil uyumlu)
+      let width, height, left, top;
+      
+      // Mobil cihaz kontrolü
+      if (window.innerWidth <= 768) {
+        // Mobil için tam ekran popup
+        width = window.screen.width;
+        height = window.screen.height;
+        left = 0;
+        top = 0;
+      } else {
+        // Desktop için ortalanmış popup
+        width = 500;
+        height = 600;
+        left = (window.screen.width - width) / 2;
+        top = (window.screen.height - height) / 2;
+      }
+      
+      const popup = window.open(
+        facebookAuthUrl,
+        'facebook-login',
+        `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`
+      );
+      
+      // Popup mesajlarını dinle
+      const handleMessage = (event: MessageEvent) => {
+        if (event.origin !== window.location.origin) return;
+        
+        if (event.data.type === 'FACEBOOK_LOGIN_SUCCESS') {
+          const user = event.data.user;
+          const token = event.data.token;
+          
+          // Kullanıcı bilgilerini localStorage'a kaydet
+          localStorage.setItem('userLoggedIn', 'true');
+          localStorage.setItem('userEmail', user.email);
+          localStorage.setItem('userName', user.name);
+          localStorage.setItem('userId', user.id);
+          localStorage.setItem('userPhone', user.phone || '');
+          localStorage.setItem('userBirthDate', user.birthDate || '');
+          localStorage.setItem('userIsAdmin', user.isAdmin.toString());
+          localStorage.setItem('token', token);
+          
+          // Admin ise admin bilgilerini de kaydet
+          if (user.isAdmin) {
+            localStorage.setItem('adminLoggedIn', 'true');
+            localStorage.setItem('adminEmail', user.email);
+            localStorage.setItem('adminToken', token);
+            sessionStorage.setItem('adminLoggedIn', 'true');
+            sessionStorage.setItem('adminEmail', user.email);
+            sessionStorage.setItem('adminToken', token);
+          }
+          
+          // Custom event tetikle
+          window.dispatchEvent(new Event('localStorageChange'));
+          
+          // Popup'ı kapat
+          if (popup) popup.close();
+          
+          // Loading'i kapat
+          setSocialLoading("");
+          
+          // Başarı mesajı göster
+          setLoginSuccess(true);
+          setRedirectMessage("Facebook ile giriş başarılı! Yönlendiriliyorsunuz...");
+          
+          // 2 saniye sonra yönlendir
+          setTimeout(() => {
+            router.push(decodeURIComponent(returnUrl));
+          }, 2000);
+          
+          // Event listener'ı kaldır
+          window.removeEventListener('message', handleMessage);
+          
+        } else if (event.data.type === 'FACEBOOK_LOGIN_ERROR') {
+          setError(event.data.error || 'Facebook ile giriş yapılırken bir hata oluştu.');
+          setSocialLoading("");
+          
+          if (popup) popup.close();
+          window.removeEventListener('message', handleMessage);
+        }
+      };
+      
+      window.addEventListener('message', handleMessage);
+      
+      // Popup kapandığında loading'i kapat
+      const checkClosed = setInterval(() => {
+        if (popup && popup.closed) {
+          setSocialLoading("");
+          clearInterval(checkClosed);
+          window.removeEventListener('message', handleMessage);
+        }
+      }, 1000);
+      
+    } catch (error) {
+      console.error('Facebook login error:', error);
+      setError("Facebook ile giriş yapılırken bir hata oluştu.");
+      setSocialLoading("");
+    }
+  };
+
+  // Success state'inde loading ekranı göster
+  if (loginSuccess) {
+    return <LoginSuccess isAdminForm={isAdminForm} redirectMessage={redirectMessage} />;
+  }
+
+  return (
+    <>
+      <style jsx>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "flex-start",
+          justifyContent: "center",
+          background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%)",
+          padding: "60px 20px 40px 20px",
+        }}
+      >
+      <div
+        style={{
+          background: "white",
+          padding: "40px",
+          borderRadius: "16px",
+          boxShadow: "0 4px 32px rgba(0, 0, 0, 0.1)",
+          width: "100%",
+          maxWidth: "400px",
+        }}
+      >
+        <LoginHeader isAdminForm={isAdminForm} />
+
+        <LoginForm
+          email={email}
+          password={password}
+          showPassword={showPassword}
+          isLoading={isLoading}
+          isAdminForm={isAdminForm}
+          rememberMe={rememberMe}
+          error={error}
+          emailVerificationError={emailVerificationError}
+          isEmailSent={isEmailSent}
+          isResendingEmail={isResendingEmail}
+          loginAttempts={loginAttempts}
+          setEmail={setEmail}
+          setPassword={setPassword}
+          setShowPassword={setShowPassword}
+          setRememberMe={setRememberMe}
+          handleSubmit={handleSubmit}
+          handleResendVerificationEmail={handleResendVerificationEmail}
+        />
+
+        <SocialLoginButtons
+          socialLoading={socialLoading}
+          handleGoogleLogin={handleGoogleLogin}
+          handleFacebookLogin={handleFacebookLogin}
+        />
+
+        <RegisterLink />
+      </div>
+    </div>
+    </>
+  );
+} 
