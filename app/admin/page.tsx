@@ -849,12 +849,21 @@ export default function AdminPage() {
         <SubmissionList
           submissions={filteredSubmissions || []}
           isMobile={isMobile}
-          onAction={handleAction}
-          onDelete={handleDeleteSubmission}
-          onDetail={handleDetailSubmission}
-          onDeliveryInfo={handleDeliveryInfo}
-          onReoffer={(submission) => handleAction(submission, 'offer')}
-          formatDate={formatDate}
+          loading={loading}
+          error={error}
+          selectedSubmission={selectedSubmission}
+          setSelectedSubmission={setSelectedSubmission}
+          showModal={showModal}
+          setShowModal={setShowModal}
+          modalType={modalType}
+          setModalType={setModalType}
+          showDeleteModal={showDeleteModal}
+          setShowDeleteModal={setShowDeleteModal}
+          deleteModalType={deleteModalType}
+          setDeleteModalType={setDeleteModalType}
+          deleteTargetId={deleteTargetId}
+          setDeleteTargetId={setDeleteTargetId}
+          isDeleting={isDeletingAll}
         />
               </div>
 
