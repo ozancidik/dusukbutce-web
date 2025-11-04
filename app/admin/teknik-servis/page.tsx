@@ -667,7 +667,7 @@ function UpdateForm({ submission, onSubmit, onCancel, isMobile }: {
         </label>
         <select
           value={status}
-          onChange={(e) => setStatus(e.target.value)}
+          onChange={(e) => setStatus(e.target.value as any)}
           style={{
             width: '100%',
             padding: isMobile ? '10px' : '12px',
