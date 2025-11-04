@@ -35,7 +35,6 @@ interface AdminDashboardProps {
   isDeletingAll: boolean;
   setIsDeletingAll: (deleting: boolean) => void;
   selectedCategory: string;
-  onDelete: (id: string, type: string) => void;
   isDeleting: boolean;
   setIsDeleting: (deleting: boolean) => void;
   setSelectedCategory: (category: string) => void;
@@ -81,7 +80,6 @@ export default function AdminDashboard({
   detailSubmission,
   setDetailSubmission,
   onActionSubmit,
-  onDelete,
   isDeleting,
   setIsDeleting,
   onDeleteAll,
@@ -157,7 +155,6 @@ export default function AdminDashboard({
           setDeleteModalType={setDeleteModalType}
           deleteTargetId={deleteTargetId}
           setDeleteTargetId={setDeleteTargetId}
-          onDelete={onDelete}
           isDeleting={isDeleting}
         />
         
@@ -176,17 +173,12 @@ export default function AdminDashboard({
         
         {showDeleteModal && (
           <DeleteModal
-            isOpen={showDeleteModal}
+            showModal={showDeleteModal}
             onClose={() => {
               setShowDeleteModal(false);
               setDeleteTargetId(null);
               setDeleteModalType(null);
             }}
-            title={deleteModalType === 'all' ? 'Tüm Başvuruları Sil' : 'Başvuruyu Sil'}
-            message={deleteModalType === 'all' 
-              ? 'Tüm başvuruları silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.'
-              : 'Bu başvuruyu silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.'
-            }
             onConfirm={() => {
               if (deleteModalType === 'all') {
                 onDeleteAll();
@@ -197,7 +189,9 @@ export default function AdminDashboard({
               setDeleteTargetId(null);
               setDeleteModalType(null);
             }}
-            isDeleting={isDeletingAll}
+            isMobile={isMobile}
+            deleteModalType={deleteModalType}
+            submissionTitle={deleteTargetId ? submissions.find(s => s._id === deleteTargetId)?.brand : undefined}
           />
         )}
         
