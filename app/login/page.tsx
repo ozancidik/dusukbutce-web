@@ -797,8 +797,13 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Remember Me Checkbox */}
-          <div style={{ marginBottom: "24px" }}>
+          {/* Remember Me & Forgot Password */}
+          <div style={{ 
+            marginBottom: "24px",
+            display: "flex",
+            alignItems: "center",
+            gap: "12px"
+          }}>
             <label
               style={{
                 display: "flex",
@@ -821,6 +826,20 @@ export default function LoginPage() {
               />
               <span>Beni Hatırla</span>
             </label>
+
+            <Link
+              href="/sifremi-unuttum"
+              style={{
+                marginLeft: "auto",
+                color: "#2563eb",
+                textDecoration: "underline",
+                fontSize: "14px",
+                fontWeight: "600",
+                whiteSpace: "nowrap"
+              }}
+            >
+              Şifremi unuttum
+            </Link>
           </div>
 
           {error && (
@@ -1056,18 +1075,6 @@ export default function LoginPage() {
               Kayıt olun
             </Link>
           </p>
-          
-          <Link
-            href="/sifremi-unuttum"
-            style={{
-              color: "#2563eb",
-              textDecoration: "underline",
-              fontSize: "14px",
-              fontWeight: "700",
-            }}
-          >
-            Şifremi unuttum
-          </Link>
         </div>
       </div>
     </div>
