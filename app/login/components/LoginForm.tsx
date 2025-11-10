@@ -164,8 +164,9 @@ const LoginForm: React.FC<LoginFormProps> = ({
       <div style={{ 
         marginBottom: "24px",
         display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center"
+        alignItems: "center",
+        gap: "12px",
+        flexWrap: "nowrap"
       }}>
         <label
           style={{
@@ -197,6 +198,8 @@ const LoginForm: React.FC<LoginFormProps> = ({
             textDecoration: "underline",
             fontSize: "14px",
             fontWeight: "600",
+            marginLeft: "auto",
+            whiteSpace: "nowrap"
           }}
         >
           Şifremi unuttum
