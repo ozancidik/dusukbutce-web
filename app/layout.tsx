@@ -114,20 +114,26 @@ export default function RootLayout({
             `,
           }}
         />
-        {/* Service Worker Registration */}
+        {/* Service Worker Removal - dinamik sayfalar cache'lenmesin */}
         <script
           suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html: `
               if ('serviceWorker' in navigator) {
                 window.addEventListener('load', function() {
-                  navigator.serviceWorker.register('/sw.js')
-                    .then(function(registration) {
-                      console.log('SW registered: ', registration);
-                    })
-                    .catch(function(registrationError) {
-                      console.log('SW registration failed: ', registrationError);
+                  navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                    registrations.forEach(function(registration) {
+                      registration.unregister();
                     });
+                  });
+
+                  if (window.caches && caches.keys) {
+                    caches.keys().then(function(cacheNames) {
+                      cacheNames.forEach(function(cacheName) {
+                        caches.delete(cacheName);
+                      });
+                    });
+                  }
                 });
               }
             `,
