@@ -4,12 +4,11 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default function RegisterPage() {
-  const [form, setForm] = useState({ firstName: '', lastName: '', email: '', password: '', passwordConfirm: '', cep_telefonu: '', dogum_tarihi: '' });
+  const [form, setForm] = useState({ firstName: '', lastName: '', email: '', password: '', passwordConfirm: '', cep_telefonu: '', birthDate: '' });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
-  const [countdown, setCountdown] = useState(5);
   const [passwordMismatch, setPasswordMismatch] = useState(false);
   const [ageTooYoung, setAgeTooYoung] = useState(false);
   const [phoneExists, setPhoneExists] = useState(false);
@@ -18,28 +17,9 @@ export default function RegisterPage() {
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [acceptNewsletter, setAcceptNewsletter] = useState(false);
-
-  // Otomatik yönlendirme için timer
-  useEffect(() => {
-    if (showSuccessPopup) {
-      const timer = setTimeout(() => {
-        window.location.href = '/login';
-      }, 5000); // 5 saniye sonra otomatik yönlendir
-      
-      return () => clearTimeout(timer);
-    }
-  }, [showSuccessPopup]);
-
-  // Geri sayım sayacı
-  useEffect(() => {
-    if (showSuccessPopup && countdown > 0) {
-      const timer = setTimeout(() => {
-        setCountdown(countdown - 1);
-      }, 1000);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [showSuccessPopup, countdown]);
+  const [acceptKvkk, setAcceptKvkk] = useState(false);
+  const emailFormatRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  const phoneFormatRegex = /^\([0-9]{3}\)\s[0-9]{3}\s[0-9]{2}\s[0-9]{2}$/;
 
   // Admin giriş kontrolü
   useEffect(() => {
@@ -191,7 +171,7 @@ export default function RegisterPage() {
         
         setForm({ ...form, [name]: formattedValue });
       }
-    } else if (name === 'dogum_tarihi') {
+    } else if (name === 'birthDate') {
       // Doğum tarihi için sadece geçerli tarih formatına izin ver
       setForm({ ...form, [name]: value });
       
@@ -285,20 +265,20 @@ export default function RegisterPage() {
     }
     
     // Doğum tarihi validasyonu
-    if (!form.dogum_tarihi) {
+    if (!form.birthDate) {
       setError('Doğum tarihi gereklidir.');
       return;
     }
     
     // Doğum tarihi format kontrolü (YYYY-MM-DD)
     const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-    if (!dateRegex.test(form.dogum_tarihi)) {
+    if (!dateRegex.test(form.birthDate)) {
       setError('Geçerli bir doğum tarihi giriniz. Örn: 1990-01-15');
       return;
     }
     
     // Doğum tarihi geçerlilik kontrolü
-    const birthDate = new Date(form.dogum_tarihi);
+    const birthDate = new Date(form.birthDate);
     const today = new Date();
     const age = today.getFullYear() - birthDate.getFullYear();
     
@@ -329,6 +309,12 @@ export default function RegisterPage() {
       return;
     }
     
+    // KVKK onayı kontrolü
+    if (!acceptKvkk) {
+      setError('KVKK aydınlatma metnini onaylamalısınız.');
+      return;
+    }
+
     // Şifre eşleşme kontrolü
     if (form.password !== form.passwordConfirm) {
       setError('Şifreler eşleşmiyor.');
@@ -360,8 +346,9 @@ export default function RegisterPage() {
           email: form.email.trim().toLowerCase(),
           password: form.password,
           cep_telefonu: form.cep_telefonu.replace(/\s/g, '').replace(/[\(\)]/g, ''),
-          dogum_tarihi: form.dogum_tarihi,
-          acceptNewsletter: acceptNewsletter
+          birth_date: form.birthDate,
+          acceptNewsletter: acceptNewsletter,
+          kvkkApproved: acceptKvkk
         }),
       });
       
@@ -369,8 +356,9 @@ export default function RegisterPage() {
       
       if (res.ok) {
         setShowSuccessPopup(true);
-        setForm({ firstName: '', lastName: '', email: '', password: '', passwordConfirm: '', cep_telefonu: '', dogum_tarihi: '' });
+        setForm({ firstName: '', lastName: '', email: '', password: '', passwordConfirm: '', cep_telefonu: '', birthDate: '' });
         setAcceptNewsletter(false);
+        setAcceptKvkk(false);
       } else {
         setError(data.error || 'Bir hata oluştu.');
       }
@@ -380,6 +368,21 @@ export default function RegisterPage() {
       setIsLoading(false);
     }
   };
+
+  const isSubmitDisabled =
+    isLoading ||
+    form.firstName.trim().length < 2 ||
+    form.lastName.trim().length < 2 ||
+    !emailFormatRegex.test(form.email.trim()) ||
+    !phoneFormatRegex.test(form.cep_telefonu) ||
+    !form.birthDate ||
+    ageTooYoung ||
+    passwordMismatch ||
+    form.password.length < 6 ||
+    form.password !== form.passwordConfirm ||
+    emailExists ||
+    phoneExists ||
+    !acceptKvkk;
 
   return (
     <>
@@ -648,7 +651,7 @@ export default function RegisterPage() {
           {/* 3. Satır: Doğum Tarihi */}
           <div style={{ marginBottom: "20px" }}>
             <label
-              htmlFor="dogum_tarihi"
+              htmlFor="birthDate"
               style={{
                 display: "block",
                 marginBottom: "8px",
@@ -660,10 +663,10 @@ export default function RegisterPage() {
               Doğum Tarihi
             </label>
             <input
-              id="dogum_tarihi"
-              name="dogum_tarihi"
+              id="birthDate"
+              name="birthDate"
               type="date"
-              value={form.dogum_tarihi}
+              value={form.birthDate}
               onChange={handleChange}
               required
               style={{
@@ -880,10 +883,11 @@ export default function RegisterPage() {
                 checked={acceptNewsletter}
                 onChange={(e) => setAcceptNewsletter(e.target.checked)}
                 style={{
-                  width: "16px",
-                  height: "16px",
+                  width: "20px",
+                  height: "20px",
                   accentColor: "#2563eb",
-                  cursor: "pointer"
+                  cursor: "pointer",
+                  flexShrink: 0
                 }}
               />
               <span>
@@ -892,19 +896,66 @@ export default function RegisterPage() {
             </label>
           </div>
 
+          {/* KVKK Checkbox */}
+          <div style={{ marginBottom: "24px" }}>
+            <label style={{
+              display: "flex",
+              alignItems: "flex-start",
+              gap: "8px",
+              cursor: "pointer",
+              fontSize: "14px",
+              color: "#374151",
+              lineHeight: "1.4",
+              userSelect: "none"
+            }}>
+              <input
+                type="checkbox"
+                checked={acceptKvkk}
+                onChange={(e) => setAcceptKvkk(e.target.checked)}
+                style={{
+                  width: "20px",
+                  height: "20px",
+                  marginTop: "2px",
+                  accentColor: "#2563eb",
+                  cursor: "pointer",
+                  flexShrink: 0
+                }}
+              />
+              <span>
+                KVKK kapsamında{" "}
+                <Link 
+                  href="/kvkk"
+                  style={{ color: "#2563eb", fontWeight: "600", textDecoration: "none" }}
+                  target="_blank"
+                >
+                  Aydınlatma Metni
+                </Link>{" "}
+                ve{" "}
+                <Link 
+                  href="/gizlilik-politikasi"
+                  style={{ color: "#2563eb", fontWeight: "600", textDecoration: "none" }}
+                  target="_blank"
+                >
+                  Gizlilik Politikası
+                </Link>
+                ’nı okudum, kişisel verilerimin işlenmesine onay veriyorum.
+              </span>
+            </label>
+          </div>
+
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={isSubmitDisabled}
             style={{
               width: "100%",
-              background: isLoading ? "#9ca3af" : "#2563eb",
+              background: isSubmitDisabled ? "#9ca3af" : "#2563eb",
               color: "white",
               border: "none",
               borderRadius: "8px",
               padding: "12px 16px",
               fontSize: "16px",
               fontWeight: "600",
-              cursor: isLoading ? "not-allowed" : "pointer",
+              cursor: isSubmitDisabled ? "not-allowed" : "pointer",
               transition: "background-color 0.2s",
               display: "flex",
               alignItems: "center",
@@ -912,12 +963,12 @@ export default function RegisterPage() {
               gap: "8px",
             }}
             onMouseEnter={(e) => {
-              if (!isLoading) {
+              if (!isSubmitDisabled) {
                 e.currentTarget.style.background = "#1d4ed8";
               }
             }}
             onMouseLeave={(e) => {
-              if (!isLoading) {
+              if (!isSubmitDisabled) {
                 e.currentTarget.style.background = "#2563eb";
               }
             }}
@@ -1086,7 +1137,7 @@ export default function RegisterPage() {
                 fontWeight: "500",
               }}
             >
-              {countdown} saniye sonra giriş sayfasına yönlendirileceksiniz...
+              Giriş yapmak için aşağıdaki butonu kullanabilir ya da bu pencereyi kapatabilirsiniz.
             </p>
 
             {/* Action Buttons */}
