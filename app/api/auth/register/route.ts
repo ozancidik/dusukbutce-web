@@ -12,7 +12,24 @@ export async function POST(request: NextRequest) {
     await connectDB();
 
     const body = await request.json();
-    const { email, password, firstName, lastName, cep_telefonu, dogum_tarihi, acceptNewsletter } = body;
+    const {
+      email,
+      password,
+      firstName,
+      lastName,
+      cep_telefonu,
+      birth_date,
+      acceptNewsletter
+    } = body;
+
+    const rawBirthDate =
+      typeof birth_date === 'string' && birth_date.trim()
+        ? birth_date.trim()
+        : typeof body.birthDate === 'string' && body.birthDate.trim()
+          ? body.birthDate.trim()
+          : typeof body.dogum_tarihi === 'string' && body.dogum_tarihi.trim()
+            ? body.dogum_tarihi.trim()
+            : '';
 
     // Input validation
     if (!email || !password || !firstName || !lastName || !cep_telefonu) {
@@ -98,7 +115,8 @@ export async function POST(request: NextRequest) {
       password: hashedPassword,
       name: sanitizedName,
       phone: sanitizedPhone,
-      dogum_tarihi: dogum_tarihi ? new Date(dogum_tarihi) : null,
+      dogum_tarihi: rawBirthDate ? new Date(rawBirthDate) : null,
+      birthDate: rawBirthDate,
       acceptNewsletter: acceptNewsletter || false,
       emailVerified: false,
       emailVerificationToken: verificationToken,
