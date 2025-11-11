@@ -43,8 +43,8 @@ export default function LoginPage() {
           console.log("👤 Kullanıcı giriş yapmış, returnUrl'e yönlendiriliyor:", returnUrl);
           router.push(decodeURIComponent(returnUrl));
         } else {
-          console.log("👤 Kullanıcı giriş yapmış, profil sayfasına yönlendiriliyor...");
-          router.push("/profile");
+          console.log("👤 Kullanıcı giriş yapmış, anasayfaya yönlendiriliyor...");
+          router.push("/");
         }
         return;
       }
@@ -247,10 +247,10 @@ export default function LoginPage() {
             }, 2000);
           } else {
             setLoginSuccess(true);
-            setRedirectMessage("Giriş başarılı! Profil sayfasına yönlendiriliyor...");
+            setRedirectMessage("Giriş başarılı! Anasayfaya yönlendiriliyor...");
             
             setTimeout(() => {
-              router.push("/profile");
+              router.push("/");
             }, 2000);
           }
         }
