@@ -4,10 +4,18 @@ import jwt from 'jsonwebtoken';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+const JWT_SECRET = process.env.JWT_SECRET;
 
 export async function POST(request: NextRequest) {
   try {
+    if (!JWT_SECRET) {
+      console.error('Admin auth error: JWT_SECRET is not configured');
+      return NextResponse.json(
+        { success: false, error: 'Sunucu yapılandırma hatası' },
+        { status: 500 }
+      );
+    }
+
     const { email, password } = await request.json();
 
     if (!email || !password) {
