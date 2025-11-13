@@ -62,6 +62,14 @@ export async function POST(request: NextRequest) {
       );
     }
     
+    if (!process.env.JWT_SECRET) {
+      console.error('Login error: JWT_SECRET is not configured');
+      return NextResponse.json(
+        { success: false, message: 'Sunucu yapılandırma hatası' },
+        { status: 500 }
+      );
+    }
+
     // JWT token oluştur
     const token = jwt.sign(
       { 
@@ -69,7 +77,7 @@ export async function POST(request: NextRequest) {
         email: user.email,
         isAdmin: user.isAdmin
       },
-      process.env.JWT_SECRET || 'fallback-secret-key',
+      process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
     

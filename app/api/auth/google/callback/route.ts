@@ -132,13 +132,21 @@ export async function GET(request: NextRequest) {
     }
 
     // JWT token oluştur
+    if (!process.env.JWT_SECRET) {
+      console.error('Google auth error: JWT_SECRET is not configured');
+      return NextResponse.json(
+        { success: false, message: 'Sunucu yapılandırma hatası' },
+        { status: 500 }
+      );
+    }
+
     const token = jwt.sign(
       { 
         userId: user._id,
         email: user.email,
         isAdmin: user.isAdmin
       },
-      process.env.JWT_SECRET || 'fallback-secret-key',
+      process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
 
