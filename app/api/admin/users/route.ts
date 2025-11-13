@@ -1,9 +1,12 @@
 import { NextResponse, NextRequest } from "next/server";
 import connectDB from "@/lib/mongodb";
 import User from '../../../../models/User';
+import { AdminAuthError, ensureAdminRequest, handleAdminAuthError } from "../utils/requireAdmin";
 
 export async function GET(request: NextRequest) {
   try {
+    ensureAdminRequest(request);
+
     console.log('🔍 Admin users API çağrıldı');
     
     // MongoDB bağlantısı
@@ -26,6 +29,9 @@ export async function GET(request: NextRequest) {
       count: users.length
     });
   } catch (error) {
+    if (error instanceof AdminAuthError) {
+      return handleAdminAuthError(error);
+    }
     console.error('❌ Admin users API hatası:', error);
     
     // Detaylı hata mesajı

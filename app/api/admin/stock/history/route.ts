@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
+import { AdminAuthError, ensureAdminRequest, handleAdminAuthError } from '../../utils/requireAdmin';
 
 // GET - Stok geçmişi (şimdilik boş array döndürüyor, gerçek uygulamada ayrı collection'da tutulur)
 export async function GET(request: NextRequest) {
   try {
+    ensureAdminRequest(request);
+
     await connectDB();
     
     // Gerçek uygulamada StockHistory collection'ından veri çekilir
@@ -16,6 +19,9 @@ export async function GET(request: NextRequest) {
       message: 'Stok geçmişi başarıyla getirildi'
     });
   } catch (error) {
+    if (error instanceof AdminAuthError) {
+      return handleAdminAuthError(error);
+    }
     console.error('Stok geçmişi getirilirken hata:', error);
     return NextResponse.json(
       { 

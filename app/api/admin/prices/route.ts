@@ -2,10 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import { Product } from '@/models/Product';
 import PriceHistory from '@/models/PriceHistory';
+import { AdminAuthError, ensureAdminRequest, handleAdminAuthError } from '../utils/requireAdmin';
 
 // GET - Fiyat geçmişi ve istatistikleri getir
 export async function GET(request: NextRequest) {
   try {
+    ensureAdminRequest(request);
+
     await connectDB();
     
     const { searchParams } = new URL(request.url);
@@ -105,6 +108,9 @@ export async function GET(request: NextRequest) {
     });
     
   } catch (error) {
+    if (error instanceof AdminAuthError) {
+      return handleAdminAuthError(error);
+    }
     console.error('Fiyat geçmişi getirme hatası:', error);
     return NextResponse.json(
       { success: false, message: 'Fiyat geçmişi getirilemedi' },
@@ -116,6 +122,8 @@ export async function GET(request: NextRequest) {
 // POST - Toplu fiyat güncelleme
 export async function POST(request: NextRequest) {
   try {
+    ensureAdminRequest(request);
+
     await connectDB();
     
     const body = await request.json();
@@ -240,6 +248,9 @@ export async function POST(request: NextRequest) {
     });
     
   } catch (error) {
+    if (error instanceof AdminAuthError) {
+      return handleAdminAuthError(error);
+    }
     console.error('Toplu fiyat güncelleme hatası:', error);
     return NextResponse.json(
       { success: false, message: 'Toplu fiyat güncelleme başarısız' },

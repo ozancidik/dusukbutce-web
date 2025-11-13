@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import { Product } from '@/models/Product';
+import { AdminAuthError, ensureAdminRequest, handleAdminAuthError } from '../../utils/requireAdmin';
 
 // POST - Stok güncelleme
 export async function POST(request: NextRequest) {
   try {
+    ensureAdminRequest(request);
+
     await connectDB();
     
     const body = await request.json();
@@ -94,6 +97,9 @@ export async function POST(request: NextRequest) {
       stockUpdate
     });
   } catch (error) {
+    if (error instanceof AdminAuthError) {
+      return handleAdminAuthError(error);
+    }
     console.error('Stok güncellenirken hata:', error);
     return NextResponse.json(
       { 

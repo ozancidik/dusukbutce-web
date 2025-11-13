@@ -3,6 +3,7 @@ import connectDB from '@/lib/mongodb';
 import { Product } from '@/models/Product';
 import PriceHistory from '@/models/PriceHistory';
 import mongoose from 'mongoose';
+import { AdminAuthError, ensureAdminRequest, handleAdminAuthError } from '../../utils/requireAdmin';
 
 // GET - Ürün fiyat geçmişi
 export async function GET(
@@ -10,6 +11,8 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    ensureAdminRequest(request);
+
     await connectDB();
     
     const { id } = await params;
@@ -54,6 +57,9 @@ export async function GET(
     });
     
   } catch (error) {
+    if (error instanceof AdminAuthError) {
+      return handleAdminAuthError(error);
+    }
     console.error('Ürün fiyat geçmişi getirme hatası:', error);
     return NextResponse.json(
       { success: false, message: 'Fiyat geçmişi getirilemedi' },
@@ -68,6 +74,8 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    ensureAdminRequest(request);
+
     await connectDB();
     
     const { id } = await params;
@@ -149,6 +157,9 @@ export async function PUT(
     });
     
   } catch (error) {
+    if (error instanceof AdminAuthError) {
+      return handleAdminAuthError(error);
+    }
     console.error('Fiyat güncelleme hatası:', error);
     return NextResponse.json(
       { success: false, message: 'Fiyat güncellenemedi' },

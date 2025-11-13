@@ -1,0 +1,69 @@
+import { NextRequest, NextResponse } from "next/server";
+import jwt, { JwtPayload, TokenExpiredError } from "jsonwebtoken";
+
+interface AdminTokenPayload extends JwtPayload {
+  userId?: string;
+  role?: string;
+  isAdmin?: boolean;
+  email?: string;
+}
+
+export class AdminAuthError extends Error {
+  status: number;
+
+  constructor(message: string, status = 401) {
+    super(message);
+    this.status = status;
+  }
+}
+
+export const ensureAdminRequest = (request: NextRequest): AdminTokenPayload => {
+  const authHeader = request.headers.get("authorization");
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    throw new AdminAuthError("Yetkisiz erişim: token bulunamadı", 401);
+  }
+
+  const token = authHeader.slice(7).trim();
+
+  if (!token) {
+    throw new AdminAuthError("Yetkisiz erişim: token geçersiz", 401);
+  }
+
+  const secret = process.env.JWT_SECRET;
+
+  if (!secret) {
+    throw new AdminAuthError("Sunucu yapılandırma hatası", 500);
+  }
+
+  try {
+    const decoded = jwt.verify(token, secret) as AdminTokenPayload;
+
+    if (!decoded || (!decoded.isAdmin && decoded.role !== "admin")) {
+      throw new AdminAuthError("Yetkisiz erişim: admin yetkisi yok", 403);
+    }
+
+    return decoded;
+  } catch (error) {
+    if (error instanceof TokenExpiredError) {
+      throw new AdminAuthError("Token süresi dolmuş", 401);
+    }
+
+    throw new AdminAuthError("Geçersiz token", 401);
+  }
+};
+
+export const handleAdminAuthError = (error: unknown) => {
+  if (error instanceof AdminAuthError) {
+    return NextResponse.json(
+      { success: false, error: error.message },
+      { status: error.status }
+    );
+  }
+
+  return NextResponse.json(
+    { success: false, error: "Sunucu hatası" },
+    { status: 500 }
+  );
+};
+

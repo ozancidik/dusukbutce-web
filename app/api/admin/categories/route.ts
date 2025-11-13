@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Category from '@/models/Category';
+import { AdminAuthError, ensureAdminRequest, handleAdminAuthError } from '../utils/requireAdmin';
 
 // GET - Tüm kategorileri getir
 export async function GET(request: NextRequest) {
   try {
+    ensureAdminRequest(request);
+
     await connectDB();
     
     const { searchParams } = new URL(request.url);
@@ -32,6 +35,9 @@ export async function GET(request: NextRequest) {
     });
     
   } catch (error) {
+    if (error instanceof AdminAuthError) {
+      return handleAdminAuthError(error);
+    }
     console.error('Kategori getirme hatası:', error);
     return NextResponse.json(
       { success: false, message: 'Kategoriler getirilemedi' },
@@ -43,6 +49,8 @@ export async function GET(request: NextRequest) {
 // POST - Yeni kategori oluştur
 export async function POST(request: NextRequest) {
   try {
+    ensureAdminRequest(request);
+
     await connectDB();
     
     const body = await request.json();
@@ -103,6 +111,9 @@ export async function POST(request: NextRequest) {
     });
     
   } catch (error) {
+    if (error instanceof AdminAuthError) {
+      return handleAdminAuthError(error);
+    }
     console.error('Kategori oluşturma hatası:', error);
     return NextResponse.json(
       { success: false, message: 'Kategori oluşturulamadı' },

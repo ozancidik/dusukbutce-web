@@ -9,50 +9,15 @@ import {
 } from '@/lib/email';
 import ProductSubmission from '@/models/ProductSubmission';
 import User from '@/models/User';
-// import { Product } from '@/models/Product';
-import jwt from 'jsonwebtoken';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key';
-
-// Token doğrulama middleware
-async function verifyToken(request: NextRequest) {
-  const authHeader = request.headers.get('authorization');
-  
-  console.log('🔍 verifyToken - authHeader:', authHeader);
-  
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    console.log('❌ verifyToken - Token bulunamadı');
-    throw new Error('Token bulunamadı');
-  }
-
-  const token = authHeader.substring(7);
-  console.log('🔍 verifyToken - token:', token.substring(0, 20) + '...');
-  
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET) as any;
-    console.log('✅ verifyToken - decoded:', decoded);
-    return decoded;
-  } catch (error) {
-    console.log('❌ verifyToken - error:', error);
-    throw new Error('Geçersiz token');
-  }
-}
+import { AdminAuthError, ensureAdminRequest, handleAdminAuthError } from '../utils/requireAdmin';
 
 export async function POST(request: NextRequest) {
   try {
     console.log('🚀 Admin action API başladı');
     
     // Token doğrula
-    const decoded = await verifyToken(request);
+    const decoded = ensureAdminRequest(request);
     console.log('✅ Token doğrulandı:', decoded);
-    
-    if (!decoded.isAdmin) {
-      console.log('❌ Admin değil');
-      return NextResponse.json(
-        { success: false, error: 'Yetkisiz erişim' },
-        { status: 403 }
-      );
-    }
 
     const { submissionId, action, amount, notes, reason, customerEmail, customerName, productName } = await request.json();
     console.log('📝 Request data:', { submissionId, action, amount, notes, customerEmail, customerName, productName });
@@ -189,15 +154,11 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
+    if (error instanceof AdminAuthError) {
+      return handleAdminAuthError(error);
+    }
     console.error('Admin action error:', error);
     
-    if (error instanceof Error && (error.message === 'Token bulunamadı' || error.message === 'Geçersiz token')) {
-      return NextResponse.json(
-        { success: false, error: error.message },
-        { status: 401 }
-      );
-    }
-
     return NextResponse.json(
       { success: false, error: 'Sunucu hatası' },
       { status: 500 }
