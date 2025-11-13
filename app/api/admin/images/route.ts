@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import { Product } from '@/models/Product';
+import { AdminAuthError, ensureAdminRequest, handleAdminAuthError } from '../utils/requireAdmin';
 
 // GET - Ürün görsellerini getir
 export async function GET(request: NextRequest) {
   try {
+    ensureAdminRequest(request);
+
     await connectDB();
     
     const { searchParams } = new URL(request.url);
@@ -74,6 +77,9 @@ export async function GET(request: NextRequest) {
     });
     
   } catch (error) {
+    if (error instanceof AdminAuthError) {
+      return handleAdminAuthError(error);
+    }
     console.error('Görsel getirme hatası:', error);
     return NextResponse.json(
       { success: false, message: 'Görseller getirilemedi' },
@@ -85,6 +91,8 @@ export async function GET(request: NextRequest) {
 // POST - Toplu görsel yükleme
 export async function POST(request: NextRequest) {
   try {
+    ensureAdminRequest(request);
+
     await connectDB();
     
     const body = await request.json();
@@ -161,6 +169,9 @@ export async function POST(request: NextRequest) {
     });
     
   } catch (error) {
+    if (error instanceof AdminAuthError) {
+      return handleAdminAuthError(error);
+    }
     console.error('Görsel yükleme hatası:', error);
     return NextResponse.json(
       { success: false, message: 'Görseller yüklenemedi' },

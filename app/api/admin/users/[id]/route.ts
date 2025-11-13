@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import connectDB from "@/lib/mongodb";
 import User from '../../../../../models/User';
+import { AdminAuthError, ensureAdminRequest, handleAdminAuthError } from "../../utils/requireAdmin";
 
 export async function DELETE(
   request: NextRequest,
@@ -8,6 +9,8 @@ export async function DELETE(
 ) {
   const { id } = await params;
   try {
+    ensureAdminRequest(request);
+
     console.log('🗑️ Admin user delete API çağrıldı');
     console.log('🆔 Silinecek kullanıcı ID:', id);
     
@@ -54,6 +57,9 @@ export async function DELETE(
       }
     });
   } catch (error) {
+    if (error instanceof AdminAuthError) {
+      return handleAdminAuthError(error);
+    }
     console.error('❌ Admin user delete API hatası:', error);
     
     // Detaylı hata mesajı

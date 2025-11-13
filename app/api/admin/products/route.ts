@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import { Product } from '@/models/Product';
+import { AdminAuthError, ensureAdminRequest, handleAdminAuthError } from '../utils/requireAdmin';
 
 // GET - Tüm ürünleri getir
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    ensureAdminRequest(request);
+
     await connectDB();
     
     const products = await Product.find({})
@@ -16,6 +19,9 @@ export async function GET() {
       products: products
     });
   } catch (error) {
+    if (error instanceof AdminAuthError) {
+      return handleAdminAuthError(error);
+    }
     console.error('Ürünler getirilirken hata:', error);
     return NextResponse.json(
       { 
@@ -31,6 +37,8 @@ export async function GET() {
 // POST - Yeni ürün oluştur
 export async function POST(request: NextRequest) {
   try {
+    ensureAdminRequest(request);
+
     await connectDB();
     
     const body = await request.json();
@@ -104,6 +112,9 @@ export async function POST(request: NextRequest) {
       product: newProduct
     });
   } catch (error) {
+    if (error instanceof AdminAuthError) {
+      return handleAdminAuthError(error);
+    }
     console.error('Ürün oluşturulurken hata:', error);
     return NextResponse.json(
       { 
@@ -119,6 +130,8 @@ export async function POST(request: NextRequest) {
 // PUT - Ürün güncelle
 export async function PUT(request: NextRequest) {
   try {
+    ensureAdminRequest(request);
+
     await connectDB();
     
     const body = await request.json();
@@ -210,6 +223,9 @@ export async function PUT(request: NextRequest) {
       product: updatedProduct
     });
   } catch (error) {
+    if (error instanceof AdminAuthError) {
+      return handleAdminAuthError(error);
+    }
     console.error('Ürün güncellenirken hata:', error);
     return NextResponse.json(
       { 
@@ -225,6 +241,8 @@ export async function PUT(request: NextRequest) {
 // DELETE - Ürün sil
 export async function DELETE(request: NextRequest) {
   try {
+    ensureAdminRequest(request);
+
     await connectDB();
     
     const body = await request.json();
@@ -261,6 +279,9 @@ export async function DELETE(request: NextRequest) {
       product: deletedProduct
     });
   } catch (error) {
+    if (error instanceof AdminAuthError) {
+      return handleAdminAuthError(error);
+    }
     console.error('Ürün silinirken hata:', error);
     return NextResponse.json(
       { 

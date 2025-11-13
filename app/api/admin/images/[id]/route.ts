@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import { Product } from '@/models/Product';
+import { AdminAuthError, ensureAdminRequest, handleAdminAuthError } from '../../utils/requireAdmin';
 
 // GET - Ürün görsellerini getir
 export async function GET(
@@ -8,6 +9,8 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    ensureAdminRequest(request);
+
     await connectDB();
     
     const { id } = await params;
@@ -36,6 +39,9 @@ export async function GET(
     });
     
   } catch (error) {
+    if (error instanceof AdminAuthError) {
+      return handleAdminAuthError(error);
+    }
     console.error('Ürün görselleri getirme hatası:', error);
     return NextResponse.json(
       { success: false, message: 'Görseller getirilemedi' },
@@ -50,6 +56,8 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    ensureAdminRequest(request);
+
     await connectDB();
     
     const { id } = await params;
@@ -196,6 +204,9 @@ export async function PUT(
     });
     
   } catch (error) {
+    if (error instanceof AdminAuthError) {
+      return handleAdminAuthError(error);
+    }
     console.error('Görsel güncelleme hatası:', error);
     return NextResponse.json(
       { success: false, message: 'Görseller güncellenemedi' },
@@ -210,6 +221,8 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    ensureAdminRequest(request);
+
     await connectDB();
     
     const { id } = await params;
@@ -232,6 +245,9 @@ export async function DELETE(
     });
     
   } catch (error) {
+    if (error instanceof AdminAuthError) {
+      return handleAdminAuthError(error);
+    }
     console.error('Görsel silme hatası:', error);
     return NextResponse.json(
       { success: false, message: 'Görseller silinemedi' },

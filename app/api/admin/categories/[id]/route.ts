@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Category from '@/models/Category';
+import { AdminAuthError, ensureAdminRequest, handleAdminAuthError } from '../../utils/requireAdmin';
 
 // GET - Tek kategori getir
 export async function GET(
@@ -8,6 +9,8 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    ensureAdminRequest(request);
+
     await connectDB();
     
     const { id } = await params;
@@ -28,6 +31,9 @@ export async function GET(
     });
     
   } catch (error) {
+    if (error instanceof AdminAuthError) {
+      return handleAdminAuthError(error);
+    }
     console.error('Kategori getirme hatası:', error);
     return NextResponse.json(
       { success: false, message: 'Kategori getirilemedi' },
@@ -42,6 +48,8 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    ensureAdminRequest(request);
+
     await connectDB();
     
     const { id } = await params;
@@ -127,6 +135,9 @@ export async function PUT(
     });
     
   } catch (error) {
+    if (error instanceof AdminAuthError) {
+      return handleAdminAuthError(error);
+    }
     console.error('Kategori güncelleme hatası:', error);
     return NextResponse.json(
       { success: false, message: 'Kategori güncellenemedi' },
@@ -141,6 +152,8 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    ensureAdminRequest(request);
+
     await connectDB();
     
     const { id } = await params;
@@ -180,6 +193,9 @@ export async function DELETE(
     });
     
   } catch (error) {
+    if (error instanceof AdminAuthError) {
+      return handleAdminAuthError(error);
+    }
     console.error('Kategori silme hatası:', error);
     return NextResponse.json(
       { success: false, message: 'Kategori silinemedi' },

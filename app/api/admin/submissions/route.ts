@@ -3,6 +3,7 @@ import connectDB from "@/lib/mongodb";
 import ProductSubmission from '@/models/ProductSubmission';
 import User from '@/models/User';
 import mongoose from 'mongoose';
+import { AdminAuthError, ensureAdminRequest, handleAdminAuthError } from "../utils/requireAdmin";
 
 // Ensure User model is registered
 if (mongoose.models.User === undefined) {
@@ -13,6 +14,8 @@ const MONGODB_URI = process.env.MONGODB_URI;
 
 export async function PUT(request: NextRequest) {
   try {
+    ensureAdminRequest(request);
+
     const { submissionId, action, data } = await request.json();
 
     if (!MONGODB_URI) {
@@ -94,6 +97,9 @@ export async function PUT(request: NextRequest) {
     });
 
   } catch (error) {
+    if (error instanceof AdminAuthError) {
+      return handleAdminAuthError(error);
+    }
     console.error('Error updating submission:', error);
     return NextResponse.json({ success: false, message: 'Internal server error' }, { status: 500 });
   }
@@ -101,6 +107,8 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
+    ensureAdminRequest(request);
+
     const body = await request.json();
     const { action, submissionId } = body;
     
@@ -140,6 +148,9 @@ export async function DELETE(request: NextRequest) {
       }, { status: 400 });
     }
   } catch (error) {
+    if (error instanceof AdminAuthError) {
+      return handleAdminAuthError(error);
+    }
     console.error('❌ Error deleting submissions:', error);
     return NextResponse.json(
       { success: false, message: 'Failed to delete submissions' },
@@ -150,6 +161,8 @@ export async function DELETE(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
+    ensureAdminRequest(request);
+
     console.log('🔍 GET /api/admin/submissions called');
     
     if (!MONGODB_URI) {
@@ -195,6 +208,9 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
+    if (error instanceof AdminAuthError) {
+      return handleAdminAuthError(error);
+    }
     console.error('❌ Error fetching submissions:', error);
     const errorMessage = error instanceof Error ? error.message : 'Internal server error';
     return NextResponse.json({ 
