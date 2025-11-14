@@ -3,24 +3,37 @@ import connectDB from "@/lib/mongodb";
 import { NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
+  // Environment'a göre redirect URI belirle
+  const isLocalhost = request.headers.get('host')?.includes('localhost');
+  const redirectUri = isLocalhost 
+    ? 'http://localhost:3000/api/auth/facebook/callback'
+    : 'https://dusukbutce.com/api/auth/facebook/callback';
+
   // Facebook OAuth yapılandırmasını kontrol et
   const facebookAppId = process.env.FACEBOOK_APP_ID;
-  const facebookRedirectUri = process.env.FACEBOOK_REDIRECT_URI;
+  const facebookAppSecret = process.env.FACEBOOK_APP_SECRET;
+  
+  // Debug bilgileri
+  console.log('Facebook OAuth Debug:');
+  console.log('App ID:', facebookAppId ? 'SET' : 'MISSING');
+  console.log('App Secret:', facebookAppSecret ? 'SET' : 'MISSING');
+  console.log('Redirect URI:', redirectUri);
+  console.log('Is Localhost:', isLocalhost);
   
   if (!facebookAppId || facebookAppId === 'your-facebook-app-id') {
     console.error('Facebook OAuth Error: FACEBOOK_APP_ID environment variable is not set');
-    return NextResponse.json(
-      { error: 'Facebook OAuth yapılandırılmamış. Lütfen sistem yöneticisi ile iletişime geçin.' },
-      { status: 500 }
-    );
-  }
-  
-  if (!facebookRedirectUri) {
-    console.error('Facebook OAuth Error: FACEBOOK_REDIRECT_URI environment variable is not set');
-    return NextResponse.json(
-      { error: 'Facebook OAuth yapılandırılmamış. Lütfen sistem yöneticisi ile iletişime geçin.' },
-      { status: 500 }
-    );
+    return new Response(`
+      <html>
+        <body>
+          <h1>Facebook OAuth Konfigürasyon Hatası</h1>
+          <p>FACEBOOK_APP_ID environment variable tanımlanmamış.</p>
+          <p>Lütfen .env.local dosyasında FACEBOOK_APP_ID ve FACEBOOK_APP_SECRET değerlerini tanımlayın.</p>
+          <p>Facebook OAuth'u kullanmak istemiyorsanız, bu özelliği frontend'de gizleyebilirsiniz.</p>
+        </body>
+      </html>
+    `, {
+      headers: { 'Content-Type': 'text/html' }
+    });
   }
 
   const searchParams = request.nextUrl.searchParams;
@@ -32,10 +45,10 @@ export async function GET(request: NextRequest) {
     returnUrl: returnUrl
   });
   
-  // Facebook OAuth URL'ini oluştur (sadece public_profile scope'u)
+  // Facebook OAuth URL'ini oluştur (sadece public_profile - email için ayrı izin gerekiyor)
   const facebookAuthUrl = `https://www.facebook.com/v18.0/dialog/oauth?` +
     `client_id=${facebookAppId}&` +
-    `redirect_uri=${encodeURIComponent(facebookRedirectUri)}&` +
+    `redirect_uri=${encodeURIComponent(redirectUri)}&` +
     `response_type=code&` +
     `scope=${encodeURIComponent('public_profile')}&` +
     `state=${encodeURIComponent(state)}`;

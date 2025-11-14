@@ -22,15 +22,15 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ success: false, message: 'Database not configured' }, { status: 500 });
     }
 
-    await connectDB();
-    
-    // Bağlantı durumunu kontrol et
-    if (mongoose.connection.readyState !== 1) {
+    try {
+      await connectDB();
+    } catch (dbError) {
+      console.error('❌ MongoDB connection error:', dbError);
       return NextResponse.json({ 
         success: false, 
-        message: 'Database connection not ready',
-        error: 'Database connection not ready'
-      }, { status: 500 });
+        message: 'Veritabanı bağlantı hatası. Lütfen daha sonra tekrar deneyin.',
+        error: 'Database connection failed'
+      }, { status: 503 });
     }
 
     let updateData: any = {};
@@ -112,7 +112,16 @@ export async function DELETE(request: NextRequest) {
     const body = await request.json();
     const { action, submissionId } = body;
     
-    await connectDB();
+    try {
+      await connectDB();
+    } catch (dbError) {
+      console.error('❌ MongoDB connection error:', dbError);
+      return NextResponse.json({ 
+        success: false, 
+        message: 'Veritabanı bağlantı hatası. Lütfen daha sonra tekrar deneyin.',
+        error: 'Database connection failed'
+      }, { status: 503 });
+    }
     
     if (action === 'deleteAll') {
       console.log('🗑️ Tüm submissions siliniyor...');
@@ -171,20 +180,18 @@ export async function GET(request: NextRequest) {
     }
 
     console.log('🔗 Connecting to MongoDB...');
-    // MongoDB'ye bağlan
-    await connectDB();
-    
-    // Bağlantı durumunu kontrol et
-    if (mongoose.connection.readyState !== 1) {
-      console.error('❌ MongoDB connection not ready, state:', mongoose.connection.readyState);
+    // MongoDB'ye bağlan (connectDB zaten bağlantıyı garanti eder)
+    try {
+      await connectDB();
+      console.log('✅ MongoDB connected successfully');
+    } catch (dbError) {
+      console.error('❌ MongoDB connection error:', dbError);
       return NextResponse.json({ 
         success: false, 
-        message: 'Database connection not ready',
-        error: 'Database connection not ready'
-      }, { status: 500 });
+        message: 'Veritabanı bağlantı hatası. Lütfen daha sonra tekrar deneyin.',
+        error: 'Database connection failed'
+      }, { status: 503 });
     }
-    
-    console.log('✅ MongoDB connected successfully');
     
     // Query parametrelerini al
     const { searchParams } = new URL(request.url);

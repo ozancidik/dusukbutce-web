@@ -17,24 +17,33 @@ async function connectDB() {
     // Eğer zaten bağlıysa, mevcut bağlantıyı kullan
     if (mongoose.connection.readyState === 1) {
       isConnected = true;
-      console.log('MongoDB already connected');
       return;
     }
     
     // Yeni bağlantı kur
-    console.log('Establishing new MongoDB connection...');
     await mongoose.connect(MONGODB_URI, {
       maxPoolSize: 10,
-      serverSelectionTimeoutMS: 5000,
-      socketTimeoutMS: 30000,
+      serverSelectionTimeoutMS: 10000, // 10 saniye timeout
+      socketTimeoutMS: 45000,
       bufferCommands: false,
       connectTimeoutMS: 10000
     });
     
+    // mongoose.connect() promise resolve olduğunda bağlantı hazır olmalı
+    // Ancak emin olmak için kısa bir kontrol yap
+    let retries = 0;
+    const maxRetries = 10;
+    while (mongoose.connection.readyState !== 1 && retries < maxRetries) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+      retries++;
+    }
+    
+    if (mongoose.connection.readyState !== 1) {
+      throw new Error('MongoDB connection not ready after connect');
+    }
+    
     isConnected = true;
-    console.log('MongoDB connected successfully');
   } catch (error) {
-    console.error('MongoDB connection error:', error);
     isConnected = false;
     throw error;
   }

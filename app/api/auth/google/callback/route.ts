@@ -100,17 +100,18 @@ export async function GET(request: NextRequest) {
     let user = await User.findOne({ email: userData.email });
 
     if (!user) {
-      // Yeni kullanıcı oluştur
+      // Yeni kullanıcı oluştur (OAuth kullanıcıları için password gerekli değil)
       user = new User({
         email: userData.email,
         name: decodeURIComponent(escape(userData.name)), // Türkçe karakterleri düzelt
         phone: phoneNumber, // Google'dan gelen telefon numarası
-        password: '', // Google kullanıcıları için şifre yok
+        // password alanı set edilmiyor - OAuth kullanıcıları için gerekli değil
         authProviders: [{
           provider: 'google',
           providerId: userData.id,
           connectedAt: new Date()
-        }]
+        }],
+        emailVerified: true // Google OAuth ile gelen email'ler zaten doğrulanmış
       });
     } else {
       // Mevcut kullanıcıya Google provider'ı ekle (eğer yoksa)
