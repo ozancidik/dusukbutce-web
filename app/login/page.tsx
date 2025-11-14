@@ -18,7 +18,24 @@ export default function LoginPage() {
   const [isResendingEmail, setIsResendingEmail] = useState(false);
   const [emailVerificationError, setEmailVerificationError] = useState(false);
   const [isEmailSent, setIsEmailSent] = useState(false);
+  const [csrfToken, setCsrfToken] = useState<string | null>(null);
   const router = useRouter();
+
+  // CSRF token al
+  React.useEffect(() => {
+    const fetchCsrfToken = async () => {
+      try {
+        const response = await fetch('/api/auth/csrf-token');
+        const data = await response.json();
+        if (data.success && data.csrfToken) {
+          setCsrfToken(data.csrfToken);
+        }
+      } catch (error) {
+        console.error('CSRF token alınamadı:', error);
+      }
+    };
+    fetchCsrfToken();
+  }, []);
 
   // Kullanıcı ve admin giriş kontrolü
   React.useEffect(() => {
@@ -198,6 +215,12 @@ export default function LoginPage() {
       }
     }
     
+    // CSRF token kontrolü
+    if (!csrfToken) {
+      setError('Güvenlik hatası: Lütfen sayfayı yenileyin.');
+      return;
+    }
+
     setIsLoading(true);
     setError("");
 
@@ -205,7 +228,8 @@ export default function LoginPage() {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, csrfToken }),
+        credentials: 'include', // Cookie'leri gönder
       });
       
       const data = await res.json();

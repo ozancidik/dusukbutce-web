@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
+import { validateCSRFToken } from '@/lib/security';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -16,7 +17,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { email, password } = await request.json();
+    const { email, password, csrfToken } = await request.json();
+    
+    // CSRF token doğrulama
+    const cookieToken = request.cookies.get('csrf-token')?.value;
+    if (!csrfToken || !cookieToken || !validateCSRFToken(csrfToken, cookieToken)) {
+      return NextResponse.json(
+        { success: false, error: 'Güvenlik hatası: Geçersiz istek' },
+        { status: 403 }
+      );
+    }
 
     if (!email || !password) {
       return NextResponse.json(
@@ -73,7 +83,7 @@ export async function POST(request: NextRequest) {
         name: adminUser.name
       },
       JWT_SECRET,
-      { expiresIn: '24h' }
+      { expiresIn: '48h' }
     );
 
     return NextResponse.json({

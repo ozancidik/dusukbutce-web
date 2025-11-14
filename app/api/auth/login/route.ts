@@ -4,12 +4,22 @@ import { NextResponse } from "next/server";
 import User from '../../../../models/User';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { validateCSRFToken } from '@/lib/security';
 
 export async function POST(request: NextRequest) {
   try {
     await connectDB();
     
-    const { email, password } = await request.json();
+    const { email, password, csrfToken } = await request.json();
+    
+    // CSRF token doğrulama
+    const cookieToken = request.cookies.get('csrf-token')?.value;
+    if (!csrfToken || !cookieToken || !validateCSRFToken(csrfToken, cookieToken)) {
+      return NextResponse.json(
+        { success: false, message: 'Güvenlik hatası: Geçersiz istek' },
+        { status: 403 }
+      );
+    }
     
     // Kullanıcıyı bul
     const user = await User.findOne({ email });
