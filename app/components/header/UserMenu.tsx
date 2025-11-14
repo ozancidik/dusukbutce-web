@@ -22,10 +22,16 @@ export default function UserMenu({ userInfo, showDropdown, setShowDropdown, safe
     localStorage.removeItem('userLoggedIn');
     localStorage.removeItem('userName');
     localStorage.removeItem('userIsAdmin');
+    localStorage.removeItem('adminLoggedIn');
+    localStorage.removeItem('adminEmail');
+    localStorage.removeItem('adminToken');
     sessionStorage.removeItem('token');
     sessionStorage.removeItem('userLoggedIn');
     sessionStorage.removeItem('userName');
     sessionStorage.removeItem('userIsAdmin');
+    sessionStorage.removeItem('adminLoggedIn');
+    sessionStorage.removeItem('adminEmail');
+    sessionStorage.removeItem('adminToken');
     
     // Reload page to reset state
     window.location.href = '/';
