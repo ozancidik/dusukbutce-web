@@ -15,6 +15,7 @@ async function connectDB() {
     }
     
     // Eğer zaten bağlıysa, mevcut bağlantıyı kullan
+    // readyState: 0 = disconnected, 1 = connected, 2 = connecting, 3 = disconnecting
     if (mongoose.connection.readyState === 1) {
       isConnected = true;
       return;
@@ -33,12 +34,13 @@ async function connectDB() {
     // Ancak emin olmak için kısa bir kontrol yap
     let retries = 0;
     const maxRetries = 10;
-    while (mongoose.connection.readyState !== 1 && retries < maxRetries) {
+    // readyState: 1 = connected
+    while ((mongoose.connection.readyState as number) !== 1 && retries < maxRetries) {
       await new Promise(resolve => setTimeout(resolve, 100));
       retries++;
     }
-    
-    if (mongoose.connection.readyState !== 1) {
+
+    if ((mongoose.connection.readyState as number) !== 1) {
       throw new Error('MongoDB connection not ready after connect');
     }
     
