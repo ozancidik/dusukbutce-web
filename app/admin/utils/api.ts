@@ -49,7 +49,8 @@ export const submitAction = async (
     const adminEmail = localStorage.getItem('adminEmail') || sessionStorage.getItem('adminEmail');
     const adminToken = localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken');
     
-    console.log('Admin status:', { adminLoggedIn, adminEmail: !!adminEmail, adminToken: !!adminToken });
+    // Hassas bilgiler loglanmıyor - sadece durum kontrolü
+    console.log('Admin status:', { isLoggedIn: !!adminLoggedIn, hasEmail: !!adminEmail, hasToken: !!adminToken });
     
     const requestBody: any = {
       submissionId,

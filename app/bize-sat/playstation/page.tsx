@@ -74,7 +74,6 @@ export default function PlayStationPage() {
       console.log('Form data being sent:', formData);
       // Get token from localStorage
       const token = localStorage.getItem('token');
-      console.log('JWT Token:', token);
       
       const response = await fetch('/api/submissions', {
         method: 'POST',

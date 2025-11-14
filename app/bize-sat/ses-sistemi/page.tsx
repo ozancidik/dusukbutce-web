@@ -42,7 +42,6 @@ export default function AudioSystemPage() {
     if (savedFormData) {
           // JWT token al
     const token = localStorage.getItem('token');
-    console.log('JWT Token:', token);
     
     try {
         const parsedData = JSON.parse(savedFormData);
@@ -147,7 +146,6 @@ export default function AudioSystemPage() {
     try {
       // JWT token al
       const token = localStorage.getItem('token');
-      console.log('JWT Token:', token);
       
       const response = await fetch('/api/audio-system-submissions', {
         method: 'POST',

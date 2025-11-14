@@ -7,17 +7,14 @@ import jwt from 'jsonwebtoken';
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('MONGODB_URI:', process.env.MONGODB_URI);
     await connectDB();
     
     const { email, password } = await request.json();
-    console.log('Login attempt for email:', email);
     
     // Kullanıcıyı bul
     const user = await User.findOne({ email });
-    console.log('User found:', !!user);
     if (!user) {
-      console.log('User not found for email:', email);
+      // Hassas bilgi loglanmıyor - sadece genel hata
       return NextResponse.json(
         { success: false, message: 'Email veya şifre hatalı' },
         { status: 401 }
@@ -26,10 +23,7 @@ export async function POST(request: NextRequest) {
     
     // Kullanıcının local auth provider'ı var mı kontrol et
     const hasLocalProvider = user.authProviders?.some((p: any) => p.provider === 'local');
-    console.log('Has local provider:', hasLocalProvider);
-    console.log('Auth providers:', user.authProviders);
     if (!hasLocalProvider) {
-      console.log('No local provider found');
       return NextResponse.json(
         { success: false, message: 'Bu email adresi ile şifreli giriş yapılamaz. Google veya Facebook ile giriş yapın.' },
         { status: 401 }
@@ -37,9 +31,7 @@ export async function POST(request: NextRequest) {
     }
     
     // Email doğrulama kontrolü
-    console.log('Email verified:', user.emailVerified);
     if (!user.emailVerified) {
-      console.log('Email not verified');
       return NextResponse.json(
         { 
           success: false, 
@@ -51,11 +43,8 @@ export async function POST(request: NextRequest) {
     }
     
     // Şifreyi kontrol et
-    console.log('Checking password...');
     const isPasswordValid = await bcrypt.compare(password, user.password);
-    console.log('Password valid:', isPasswordValid);
     if (!isPasswordValid) {
-      console.log('Invalid password');
       return NextResponse.json(
         { success: false, message: 'Email veya şifre hatalı' },
         { status: 401 }

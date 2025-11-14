@@ -43,7 +43,6 @@ export default function RamPage() {
     // localStorage'dan kaydedilmiş form verilerini yükle
         // JWT token al
     const token = localStorage.getItem('token');
-    console.log('JWT Token:', token);
     
     try {
       const savedFormData = localStorage.getItem('ramFormData');
@@ -170,7 +169,6 @@ export default function RamPage() {
     try {
       // JWT token al
       const token = localStorage.getItem('token');
-      console.log('JWT Token:', token);
       
       const response = await fetch('/api/ram-submissions', {
         method: 'POST',

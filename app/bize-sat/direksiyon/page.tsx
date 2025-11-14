@@ -43,7 +43,6 @@ export default function SteeringWheelPage() {
     if (savedFormData) {
           // JWT token al
     const token = localStorage.getItem('token');
-    console.log('JWT Token:', token);
     
     try {
         const parsedData = JSON.parse(savedFormData);
@@ -115,7 +114,6 @@ export default function SteeringWheelPage() {
     try {
       // JWT token al
       const token = localStorage.getItem('token');
-      console.log('JWT Token:', token);
       
       const response = await fetch('/api/notebook-submissions', {
         method: 'POST',

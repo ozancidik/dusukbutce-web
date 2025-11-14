@@ -40,7 +40,6 @@ export default function GamepadPage() {
     // localStorage'dan kaydedilmiş form verilerini yükle
         // JWT token al
     const token = localStorage.getItem('token');
-    console.log('JWT Token:', token);
     
     try {
       const savedFormData = localStorage.getItem('gamepadFormData');
@@ -75,7 +74,6 @@ export default function GamepadPage() {
     try {
       // JWT token al
       const token = localStorage.getItem('token');
-      console.log('JWT Token:', token);
       
       const response = await fetch('/api/submissions', {
         method: 'POST',

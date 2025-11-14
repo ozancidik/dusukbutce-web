@@ -81,7 +81,8 @@ export default function AdminPage() {
       const adminEmail = localStorage.getItem('adminEmail') || sessionStorage.getItem('adminEmail');
       const adminToken = localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken');
       
-      console.log("🔍 Admin bilgileri:", { adminLoggedIn, adminEmail, hasToken: !!adminToken });
+      // Hassas bilgiler loglanmıyor - sadece durum kontrolü
+      console.log("🔍 Admin durumu:", { isLoggedIn: !!adminLoggedIn, hasEmail: !!adminEmail, hasToken: !!adminToken });
       
       // Admin bilgileri eksikse veya token yoksa temizle ve yönlendir
       if (!adminLoggedIn || !adminEmail || !adminToken) {
