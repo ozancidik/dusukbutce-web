@@ -26,7 +26,15 @@ export async function POST(request: NextRequest) {
     }
 
     // MongoDB'ye bağlan
-    await connectDB();
+    try {
+      await connectDB();
+    } catch (dbError: any) {
+      console.error('MongoDB connection error:', dbError);
+      return NextResponse.json(
+        { success: false, error: 'Veritabanı bağlantı hatası. Lütfen daha sonra tekrar deneyin.' },
+        { status: 503 }
+      );
+    }
 
     // Admin kullanıcısını bul (email ile ve isAdmin: true)
     const adminUser = await User.findOne({ 

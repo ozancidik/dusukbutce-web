@@ -2,8 +2,20 @@ import { Submission, ModalType, ToastType } from '../types';
 
 export const fetchSubmissions = async (): Promise<{ submissions: Submission[]; error?: string }> => {
   try {
+    const adminToken = localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken');
+    
+    if (!adminToken) {
+      console.error('❌ Admin token bulunamadı');
+      return { submissions: [], error: 'Yetkisiz erişim: Lütfen tekrar giriş yapın' };
+    }
+    
     console.log("🔍 fetchSubmissions: API çağrısı yapılıyor...");
-    const response = await fetch('/api/admin/submissions?limit=10');
+    const response = await fetch('/api/admin/submissions?limit=10', {
+      headers: {
+        'Authorization': `Bearer ${adminToken}`,
+        'Content-Type': 'application/json'
+      }
+    });
     console.log("🔍 fetchSubmissions: Response status:", response.status);
     
     const data = await response.json();
@@ -98,10 +110,17 @@ export const submitAction = async (
 
 export const deleteAllSubmissions = async (): Promise<{ success: boolean; message: string }> => {
   try {
+    const adminToken = localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken');
+    
+    if (!adminToken) {
+      return { success: false, message: 'Yetkisiz erişim: Lütfen tekrar giriş yapın' };
+    }
+    
     const response = await fetch('/api/admin/submissions', {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${adminToken}`
       },
       body: JSON.stringify({ action: 'deleteAll' }),
     });
@@ -122,10 +141,17 @@ export const deleteAllSubmissions = async (): Promise<{ success: boolean; messag
 
 export const deleteSingleSubmission = async (submissionId: string): Promise<{ success: boolean; message: string }> => {
   try {
+    const adminToken = localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken');
+    
+    if (!adminToken) {
+      return { success: false, message: 'Yetkisiz erişim: Lütfen tekrar giriş yapın' };
+    }
+    
     const response = await fetch('/api/admin/submissions', {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${adminToken}`
       },
       body: JSON.stringify({ action: 'deleteOne', submissionId }),
     });

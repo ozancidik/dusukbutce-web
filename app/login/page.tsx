@@ -25,14 +25,62 @@ export default function LoginPage() {
     const checkUserStatus = () => {
       const adminLoggedIn = localStorage.getItem("adminLoggedIn") || sessionStorage.getItem("adminLoggedIn");
       const adminEmail = localStorage.getItem("adminEmail") || sessionStorage.getItem("adminEmail");
+      const adminToken = localStorage.getItem("adminToken") || sessionStorage.getItem("adminToken");
       const userLoggedIn = localStorage.getItem("userLoggedIn") || sessionStorage.getItem("userLoggedIn");
       const userEmail = localStorage.getItem("userEmail") || sessionStorage.getItem("userEmail");
       
-      // Admin bilgileri varsa ve geçerliyse yönlendir
-      if (adminLoggedIn === "true" && adminEmail) {
-        console.log("🔒 Admin giriş yapmış, admin paneline yönlendiriliyor...");
-        router.push("/admin");
-        return;
+      // Login sayfasında admin kontrolü yapma - kullanıcı login yapmak istiyor
+      // Eğer admin bilgileri varsa ama token geçersizse temizle
+      if (adminLoggedIn === "true" || adminEmail) {
+        // Token kontrolü yap
+        if (!adminToken) {
+          // Token yok, admin bilgilerini temizle
+          console.log("🔒 Admin token eksik, admin bilgileri temizleniyor...");
+          localStorage.removeItem("adminLoggedIn");
+          localStorage.removeItem("adminEmail");
+          localStorage.removeItem("adminToken");
+          sessionStorage.removeItem("adminLoggedIn");
+          sessionStorage.removeItem("adminEmail");
+          sessionStorage.removeItem("adminToken");
+        } else {
+          // Token var, geçerliliğini kontrol et
+          try {
+            const tokenParts = adminToken.split('.');
+            if (tokenParts.length === 3) {
+              const payload = JSON.parse(atob(tokenParts[1]));
+              const now = Math.floor(Date.now() / 1000);
+              // Token süresi dolmuşsa temizle
+              if (payload.exp && payload.exp <= now) {
+                console.log("🔒 Admin token süresi dolmuş, temizleniyor...");
+                localStorage.removeItem("adminLoggedIn");
+                localStorage.removeItem("adminEmail");
+                localStorage.removeItem("adminToken");
+                sessionStorage.removeItem("adminLoggedIn");
+                sessionStorage.removeItem("adminEmail");
+                sessionStorage.removeItem("adminToken");
+              }
+              // Token geçerliyse bile login sayfasında kal - kullanıcı login yapmak istiyor
+            } else {
+              // Token formatı geçersiz, temizle
+              console.log("🔒 Admin token formatı geçersiz, temizleniyor...");
+              localStorage.removeItem("adminLoggedIn");
+              localStorage.removeItem("adminEmail");
+              localStorage.removeItem("adminToken");
+              sessionStorage.removeItem("adminLoggedIn");
+              sessionStorage.removeItem("adminEmail");
+              sessionStorage.removeItem("adminToken");
+            }
+          } catch (error) {
+            // Token parse edilemedi, temizle
+            console.log("🔒 Admin token parse edilemedi, temizleniyor...");
+            localStorage.removeItem("adminLoggedIn");
+            localStorage.removeItem("adminEmail");
+            localStorage.removeItem("adminToken");
+            sessionStorage.removeItem("adminLoggedIn");
+            sessionStorage.removeItem("adminEmail");
+            sessionStorage.removeItem("adminToken");
+          }
+        }
       }
       
       // Normal kullanıcı giriş yapmışsa returnUrl kontrolü yap

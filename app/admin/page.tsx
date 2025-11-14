@@ -79,11 +79,19 @@ export default function AdminPage() {
       console.log("🔍 Admin durumu kontrol ediliyor...");
       const adminLoggedIn = localStorage.getItem('adminLoggedIn') || sessionStorage.getItem('adminLoggedIn');
       const adminEmail = localStorage.getItem('adminEmail') || sessionStorage.getItem('adminEmail');
+      const adminToken = localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken');
       
-      console.log("🔍 Admin bilgileri:", { adminLoggedIn, adminEmail });
+      console.log("🔍 Admin bilgileri:", { adminLoggedIn, adminEmail, hasToken: !!adminToken });
       
-      if (!adminLoggedIn || !adminEmail) {
-        console.log("🔒 Admin giriş yapılmamış, anasayfaya yönlendiriliyor...");
+      // Admin bilgileri eksikse veya token yoksa temizle ve yönlendir
+      if (!adminLoggedIn || !adminEmail || !adminToken) {
+        console.log("🔒 Admin giriş yapılmamış veya token eksik, admin bilgileri temizleniyor...");
+        localStorage.removeItem('adminLoggedIn');
+        localStorage.removeItem('adminEmail');
+        localStorage.removeItem('adminToken');
+        sessionStorage.removeItem('adminLoggedIn');
+        sessionStorage.removeItem('adminEmail');
+        sessionStorage.removeItem('adminToken');
         router.push('/');
         return;
       }

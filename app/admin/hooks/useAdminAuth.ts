@@ -39,8 +39,10 @@ export const useAdminAuth = () => {
   const handleLogout = () => {
     localStorage.removeItem('adminLoggedIn');
     localStorage.removeItem('adminEmail');
+    localStorage.removeItem('adminToken');
     sessionStorage.removeItem('adminLoggedIn');
     sessionStorage.removeItem('adminEmail');
+    sessionStorage.removeItem('adminToken');
     
     window.dispatchEvent(new Event('localStorageChange'));
     window.dispatchEvent(new CustomEvent('logout'));
