@@ -111,6 +111,14 @@ export async function GET(request: NextRequest) {
 
     const token = authHeader.substring(7);
     
+    if (!JWT_SECRET) {
+      console.error('Token verification error: JWT_SECRET is not configured');
+      return NextResponse.json(
+        { success: false, error: 'Sunucu yapılandırma hatası' },
+        { status: 500 }
+      );
+    }
+    
     try {
       const decoded = jwt.verify(token, JWT_SECRET) as any;
       
