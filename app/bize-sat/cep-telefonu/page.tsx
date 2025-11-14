@@ -50,7 +50,6 @@ export default function CepTelefonuPage() {
     
     // localStorage'dan kaydedilmiş form verilerini yükle
     const token = localStorage.getItem('token');
-    console.log('JWT Token:', token);
     
     try {
       const savedFormData = localStorage.getItem('phoneFormData');

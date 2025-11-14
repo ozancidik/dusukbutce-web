@@ -87,7 +87,9 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Admin auth error:', error);
+    // Hassas bilgileri loglamadan sadece hata tipini logla
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Admin auth error:', errorMessage);
     return NextResponse.json(
       { success: false, error: 'Sunucu hatası' },
       { status: 500 }
@@ -128,7 +130,9 @@ export async function GET(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error('Token verification error:', error);
+    // Hassas bilgileri loglamadan sadece hata tipini logla
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Token verification error:', errorMessage);
     return NextResponse.json(
       { success: false, error: 'Sunucu hatası' },
       { status: 500 }

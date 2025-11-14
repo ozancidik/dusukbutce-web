@@ -45,7 +45,6 @@ export default function KeyboardPage() {
     if (savedFormData) {
           // JWT token al
     const token = localStorage.getItem('token');
-    console.log('JWT Token:', token);
     
     try {
         const parsedData = JSON.parse(savedFormData);
@@ -109,7 +108,6 @@ export default function KeyboardPage() {
     try {
       // JWT token al
       const token = localStorage.getItem('token');
-      console.log('JWT Token:', token);
       
       const response = await fetch('/api/keyboard-submissions', {
         method: 'POST',

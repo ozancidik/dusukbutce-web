@@ -47,7 +47,6 @@ export default function MonitorPage() {
     if (savedFormData) {
           // JWT token al
     const token = localStorage.getItem('token');
-    console.log('JWT Token:', token);
     
     try {
         const parsedData = JSON.parse(savedFormData);
@@ -130,7 +129,6 @@ export default function MonitorPage() {
     try {
       // JWT token al
       const token = localStorage.getItem('token');
-      console.log('JWT Token:', token);
       
       const response = await fetch('/api/monitor-submissions', {
         method: 'POST',

@@ -43,7 +43,6 @@ export default function CoolerPage() {
     if (savedFormData) {
           // JWT token al
     const token = localStorage.getItem('token');
-    console.log('JWT Token:', token);
     
     try {
         const parsedData = JSON.parse(savedFormData);
@@ -148,7 +147,6 @@ export default function CoolerPage() {
     try {
       // JWT token al
       const token = localStorage.getItem('token');
-      console.log('JWT Token:', token);
       
       const response = await fetch('/api/cooler-submissions', {
         method: 'POST',

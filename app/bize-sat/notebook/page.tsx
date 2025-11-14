@@ -51,7 +51,6 @@ export default function NotebookPage() {
     // localStorage'dan kaydedilmiş form verilerini yükle
         // JWT token al
     const token = localStorage.getItem('token');
-    console.log('JWT Token:', token);
     
     try {
       const savedFormData = localStorage.getItem('notebookFormData');
@@ -238,7 +237,6 @@ export default function NotebookPage() {
     try {
       // JWT token al
       const token = localStorage.getItem('token');
-      console.log('JWT Token:', token);
       console.log('📝 Form Data before submit:', formData);
       console.log('🔍 Dropdown values:', {
         processorBrand: formData.processorBrand,

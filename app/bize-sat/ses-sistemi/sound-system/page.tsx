@@ -43,7 +43,6 @@ export default function SoundSystemPage() {
     if (savedFormData) {
           // JWT token al
     const token = localStorage.getItem('token');
-    console.log('JWT Token:', token);
     
     try {
         const parsedData = JSON.parse(savedFormData);
@@ -144,7 +143,6 @@ export default function SoundSystemPage() {
     try {
       // JWT token al
       const token = localStorage.getItem('token');
-      console.log('JWT Token:', token);
       
       const response = await fetch('/api/sound-system-submissions', {
         method: 'POST',
