@@ -71,6 +71,10 @@ const userSchema = new mongoose.Schema({
   birthDate: {
     type: String
   },
+  birthDateEdited: {
+    type: Boolean,
+    default: false
+  },
   acceptNewsletter: {
     type: Boolean,
     default: false
