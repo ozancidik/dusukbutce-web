@@ -5,10 +5,22 @@ import User from '@/models/User';
 import jwt from 'jsonwebtoken';
 
 export async function GET(request: NextRequest) {
+  // Environment'a göre redirect URI belirle
+  const isLocalhost = request.headers.get('host')?.includes('localhost');
+  const redirectUri = isLocalhost 
+    ? 'http://localhost:3000/api/auth/facebook/callback'
+    : 'https://dusukbutce.com/api/auth/facebook/callback';
+
   // Facebook OAuth yapılandırmasını kontrol et
   const facebookAppId = process.env.FACEBOOK_APP_ID;
   const facebookAppSecret = process.env.FACEBOOK_APP_SECRET;
-  const facebookRedirectUri = process.env.FACEBOOK_REDIRECT_URI;
+  
+  // Debug bilgileri
+  console.log('Facebook OAuth Callback Debug:');
+  console.log('App ID:', facebookAppId ? 'SET' : 'MISSING');
+  console.log('App Secret:', facebookAppSecret ? 'SET' : 'MISSING');
+  console.log('Redirect URI:', redirectUri);
+  console.log('Is Localhost:', isLocalhost);
   
   if (!facebookAppId || facebookAppId === 'your-facebook-app-id') {
     console.error('Facebook OAuth Error: FACEBOOK_APP_ID environment variable is not set');
@@ -18,7 +30,7 @@ export async function GET(request: NextRequest) {
           <script>
             window.opener.postMessage({
               type: 'FACEBOOK_LOGIN_ERROR',
-              error: 'Facebook OAuth yapılandırılmamış. Lütfen sistem yöneticisi ile iletişime geçin.'
+              error: 'Facebook OAuth yapılandırılmamış. Lütfen .env.local dosyasında FACEBOOK_APP_ID ve FACEBOOK_APP_SECRET değerlerini tanımlayın.'
             }, window.location.origin);
             window.close();
           </script>
@@ -37,26 +49,7 @@ export async function GET(request: NextRequest) {
           <script>
             window.opener.postMessage({
               type: 'FACEBOOK_LOGIN_ERROR',
-              error: 'Facebook OAuth yapılandırılmamış. Lütfen sistem yöneticisi ile iletişime geçin.'
-            }, window.location.origin);
-            window.close();
-          </script>
-        </body>
-      </html>
-    `, {
-      headers: { 'Content-Type': 'text/html' }
-    });
-  }
-  
-  if (!facebookRedirectUri) {
-    console.error('Facebook OAuth Error: FACEBOOK_REDIRECT_URI environment variable is not set');
-    return new Response(`
-      <html>
-        <body>
-          <script>
-            window.opener.postMessage({
-              type: 'FACEBOOK_LOGIN_ERROR',
-              error: 'Facebook OAuth yapılandırılmamış. Lütfen sistem yöneticisi ile iletişime geçin.'
+              error: 'Facebook OAuth yapılandırılmamış. Lütfen .env.local dosyasında FACEBOOK_APP_ID ve FACEBOOK_APP_SECRET değerlerini tanımlayın.'
             }, window.location.origin);
             window.close();
           </script>
@@ -135,7 +128,7 @@ export async function GET(request: NextRequest) {
         client_secret: facebookAppSecret,
         code: code,
         grant_type: 'authorization_code',
-        redirect_uri: facebookRedirectUri,
+        redirect_uri: redirectUri,
       }),
     });
 
@@ -189,16 +182,17 @@ export async function GET(request: NextRequest) {
 
     if (!user) {
       console.log('Facebook OAuth: Creating new user...');
-      // Yeni kullanıcı oluştur
+      // Yeni kullanıcı oluştur (OAuth kullanıcıları için password gerekli değil)
       user = new User({
         email: userEmail,
         name: userName,
-        password: '', // Facebook kullanıcıları için şifre yok
+        // password alanı set edilmiyor - OAuth kullanıcıları için gerekli değil
         authProviders: [{
           provider: 'facebook',
           providerId: userData.id,
           connectedAt: new Date()
-        }]
+        }],
+        emailVerified: true // Facebook OAuth ile gelen email'ler zaten doğrulanmış
       });
       await user.save();
       console.log('Facebook OAuth: New user created successfully');

@@ -10,7 +10,8 @@ const userSchema = new mongoose.Schema({
   },
   password: { 
     type: String, 
-    required: true 
+    required: false, // OAuth kullanıcıları için password gerekli değil
+    default: ''
   },
   name: { 
     type: String, 
