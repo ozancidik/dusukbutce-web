@@ -379,7 +379,7 @@ export default function ProfilePage() {
       setCanEditBirthDate(false);
       setIsSocialLogin(hasSocialProvider);
       // userInfo'yu güncelle
-      setUserInfo(prev => ({
+      setUserInfo((prev: any) => ({
         ...prev,
         birthDateEdited: true,
         authProviders: authProviders
@@ -431,7 +431,7 @@ export default function ProfilePage() {
           }
           
           // userInfo'yu güncelle
-          setUserInfo(prev => ({
+          setUserInfo((prev: any) => ({
             ...prev,
             birthDate: apiUserData.birthDate || prev.birthDate,
             birthDateEdited: birthDateEdited,
@@ -439,7 +439,7 @@ export default function ProfilePage() {
           }));
           
           // EditForm'u güncelle
-          setEditForm(prev => ({
+          setEditForm((prev: any) => ({
             ...prev,
             email: currentEmail,
             birthDate: apiUserData.birthDate || prev.birthDate
@@ -458,7 +458,7 @@ export default function ProfilePage() {
           }
           
           // EditForm'u güncelle
-          setEditForm(prev => ({
+          setEditForm((prev: any) => ({
             ...prev,
             email: currentEmail
           }));
@@ -477,14 +477,14 @@ export default function ProfilePage() {
         }
         
         // EditForm'u güncelle
-        setEditForm(prev => ({
+        setEditForm((prev: any) => ({
           ...prev,
           email: currentEmail
         }));
       }
     } else {
       // EditForm'u güncelle
-      setEditForm(prev => ({
+      setEditForm((prev: any) => ({
         ...prev,
         email: currentEmail
       }));
@@ -971,7 +971,7 @@ export default function ProfilePage() {
           setShowErrorPopup(true);
           
           // EditForm'daki birthDate'i mevcut değere geri al
-          setEditForm(prev => ({
+          setEditForm((prev: any) => ({
             ...prev,
             birthDate: userInfo.birthDate || prev.birthDate
           }));
@@ -1136,7 +1136,7 @@ export default function ProfilePage() {
             birthDateEdited: true
           });
           // EditForm'daki birthDate'i güncelle (mevcut değeri koru)
-          setEditForm(prev => ({
+          setEditForm((prev: any) => ({
             ...prev,
             birthDate: userInfo.birthDate || prev.birthDate
           }));
