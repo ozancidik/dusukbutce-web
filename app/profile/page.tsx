@@ -104,8 +104,51 @@ export default function ProfilePage() {
     return formattedValue;
   };
 
+  // Doğum tarihi düzenlenebilir mi kontrol fonksiyonu
+  const isBirthDateEditable = (): boolean => {
+    // userInfo yoksa, düzenlenemez
+    if (!userInfo) {
+      return false;
+    }
+    
+    // Çoklu kontrol: userInfo.birthDateEdited, localStorage, authProviders, birthDate
+    const birthDateEditedFromStorage = localStorage.getItem('birthDateEdited') === 'true' || 
+                                        sessionStorage.getItem('birthDateEdited') === 'true';
+    const birthDateEditedFromUserInfo = (userInfo as any)?.birthDateEdited === true;
+    const birthDate = (userInfo as any)?.birthDate || '';
+    
+    // OAuth kullanıcısı kontrolü (authProviders'dan)
+    const authProviders = (userInfo as any)?.authProviders || [];
+    const hasSocialProvider = authProviders.some((provider: any) => 
+      provider.provider === 'google' || provider.provider === 'facebook'
+    );
+    const hasLocalProvider = authProviders.some((provider: any) => 
+      provider.provider === 'local'
+    );
+    
+    // Local authentication kullanıcıları için doğum tarihi düzenlenemez
+    if (hasLocalProvider) {
+      return false;
+    }
+    
+    // Eğer OAuth kullanıcısı ise ve zaten bir doğum tarihi varsa, düzenlenemez (migration için)
+    // Bu, eski kayıtlar için geçerli - zaten bir doğum tarihi varsa, artık düzenlenemez
+    if (hasSocialProvider && birthDate && !hasLocalProvider) {
+      console.log('🔒 isBirthDateEditable: OAuth kullanıcısı ve zaten doğum tarihi var, düzenlenemez');
+      return false;
+    }
+    
+    // Eğer herhangi biri true ise, düzenlenemez
+    if (birthDateEditedFromUserInfo || birthDateEditedFromStorage) {
+      return false;
+    }
+    
+    // Sadece OAuth kullanıcıları, daha önce düzenlenmemişse ve doğum tarihi yoksa düzenlenebilir
+    return hasSocialProvider && !birthDateEditedFromUserInfo && !birthDateEditedFromStorage && !birthDate;
+  };
+
   // Kullanıcı verilerini yükleme fonksiyonu
-  const loadUserData = () => {
+  const loadUserData = async () => {
     // localStorage'dan kullanıcı bilgilerini al
     const userLoggedIn = localStorage.getItem('userLoggedIn');
     if (userLoggedIn !== 'true') {
@@ -114,30 +157,19 @@ export default function ProfilePage() {
       return;
     }
 
-    const userData = {
-      id: localStorage.getItem('userId') || sessionStorage.getItem('userId'),
-      email: localStorage.getItem('userEmail') || sessionStorage.getItem('userEmail'),
-      name: (() => {
-        const name = localStorage.getItem('userName') || sessionStorage.getItem('userName');
-        // Türkçe karakterleri düzelt
-        if (name && name.includes('Ä±')) {
-          return decodeURIComponent(escape(name));
-        }
-        return name;
-      })(),
-      phone: localStorage.getItem('userPhone') || sessionStorage.getItem('userPhone') || '',
-      birthDate: localStorage.getItem('userBirthDate') || sessionStorage.getItem('userBirthDate') || '',
-      isAdmin: localStorage.getItem('adminLoggedIn') === 'true' || sessionStorage.getItem('adminLoggedIn') === 'true'
-    };
-    
-    console.log('🔍 Profile sayfasında userData:', userData);
-    console.log('🔍 userData.phone:', userData.phone);
-    console.log('🔍 userData.id:', userData.id);
-    console.log('🔍 userData.email:', userData.email);
-    console.log('🔍 userData.name:', userData.name);
+    const userId = localStorage.getItem('userId') || sessionStorage.getItem('userId');
+    const userEmail = localStorage.getItem('userEmail') || sessionStorage.getItem('userEmail');
+    const userName = (() => {
+      const name = localStorage.getItem('userName') || sessionStorage.getItem('userName');
+      // Türkçe karakterleri düzelt
+      if (name && name.includes('Ä±')) {
+        return decodeURIComponent(escape(name));
+      }
+      return name;
+    })();
     
     // Eğer kullanıcı verileri yoksa, localStorage'ı temizle ve login sayfasına yönlendir
-    if (!userData.id || !userData.email) {
+    if (!userId || !userEmail) {
       console.log('🔍 Kullanıcı verileri bulunamadı, localStorage temizleniyor ve login sayfasına yönlendiriliyor...');
       
       // Tüm localStorage'ı temizle
@@ -152,45 +184,143 @@ export default function ProfilePage() {
       window.location.href = '/login';
       return;
     }
-    
-    // Doğum tarihi düzenleme kontrolü
-    const birthDateEdited = localStorage.getItem('birthDateEdited') === 'true';
-    const authProviders = (userData as any).authProviders || [];
-    const hasSocialProvider = authProviders.some((provider: any) => 
-      provider.provider === 'google' || provider.provider === 'facebook'
-    );
-    const hasLocalProvider = authProviders.some((provider: any) => 
-      provider.provider === 'local'
-    );
-    
-    // Doğum tarihi düzenleme kuralları:
-    // 1. Normal kayıt (local) + doğum tarihi varsa → düzenlenemez
-    // 2. Sosyal medya (google/facebook) + daha önce düzenlenmemişse → 1 seferlik düzenlenebilir
-    // 3. Sosyal medya + daha önce düzenlenmişse → düzenlenemez
-    const canEdit = hasSocialProvider && !birthDateEdited;
-    
-    console.log('🔍 Doğum tarihi düzenleme kontrolü:');
-    console.log('🔍 authProviders:', authProviders);
-    console.log('🔍 hasSocialProvider:', hasSocialProvider);
-    console.log('🔍 hasLocalProvider:', hasLocalProvider);
-    console.log('🔍 birthDateEdited:', birthDateEdited);
-    console.log('🔍 canEditBirthDate:', canEdit);
-    console.log('🔍 userData.birthDate:', userData.birthDate);
-    
-    setIsSocialLogin(hasSocialProvider);
-    setCanEditBirthDate(canEdit);
-    
-    setUserInfo(userData);
-    
-    // İsim ve soyisimi ayır
-    const nameParts = userData.name ? safeDecodeName(userData.name).split(' ') : ['', ''];
-    setEditForm({
-      firstName: nameParts[0] || '',
-      lastName: nameParts.slice(1).join(' ') || '',
-      email: userData.email || '',
-      phone: formatPhoneNumber(userData.phone || ''),
-      birthDate: userData.birthDate || ''
-    });
+
+    // API'den kullanıcı bilgilerini çek (authProviders ve birthDateEdited bilgisi için)
+    try {
+      const response = await fetch(`/api/auth/update-profile?userId=${userId}`);
+      const data = await response.json();
+      
+      if (data.success && data.user) {
+        const apiUserData = data.user;
+        const authProviders = apiUserData.authProviders || [];
+        let birthDateEdited = apiUserData.birthDateEdited || false;
+        
+        // MIGRATION: Eğer OAuth kullanıcısı ise ve zaten bir birthDate değeri varsa
+        // ama birthDateEdited false ise, bunu true yap (eski kayıtlar için)
+        const hasSocialProvider = authProviders.some((provider: any) => 
+          provider.provider === 'google' || provider.provider === 'facebook'
+        );
+        const hasLocalProvider = authProviders.some((provider: any) => 
+          provider.provider === 'local'
+        );
+        
+        const birthDate = apiUserData.birthDate || localStorage.getItem('userBirthDate') || sessionStorage.getItem('userBirthDate') || '';
+        
+        // Eğer OAuth kullanıcısı ise ve zaten bir doğum tarihi varsa ama birthDateEdited false ise
+        // Frontend'de de bunu true olarak kabul et (API migration yapacak ama frontend'de de kontrol et)
+        if (hasSocialProvider && !hasLocalProvider && birthDate && !birthDateEdited) {
+          console.log('🔄 MIGRATION (Frontend): OAuth kullanıcısı için birthDateEdited flag\'i set ediliyor');
+          console.log('🔄 birthDate:', birthDate);
+          console.log('🔄 birthDateEdited (önceki):', birthDateEdited);
+          
+          // Frontend'de geçici olarak true yap (API bir sonraki çağrıda düzeltecek)
+          birthDateEdited = true;
+          
+          // localStorage'a da kaydet
+          localStorage.setItem('birthDateEdited', 'true');
+          sessionStorage.setItem('birthDateEdited', 'true');
+          
+          console.log('✅ MIGRATION (Frontend): birthDateEdited=true yapıldı');
+        }
+        
+        const userData = {
+          id: userId,
+          email: apiUserData.email || userEmail,
+          name: apiUserData.name || userName,
+          phone: apiUserData.phone || localStorage.getItem('userPhone') || sessionStorage.getItem('userPhone') || '',
+          birthDate: birthDate,
+          isAdmin: apiUserData.isAdmin || localStorage.getItem('adminLoggedIn') === 'true' || sessionStorage.getItem('adminLoggedIn') === 'true',
+          authProviders: authProviders,
+          birthDateEdited: birthDateEdited
+        };
+        
+        // localStorage'a authProviders ve birthDateEdited bilgisini kaydet
+        localStorage.setItem('userBirthDate', userData.birthDate);
+        localStorage.setItem('birthDateEdited', birthDateEdited.toString());
+        if (birthDateEdited) {
+          sessionStorage.setItem('birthDateEdited', 'true');
+        } else {
+          sessionStorage.removeItem('birthDateEdited');
+        }
+        
+        // Doğum tarihi düzenleme kuralları:
+        // 1. Normal kayıt (local) → düzenlenemez
+        // 2. Sosyal medya (google/facebook) + daha önce düzenlenmemişse → 1 seferlik düzenlenebilir
+        // 3. Sosyal medya + daha önce düzenlenmişse → düzenlenemez
+        // 4. Sosyal medya + zaten bir doğum tarihi varsa → düzenlenemez (migration)
+        const canEdit = hasSocialProvider && !birthDateEdited && !birthDate;
+        
+        console.log('🔍 Doğum tarihi düzenleme kontrolü:');
+        console.log('🔍 authProviders:', authProviders);
+        console.log('🔍 hasSocialProvider:', hasSocialProvider);
+        console.log('🔍 hasLocalProvider:', hasLocalProvider);
+        console.log('🔍 birthDateEdited:', birthDateEdited);
+        console.log('🔍 birthDate:', birthDate);
+        console.log('🔍 canEditBirthDate:', canEdit);
+        console.log('🔍 userData.birthDate:', userData.birthDate);
+        
+        setIsSocialLogin(hasSocialProvider);
+        setCanEditBirthDate(canEdit);
+        
+        setUserInfo(userData);
+        
+        // İsim ve soyisimi ayır
+        const nameParts = userData.name ? safeDecodeName(userData.name).split(' ') : ['', ''];
+        setEditForm({
+          firstName: nameParts[0] || '',
+          lastName: nameParts.slice(1).join(' ') || '',
+          email: userData.email || '',
+          phone: formatPhoneNumber(userData.phone || ''),
+          birthDate: userData.birthDate || ''
+        });
+      } else {
+        // API hatası durumunda localStorage'dan devam et
+        console.warn('⚠️ API\'den kullanıcı bilgileri alınamadı, localStorage\'dan devam ediliyor');
+        const userData = {
+          id: userId,
+          email: userEmail,
+          name: userName,
+          phone: localStorage.getItem('userPhone') || sessionStorage.getItem('userPhone') || '',
+          birthDate: localStorage.getItem('userBirthDate') || sessionStorage.getItem('userBirthDate') || '',
+          isAdmin: localStorage.getItem('adminLoggedIn') === 'true' || sessionStorage.getItem('adminLoggedIn') === 'true',
+          authProviders: [],
+          birthDateEdited: false
+        };
+        
+        setUserInfo(userData);
+        const nameParts = userData.name ? safeDecodeName(userData.name).split(' ') : ['', ''];
+        setEditForm({
+          firstName: nameParts[0] || '',
+          lastName: nameParts.slice(1).join(' ') || '',
+          email: userData.email || '',
+          phone: formatPhoneNumber(userData.phone || ''),
+          birthDate: userData.birthDate || ''
+        });
+      }
+    } catch (error) {
+      console.error('❌ Kullanıcı bilgileri yüklenirken hata:', error);
+      // Hata durumunda localStorage'dan devam et
+      const userData = {
+        id: userId,
+        email: userEmail,
+        name: userName,
+        phone: localStorage.getItem('userPhone') || sessionStorage.getItem('userPhone') || '',
+        birthDate: localStorage.getItem('userBirthDate') || sessionStorage.getItem('userBirthDate') || '',
+        isAdmin: localStorage.getItem('adminLoggedIn') === 'true' || sessionStorage.getItem('adminLoggedIn') === 'true',
+        authProviders: [],
+        birthDateEdited: false
+      };
+      
+      setUserInfo(userData);
+      const nameParts = userData.name ? safeDecodeName(userData.name).split(' ') : ['', ''];
+      setEditForm({
+        firstName: nameParts[0] || '',
+        lastName: nameParts.slice(1).join(' ') || '',
+        email: userData.email || '',
+        phone: formatPhoneNumber(userData.phone || ''),
+        birthDate: userData.birthDate || ''
+      });
+    }
   };
 
   useEffect(() => {
@@ -222,7 +352,7 @@ export default function ProfilePage() {
     };
   }, [router]);
 
-  const handleEdit = () => {
+  const handleEdit = async () => {
     setIsEditing(true);
     setMessage('');
     const currentEmail = userInfo?.email || '';
@@ -230,11 +360,135 @@ export default function ProfilePage() {
     setIsEmailChanged(false);
     setEmailVerificationCode('');
     
-    // EditForm'u da güncelle
-    setEditForm(prev => ({
-      ...prev,
-      email: currentEmail
-    }));
+    // Önce localStorage'dan birthDateEdited bilgisini kontrol et (hızlı kontrol)
+    const birthDateEditedFromStorage = localStorage.getItem('birthDateEdited') === 'true' || 
+                                        sessionStorage.getItem('birthDateEdited') === 'true';
+    
+    // userInfo'dan authProviders kontrolü
+    const authProviders = (userInfo as any)?.authProviders || [];
+    const hasSocialProvider = authProviders.some((provider: any) => 
+      provider.provider === 'google' || provider.provider === 'facebook'
+    );
+    const hasLocalProvider = authProviders.some((provider: any) => 
+      provider.provider === 'local'
+    );
+    
+    // Eğer localStorage'da birthDateEdited true ise, hemen state'i güncelle (API çağrısı yapmadan önce)
+    if (birthDateEditedFromStorage) {
+      console.log('🔒 handleEdit: localStorage birthDateEdited=true, input disabled olacak');
+      setCanEditBirthDate(false);
+      setIsSocialLogin(hasSocialProvider);
+      // userInfo'yu güncelle
+      setUserInfo(prev => ({
+        ...prev,
+        birthDateEdited: true,
+        authProviders: authProviders
+      }));
+    } else if (hasSocialProvider && !hasLocalProvider) {
+      // OAuth kullanıcısı ve daha önce düzenlenmemişse, düzenlenebilir
+      console.log('🔓 handleEdit: OAuth kullanıcısı, düzenlenebilir');
+      setCanEditBirthDate(true);
+      setIsSocialLogin(true);
+    } else {
+      // Local authentication kullanıcısı veya bilinmeyen durum
+      console.log('🔒 handleEdit: Local kullanıcı veya bilinmeyen durum, düzenlenemez');
+      setCanEditBirthDate(false);
+      setIsSocialLogin(hasSocialProvider);
+    }
+    
+    // Güncel kullanıcı bilgilerini API'den çek (birthDateEdited durumunu kontrol etmek için)
+    if (userInfo?.id) {
+      try {
+        const response = await fetch(`/api/auth/update-profile?userId=${userInfo.id}`);
+        const data = await response.json();
+        
+        if (data.success && data.user) {
+          const apiUserData = data.user;
+          const authProviders = apiUserData.authProviders || [];
+          const birthDateEdited = apiUserData.birthDateEdited || false;
+          
+          console.log('🔍 API response: birthDateEdited=', birthDateEdited);
+          
+          const hasSocialProvider = authProviders.some((provider: any) => 
+            provider.provider === 'google' || provider.provider === 'facebook'
+          );
+          
+          // canEditBirthDate state'ini güncelle (API'den gelen bilgi kesin)
+          const canEdit = hasSocialProvider && !birthDateEdited;
+          console.log('🔍 canEditBirthDate=', canEdit, '(hasSocialProvider:', hasSocialProvider, ', birthDateEdited:', birthDateEdited, ')');
+          setCanEditBirthDate(canEdit);
+          setIsSocialLogin(hasSocialProvider);
+          
+          // localStorage'a kaydet (API'den gelen bilgi kesin olduğu için)
+          if (birthDateEdited) {
+            localStorage.setItem('birthDateEdited', 'true');
+            sessionStorage.setItem('birthDateEdited', 'true');
+            console.log('💾 localStorage\'a birthDateEdited=true kaydedildi');
+          } else {
+            localStorage.removeItem('birthDateEdited');
+            sessionStorage.removeItem('birthDateEdited');
+            console.log('💾 localStorage\'dan birthDateEdited kaldırıldı');
+          }
+          
+          // userInfo'yu güncelle
+          setUserInfo(prev => ({
+            ...prev,
+            birthDate: apiUserData.birthDate || prev.birthDate,
+            birthDateEdited: birthDateEdited,
+            authProviders: authProviders
+          }));
+          
+          // EditForm'u güncelle
+          setEditForm(prev => ({
+            ...prev,
+            email: currentEmail,
+            birthDate: apiUserData.birthDate || prev.birthDate
+          }));
+        } else {
+          // API'den bilgi alınamazsa, localStorage'dan kontrol et
+          console.warn('⚠️ API\'den bilgi alınamadı, localStorage\'dan kontrol ediliyor');
+          const hasSocialProvider = (userInfo as any)?.authProviders?.some((provider: any) => 
+            provider.provider === 'google' || provider.provider === 'facebook'
+          ) || false;
+          
+          if (hasSocialProvider) {
+            const canEdit = !birthDateEditedFromStorage;
+            setCanEditBirthDate(canEdit);
+            setIsSocialLogin(true);
+          }
+          
+          // EditForm'u güncelle
+          setEditForm(prev => ({
+            ...prev,
+            email: currentEmail
+          }));
+        }
+      } catch (error) {
+        console.error('❌ Kullanıcı bilgileri yüklenirken hata:', error);
+        // Hata durumunda localStorage'dan kontrol et
+        const hasSocialProvider = (userInfo as any)?.authProviders?.some((provider: any) => 
+          provider.provider === 'google' || provider.provider === 'facebook'
+        ) || false;
+        
+        if (hasSocialProvider) {
+          const canEdit = !birthDateEditedFromStorage;
+          setCanEditBirthDate(canEdit);
+          setIsSocialLogin(true);
+        }
+        
+        // EditForm'u güncelle
+        setEditForm(prev => ({
+          ...prev,
+          email: currentEmail
+        }));
+      }
+    } else {
+      // EditForm'u güncelle
+      setEditForm(prev => ({
+        ...prev,
+        email: currentEmail
+      }));
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -292,8 +546,8 @@ export default function ProfilePage() {
       }
     } else if (name === 'birthDate') {
       // Doğum tarihi düzenlenebilir mi kontrol et
-      if (!canEditBirthDate) {
-        return;
+      if (!isBirthDateEditable()) {
+        return; // Düzenlenemezse, değişiklik yapma
       }
       // Doğum tarihi için sadece geçerli tarih formatına izin ver
       if (value === '' || /^\d{4}-\d{2}-\d{2}$/.test(value)) {
@@ -662,6 +916,20 @@ export default function ProfilePage() {
         phone: editForm.phone
       });
       
+      // Doğum tarihi düzenlenebilir mi kontrol et (çoklu kontrol)
+      const birthDateEditedFromStorage = localStorage.getItem('birthDateEdited') === 'true' || 
+                                          sessionStorage.getItem('birthDateEdited') === 'true';
+      const birthDateEditedFromUserInfo = (userInfo as any)?.birthDateEdited === true;
+      const canEdit = isBirthDateEditable();
+      
+      console.log('🔍 handleSave: Doğum tarihi kontrolü:');
+      console.log('🔍 canEditBirthDate state:', canEditBirthDate);
+      console.log('🔍 birthDateEditedFromStorage:', birthDateEditedFromStorage);
+      console.log('🔍 birthDateEditedFromUserInfo:', birthDateEditedFromUserInfo);
+      console.log('🔍 isBirthDateEditable():', canEdit);
+      console.log('🔍 editForm.birthDate:', editForm.birthDate);
+      console.log('🔍 userInfo.birthDate:', userInfo.birthDate);
+      
       // API'ye güncelleme gönder
       const updateData: any = {
         userId: userInfo.id,
@@ -671,9 +939,50 @@ export default function ProfilePage() {
         phone: editForm.phone ? '0' + editForm.phone.replace(/\s/g, '').replace(/[\(\)]/g, '') : ''
       };
       
-      // Doğum tarihini gönder - sadece düzenlenebilirse
-      if (canEditBirthDate) {
-        updateData.birthDate = editForm.birthDate || '';
+      // Doğum tarihi gönderme mantığı - KESIN KONTROL
+      // 1. Eğer düzenlenebilirse ve değer değiştiyse → yeni değeri gönder
+      // 2. Eğer düzenlenemezse → HİÇBİR ŞEKİLDE YENİ DEĞER GÖNDERME, sadece mevcut değeri gönder
+      // 3. API tarafında da kontrol var, ama frontend'de de kesin kontrol yapıyoruz
+      
+      if (canEdit) {
+        // Düzenlenebilirse, değer değiştiyse yeni değeri gönder
+        if (editForm.birthDate && editForm.birthDate !== userInfo.birthDate) {
+          updateData.birthDate = editForm.birthDate;
+          console.log('✅ handleSave: Yeni doğum tarihi gönderiliyor (düzenlenebilir):', editForm.birthDate);
+        } else if (editForm.birthDate) {
+          // Aynı değer, normal güncelleme
+          updateData.birthDate = editForm.birthDate;
+          console.log('✅ handleSave: Doğum tarihi aynı (düzenlenebilir):', editForm.birthDate);
+        }
+      } else {
+        // DÜZENLENEMEZSE - Kesin kontrol
+        if (editForm.birthDate && editForm.birthDate !== userInfo.birthDate) {
+          // Değer değişmiş ama düzenlenemez → HATA
+          console.error('❌ handleSave: Doğum tarihi düzenlenemez ama değer değişmiş!');
+          console.error('❌ editForm.birthDate:', editForm.birthDate);
+          console.error('❌ userInfo.birthDate:', userInfo.birthDate);
+          console.error('❌ birthDateEditedFromStorage:', birthDateEditedFromStorage);
+          console.error('❌ birthDateEditedFromUserInfo:', birthDateEditedFromUserInfo);
+          
+          // Frontend'de hata göster ve API çağrısı yapma
+          setMessage('Doğum tarihi daha önce belirlenmiş. Artık değiştirilemez.');
+          setMessageType('error');
+          setErrorMessage('Doğum tarihi daha önce belirlenmiş. Artık değiştirilemez.');
+          setShowErrorPopup(true);
+          
+          // EditForm'daki birthDate'i mevcut değere geri al
+          setEditForm(prev => ({
+            ...prev,
+            birthDate: userInfo.birthDate || prev.birthDate
+          }));
+          
+          return; // API çağrısı yapma
+        } else if (editForm.birthDate) {
+          // Aynı değer, mevcut değeri gönder (normal güncelleme, diğer alanlar için)
+          updateData.birthDate = userInfo.birthDate || editForm.birthDate;
+          console.log('✅ handleSave: Doğum tarihi aynı (düzenlenemez, mevcut değer gönderiliyor):', updateData.birthDate);
+        }
+        // Eğer editForm.birthDate yoksa, birthDate gönderme (API mevcut değeri koruyacak)
       }
 
       // Email değişikliği için doğrulama kodu gönder
@@ -696,14 +1005,31 @@ export default function ProfilePage() {
         localStorage.setItem('userEmail', editForm.email);
         localStorage.setItem('userPhone', editForm.phone);
         
-        // Doğum tarihini güncelle - sadece düzenlenebilirse
-        if (canEditBirthDate) {
+        // API'den gelen kullanıcı bilgilerini kullan
+        const updatedUserData = data.user || {};
+        const birthDateEdited = updatedUserData.birthDateEdited || false;
+        const authProviders = updatedUserData.authProviders || (userInfo as any).authProviders || [];
+        
+        // Doğum tarihini güncelle - API'den gelen bilgiyi kullan
+        if (updatedUserData.birthDate) {
+          localStorage.setItem('userBirthDate', updatedUserData.birthDate);
+          sessionStorage.setItem('userBirthDate', updatedUserData.birthDate);
+        } else if (canEditBirthDate && editForm.birthDate) {
           localStorage.setItem('userBirthDate', editForm.birthDate);
-          // Sosyal medya girişi için düzenleme flag'ini set et
-          if (isSocialLogin) {
-            localStorage.setItem('birthDateEdited', 'true');
-            setCanEditBirthDate(false); // Artık düzenlenemez
-          }
+          sessionStorage.setItem('userBirthDate', editForm.birthDate);
+        }
+        
+        // birthDateEdited flag'ini güncelle (API'den gelen bilgi kesin)
+        if (birthDateEdited) {
+          localStorage.setItem('birthDateEdited', 'true');
+          sessionStorage.setItem('birthDateEdited', 'true');
+          setCanEditBirthDate(false); // Artık düzenlenemez
+          console.log('💾 handleSave: birthDateEdited=true, localStorage\'a kaydedildi');
+        } else {
+          // Eğer API'den false gelirse, localStorage'dan kaldır (temizlik)
+          localStorage.removeItem('birthDateEdited');
+          sessionStorage.removeItem('birthDateEdited');
+          console.log('💾 handleSave: birthDateEdited=false, localStorage\'dan kaldırıldı');
         }
         
         // Telefon bilgisini formatlanmış halde localStorage'a kaydet
@@ -716,9 +1042,6 @@ export default function ProfilePage() {
         sessionStorage.setItem('userName', newName);
         sessionStorage.setItem('userEmail', editForm.email);
         sessionStorage.setItem('userPhone', formattedPhone || editForm.phone);
-        if (canEditBirthDate) {
-          sessionStorage.setItem('userBirthDate', editForm.birthDate);
-        }
         
         // JSON user objesini güncelle
         const updatedUser = {
@@ -726,23 +1049,44 @@ export default function ProfilePage() {
           email: editForm.email,
           name: newName,
           phone: formattedPhone || editForm.phone,
-          birthDate: canEditBirthDate ? editForm.birthDate : userInfo.birthDate
+          birthDate: updatedUserData.birthDate || (canEditBirthDate ? editForm.birthDate : userInfo.birthDate),
+          birthDateEdited: birthDateEdited,
+          authProviders: authProviders,
+          isAdmin: updatedUserData.isAdmin || userInfo.isAdmin
         };
         localStorage.setItem('user', JSON.stringify(updatedUser));
         sessionStorage.setItem('user', JSON.stringify(updatedUser));
         
+        // OAuth kullanıcısı kontrolü güncelle
+        const hasSocialProvider = authProviders.some((provider: any) => 
+          provider.provider === 'google' || provider.provider === 'facebook'
+        );
+        
+        // Doğum tarihi düzenlendiyse flag'leri güncelle
+        if (birthDateEdited) {
+          console.log('🔒 handleSave: birthDateEdited=true, state güncelleniyor');
+          setIsSocialLogin(hasSocialProvider); // Hala sosyal medya kullanıcısı ama artık düzenlenemez
+          // canEditBirthDate state'ini kesinlikle false yap (hemen, localStorage'dan önce)
+          setCanEditBirthDate(false);
+          console.log('✅ handleSave: canEditBirthDate=false yapıldı');
+        }
+        
+        // userInfo'yu güncelle (birthDateEdited dahil)
+        // Doğum tarihini belirle: API'den gelen değer varsa onu kullan, yoksa mevcut değeri koru
+        const finalBirthDate = updatedUserData.birthDate || userInfo.birthDate || editForm.birthDate || '';
         setUserInfo({
           ...userInfo,
           name: newName,
           email: editForm.email,
           phone: editForm.phone,
-          birthDate: canEditBirthDate ? editForm.birthDate : userInfo.birthDate
+          birthDate: finalBirthDate,
+          birthDateEdited: birthDateEdited, // API'den gelen değer (kesin)
+          authProviders: authProviders,
+          isAdmin: updatedUserData.isAdmin || userInfo.isAdmin
         });
         
-        // Doğum tarihi düzenlendiyse sosyal medya girişi flag'ini güncelle
-        if (isSocialLogin && editForm.birthDate) {
-          setIsSocialLogin(false);
-        }
+        console.log('✅ handleSave: userInfo güncellendi, birthDateEdited=', birthDateEdited);
+        console.log('✅ handleSave: localStorage birthDateEdited=', localStorage.getItem('birthDateEdited'));
         
         setIsEditing(false);
         setMessage('Profil başarıyla güncellendi!');
@@ -780,6 +1124,23 @@ export default function ProfilePage() {
       } else {
         const data = await response.json();
         const errorMsg = data.message || 'Güncelleme sırasında bir hata oluştu.';
+        
+        // Doğum tarihi düzenlenemez hatası kontrolü
+        if (errorMsg.includes('Doğum tarihi daha önce belirlenmiş') || 
+            errorMsg.includes('Artık değiştirilemez')) {
+          // canEditBirthDate state'ini false yap
+          setCanEditBirthDate(false);
+          // userInfo'yu güncelle
+          setUserInfo({
+            ...userInfo,
+            birthDateEdited: true
+          });
+          // EditForm'daki birthDate'i güncelle (mevcut değeri koru)
+          setEditForm(prev => ({
+            ...prev,
+            birthDate: userInfo.birthDate || prev.birthDate
+          }));
+        }
         
         // Doğrulama kodu hatası kontrolü
         if (errorMsg.includes('Geçersiz doğrulama kodu') || 
@@ -1380,18 +1741,54 @@ export default function ProfilePage() {
                     name="birthDate"
                     value={editForm.birthDate}
                     onChange={handleChange}
-                    disabled={!canEditBirthDate}
+                    disabled={!isBirthDateEditable()}
+                    readOnly={!isBirthDateEditable()}
                     style={{
                       width: '100%',
                       padding: isMobile ? '10px' : '12px',
                       borderRadius: '8px',
                       border: '1px solid #d1d5db',
                       fontSize: isMobile ? '14px' : '16px',
-                      backgroundColor: isSocialLogin ? '#ffffff' : '#f9fafb',
-                      color: isSocialLogin ? '#374151' : '#9ca3af',
-                      cursor: isSocialLogin ? 'text' : 'not-allowed'
+                      backgroundColor: isBirthDateEditable() ? '#ffffff' : '#f9fafb',
+                      color: isBirthDateEditable() ? '#374151' : '#9ca3af',
+                      cursor: isBirthDateEditable() ? 'text' : 'not-allowed',
+                      pointerEvents: isBirthDateEditable() ? 'auto' : 'none'
+                    }}
+                    onKeyDown={(e) => {
+                      // Eğer düzenlenemezse, klavye girişlerini engelle
+                      if (!isBirthDateEditable()) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }
+                    }}
+                    onFocus={(e) => {
+                      // Eğer düzenlenemezse, focus'u engelle
+                      if (!isBirthDateEditable()) {
+                        e.target.blur();
+                      }
                     }}
                   />
+                  {isSocialLogin && (
+                    <div style={{ 
+                      marginTop: '8px',
+                      fontSize: '12px', 
+                      color: isBirthDateEditable() ? '#f59e0b' : '#9ca3af',
+                      fontStyle: 'italic',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}>
+                      {isBirthDateEditable() ? (
+                        <>
+                          ⚠️ Doğum tarihi sadece 1 kez değiştirilebilir. Lütfen dikkatli seçin.
+                        </>
+                      ) : (
+                        <>
+                          🔒 Doğum tarihi daha önce belirlenmiş. Artık değiştirilemez.
+                        </>
+                      )}
+                    </div>
+                  )}
                 </div>
 
 
@@ -1544,6 +1941,27 @@ export default function ProfilePage() {
                     }}>
                       {userInfo.birthDate ? new Date(userInfo.birthDate).toLocaleDateString('tr-TR') : 'Belirtilmemiş'}
                     </div>
+                    {isSocialLogin && (
+                      <div style={{ 
+                        marginTop: '8px',
+                        fontSize: '11px', 
+                        color: (userInfo as any).birthDateEdited ? '#9ca3af' : '#f59e0b',
+                        fontStyle: 'italic',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}>
+                        {(userInfo as any).birthDateEdited ? (
+                          <>
+                            🔒 Doğum tarihi daha önce belirlenmiş. Artık değiştirilemez.
+                          </>
+                        ) : (
+                          <>
+                            ⚠️ Doğum tarihi sadece 1 kez değiştirilebilir. Profil düzenleme modunda değiştirebilirsiniz.
+                          </>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
