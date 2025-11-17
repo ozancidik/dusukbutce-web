@@ -30,7 +30,7 @@ export default function SubmissionList({
   formatDate
 }: SubmissionListProps) {
   if (loading) {
-    return <LoadingSpinner />;
+    return <LoadingSpinner isMobile={isMobile} />;
   }
 
   if (error) {

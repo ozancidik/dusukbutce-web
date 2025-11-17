@@ -7,6 +7,9 @@ export const size = {
 }
 export const contentType = 'image/png'
 
+// Route segment config
+export const runtime = 'edge'
+
 // Image generation
 export default function Icon() {
   return new ImageResponse(
