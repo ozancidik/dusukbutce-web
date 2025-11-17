@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import PasswordValidation from '../register/components/PasswordValidation';
 
 interface UserInfo {
   id: string;
@@ -21,6 +22,13 @@ export default function SifreDegistirPage() {
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState<'success' | 'error'>('success');
   const [showMessage, setShowMessage] = useState(false);
+  const [passwordMismatch, setPasswordMismatch] = useState(false);
+  const [passwordErrors, setPasswordErrors] = useState({
+    length: false,
+    uppercase: false,
+    lowercase: false,
+    special: false
+  });
   
   const [formData, setFormData] = useState({
     currentPassword: '',
@@ -41,6 +49,35 @@ export default function SifreDegistirPage() {
     
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  // Şifre validasyonu - şifre değiştiğinde
+  useEffect(() => {
+    if (formData.newPassword) {
+      const errors = {
+        length: formData.newPassword.length >= 8,
+        uppercase: /[A-Z]/.test(formData.newPassword),
+        lowercase: /[a-z]/.test(formData.newPassword),
+        special: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(formData.newPassword)
+      };
+      setPasswordErrors(errors);
+    } else {
+      setPasswordErrors({
+        length: false,
+        uppercase: false,
+        lowercase: false,
+        special: false
+      });
+    }
+  }, [formData.newPassword]);
+
+  // Şifre eşleşme kontrolü
+  useEffect(() => {
+    if (formData.newPassword && formData.confirmPassword) {
+      setPasswordMismatch(formData.newPassword !== formData.confirmPassword);
+    } else {
+      setPasswordMismatch(false);
+    }
+  }, [formData.newPassword, formData.confirmPassword]);
 
   useEffect(() => {
     const loadUserData = () => {
@@ -133,8 +170,42 @@ export default function SifreDegistirPage() {
       return;
     }
 
-    if (formData.newPassword.length < 6) {
-      setMessage('Yeni şifre en az 6 karakter olmalıdır.');
+    // Şifre uzunluk kontrolü
+    if (formData.newPassword.length < 8) {
+      setMessage('Yeni şifre en az 8 karakter olmalıdır.');
+      setMessageType('error');
+      setShowMessage(true);
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (formData.newPassword.length > 50) {
+      setMessage('Yeni şifre en fazla 50 karakter olabilir.');
+      setMessageType('error');
+      setShowMessage(true);
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Şifre karmaşıklık kontrolleri
+    if (!/[A-Z]/.test(formData.newPassword)) {
+      setMessage('Şifre en az bir büyük harf (A-Z) içermelidir.');
+      setMessageType('error');
+      setShowMessage(true);
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (!/[a-z]/.test(formData.newPassword)) {
+      setMessage('Şifre en az bir küçük harf (a-z) içermelidir.');
+      setMessageType('error');
+      setShowMessage(true);
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(formData.newPassword)) {
+      setMessage('Şifre en az bir özel karakter (!@#$%^&* vb.) içermelidir.');
       setMessageType('error');
       setShowMessage(true);
       setIsSubmitting(false);
@@ -222,7 +293,7 @@ export default function SifreDegistirPage() {
     }}>
       {/* Breadcrumb */}
       <div style={{ 
-        maxWidth: '1200px', 
+        maxWidth: '600px', 
         margin: '0 auto',
         padding: isMobile ? '12px 12px 0' : '20px 20px 0',
         marginBottom: isMobile ? '16px' : '20px'
@@ -240,7 +311,7 @@ export default function SifreDegistirPage() {
       </div>
 
       <div style={{ 
-        maxWidth: '1200px', 
+        maxWidth: '600px', 
         margin: '0 auto',
         padding: isMobile ? '0 12px 20px' : '0 20px 20px'
       }}>
@@ -329,32 +400,36 @@ export default function SifreDegistirPage() {
                   value={formData.newPassword}
                   onChange={handleChange}
                   required
-                  minLength={6}
+                  minLength={8}
                   style={{
                     width: '100%',
                     padding: isMobile ? '12px 16px' : '16px 20px',
-                    border: '2px solid #e2e8f0',
+                    border: (formData.newPassword && (passwordErrors.length === false || passwordErrors.uppercase === false || passwordErrors.lowercase === false || passwordErrors.special === false)) ? '2px solid #dc2626' : '2px solid #e2e8f0',
                     borderRadius: '12px',
                     fontSize: isMobile ? '14px' : '16px',
                     transition: 'all 0.2s ease',
                     boxSizing: 'border-box'
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = '#3b82f6';
+                    const hasError = formData.newPassword && (passwordErrors.length === false || passwordErrors.uppercase === false || passwordErrors.lowercase === false || passwordErrors.special === false);
+                    e.target.style.borderColor = hasError ? '#dc2626' : '#3b82f6';
                     e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = '#e2e8f0';
+                    const hasError = formData.newPassword && (passwordErrors.length === false || passwordErrors.uppercase === false || passwordErrors.lowercase === false || passwordErrors.special === false);
+                    e.target.style.borderColor = hasError ? '#dc2626' : '#e2e8f0';
                     e.target.style.boxShadow = 'none';
                   }}
                 />
-                <p style={{
-                  margin: '8px 0 0 0',
-                  fontSize: isMobile ? '12px' : '14px',
-                  color: '#64748b'
-                }}>
-                  En az 6 karakter olmalıdır
-                </p>
+                
+                {/* Şifre validasyon gösterimi */}
+                {formData.newPassword && (
+                  <PasswordValidation 
+                    password={formData.newPassword} 
+                    passwordErrors={passwordErrors} 
+                    isMobile={isMobile} 
+                  />
+                )}
               </div>
 
               <div style={{ marginBottom: '32px' }}>
@@ -373,25 +448,40 @@ export default function SifreDegistirPage() {
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   required
-                  minLength={6}
+                  minLength={8}
                   style={{
                     width: '100%',
                     padding: isMobile ? '12px 16px' : '16px 20px',
-                    border: '2px solid #e2e8f0',
+                    border: passwordMismatch && formData.confirmPassword ? '2px solid #dc2626' : '2px solid #e2e8f0',
                     borderRadius: '12px',
                     fontSize: isMobile ? '14px' : '16px',
                     transition: 'all 0.2s ease',
                     boxSizing: 'border-box'
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = '#3b82f6';
+                    e.target.style.borderColor = passwordMismatch && formData.confirmPassword ? '#dc2626' : '#3b82f6';
                     e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = '#e2e8f0';
+                    e.target.style.borderColor = passwordMismatch && formData.confirmPassword ? '#dc2626' : '#e2e8f0';
                     e.target.style.boxShadow = 'none';
                   }}
                 />
+                
+                {/* Şifre eşleşme hatası */}
+                {passwordMismatch && formData.confirmPassword && (
+                  <p style={{
+                    margin: '8px 0 0 0',
+                    color: '#dc2626',
+                    fontSize: isMobile ? '12px' : '14px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}>
+                    <span>❌</span>
+                    Şifreler eşleşmiyor
+                  </p>
+                )}
               </div>
 
               {/* Mesaj */}
