@@ -15,9 +15,39 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (newPassword.length < 6) {
+    // Şifre uzunluk kontrolü
+    if (newPassword.length < 8) {
       return NextResponse.json(
-        { message: 'Yeni şifre en az 6 karakter olmalıdır.' },
+        { message: 'Yeni şifre en az 8 karakter olmalıdır.' },
+        { status: 400 }
+      );
+    }
+
+    if (newPassword.length > 50) {
+      return NextResponse.json(
+        { message: 'Yeni şifre en fazla 50 karakter olabilir.' },
+        { status: 400 }
+      );
+    }
+
+    // Şifre karmaşıklık kontrolleri
+    if (!/[A-Z]/.test(newPassword)) {
+      return NextResponse.json(
+        { message: 'Şifre en az bir büyük harf (A-Z) içermelidir.' },
+        { status: 400 }
+      );
+    }
+
+    if (!/[a-z]/.test(newPassword)) {
+      return NextResponse.json(
+        { message: 'Şifre en az bir küçük harf (a-z) içermelidir.' },
+        { status: 400 }
+      );
+    }
+
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(newPassword)) {
+      return NextResponse.json(
+        { message: 'Şifre en az bir özel karakter (!@#$%^&* vb.) içermelidir.' },
         { status: 400 }
       );
     }
