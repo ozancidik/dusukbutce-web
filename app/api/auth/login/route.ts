@@ -33,14 +33,58 @@ export async function POST(request: NextRequest) {
     
     // Kullanıcının local auth provider'ı var mı kontrol et
     const hasLocalProvider = user.authProviders?.some((p: any) => p.provider === 'local');
+    
+    // Eğer local provider yoksa ama kullanıcının şifresi varsa, şifreyi kontrol et
+    // Şifre doğruysa local provider'ı otomatik olarak ekle (Google/Facebook ile giriş yapanlar için)
     if (!hasLocalProvider) {
-      return NextResponse.json(
-        { success: false, message: 'Bu email adresi ile şifreli giriş yapılamaz. Google veya Facebook ile giriş yapın.' },
-        { status: 401 }
-      );
+      // Kullanıcının şifresi var mı kontrol et
+      if (!user.password || user.password.trim() === '') {
+        // OAuth ile giriş yapan kullanıcı için şifre oluşturma yönlendirmesi
+        const hasOAuthProvider = user.authProviders?.some((p: any) => p.provider === 'google' || p.provider === 'facebook');
+        return NextResponse.json(
+          { 
+            success: false, 
+            message: hasOAuthProvider 
+              ? 'Bu hesap Google veya Facebook ile oluşturulmuş. Şifre ile giriş yapmak için önce şifre oluşturmanız gerekiyor.' 
+              : 'Bu email adresi ile şifreli giriş yapılamaz. Google veya Facebook ile giriş yapın.',
+            requiresPasswordSetup: hasOAuthProvider
+          },
+          { status: 401 }
+        );
+      }
+      
+      // Şifreyi kontrol et
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (!isPasswordValid) {
+        return NextResponse.json(
+          { success: false, message: 'Email veya şifre hatalı' },
+          { status: 401 }
+        );
+      }
+      
+      // Şifre doğruysa local provider'ı ekle
+      if (!user.authProviders) {
+        user.authProviders = [];
+      }
+      user.authProviders.push({
+        provider: 'local',
+        providerId: 'local',
+        connectedAt: new Date()
+      });
+      await user.save();
+    } else {
+      // Local provider varsa normal şifre kontrolü yap
+      // Şifreyi kontrol et
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (!isPasswordValid) {
+        return NextResponse.json(
+          { success: false, message: 'Email veya şifre hatalı' },
+          { status: 401 }
+        );
+      }
     }
     
-    // Email doğrulama kontrolü
+    // Email doğrulama kontrolü (her iki durum için de)
     if (!user.emailVerified) {
       return NextResponse.json(
         { 
@@ -48,15 +92,6 @@ export async function POST(request: NextRequest) {
           message: 'Email adresinizi doğrulamanız gerekiyor. Email kutunuzu kontrol edin.',
           requiresVerification: true 
         },
-        { status: 401 }
-      );
-    }
-    
-    // Şifreyi kontrol et
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      return NextResponse.json(
-        { success: false, message: 'Email veya şifre hatalı' },
         { status: 401 }
       );
     }

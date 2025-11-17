@@ -57,22 +57,37 @@ export async function POST(request: NextRequest) {
     console.log('✅ Şifre sıfırlama token\'ı oluşturuldu:', email);
 
     // E-posta gönderme işlemi
-    const emailSent = await sendPasswordResetEmail(email, resetToken, user.name);
-    
-    if (!emailSent) {
+    try {
+      const emailSent = await sendPasswordResetEmail(email, resetToken, user.name);
+      
+      if (!emailSent) {
+        console.error('❌ Şifre sıfırlama e-postası gönderilemedi:', email);
+        return NextResponse.json({
+          success: false,
+          error: 'E-posta gönderilemedi. Lütfen daha sonra tekrar deneyin veya destek ekibiyle iletişime geçin.'
+        }, { status: 500 });
+      }
+      
+      console.log('✅ Şifre sıfırlama e-postası başarıyla gönderildi:', email);
+      return NextResponse.json({
+        success: true,
+        message: 'Şifre sıfırlama bağlantısı e-posta adresinize gönderildi. Lütfen gelen kutunuzu kontrol edin.'
+      });
+    } catch (emailError: any) {
+      console.error('❌ E-posta gönderme hatası:', emailError);
       return NextResponse.json({
         success: false,
-        error: 'E-posta gönderilemedi. Lütfen tekrar deneyin.'
+        error: 'E-posta gönderilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.'
       }, { status: 500 });
     }
-    
-    return NextResponse.json({
-      success: true,
-      message: 'Şifre sıfırlama bağlantısı e-posta adresinize gönderildi. Lütfen gelen kutunuzu kontrol edin.'
-    });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Şifre sıfırlama hatası:', error);
+    console.error('❌ Hata detayları:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
     
     return NextResponse.json(
       { 

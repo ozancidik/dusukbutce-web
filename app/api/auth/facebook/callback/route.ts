@@ -7,9 +7,8 @@ import jwt from 'jsonwebtoken';
 export async function GET(request: NextRequest) {
   // Environment'a göre redirect URI belirle
   const isLocalhost = request.headers.get('host')?.includes('localhost');
-  const redirectUri = isLocalhost 
-    ? 'http://localhost:3000/api/auth/facebook/callback'
-    : 'https://dusukbutce.com/api/auth/facebook/callback';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || (isLocalhost ? 'http://localhost:3000' : 'https://www.dusukbutce.com');
+  const redirectUri = `${baseUrl}/api/auth/facebook/callback`;
 
   // Facebook OAuth yapılandırmasını kontrol et
   const facebookAppId = process.env.FACEBOOK_APP_ID;
