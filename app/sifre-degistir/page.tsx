@@ -29,6 +29,9 @@ export default function SifreDegistirPage() {
     lowercase: false,
     special: false
   });
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
   const [formData, setFormData] = useState({
     currentPassword: '',
@@ -221,12 +224,21 @@ export default function SifreDegistirPage() {
     }
 
     try {
+      if (!userInfo || !userInfo.id) {
+        setMessage('Kullanıcı bilgisi bulunamadı. Lütfen tekrar giriş yapın.');
+        setMessageType('error');
+        setShowMessage(true);
+        setIsSubmitting(false);
+        return;
+      }
+
       const response = await fetch('/api/auth/change-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          userId: userInfo.id,
           currentPassword: formData.currentPassword,
           newPassword: formData.newPassword
         }),
@@ -358,30 +370,71 @@ export default function SifreDegistirPage() {
                 }}>
                   Mevcut Şifre
                 </label>
-                <input
-                  type="password"
-                  name="currentPassword"
-                  value={formData.currentPassword}
-                  onChange={handleChange}
-                  required
-                  style={{
-                    width: '100%',
-                    padding: isMobile ? '12px 16px' : '16px 20px',
-                    border: '2px solid #e2e8f0',
-                    borderRadius: '12px',
-                    fontSize: isMobile ? '14px' : '16px',
-                    transition: 'all 0.2s ease',
-                    boxSizing: 'border-box'
-                  }}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = '#3b82f6';
-                    e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = '#e2e8f0';
-                    e.target.style.boxShadow = 'none';
-                  }}
-                />
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type={showCurrentPassword ? "text" : "password"}
+                    name="currentPassword"
+                    value={formData.currentPassword}
+                    onChange={handleChange}
+                    required
+                    style={{
+                      width: '100%',
+                      padding: isMobile ? '12px 48px 12px 16px' : '16px 48px 16px 20px',
+                      border: '2px solid #e2e8f0',
+                      borderRadius: '12px',
+                      fontSize: isMobile ? '14px' : '16px',
+                      transition: 'all 0.2s ease',
+                      boxSizing: 'border-box'
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = '#3b82f6';
+                      e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = '#e2e8f0';
+                      e.target.style.boxShadow = 'none';
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                    style={{
+                      position: 'absolute',
+                      right: '12px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: '4px',
+                      borderRadius: '4px',
+                      transition: 'background-color 0.2s',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#6b7280',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#f3f4f6';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }}
+                    title={showCurrentPassword ? "Şifreyi gizle" : "Şifreyi göster"}
+                  >
+                    {showCurrentPassword ? (
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                        <line x1="1" y1="1" x2="23" y2="23"/>
+                      </svg>
+                    ) : (
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                      </svg>
+                    )}
+                  </button>
+                </div>
               </div>
 
               <div style={{ marginBottom: '24px' }}>
@@ -394,33 +447,74 @@ export default function SifreDegistirPage() {
                 }}>
                   Yeni Şifre
                 </label>
-                <input
-                  type="password"
-                  name="newPassword"
-                  value={formData.newPassword}
-                  onChange={handleChange}
-                  required
-                  minLength={8}
-                  style={{
-                    width: '100%',
-                    padding: isMobile ? '12px 16px' : '16px 20px',
-                    border: (formData.newPassword && (passwordErrors.length === false || passwordErrors.uppercase === false || passwordErrors.lowercase === false || passwordErrors.special === false)) ? '2px solid #dc2626' : '2px solid #e2e8f0',
-                    borderRadius: '12px',
-                    fontSize: isMobile ? '14px' : '16px',
-                    transition: 'all 0.2s ease',
-                    boxSizing: 'border-box'
-                  }}
-                  onFocus={(e) => {
-                    const hasError = formData.newPassword && (passwordErrors.length === false || passwordErrors.uppercase === false || passwordErrors.lowercase === false || passwordErrors.special === false);
-                    e.target.style.borderColor = hasError ? '#dc2626' : '#3b82f6';
-                    e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
-                  }}
-                  onBlur={(e) => {
-                    const hasError = formData.newPassword && (passwordErrors.length === false || passwordErrors.uppercase === false || passwordErrors.lowercase === false || passwordErrors.special === false);
-                    e.target.style.borderColor = hasError ? '#dc2626' : '#e2e8f0';
-                    e.target.style.boxShadow = 'none';
-                  }}
-                />
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type={showNewPassword ? "text" : "password"}
+                    name="newPassword"
+                    value={formData.newPassword}
+                    onChange={handleChange}
+                    required
+                    minLength={8}
+                    style={{
+                      width: '100%',
+                      padding: isMobile ? '12px 48px 12px 16px' : '16px 48px 16px 20px',
+                      border: (formData.newPassword && (passwordErrors.length === false || passwordErrors.uppercase === false || passwordErrors.lowercase === false || passwordErrors.special === false)) ? '2px solid #dc2626' : '2px solid #e2e8f0',
+                      borderRadius: '12px',
+                      fontSize: isMobile ? '14px' : '16px',
+                      transition: 'all 0.2s ease',
+                      boxSizing: 'border-box'
+                    }}
+                    onFocus={(e) => {
+                      const hasError = formData.newPassword && (passwordErrors.length === false || passwordErrors.uppercase === false || passwordErrors.lowercase === false || passwordErrors.special === false);
+                      e.target.style.borderColor = hasError ? '#dc2626' : '#3b82f6';
+                      e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+                    }}
+                    onBlur={(e) => {
+                      const hasError = formData.newPassword && (passwordErrors.length === false || passwordErrors.uppercase === false || passwordErrors.lowercase === false || passwordErrors.special === false);
+                      e.target.style.borderColor = hasError ? '#dc2626' : '#e2e8f0';
+                      e.target.style.boxShadow = 'none';
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewPassword(!showNewPassword)}
+                    style={{
+                      position: 'absolute',
+                      right: '12px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: '4px',
+                      borderRadius: '4px',
+                      transition: 'background-color 0.2s',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#6b7280',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#f3f4f6';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }}
+                    title={showNewPassword ? "Şifreyi gizle" : "Şifreyi göster"}
+                  >
+                    {showNewPassword ? (
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                        <line x1="1" y1="1" x2="23" y2="23"/>
+                      </svg>
+                    ) : (
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                      </svg>
+                    )}
+                  </button>
+                </div>
                 
                 {/* Şifre validasyon gösterimi */}
                 {formData.newPassword && (
@@ -442,31 +536,72 @@ export default function SifreDegistirPage() {
                 }}>
                   Yeni Şifre Tekrar
                 </label>
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  required
-                  minLength={8}
-                  style={{
-                    width: '100%',
-                    padding: isMobile ? '12px 16px' : '16px 20px',
-                    border: passwordMismatch && formData.confirmPassword ? '2px solid #dc2626' : '2px solid #e2e8f0',
-                    borderRadius: '12px',
-                    fontSize: isMobile ? '14px' : '16px',
-                    transition: 'all 0.2s ease',
-                    boxSizing: 'border-box'
-                  }}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = passwordMismatch && formData.confirmPassword ? '#dc2626' : '#3b82f6';
-                    e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = passwordMismatch && formData.confirmPassword ? '#dc2626' : '#e2e8f0';
-                    e.target.style.boxShadow = 'none';
-                  }}
-                />
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    required
+                    minLength={8}
+                    style={{
+                      width: '100%',
+                      padding: isMobile ? '12px 48px 12px 16px' : '16px 48px 16px 20px',
+                      border: passwordMismatch && formData.confirmPassword ? '2px solid #dc2626' : '2px solid #e2e8f0',
+                      borderRadius: '12px',
+                      fontSize: isMobile ? '14px' : '16px',
+                      transition: 'all 0.2s ease',
+                      boxSizing: 'border-box'
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = passwordMismatch && formData.confirmPassword ? '#dc2626' : '#3b82f6';
+                      e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = passwordMismatch && formData.confirmPassword ? '#dc2626' : '#e2e8f0';
+                      e.target.style.boxShadow = 'none';
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    style={{
+                      position: 'absolute',
+                      right: '12px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: '4px',
+                      borderRadius: '4px',
+                      transition: 'background-color 0.2s',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#6b7280',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#f3f4f6';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }}
+                    title={showConfirmPassword ? "Şifreyi gizle" : "Şifreyi göster"}
+                  >
+                    {showConfirmPassword ? (
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                        <line x1="1" y1="1" x2="23" y2="23"/>
+                      </svg>
+                    ) : (
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                      </svg>
+                    )}
+                  </button>
+                </div>
                 
                 {/* Şifre eşleşme hatası */}
                 {passwordMismatch && formData.confirmPassword && (

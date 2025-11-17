@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -20,6 +20,7 @@ export default function LoginPage() {
   const [isEmailSent, setIsEmailSent] = useState(false);
   const [csrfToken, setCsrfToken] = useState<string | null>(null);
   const [requiresPasswordSetup, setRequiresPasswordSetup] = useState(false);
+  const redirectExecutedRef = useRef(false);
   const router = useRouter();
 
   // CSRF token al
@@ -40,7 +41,25 @@ export default function LoginPage() {
 
   // Kullanıcı ve admin giriş kontrolü
   React.useEffect(() => {
+    // Bu useEffect sadece login sayfasında çalışmalı
+    // Eğer login sayfasında değilse, hemen çık ve event listener'ları ekleme
+    const isLoginPage = typeof window !== 'undefined' && window.location.pathname === '/login';
+    
+    if (!isLoginPage) {
+      console.log("👤 [LOGIN PAGE] useEffect çalıştı ama login sayfasında değil, işlem yapılmıyor. Mevcut sayfa:", typeof window !== 'undefined' ? window.location.pathname : 'N/A');
+      return () => {
+        // Cleanup - hiçbir şey yapma çünkü event listener eklemedik
+      };
+    }
+    
+    console.log("👤 [LOGIN PAGE] useEffect çalıştı, login sayfasında, event listener'lar ekleniyor...");
+
     const checkUserStatus = () => {
+      // Login sayfasında değilse hiçbir şey yapma
+      if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
+        console.log("👤 [LOGIN PAGE] checkUserStatus çağrıldı ama login sayfasında değil, işlem yapılmıyor. Mevcut sayfa:", window.location.pathname);
+        return;
+      }
       const adminLoggedIn = localStorage.getItem("adminLoggedIn") || sessionStorage.getItem("adminLoggedIn");
       const adminEmail = localStorage.getItem("adminEmail") || sessionStorage.getItem("adminEmail");
       const adminToken = localStorage.getItem("adminToken") || sessionStorage.getItem("adminToken");
@@ -101,17 +120,36 @@ export default function LoginPage() {
         }
       }
       
-      // Normal kullanıcı giriş yapmışsa returnUrl kontrolü yap
-      if (userLoggedIn === "true" && userEmail) {
+      // Normal kullanıcı giriş yapmışsa returnUrl kontrolü yap (sadece login sayfasındaysa)
+      // window.location.pathname kontrolü ekleyerek, sadece login sayfasındayken yönlendirme yap
+      const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
+      if (userLoggedIn === "true" && userEmail && currentPath === '/login') {
         // returnUrl parametresi varsa oraya yönlendir
         const returnUrl = new URLSearchParams(window.location.search).get('returnUrl');
+        
+        // Yönlendirme flag'ini set et (tekrar yönlendirme yapılmasını önlemek için)
+        redirectExecutedRef.current = true;
+        
+        // Event listener'ları hemen kaldır (yönlendirmeden önce)
+        window.removeEventListener('storage', handleStorageChange);
+        window.removeEventListener('localStorageChange', handleStorageChange);
+        
         if (returnUrl) {
-          console.log("👤 Kullanıcı giriş yapmış, returnUrl'e yönlendiriliyor:", returnUrl);
+          console.log("👤 [LOGIN PAGE] Kullanıcı giriş yapmış, returnUrl'e yönlendiriliyor:", returnUrl);
+          // Yönlendirmeyi hemen yap (setTimeout gereksiz)
           router.push(decodeURIComponent(returnUrl));
         } else {
-          console.log("👤 Kullanıcı giriş yapmış, anasayfaya yönlendiriliyor...");
+          console.log("👤 [LOGIN PAGE] Kullanıcı giriş yapmış, anasayfaya yönlendiriliyor...");
+          // Yönlendirmeyi hemen yap (setTimeout gereksiz)
           router.push("/");
         }
+        return;
+      } else if (userLoggedIn === "true" && userEmail && currentPath !== '/login') {
+        // Login sayfasında değilse hiçbir şey yapma
+        console.log("👤 [LOGIN PAGE] Kullanıcı giriş yapmış ama login sayfasında değil, yönlendirme yapılmıyor. Mevcut sayfa:", currentPath);
+        // Event listener'ları kaldır (login sayfasında değilsek)
+        window.removeEventListener('storage', handleStorageChange);
+        window.removeEventListener('localStorageChange', handleStorageChange);
         return;
       }
       
@@ -122,8 +160,23 @@ export default function LoginPage() {
     // İlk kontrol
     checkUserStatus();
 
-    // localStorage değişikliklerini dinle
+    // localStorage değişikliklerini dinle (sadece login sayfasındayken)
     const handleStorageChange = () => {
+      // Eğer daha önce yönlendirme yapıldıysa, tekrar yapma
+      if (redirectExecutedRef.current) {
+        console.log("👤 [LOGIN PAGE] Yönlendirme zaten yapıldı, tekrar yönlendirme yapılmıyor.");
+        return;
+      }
+      
+      // Sadece login sayfasındayken yönlendirme yap
+      const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
+      if (currentPath !== '/login') {
+        console.log("👤 [LOGIN PAGE] localStorageChange event'i alındı ama login sayfasında değil, yönlendirme yapılmıyor. Mevcut sayfa:", currentPath);
+        return;
+      }
+      
+      console.log("👤 [LOGIN PAGE] localStorageChange event'i alındı, login sayfasında, kontrol ediliyor...");
+      
       const adminLoggedIn = localStorage.getItem("adminLoggedIn") || sessionStorage.getItem("adminLoggedIn");
       const adminEmail = localStorage.getItem("adminEmail") || sessionStorage.getItem("adminEmail");
       const userLoggedIn = localStorage.getItem("userLoggedIn") || sessionStorage.getItem("userLoggedIn");
@@ -135,11 +188,16 @@ export default function LoginPage() {
       }
     };
 
-    // Custom event'leri dinle
-    window.addEventListener('storage', handleStorageChange);
-    window.addEventListener('localStorageChange', handleStorageChange);
+    // Custom event'leri dinle - sadece login sayfasındayken
+    // Her pathname değişikliğinde kontrol et
+    const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
+    if (currentPath === '/login') {
+      window.addEventListener('storage', handleStorageChange);
+      window.addEventListener('localStorageChange', handleStorageChange);
+    }
 
     return () => {
+      // Cleanup - event listener'ları kaldır
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('localStorageChange', handleStorageChange);
     };
@@ -280,14 +338,16 @@ export default function LoginPage() {
           localStorage.removeItem("rememberedEmail");
         }
         
-        // Custom event'i tetikle
-        window.dispatchEvent(new Event('localStorageChange'));
-        
         // Rate limiting'i sıfırla
         localStorage.setItem("loginAttempts", "0");
         localStorage.removeItem("lastLoginAttempt");
         localStorage.removeItem("isRealPasswordAttempt");
         setLoginAttempts(0);
+        
+        // Yönlendirme flag'ini set et (useEffect içindeki yönlendirmeyi önlemek için)
+        // Bu flag'i yönlendirmeden ÖNCE set ediyoruz, böylece localStorageChange event'i
+        // tetiklendiğinde useEffect içindeki handleStorageChange tekrar yönlendirme yapmayacak
+        redirectExecutedRef.current = true;
         
         if (data.user.isAdmin) {
           localStorage.setItem("adminLoggedIn", "true");
@@ -305,7 +365,10 @@ export default function LoginPage() {
           setIsLoading(false);
           
           setTimeout(() => {
-            router.push("/admin");
+            // Yönlendirme yapmadan önce hala login sayfasında mıyız kontrol et
+            if (typeof window !== 'undefined' && window.location.pathname === '/login') {
+              router.push("/admin");
+            }
           }, 1500); // 2 saniyeden 1.5 saniyeye düşürdük
         } else {
           // Normal kullanıcı yönlendirmesi - returnUrl varsa oraya, yoksa profile sayfasına git
@@ -316,17 +379,27 @@ export default function LoginPage() {
             setRedirectMessage("Giriş başarılı! Yönlendiriliyorsunuz...");
             
             setTimeout(() => {
-              router.push(decodeURIComponent(returnUrl));
+              // Yönlendirme yapmadan önce hala login sayfasında mıyız kontrol et
+              if (typeof window !== 'undefined' && window.location.pathname === '/login') {
+                router.push(decodeURIComponent(returnUrl));
+              }
             }, 2000);
           } else {
             setLoginSuccess(true);
             setRedirectMessage("Giriş başarılı! Anasayfaya yönlendiriliyor...");
             
             setTimeout(() => {
-              router.push("/");
+              // Yönlendirme yapmadan önce hala login sayfasında mıyız kontrol et
+              if (typeof window !== 'undefined' && window.location.pathname === '/login') {
+                router.push("/");
+              }
             }, 2000);
           }
         }
+        
+        // Custom event'i tetikle (yönlendirme flag'ini set ettikten SONRA)
+        // Böylece useEffect içindeki handleStorageChange, redirectExecutedRef.current = true olduğunu görecek
+        window.dispatchEvent(new Event('localStorageChange'));
       } else {
         // Email doğrulama hatası ise rate limiting'i artırma ve sayacı sıfırla
         if (data.requiresVerification) {

@@ -1,0 +1,53 @@
+
+> nextjs@0.1.0 dev
+> next dev
+
+   ▲ Next.js 15.5.4
+   - Local:        http://localhost:3000
+   - Network:      http://10.20.151.60:3000
+   - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 1335ms
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ✓ Compiled /middleware in 411ms (159 modules)
+ ○ Compiling /admin ...
+ ✓ Compiled /admin in 3.1s (749 modules)
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ GET /admin 200 in 3574ms
+ GET /admin 200 in 54ms
+ ○ Compiling /icon ...
+ ✓ Compiled /icon in 661ms (744 modules)
+ GET / 200 in 822ms
+ GET /icon?bc22b6474563febc 200 in 843ms
+ GET / 200 in 38ms
+ ✓ Compiled /login in 258ms (751 modules)
+ GET /login?returnUrl=%2F 200 in 366ms
+ GET /admin 200 in 253ms
+ GET / 200 in 105ms
+ GET /admin 200 in 110ms
+ GET / 200 in 46ms
+ ✓ Compiled in 522ms (765 modules)
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/ozancidik/Desktop/dusukbutce-web/.next/server/app/page.js'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/ozancidik/Desktop/dusukbutce-web/.next/server/app/page.js',
+  page: '/'
+}
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/ozancidik/Desktop/dusukbutce-web/.next/server/app/page.js'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/ozancidik/Desktop/dusukbutce-web/.next/server/app/page.js',
+  page: '/'
+}
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 1528ms (1091 modules)
+ GET / 500 in 2009ms
+ GET / 500 in 1862ms
+ ✓ Compiled /favicon.ico in 154ms (684 modules)
+ GET /favicon.ico 200 in 230ms
+ ✓ Compiled in 822ms (1102 modules)
+[?25h

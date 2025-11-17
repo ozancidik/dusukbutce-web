@@ -1,0 +1,103 @@
+
+> nextjs@0.1.0 dev
+> next dev
+
+   ▲ Next.js 15.5.4
+   - Local:        http://localhost:3000
+   - Network:      http://10.20.151.60:3000
+   - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 1456ms
+ ✓ Compiled /middleware in 489ms (159 modules)
+ ○ Compiling / ...
+ ✓ Compiled / in 3.2s (737 modules)
+ GET / 200 in 2116ms
+ GET / 200 in 530ms
+ GET / 200 in 3475ms
+ GET / 200 in 559ms
+ GET / 200 in 562ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/ozancidik/Desktop/dusukbutce-web/.next/cache/webpack/edge-server-development/0.pack.gz_' -> '/Users/ozancidik/Desktop/dusukbutce-web/.next/cache/webpack/edge-server-development/0.pack.gz'
+ GET / 200 in 191ms
+ ✓ Compiled /login in 282ms (725 modules)
+ GET /login?returnUrl=%2F 200 in 374ms
+ GET /login?returnUrl=%2F 200 in 31ms
+ ✓ Compiled /admin in 230ms (730 modules)
+ GET /admin 200 in 304ms
+ GET /admin 200 in 28ms
+ ✓ Compiled /api/admin/submissions in 325ms (833 modules)
+🔍 GET /api/admin/submissions called
+🔗 Connecting to MongoDB...
+Establishing new MongoDB connection...
+MongoDB connected successfully
+✅ MongoDB connected successfully
+📊 Fetching submissions with limit: 10
+✅ Found submissions: 0
+ GET /api/admin/submissions?limit=10 200 in 5299ms
+🔍 GET /api/admin/submissions called
+🔗 Connecting to MongoDB...
+MongoDB already connected
+✅ MongoDB connected successfully
+📊 Fetching submissions with limit: 10
+✅ Found submissions: 0
+ GET /api/admin/submissions?limit=10 200 in 174ms
+ ✓ Compiled in 511ms (735 modules)
+ GET /admin 200 in 243ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/ozancidik/Desktop/dusukbutce-web/.next/cache/webpack/server-development/0.pack.gz_' -> '/Users/ozancidik/Desktop/dusukbutce-web/.next/cache/webpack/server-development/0.pack.gz'
+ ✓ Compiled in 244ms (272 modules)
+ GET /admin 200 in 66ms
+ ✓ Compiled in 572ms (735 modules)
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/ozancidik/Desktop/dusukbutce-web/.next/server/app/admin/page.js'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/ozancidik/Desktop/dusukbutce-web/.next/server/app/admin/page.js',
+  page: '/admin'
+}
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 1132ms (1075 modules)
+ GET /admin 500 in 1565ms
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/ozancidik/Desktop/dusukbutce-web/.next/server/app/admin/page.js'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/ozancidik/Desktop/dusukbutce-web/.next/server/app/admin/page.js',
+  page: '/admin'
+}
+ GET /admin 500 in 473ms
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/ozancidik/Desktop/dusukbutce-web/.next/server/app/admin/page.js'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/ozancidik/Desktop/dusukbutce-web/.next/server/app/admin/page.js',
+  page: '/admin'
+}
+ GET /admin 500 in 448ms
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/ozancidik/Desktop/dusukbutce-web/.next/server/app/admin/page.js'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/ozancidik/Desktop/dusukbutce-web/.next/server/app/admin/page.js',
+  page: '/admin'
+}
+ GET /admin 500 in 447ms
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/ozancidik/Desktop/dusukbutce-web/.next/server/app/admin/page.js'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/ozancidik/Desktop/dusukbutce-web/.next/server/app/admin/page.js',
+  page: '/admin'
+}
+ GET /admin 500 in 449ms
+ ✓ Compiled /favicon.ico in 167ms (669 modules)
+ GET /favicon.ico 200 in 313ms
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/ozancidik/Desktop/dusukbutce-web/.next/server/app/admin/page.js'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/ozancidik/Desktop/dusukbutce-web/.next/server/app/admin/page.js',
+  page: '/admin'
+}
+ GET /admin 500 in 547ms
+ GET /favicon.ico 200 in 34ms
+[?25h
