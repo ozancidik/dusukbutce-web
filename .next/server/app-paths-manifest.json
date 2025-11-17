@@ -1,14 +1,9 @@
 {
-  "/favicon.ico/route": "app/favicon.ico/route.js",
-  "/products": "app/products.js",
+  "/api/auth/csrf-token/route": "app/api/auth/csrf-token/route.js",
   "/api/auth/login/route": "app/api/auth/login/route.js",
-  "/api/addresses/route": "app/api/addresses/route.js",
-  "/profile/page": "app/profile/page.js",
   "/page": "app/page.js",
-  "/adreslerim/page": "app/adreslerim/page.js",
-  "/sifre-degistir/page": "app/sifre-degistir/page.js",
-  "/iptal-iade-islemlerim/page": "app/iptal-iade-islemlerim/page.js",
-  "/bize-sat/page": "app/bize-sat/page.js",
   "/login/page": "app/login/page.js",
-  "/_not-found/page": "app/_not-found/page.js"
+  "/profile/page": "app/profile/page.js",
+  "/sifre-degistir/page": "app/sifre-degistir/page.js",
+  "/bize-sat/notebook/page": "app/bize-sat/notebook/page.js"
 }

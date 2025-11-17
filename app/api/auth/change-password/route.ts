@@ -5,9 +5,16 @@ import bcrypt from 'bcryptjs';
 
 export async function POST(request: NextRequest) {
   try {
-    const { currentPassword, newPassword } = await request.json();
+    const { userId, currentPassword, newPassword } = await request.json();
 
     // Validation
+    if (!userId) {
+      return NextResponse.json(
+        { message: 'Kullanıcı kimliği gerekli.' },
+        { status: 400 }
+      );
+    }
+
     if (!currentPassword || !newPassword) {
       return NextResponse.json(
         { message: 'Mevcut şifre ve yeni şifre gereklidir.' },
@@ -56,16 +63,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { message: 'Yeni şifre mevcut şifre ile aynı olamaz.' },
         { status: 400 }
-      );
-    }
-
-    // Get user ID from request headers or body
-    const userId = request.headers.get('x-user-id');
-    
-    if (!userId) {
-      return NextResponse.json(
-        { message: 'Kullanıcı kimliği bulunamadı.' },
-        { status: 401 }
       );
     }
 
