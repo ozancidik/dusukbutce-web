@@ -35,7 +35,7 @@ const productSubmissionSchema = new mongoose.Schema({
   images: [{ type: String }], // Base64 encoded images
   quantity: { type: Number, default: 1 },
   createdAt: { type: Date, default: Date.now },
-  status: { type: String, enum: ['pending', 'offered', 'listed', 'rejected', 'approved', 'accepted', 'customer_rejected', 'delivery_confirmed'], default: 'pending' },
+  status: { type: String, enum: ['pending', 'offered', 'listed', 'rejected', 'approved', 'accepted', 'customer_accepted', 'customer_rejected', 'delivery_confirmed'], default: 'pending' },
   adminNotes: { type: String },
   offer: {
     amount: { type: Number },

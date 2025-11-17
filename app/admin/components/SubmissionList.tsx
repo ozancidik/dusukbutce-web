@@ -1,57 +1,36 @@
 "use client";
 import React from 'react';
+import { Submission } from '../types';
+import SubmissionCard from './SubmissionCard';
+import LoadingSpinner from './LoadingSpinner';
 
 interface SubmissionListProps {
-  submissions: any[];
+  submissions: Submission[];
   isMobile: boolean;
   loading: boolean;
   error: string | null;
-  selectedSubmission: any;
-  setSelectedSubmission: (submission: any) => void;
-  showModal: boolean;
-  setShowModal: (show: boolean) => void;
-  modalType: string | null;
-  setModalType: (type: any) => void;
-  showDeleteModal: boolean;
-  setShowDeleteModal: (show: boolean) => void;
-  deleteModalType: string | null;
-  setDeleteModalType: (type: any) => void;
-  deleteTargetId: string | null;
-  setDeleteTargetId: (id: string | null) => void;
-  isDeleting: boolean;
+  onAction: (submission: Submission, action: 'offer' | 'listing' | 'reject' | 'delivery_completed') => void;
+  onDelete: (submissionId: string) => void;
+  onDetail: (submission: Submission) => void;
+  onDeliveryInfo: (submission: Submission) => void;
+  onReoffer: (submission: Submission) => void;
+  formatDate: (dateString: string) => string;
 }
 
 export default function SubmissionList({
   submissions,
   isMobile,
   loading,
-  error
+  error,
+  onAction,
+  onDelete,
+  onDetail,
+  onDeliveryInfo,
+  onReoffer,
+  formatDate
 }: SubmissionListProps) {
   if (loading) {
-    return (
-      <div style={{
-        background: 'white',
-        borderRadius: '16px',
-        padding: isMobile ? '32px 20px' : '48px 40px',
-        textAlign: 'center',
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
-        border: '1px solid #e5e7eb'
-      }}>
-        <div style={{
-          fontSize: isMobile ? '48px' : '64px',
-          marginBottom: '16px'
-        }}>
-          ⏳
-        </div>
-        <p style={{
-          fontSize: isMobile ? '14px' : '16px',
-          color: '#6b7280',
-          margin: 0
-        }}>
-          Yükleniyor...
-        </p>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   if (error) {
@@ -162,39 +141,17 @@ export default function SubmissionList({
       marginBottom: '32px'
     }}>
       {submissions.map((submission) => (
-        <div key={submission._id} style={{
-          background: 'white',
-          borderRadius: '12px',
-          padding: isMobile ? '16px' : '20px',
-          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-          border: '1px solid #e5e7eb'
-        }}>
-          <h3 style={{
-            margin: '0 0 8px 0',
-            fontSize: isMobile ? '16px' : '18px',
-            fontWeight: '600',
-            color: '#1f2937'
-          }}>
-            {submission.brand} {submission.model}
-          </h3>
-          <p style={{
-            margin: '0 0 8px 0',
-            fontSize: '14px',
-            color: '#6b7280'
-          }}>
-            Kategori: {submission.category}
-          </p>
-          {submission.status && (
-            <p style={{
-              margin: 0,
-              fontSize: '14px',
-              color: '#3b82f6',
-              fontWeight: '500'
-            }}>
-              Durum: {submission.status}
-            </p>
-          )}
-        </div>
+        <SubmissionCard
+          key={submission._id}
+          submission={submission}
+          isMobile={isMobile}
+          onAction={onAction}
+          onDelete={onDelete}
+          onDetail={onDetail}
+          onDeliveryInfo={onDeliveryInfo}
+          onReoffer={onReoffer}
+          formatDate={formatDate}
+        />
       ))}
     </div>
   );
