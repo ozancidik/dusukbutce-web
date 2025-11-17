@@ -255,6 +255,12 @@ export default function AdminPage() {
     }, 100);
   };
 
+  const handleReoffer = (submission: Submission) => {
+    setSelectedSubmission(submission);
+    setModalType('offer');
+    setShowModal(true);
+  };
+
   const confirmDelete = async () => {
     if (deleteModalType === 'all') {
       setIsDeletingAll(true);
@@ -860,19 +866,12 @@ export default function AdminPage() {
           isMobile={isMobile}
           loading={loading}
           error={error}
-          selectedSubmission={selectedSubmission}
-          setSelectedSubmission={setSelectedSubmission}
-          showModal={showModal}
-          setShowModal={setShowModal}
-          modalType={modalType}
-          setModalType={setModalType}
-          showDeleteModal={showDeleteModal}
-          setShowDeleteModal={setShowDeleteModal}
-          deleteModalType={deleteModalType}
-          setDeleteModalType={setDeleteModalType}
-          deleteTargetId={deleteTargetId}
-          setDeleteTargetId={setDeleteTargetId}
-          isDeleting={isDeletingAll}
+          onAction={handleAction}
+          onDelete={handleDeleteSubmission}
+          onDetail={handleDetailSubmission}
+          onDeliveryInfo={handleDeliveryInfo}
+          onReoffer={handleReoffer}
+          formatDate={formatDate}
         />
               </div>
 

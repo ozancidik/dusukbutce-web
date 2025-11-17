@@ -123,7 +123,9 @@ export default function TekliflerimPage() {
       console.log('🔍 Submissions count:', data.submissions?.length || 0);
       
       if (response.ok) {
-        setSubmissions(data.submissions || []);
+        const submissions = data.submissions || [];
+        console.log('🔍 Submissions with statuses:', submissions.map((s: Submission) => ({ id: s._id, status: s.status })));
+        setSubmissions(submissions);
       } else {
         console.error('Veri çekme hatası:', data.error);
       }
@@ -153,7 +155,17 @@ export default function TekliflerimPage() {
   };
 
   const getStatusInfo = (status: string) => {
-    switch (status) {
+    // Status'u temizle (null, undefined, boş string kontrolü)
+    if (!status || typeof status !== 'string') {
+      console.warn('⚠️ Invalid status:', status, typeof status);
+      return { color: '#6b7280', text: 'Bilinmeyen', icon: '❓' };
+    }
+    
+    // Status'u trim et ve küçük harfe çevir
+    const cleanStatus = status.trim().toLowerCase();
+    console.log('🔍 getStatusInfo called with status:', status, '-> cleaned:', cleanStatus);
+    
+    switch (cleanStatus) {
       case 'pending':
         return { color: '#f59e0b', text: 'Beklemede', icon: '⏳' };
       case 'offered':
@@ -170,7 +182,10 @@ export default function TekliflerimPage() {
         return { color: '#059669', text: 'Sizin Tarafınızdan Kabul Edildi', icon: '✅' };
       case 'customer_rejected':
         return { color: '#dc2626', text: 'Sizin Tarafınızdan Reddedildi', icon: '❌' };
+      case 'delivery_confirmed':
+        return { color: '#7c3aed', text: 'Teslimat Onaylandı', icon: '🚚' };
       default:
+        console.warn('⚠️ Unknown status:', cleanStatus, 'original:', status);
         return { color: '#6b7280', text: 'Bilinmeyen', icon: '❓' };
     }
   };
@@ -203,30 +218,43 @@ export default function TekliflerimPage() {
       });
 
       const result = await response.json();
+      console.log('📦 API Response:', result);
+      console.log('📋 Submission status from API:', result.submission?.status);
 
       if (result.success) {
-        // Update local state immediately
-        setSubmissions(prev => 
-          prev.map(sub => 
+        // Update local state with API response
+        const newStatus = result.submission?.status || (actionType === 'accept' ? 'customer_accepted' : 'customer_rejected');
+        console.log('✅ Setting status to:', newStatus);
+        
+        setSubmissions(prev => {
+          const updated = prev.map(sub => 
             sub._id === selectedSubmission._id 
               ? { 
                   ...sub, 
-                  customerResponse: {
+                  ...(result.submission || {}),
+                  customerResponse: result.submission?.customerResponse || {
                     action: actionType === 'accept' ? 'accepted' : 'rejected',
                     note: actionNote,
                     reason: actionType === 'reject' ? actionNote : undefined,
                     date: new Date().toISOString(),
                   },
-                  status: actionType === 'accept' ? 'accepted' : 'customer_rejected'
+                  status: newStatus
                 }
               : sub
-          )
-        );
+          );
+          console.log('🔄 Updated submissions:', updated.find(s => s._id === selectedSubmission._id)?.status);
+          return updated;
+        });
         
         setShowActionModal(false);
         setSelectedSubmission(null);
         setActionType(null);
         setActionNote('');
+        
+        // Submission listesini yeniden yükle (status'un doğru geldiğinden emin olmak için)
+        setTimeout(() => {
+          fetchSubmissions();
+        }, 500);
         
         // Show success message and redirect
         if (actionType === 'accept') {

@@ -562,7 +562,7 @@ export async function sendOfferEmail(customerEmail: string, customerName: string
           
           <div style="background: #fef3c7; padding: 15px; border-radius: 8px; border-left: 4px solid #f59e0b;">
             <p style="color: #92400e; margin: 0; font-size: 14px;">
-              <strong>⚠️ Önemli:</strong> Bu teklif 3 gün süreyle geçerlidir. Teklifimizi kabul etmek için yukarıdaki butona tıklayarak tekliflerinizi görüntüleyebilirsiniz.
+              <strong>⚠️ Önemli:</strong> Bu teklif 24 saat süreyle geçerlidir. Teklifimizi kabul etmek için yukarıdaki butona tıklayarak tekliflerinizi görüntüleyebilirsiniz.
             </p>
           </div>
           

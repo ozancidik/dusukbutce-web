@@ -1,9 +1,9 @@
 {
-  "/api/auth/csrf-token/route": "app/api/auth/csrf-token/route.js",
-  "/api/auth/login/route": "app/api/auth/login/route.js",
+  "/icon/route": "app/icon/route.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/tekliflerim/page": "app/tekliflerim/page.js",
   "/page": "app/page.js",
-  "/login/page": "app/login/page.js",
-  "/profile/page": "app/profile/page.js",
-  "/sifre-degistir/page": "app/sifre-degistir/page.js",
-  "/bize-sat/notebook/page": "app/bize-sat/notebook/page.js"
+  "/teklif-teslimat/page": "app/teklif-teslimat/page.js",
+  "/admin/page": "app/admin/page.js",
+  "/bize-sat/islemci/page": "app/bize-sat/islemci/page.js"
 }
