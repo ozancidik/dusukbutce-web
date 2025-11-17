@@ -2,6 +2,7 @@
 import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import PasswordValidation from "../register/components/PasswordValidation";
 
 function ResetPasswordContent() {
   const [password, setPassword] = useState("");
@@ -14,9 +15,56 @@ function ResetPasswordContent() {
   const [token, setToken] = useState("");
   const [isValidToken, setIsValidToken] = useState(false);
   const [isCheckingToken, setIsCheckingToken] = useState(true);
+  const [passwordMismatch, setPasswordMismatch] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [passwordErrors, setPasswordErrors] = useState({
+    length: false,
+    uppercase: false,
+    lowercase: false,
+    special: false
+  });
   
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  // Mobil kontrolü
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Şifre validasyonu - şifre değiştiğinde
+  useEffect(() => {
+    if (password) {
+      const errors = {
+        length: password.length >= 8,
+        uppercase: /[A-Z]/.test(password),
+        lowercase: /[a-z]/.test(password),
+        special: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)
+      };
+      setPasswordErrors(errors);
+    } else {
+      setPasswordErrors({
+        length: false,
+        uppercase: false,
+        lowercase: false,
+        special: false
+      });
+    }
+  }, [password]);
+
+  // Şifre eşleşme kontrolü
+  useEffect(() => {
+    if (password && confirmPassword) {
+      setPasswordMismatch(password !== confirmPassword);
+    } else {
+      setPasswordMismatch(false);
+    }
+  }, [password, confirmPassword]);
 
   useEffect(() => {
     const tokenFromUrl = searchParams.get('token');
@@ -53,19 +101,42 @@ function ResetPasswordContent() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setMessage("");
     
+    // Şifre eşleşme kontrolü
     if (password !== confirmPassword) {
       setMessage("Şifreler eşleşmiyor.");
       return;
     }
 
-    if (password.length < 6) {
-      setMessage("Şifre en az 6 karakter olmalıdır.");
+    // Şifre uzunluk kontrolü
+    if (password.length < 8) {
+      setMessage("Şifre en az 8 karakter olmalıdır.");
+      return;
+    }
+
+    if (password.length > 50) {
+      setMessage("Şifre en fazla 50 karakter olabilir.");
+      return;
+    }
+
+    // Şifre karmaşıklık kontrolleri
+    if (!/[A-Z]/.test(password)) {
+      setMessage("Şifre en az bir büyük harf (A-Z) içermelidir.");
+      return;
+    }
+
+    if (!/[a-z]/.test(password)) {
+      setMessage("Şifre en az bir küçük harf (a-z) içermelidir.");
+      return;
+    }
+
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+      setMessage("Şifre en az bir özel karakter (!@#$%^&* vb.) içermelidir.");
       return;
     }
 
     setIsLoading(true);
-    setMessage("");
 
     try {
       const response = await fetch('/api/auth/reset-password', {
@@ -345,7 +416,7 @@ function ResetPasswordContent() {
                     padding: '16px 20px',
                     paddingRight: '48px',
                     borderRadius: '12px',
-                    border: '2px solid #e5e7eb',
+                    border: (password && (passwordErrors.length === false || passwordErrors.uppercase === false || passwordErrors.lowercase === false || passwordErrors.special === false)) ? '2px solid #dc2626' : '2px solid #e5e7eb',
                     fontSize: '16px',
                     transition: 'all 0.2s',
                     boxSizing: 'border-box',
@@ -353,11 +424,13 @@ function ResetPasswordContent() {
                     color: isLoading ? '#9ca3af' : '#374151'
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = '#2563eb';
+                    const hasError = password && (passwordErrors.length === false || passwordErrors.uppercase === false || passwordErrors.lowercase === false || passwordErrors.special === false);
+                    e.target.style.borderColor = hasError ? '#dc2626' : '#2563eb';
                     e.target.style.boxShadow = '0 0 0 3px rgba(37, 99, 235, 0.1)';
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = '#e5e7eb';
+                    const hasError = password && (passwordErrors.length === false || passwordErrors.uppercase === false || passwordErrors.lowercase === false || passwordErrors.special === false);
+                    e.target.style.borderColor = hasError ? '#dc2626' : '#e5e7eb';
                     e.target.style.boxShadow = 'none';
                   }}
                 />
@@ -401,6 +474,15 @@ function ResetPasswordContent() {
                   )}
                 </button>
               </div>
+              
+              {/* Şifre validasyon gösterimi */}
+              {password && (
+                <PasswordValidation 
+                  password={password} 
+                  passwordErrors={passwordErrors} 
+                  isMobile={isMobile} 
+                />
+              )}
             </div>
 
             <div>
@@ -426,7 +508,7 @@ function ResetPasswordContent() {
                     padding: '16px 20px',
                     paddingRight: '48px',
                     borderRadius: '12px',
-                    border: '2px solid #e5e7eb',
+                    border: passwordMismatch && confirmPassword ? '2px solid #dc2626' : '2px solid #e5e7eb',
                     fontSize: '16px',
                     transition: 'all 0.2s',
                     boxSizing: 'border-box',
@@ -434,11 +516,11 @@ function ResetPasswordContent() {
                     color: isLoading ? '#9ca3af' : '#374151'
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = '#2563eb';
+                    e.target.style.borderColor = passwordMismatch && confirmPassword ? '#dc2626' : '#2563eb';
                     e.target.style.boxShadow = '0 0 0 3px rgba(37, 99, 235, 0.1)';
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = '#e5e7eb';
+                    e.target.style.borderColor = passwordMismatch && confirmPassword ? '#dc2626' : '#e5e7eb';
                     e.target.style.boxShadow = 'none';
                   }}
                 />
@@ -482,6 +564,21 @@ function ResetPasswordContent() {
                   )}
                 </button>
               </div>
+              
+              {/* Şifre eşleşme hatası */}
+              {passwordMismatch && confirmPassword && (
+                <p style={{
+                  margin: '8px 0 0 0',
+                  color: '#dc2626',
+                  fontSize: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}>
+                  <span>❌</span>
+                  Şifreler eşleşmiyor
+                </p>
+              )}
             </div>
 
             <button 

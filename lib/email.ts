@@ -7,76 +7,161 @@ interface EmailData {
   message: string;
 }
 
+// Transporter cache - her seferinde yeni transporter oluşturmamak için
+let cachedTransporter: nodemailer.Transporter | null = null;
+
+function getTransporter(): nodemailer.Transporter {
+  if (cachedTransporter) {
+    return cachedTransporter;
+  }
+
+  const gmailUser = process.env.GMAIL_USER || 'info@dusukbutce.com';
+  let gmailPassword = process.env.GMAIL_APP_PASSWORD;
+  
+  if (!gmailPassword) {
+    throw new Error('GMAIL_APP_PASSWORD environment değişkeni tanımlı değil!');
+  }
+  
+  // Boşlukları temizle
+  gmailPassword = gmailPassword.replace(/\s+/g, '').trim();
+  
+  if (!gmailPassword || gmailPassword.length < 16) {
+    throw new Error('GMAIL_APP_PASSWORD geçersiz! (çok kısa veya boş)');
+  }
+
+  cachedTransporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: gmailUser,
+      pass: gmailPassword
+    },
+    // Daha kısa timeout'lar - hızlı hata dönüşü için
+    connectionTimeout: 5000,
+    greetingTimeout: 5000,
+    socketTimeout: 5000
+  });
+
+  return cachedTransporter;
+}
+
 export async function sendPasswordResetEmail(email: string, resetToken: string, userName: string) {
   try {
-    // Gmail SMTP transporter oluştur
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: 'destek@dusukbutce.com',
-        pass: process.env.GMAIL_APP_PASSWORD
-      }
-    });
+    // Cached transporter kullan - verify() kontrolünü kaldırdık (hız için)
+    const transporter = getTransporter();
+    const gmailUser = process.env.GMAIL_USER || 'info@dusukbutce.com';
 
+    // Reset URL oluştur
+    const resetUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/sifre-sifirla?token=${resetToken}`;
+    
     // E-posta içeriği
     const mailOptions = {
       from: {
         name: 'Düşük Bütçe Destek',
-        address: 'destek@dusukbutce.com'
+        address: gmailUser
       },
-      replyTo: 'destek@dusukbutce.com',
+      replyTo: gmailUser,
       to: email,
       subject: 'Şifre Sıfırlama - Düşük Bütçe',
+      text: `Merhaba ${userName},
+
+Şifrenizi sıfırlamak için aşağıdaki bağlantıya tıklayın:
+${resetUrl}
+
+Bu bağlantı 1 saat süreyle geçerlidir.
+
+Eğer bu işlemi siz yapmadıysanız, lütfen bu e-postayı dikkate almayın.
+
+Düşük Bütçe Destek Ekibi`,
       html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #2563eb; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">
-            🔐 Şifre Sıfırlama
-          </h2>
-          
-          <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <p style="color: #374151; margin: 0; line-height: 1.6;">
-              Merhaba <strong>${userName}</strong>,
-            </p>
-            <p style="color: #374151; margin: 10px 0; line-height: 1.6;">
-              Şifrenizi sıfırlamak için aşağıdaki butona tıklayın. Bu bağlantı 1 saat süreyle geçerlidir.
-            </p>
-          </div>
-          
-          <div style="margin: 20px 0; text-align: center;">
-            <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}" 
-               style="background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block;">
-              🔑 Şifremi Sıfırla
-            </a>
-          </div>
-          
-          <div style="background: #fef3c7; padding: 15px; border-radius: 8px; border-left: 4px solid #f59e0b;">
-            <p style="color: #92400e; margin: 0; font-size: 14px;">
-              <strong>⚠️ Güvenlik Uyarısı:</strong> Bu e-postayı siz talep etmediyseniz, lütfen dikkate almayın.
-            </p>
-          </div>
-        </div>
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Şifre Sıfırlama</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f8fafc;">
+  <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 40px 20px;">
+    <h2 style="color: #2563eb; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px; margin-top: 0;">
+      🔐 Şifre Sıfırlama
+    </h2>
+    
+    <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0;">
+      <p style="color: #374151; margin: 0; line-height: 1.6;">
+        Merhaba <strong>${userName}</strong>,
+      </p>
+      <p style="color: #374151; margin: 10px 0; line-height: 1.6;">
+        Şifrenizi sıfırlamak için aşağıdaki butona tıklayın. Bu bağlantı 1 saat süreyle geçerlidir.
+      </p>
+    </div>
+    
+    <div style="margin: 20px 0; text-align: center;">
+      <a href="${resetUrl}" 
+         style="background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600;">
+        🔑 Şifremi Sıfırla
+      </a>
+    </div>
+    
+    <div style="margin: 20px 0; padding: 15px; background: #f3f4f6; border-radius: 8px;">
+      <p style="color: #6b7280; margin: 0; font-size: 14px;">
+        Buton çalışmıyorsa, aşağıdaki bağlantıyı tarayıcınıza kopyalayıp yapıştırın:
+      </p>
+      <p style="color: #2563eb; margin: 10px 0 0 0; font-size: 12px; word-break: break-all;">
+        ${resetUrl}
+      </p>
+    </div>
+    
+    <div style="background: #fef3c7; padding: 15px; border-radius: 8px; border-left: 4px solid #f59e0b; margin-top: 20px;">
+      <p style="color: #92400e; margin: 0; font-size: 14px;">
+        <strong>⚠️ Güvenlik Uyarısı:</strong> Bu e-postayı siz talep etmediyseniz, lütfen dikkate almayın.
+      </p>
+    </div>
+  </div>
+</body>
+</html>
       `
     };
 
     // E-postayı gönder
     const info = await transporter.sendMail(mailOptions);
-    console.log('Şifre sıfırlama e-postası gönderildi:', info.messageId);
+    console.log('✅ Şifre sıfırlama e-postası gönderildi:', info.messageId);
     return true;
 
-  } catch (error) {
-    console.error('Şifre sıfırlama e-postası gönderim hatası:', error);
+  } catch (error: any) {
+    console.error('❌ Şifre sıfırlama e-postası gönderim hatası:', error);
+    
+    // Auth hatası varsa transporter'ı sıfırla - belki yanlış credentials var
+    if (error.code === 'EAUTH' || error.message?.includes('GMAIL')) {
+      cachedTransporter = null;
+      console.error('🔐 Gmail kimlik doğrulama hatası! Transporter cache temizlendi.');
+      console.error('💡 Çözüm adımları:');
+      console.error('1. .env.local dosyasında GMAIL_USER değerini kontrol edin');
+      console.error('2. GMAIL_APP_PASSWORD değerinin doğru olduğundan emin olun');
+      console.error('3. Gmail hesabında 2 faktörlü doğrulama açık olmalı');
+      console.error('4. Gmail App Password\'un doğru hesap için oluşturulduğundan emin olun');
+      console.error('5. Yeni bir App Password oluşturmayı deneyin');
+    }
     return false;
   }
 }
 
 export async function sendContactNotification(data: EmailData) {
   try {
+    // Gmail SMTP yapılandırmasını kontrol et
+    const gmailUser = process.env.GMAIL_USER || 'info@dusukbutce.com';
+    const gmailPassword = process.env.GMAIL_APP_PASSWORD;
+    
+    if (!gmailPassword) {
+      console.error('❌ GMAIL_APP_PASSWORD environment değişkeni tanımlı değil!');
+      return false;
+    }
+    
     // Gmail SMTP transporter oluştur
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: 'destek@dusukbutce.com',
-        pass: process.env.GMAIL_APP_PASSWORD
+        user: gmailUser,
+        pass: gmailPassword
       }
     });
 
@@ -84,8 +169,9 @@ export async function sendContactNotification(data: EmailData) {
     const mailOptions = {
       from: {
         name: 'Düşük Bütçe İletişim',
-        address: process.env.GMAIL_USER || 'destek@dusukbutce.com'
+        address: gmailUser
       },
+      replyTo: gmailUser,
       to: 'ozancidik@gmail.com', // Bildirim gidecek e-posta
       subject: `Yeni İletişim Formu: ${data.subject}`,
       html: `
@@ -160,8 +246,8 @@ export async function sendCustomerAcceptEmailToAdmin(customerEmail: string, cust
     const formattedAmount = Number(offerAmount).toLocaleString('tr-TR');
 
     const mailOptions = {
-      from: 'teklif@dusukbutce.com',
-      replyTo: 'teklif@dusukbutce.com',
+      from: 'info@dusukbutce.com',
+      replyTo: 'info@dusukbutce.com',
       to: adminEmail,
       subject: `✅ Müşteri Teklifi Kabul Etti - ${productName}`,
       html: `
@@ -224,8 +310,8 @@ export async function sendCustomerRejectEmailToAdmin(customerEmail: string, cust
     const formattedAmount = Number(offerAmount).toLocaleString('tr-TR');
 
     const mailOptions = {
-      from: 'teklif@dusukbutce.com',
-      replyTo: 'teklif@dusukbutce.com',
+      from: 'info@dusukbutce.com',
+      replyTo: 'info@dusukbutce.com',
       to: adminEmail,
       subject: `❌ Müşteri Teklifi Reddetti - ${productName}`,
       html: `
@@ -295,8 +381,8 @@ export async function sendAdminAcceptEmailToCustomer(customerEmail: string, cust
     const formattedAmount = Number(offerAmount).toLocaleString('tr-TR');
 
     const mailOptions = {
-      from: 'teklif@dusukbutce.com',
-      replyTo: 'teklif@dusukbutce.com',
+      from: 'info@dusukbutce.com',
+      replyTo: 'info@dusukbutce.com',
       to: customerEmail,
       subject: `✅ Teklifiniz Kabul Edildi - Düşük Bütçe`,
       html: `
@@ -333,7 +419,7 @@ export async function sendAdminAcceptEmailToCustomer(customerEmail: string, cust
           
           <div style="background: #fef3c7; padding: 15px; border-radius: 8px; border-left: 4px solid #f59e0b;">
             <p style="color: #92400e; margin: 0; font-size: 14px;">
-              <strong>📞 İletişim:</strong> Sorularınız için <a href="mailto:teklif@dusukbutce.com" style="color: #2563eb;">teklif@dusukbutce.com</a> adresinden bize ulaşabilirsiniz.
+              <strong>📞 İletişim:</strong> Sorularınız için <a href="mailto:info@dusukbutce.com" style="color: #2563eb;">info@dusukbutce.com</a> adresinden bize ulaşabilirsiniz.
             </p>
           </div>
         </div>
@@ -362,8 +448,8 @@ export async function sendAdminRejectEmailToCustomer(customerEmail: string, cust
     });
 
     const mailOptions = {
-      from: 'teklif@dusukbutce.com',
-      replyTo: 'teklif@dusukbutce.com',
+      from: 'info@dusukbutce.com',
+      replyTo: 'info@dusukbutce.com',
       to: customerEmail,
       subject: `❌ Teklifiniz Reddedildi - Düşük Bütçe`,
       html: `
@@ -398,7 +484,7 @@ export async function sendAdminRejectEmailToCustomer(customerEmail: string, cust
           
           <div style="background: #fef3c7; padding: 15px; border-radius: 8px; border-left: 4px solid #f59e0b;">
             <p style="color: #92400e; margin: 0; font-size: 14px;">
-              <strong>📞 İletişim:</strong> Sorularınız için <a href="mailto:teklif@dusukbutce.com" style="color: #2563eb;">teklif@dusukbutce.com</a> adresinden bize ulaşabilirsiniz.
+              <strong>📞 İletişim:</strong> Sorularınız için <a href="mailto:info@dusukbutce.com" style="color: #2563eb;">info@dusukbutce.com</a> adresinden bize ulaşabilirsiniz.
             </p>
           </div>
         </div>
@@ -431,8 +517,8 @@ export async function sendOfferEmail(customerEmail: string, customerName: string
 
     // E-posta içeriği
     const mailOptions = {
-      from: 'teklif@dusukbutce.com',
-      replyTo: 'teklif@dusukbutce.com',
+      from: 'info@dusukbutce.com',
+      replyTo: 'info@dusukbutce.com',
       to: customerEmail,
       subject: `💰 Ürününüz İçin Teklifimiz - Düşük Bütçe`,
       html: `
@@ -482,7 +568,7 @@ export async function sendOfferEmail(customerEmail: string, customerName: string
           
           <div style="margin-top: 30px; padding: 20px; background: #f9fafb; border-radius: 8px; text-align: center;">
             <p style="color: #6b7280; margin: 0; font-size: 14px;">
-              <strong>📞 İletişim:</strong> Sorularınız için <a href="mailto:teklif@dusukbutce.com" style="color: #2563eb;">teklif@dusukbutce.com</a> adresinden bize ulaşabilirsiniz.
+              <strong>📞 İletişim:</strong> Sorularınız için <a href="mailto:info@dusukbutce.com" style="color: #2563eb;">info@dusukbutce.com</a> adresinden bize ulaşabilirsiniz.
             </p>
           </div>
           
@@ -512,7 +598,7 @@ export async function sendOfferEmail(customerEmail: string, customerName: string
             
             <div style="margin-bottom: 15px;">
               <p style="color: #6b7280; margin: 0; font-size: 14px;">
-                <strong>📧 Destek:</strong> <a href="mailto:destek@dusukbutce.com" style="color: #2563eb;">destek@dusukbutce.com</a>
+                <strong>📧 Destek:</strong> <a href="mailto:info@dusukbutce.com" style="color: #2563eb;">info@dusukbutce.com</a>
               </p>
             </div>
             
@@ -562,9 +648,9 @@ export async function sendNewSubmissionNotificationToAdmin(submissionData: any) 
     const customerPhone = submissionData.customerInfo?.phone || 'Telefon bilgisi yok';
 
     const mailOptions = {
-      from: 'teklif@dusukbutce.com',
-      replyTo: 'teklif@dusukbutce.com',
-      to: 'teklif@dusukbutce.com',
+      from: 'info@dusukbutce.com',
+      replyTo: 'info@dusukbutce.com',
+      to: 'info@dusukbutce.com',
       subject: `🆕 Yeni Teklif Formu - ${productName}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -653,20 +739,29 @@ export async function sendNewSubmissionNotificationToAdmin(submissionData: any) 
 
 export async function sendEmailVerificationEmail(email: string, verificationToken: string, userName: string) {
   try {
+    // Gmail SMTP yapılandırmasını kontrol et
+    const gmailUser = process.env.GMAIL_USER || 'info@dusukbutce.com';
+    const gmailPassword = process.env.GMAIL_APP_PASSWORD?.replace(/\s+/g, '') || process.env.GMAIL_APP_PASSWORD; // Boşlukları kaldır
+    
+    if (!gmailPassword) {
+      console.error('❌ GMAIL_APP_PASSWORD environment değişkeni tanımlı değil!');
+      return false;
+    }
+    
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: 'destek@dusukbutce.com',
-        pass: process.env.GMAIL_APP_PASSWORD
+        user: gmailUser,
+        pass: gmailPassword.trim() // Boşlukları temizle
       }
     });
 
     const mailOptions = {
       from: {
         name: 'Düşük Bütçe Destek',
-        address: 'destek@dusukbutce.com'
+        address: gmailUser
       },
-      replyTo: 'destek@dusukbutce.com',
+      replyTo: gmailUser,
       to: email,
       subject: 'Email Doğrulama - Düşük Bütçe',
       html: `
@@ -722,20 +817,61 @@ export async function sendEmailVerificationEmail(email: string, verificationToke
 // Email değişikliği doğrulama kodu gönderme
 export async function sendEmailChangeVerificationEmail(email: string, verificationCode: string, userName: string) {
   try {
+    // Gmail SMTP yapılandırmasını kontrol et
+    const gmailUser = process.env.GMAIL_USER || 'info@dusukbutce.com';
+    let gmailPassword = process.env.GMAIL_APP_PASSWORD;
+    
+    if (!gmailPassword) {
+      console.error('❌ GMAIL_APP_PASSWORD environment değişkeni tanımlı değil!');
+      console.error('📧 Gmail User:', gmailUser);
+      return false;
+    }
+    
+    // Boşlukları temizle (Gmail App Password'ları bazen boşluklu gelir)
+    gmailPassword = gmailPassword.replace(/\s+/g, '').trim();
+    
+    if (!gmailPassword || gmailPassword.length < 16) {
+      console.error('❌ GMAIL_APP_PASSWORD geçersiz! (çok kısa veya boş)');
+      console.error('📧 Gmail User:', gmailUser);
+      return false;
+    }
+    
+    console.log('📧 Email gönderme yapılandırması:');
+    console.log('📧 Gmail User:', gmailUser);
+    console.log('📧 Gmail Password Length:', gmailPassword.length);
+    
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: 'destek@dusukbutce.com',
-        pass: process.env.GMAIL_APP_PASSWORD
-      }
+        user: gmailUser,
+        pass: gmailPassword
+      },
+      // Connection timeout ayarları
+      connectionTimeout: 10000,
+      greetingTimeout: 10000,
+      socketTimeout: 10000
     });
+    
+    // Bağlantıyı test et
+    try {
+      await transporter.verify();
+      console.log('✅ Gmail SMTP bağlantısı başarılı');
+    } catch (verifyError: any) {
+      console.error('❌ Gmail SMTP bağlantı hatası:', verifyError.message);
+      console.error('📧 Gmail User:', gmailUser);
+      if (verifyError.code === 'EAUTH') {
+        console.error('🔐 Kimlik doğrulama hatası: GMAIL_USER ve GMAIL_APP_PASSWORD eşleşmiyor olabilir');
+        console.error('💡 Çözüm: .env.local dosyasında GMAIL_USER ve GMAIL_APP_PASSWORD değerlerini kontrol edin');
+      }
+      return false;
+    }
 
     const mailOptions = {
       from: {
         name: 'Düşük Bütçe Destek',
-        address: 'destek@dusukbutce.com'
+        address: gmailUser
       },
-      replyTo: 'destek@dusukbutce.com',
+      replyTo: gmailUser,
       to: email,
       subject: 'Email Değişikliği Doğrulama Kodu - Düşük Bütçe',
       html: `
@@ -783,8 +919,17 @@ export async function sendEmailChangeVerificationEmail(email: string, verificati
     console.log('Email değişikliği doğrulama kodu gönderildi:', info.messageId);
     return true;
 
-  } catch (error) {
-    console.error('Email değişikliği doğrulama kodu gönderim hatası:', error);
+  } catch (error: any) {
+    console.error('❌ Email değişikliği doğrulama kodu gönderim hatası:', error);
+    if (error.code === 'EAUTH') {
+      console.error('🔐 Gmail kimlik doğrulama hatası!');
+      console.error('💡 Çözüm adımları:');
+      console.error('1. .env.local dosyasında GMAIL_USER değerini kontrol edin');
+      console.error('2. GMAIL_APP_PASSWORD değerinin doğru olduğundan emin olun');
+      console.error('3. Gmail hesabında 2 faktörlü doğrulama açık olmalı');
+      console.error('4. Gmail App Password\'un doğru hesap için oluşturulduğundan emin olun');
+      console.error('5. Yeni bir App Password oluşturmayı deneyin');
+    }
     return false;
   }
 }

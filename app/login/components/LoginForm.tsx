@@ -13,6 +13,7 @@ interface LoginFormProps {
   isEmailSent: boolean;
   isResendingEmail: boolean;
   loginAttempts: number;
+  requiresPasswordSetup?: boolean;
   setEmail: (email: string) => void;
   setPassword: (password: string) => void;
   setShowPassword: (show: boolean) => void;
@@ -33,6 +34,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
   isEmailSent,
   isResendingEmail,
   loginAttempts,
+  requiresPasswordSetup = false,
   setEmail,
   setPassword,
   setShowPassword,
@@ -231,6 +233,22 @@ const LoginForm: React.FC<LoginFormProps> = ({
               error
             )}
           </div>
+          {requiresPasswordSetup && (
+            <div style={{ marginTop: "8px" }}>
+              <a
+                href="/sifremi-unuttum"
+                style={{
+                  color: "#2563eb",
+                  textDecoration: "underline",
+                  fontSize: "14px",
+                  fontWeight: "600",
+                  display: "inline-block",
+                }}
+              >
+                Şifre oluşturmak için "Şifremi Unuttum" sayfasını kullanın →
+              </a>
+            </div>
+          )}
           {emailVerificationError && !isEmailSent && (
             <button
               type="button"

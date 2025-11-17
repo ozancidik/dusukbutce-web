@@ -16,9 +16,39 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (password.length < 6) {
+    // Şifre uzunluk kontrolü
+    if (password.length < 8) {
       return NextResponse.json(
-        { success: false, error: 'Şifre en az 6 karakter olmalıdır' },
+        { success: false, error: 'Şifre en az 8 karakter olmalıdır' },
+        { status: 400 }
+      );
+    }
+
+    if (password.length > 50) {
+      return NextResponse.json(
+        { success: false, error: 'Şifre en fazla 50 karakter olabilir' },
+        { status: 400 }
+      );
+    }
+
+    // Şifre karmaşıklık kontrolleri
+    if (!/[A-Z]/.test(password)) {
+      return NextResponse.json(
+        { success: false, error: 'Şifre en az bir büyük harf (A-Z) içermelidir' },
+        { status: 400 }
+      );
+    }
+
+    if (!/[a-z]/.test(password)) {
+      return NextResponse.json(
+        { success: false, error: 'Şifre en az bir küçük harf (a-z) içermelidir' },
+        { status: 400 }
+      );
+    }
+
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+      return NextResponse.json(
+        { success: false, error: 'Şifre en az bir özel karakter (!@#$%^&* vb.) içermelidir' },
         { status: 400 }
       );
     }

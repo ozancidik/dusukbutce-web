@@ -19,6 +19,7 @@ export default function LoginPage() {
   const [emailVerificationError, setEmailVerificationError] = useState(false);
   const [isEmailSent, setIsEmailSent] = useState(false);
   const [csrfToken, setCsrfToken] = useState<string | null>(null);
+  const [requiresPasswordSetup, setRequiresPasswordSetup] = useState(false);
   const router = useRouter();
 
   // CSRF token al
@@ -330,13 +331,25 @@ export default function LoginPage() {
         // Email doğrulama hatası ise rate limiting'i artırma ve sayacı sıfırla
         if (data.requiresVerification) {
           setEmailVerificationError(true);
+          setRequiresPasswordSetup(false);
           setError(data.message || "Email adresinizi doğrulamanız gerekiyor. Email kutunuzu kontrol edin.");
           // Email doğrulama hatası durumunda sayacı sıfırla
           localStorage.setItem("loginAttempts", "0");
           localStorage.removeItem("lastLoginAttempt");
           localStorage.removeItem("isRealPasswordAttempt");
           setLoginAttempts(0);
+        } else if (data.requiresPasswordSetup) {
+          // OAuth kullanıcısı için şifre oluşturma yönlendirmesi
+          setRequiresPasswordSetup(true);
+          setEmailVerificationError(false);
+          setError(data.message || "Şifre ile giriş yapmak için önce şifre oluşturmanız gerekiyor.");
+          // Şifre oluşturma hatası durumunda sayacı sıfırla
+          localStorage.setItem("loginAttempts", "0");
+          localStorage.removeItem("lastLoginAttempt");
+          localStorage.removeItem("isRealPasswordAttempt");
+          setLoginAttempts(0);
         } else {
+          setRequiresPasswordSetup(false);
           // Sadece yanlış şifre hatası için rate limiting'i artır
           if (data.message && data.message.includes("Email veya şifre hatalı")) {
             const newAttempts = loginAttempts + 1;
@@ -917,19 +930,35 @@ export default function LoginPage() {
           {error && (
             <div
               style={{
-                background: isEmailSent ? "#f0fdf4" : emailVerificationError ? "#fef3c7" : "#fef2f2",
-                color: isEmailSent ? "#166534" : emailVerificationError ? "#d97706" : "#dc2626",
+                background: isEmailSent ? "#f0fdf4" : emailVerificationError ? "#fef3c7" : requiresPasswordSetup ? "#e0e7ff" : "#fef2f2",
+                color: isEmailSent ? "#166534" : emailVerificationError ? "#d97706" : requiresPasswordSetup ? "#4338ca" : "#dc2626",
                 padding: "12px",
                 borderRadius: "8px",
                 marginBottom: "20px",
                 fontSize: "14px",
-                border: isEmailSent ? "1px solid #bbf7d0" : emailVerificationError ? "1px solid #fed7aa" : "1px solid #fecaca",
+                border: isEmailSent ? "1px solid #bbf7d0" : emailVerificationError ? "1px solid #fed7aa" : requiresPasswordSetup ? "1px solid #c7d2fe" : "1px solid #fecaca",
                 display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
+                flexDirection: "column",
+                gap: "12px",
               }}
             >
-              <span>{error}</span>
+              <div style={{ lineHeight: "1.5" }}>{error}</div>
+              {requiresPasswordSetup && (
+                <div>
+                  <Link
+                    href="/sifremi-unuttum"
+                    style={{
+                      color: "#4338ca",
+                      textDecoration: "underline",
+                      fontSize: "14px",
+                      fontWeight: "600",
+                      display: "inline-block",
+                    }}
+                  >
+                    Şifre oluşturmak için "Şifremi Unuttum" sayfasını kullanın →
+                  </Link>
+                </div>
+              )}
               {emailVerificationError && !isEmailSent && (
                 <button
                   type="button"
