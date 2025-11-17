@@ -139,23 +139,48 @@ export default function AdminDashboard({
         )}
         
         <SubmissionList
-          isMobile={isMobile}
           submissions={filteredSubmissions}
+          isMobile={isMobile}
           loading={loading}
           error={error}
-          selectedSubmission={selectedSubmission}
-          setSelectedSubmission={setSelectedSubmission}
-          showModal={showModal}
-          setShowModal={setShowModal}
-          modalType={modalType}
-          setModalType={setModalType}
-          showDeleteModal={showDeleteModal}
-          setShowDeleteModal={setShowDeleteModal}
-          deleteModalType={deleteModalType}
-          setDeleteModalType={setDeleteModalType}
-          deleteTargetId={deleteTargetId}
-          setDeleteTargetId={setDeleteTargetId}
-          isDeleting={isDeleting}
+          onAction={(submission, action) => {
+            setSelectedSubmission(submission);
+            setModalType(action);
+            setShowModal(true);
+          }}
+          onDelete={(submissionId) => {
+            setDeleteTargetId(submissionId);
+            setDeleteModalType('single');
+            setShowDeleteModal(true);
+          }}
+          onDetail={(submission) => {
+            setDetailSubmission(submission);
+            setShowDetailModal(true);
+          }}
+          onDeliveryInfo={(submission) => {
+            setDetailSubmission(submission);
+            setShowDetailModal(true);
+            setTimeout(() => {
+              const teslimatTab = document.querySelector('[data-tab="teslimat"]') as HTMLButtonElement;
+              if (teslimatTab) {
+                teslimatTab.click();
+              }
+            }, 100);
+          }}
+          onReoffer={(submission) => {
+            setSelectedSubmission(submission);
+            setModalType('offer');
+            setShowModal(true);
+          }}
+          formatDate={(dateString: string) => {
+            return new Date(dateString).toLocaleString('tr-TR', {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit'
+            });
+          }}
         />
         
         {showModal && selectedSubmission && (

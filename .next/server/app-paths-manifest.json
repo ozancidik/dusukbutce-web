@@ -1,9 +1,4 @@
 {
   "/icon/route": "app/icon/route.js",
-  "/favicon.ico/route": "app/favicon.ico/route.js",
-  "/tekliflerim/page": "app/tekliflerim/page.js",
-  "/page": "app/page.js",
-  "/teklif-teslimat/page": "app/teklif-teslimat/page.js",
-  "/admin/page": "app/admin/page.js",
-  "/bize-sat/islemci/page": "app/bize-sat/islemci/page.js"
+  "/page": "app/page.js"
 }
