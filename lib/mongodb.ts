@@ -16,21 +16,21 @@ async function connectDB() {
     
     // Eğer zaten bağlıysa, mevcut bağlantıyı kullan
     // readyState: 0 = disconnected, 1 = connected, 2 = connecting, 3 = disconnecting
-    if (mongoose.connection.readyState === 1) {
+    if ((mongoose.connection.readyState as number) === 1) {
       isConnected = true;
       console.log('✅ MongoDB zaten bağlı');
       return;
     }
     
     // Eğer bağlantı kuruluyorsa bekle
-    if (mongoose.connection.readyState === 2) {
+    if ((mongoose.connection.readyState as number) === 2) {
       console.log('⏳ MongoDB bağlantısı bekleniyor...');
       let waitCount = 0;
-      while (mongoose.connection.readyState === 2 && waitCount < 100) {
+      while ((mongoose.connection.readyState as number) === 2 && waitCount < 100) {
         await new Promise(resolve => setTimeout(resolve, 100));
         waitCount++;
       }
-      if (mongoose.connection.readyState === 1) {
+      if ((mongoose.connection.readyState as number) === 1) {
         isConnected = true;
         console.log('✅ MongoDB bağlantısı hazır');
         return;
