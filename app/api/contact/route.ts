@@ -37,18 +37,20 @@ export async function POST(request: NextRequest) {
 
     await contact.save();
 
-    // E-posta bildirimi gönder
-    try {
-      await sendContactNotification({
-        name: contact.name,
-        email: contact.email,
-        subject: contact.subject,
-        message: contact.message
-      });
-    } catch (emailError) {
+    // E-posta bildirimi gönder (async - kullanıcı beklemeden response döndür)
+    sendContactNotification({
+      name: contact.name,
+      email: contact.email,
+      subject: contact.subject,
+      message: contact.message
+    })
+    .then(() => {
+      console.log('✅ İletişim formu bildirimi gönderildi');
+    })
+    .catch((emailError) => {
       console.error('E-posta gönderim hatası:', emailError);
       // E-posta hatası olsa bile form kaydedildi, sadece log'la
-    }
+    });
 
     return NextResponse.json(
       { 

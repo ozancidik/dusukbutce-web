@@ -1,65 +1,130 @@
-import { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
-import connectDB from "@/lib/mongodb";
-import ProductSubmission from '../../../models/ProductSubmission';
+import { NextResponse, NextRequest } from "next/server";
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
+import connectDB from "@/lib/mongodb";
+import User from "@/models/User";
 import { sendNewSubmissionNotificationToAdmin } from '@/lib/email';
 
 export async function POST(request: NextRequest) {
   try {
-    await connectDB();
+    console.log('📝 Submission başlatılıyor...');
     
     const body = await request.json();
-    console.log('API received data:', body);
-    
-    // Get userId from JWT token (fast decode without verify)
+    console.log('📝 Gelen veri:', JSON.stringify(body, null, 2));
+
+    // JWT token'dan userId al
     let userId = null;
     try {
       const token = request.headers.get('authorization')?.replace('Bearer ', '');
       if (token) {
-        // Fast decode without verification (since token comes from our frontend)
         const decoded = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
         userId = decoded.userId;
-        console.log('Found userId from token:', userId);
+        console.log('📝 Found userId from token:', userId);
       }
     } catch (error) {
-      console.log('No valid token found, creating temporary userId');
+      console.log('📝 No valid token found, creating temporary userId');
     }
     
-    // Add userId to submission data
-    const submissionData = {
+    // MongoDB bağlantısı kontrolü
+    if (!process.env.MONGODB_URI) {
+      console.log('⚠️ MongoDB URI tanımlı değil, veri console\'a yazdırılıyor:');
+      console.log('📊 Submission Data:', {
+        ...body,
+        category: body.category || 'playstation',
+        timestamp: new Date().toISOString()
+      });
+      
+      return NextResponse.json({ 
+        success: true, 
+        message: 'Submission received (MongoDB not configured)',
+        data: body
+      });
+    }
+    
+    // MongoDB bağlantısı varsa normal işlemi yap
+    const { default: connectDB } = await import('../../../lib/mongodb');
+    const { default: ProductSubmission } = await import('../../../models/ProductSubmission');
+    const { default: User } = await import('../../../models/User');
+    
+    console.log('🔗 MongoDB bağlantısı kuruluyor...');
+    await connectDB();
+    console.log('✅ MongoDB bağlantısı başarılı');
+    
+    // Create submission with category and additional fields
+    const submission = new ProductSubmission({
       ...body,
-      userId: userId || new mongoose.Types.ObjectId() // Use real userId or create temporary one
+      category: body.category || 'playstation',
+      userId: userId || new mongoose.Types.ObjectId(),
+      status: 'pending', // Yeni talep durumu
+      createdAt: new Date(),
+      adminNotes: '' // Admin notları için boş alan
+    });
+    
+    console.log('💾 Veritabanına kaydediliyor...');
+    await submission.save();
+    console.log('✅ Veri başarıyla kaydedildi, ID:', submission._id);
+    
+    // Müşteri bilgilerini al (MongoDB zaten bağlı, tekrar bağlanmaya gerek yok)
+    let customerInfo = null;
+    if (userId) {
+      try {
+        const user = await User.findById(userId);
+        if (user) {
+          customerInfo = {
+            name: user.name || '',
+            email: user.email || '',
+            phone: user.phone || ''
+          };
+        }
+      } catch (error) {
+        console.error('Müşteri bilgileri alınamadı:', error);
+      }
+    }
+
+    // Submission'a müşteri bilgilerini ekle
+    const submissionWithCustomerInfo = {
+      ...submission.toObject(),
+      customerInfo
     };
     
-    // Create submission
-    const submission = new ProductSubmission(submissionData);
-    console.log('Submission before save:', submission);
-    await submission.save();
-    console.log('Submission after save:', submission);
-    
-    // Send notification email to admin
-    try {
-      const emailSent = await sendNewSubmissionNotificationToAdmin(submissionData);
-      if (emailSent) {
-        console.log('✅ Yeni teklif bildirimi admin\'e gönderildi');
-      } else {
-        console.log('❌ Yeni teklif bildirimi gönderilemedi');
-      }
-    } catch (error) {
-      console.error('Mail gönderme hatası:', error);
-    }
+    // Email gönderimini async yap (kullanıcı beklemeden response döndür)
+    sendNewSubmissionNotificationToAdmin(submissionWithCustomerInfo)
+      .then((emailSent) => {
+        if (emailSent) {
+          console.log('✅ Yeni teklif bildirimi admin\'e gönderildi');
+        } else {
+          console.log('❌ Yeni teklif bildirimi gönderilemedi');
+        }
+      })
+      .catch((error) => {
+        console.error('Mail gönderme hatası:', error);
+      });
     
     return NextResponse.json({ 
       success: true, 
       message: 'Submission saved successfully',
       id: submission._id 
     });
-  } catch (error) {
-    console.error('Error saving submission:', error);
+  } catch (error: any) {
+    console.error('❌ Error saving submission:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Bilinmeyen hata';
+    const errorStack = error instanceof Error ? error.stack : '';
+    console.error('❌ Error details:', { errorMessage, errorStack });
+    
+    // DNS timeout hatası için özel mesaj
+    let userMessage = errorMessage || 'Teklif talebiniz gönderilemedi. Lütfen tekrar deneyin.';
+    if (errorMessage.includes('querySrv ETIMEOUT') || errorMessage.includes('ETIMEOUT')) {
+      userMessage = 'Veritabanı bağlantısı zaman aşımına uğradı. Lütfen birkaç saniye sonra tekrar deneyin.';
+    } else if (errorMessage.includes('MongoNetworkError') || errorMessage.includes('MongoServerSelectionError')) {
+      userMessage = 'Veritabanı bağlantısı kurulamadı. Lütfen daha sonra tekrar deneyin.';
+    }
+    
     return NextResponse.json(
-      { success: false, message: 'Failed to save submission' },
+      { 
+        success: false, 
+        message: userMessage,
+        error: errorMessage
+      },
       { status: 500 }
     );
   }
@@ -67,6 +132,9 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
+    const { default: connectDB } = await import('../../../lib/mongodb');
+    const { default: ProductSubmission } = await import('../../../models/ProductSubmission');
+    
     await connectDB();
     
     const { searchParams } = new URL(request.url);
@@ -100,6 +168,9 @@ export async function GET(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
+    const { default: connectDB } = await import('../../../lib/mongodb');
+    const { default: ProductSubmission } = await import('../../../models/ProductSubmission');
+    
     await connectDB();
     
     const body = await request.json();
@@ -160,6 +231,9 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
+    const { default: connectDB } = await import('../../../lib/mongodb');
+    const { default: ProductSubmission } = await import('../../../models/ProductSubmission');
+    
     await connectDB();
     
     const { searchParams } = new URL(request.url);

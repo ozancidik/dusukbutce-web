@@ -70,11 +70,10 @@ export async function POST(request: NextRequest) {
     await submission.save();
     console.log('✅ Veri başarıyla kaydedildi, ID:', submission._id);
     
-    // Müşteri bilgilerini al
+    // Müşteri bilgilerini al (MongoDB zaten bağlı, tekrar bağlanmaya gerek yok)
     let customerInfo = null;
     if (userId) {
       try {
-        await connectDB();
         const user = await User.findById(userId);
         if (user) {
           customerInfo = {
@@ -94,17 +93,18 @@ export async function POST(request: NextRequest) {
       customerInfo
     };
     
-    // Send notification email to admin
-    try {
-      const emailSent = await sendNewSubmissionNotificationToAdmin(submissionWithCustomerInfo);
-      if (emailSent) {
-        console.log('✅ Yeni teklif bildirimi admin\'e gönderildi');
-      } else {
-        console.log('❌ Yeni teklif bildirimi gönderilemedi');
-      }
-    } catch (error) {
-      console.error('Mail gönderme hatası:', error);
-    }
+    // Email gönderimini async yap (kullanıcı beklemeden response döndür)
+    sendNewSubmissionNotificationToAdmin(submissionWithCustomerInfo)
+      .then((emailSent) => {
+        if (emailSent) {
+          console.log('✅ Yeni teklif bildirimi admin\'e gönderildi');
+        } else {
+          console.log('❌ Yeni teklif bildirimi gönderilemedi');
+        }
+      })
+      .catch((error) => {
+        console.error('Mail gönderme hatası:', error);
+      });
     
     return NextResponse.json({ 
       success: true, 
