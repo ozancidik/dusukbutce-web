@@ -409,7 +409,7 @@ export default function RegisterPage() {
           alignItems: "center",
           justifyContent: "center",
           background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%)",
-          padding: "1px 20px 20px 20px",
+          padding: "60px 20px 60px 20px",
         }}
       >
       <div

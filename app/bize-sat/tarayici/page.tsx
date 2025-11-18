@@ -40,6 +40,9 @@ export default function TarayiciPage() {
   });
 
   useEffect(() => {
+    // Client-side only
+    if (typeof window === 'undefined') return;
+    
     const checkMobile = () => {
       setIsMobile(window.innerWidth <= 768);
     };
@@ -48,8 +51,6 @@ export default function TarayiciPage() {
     window.addEventListener('resize', checkMobile);
     
     // localStorage'dan kaydedilmiş form verilerini yükle
-    const token = localStorage.getItem('token');
-    
     try {
       const savedFormData = localStorage.getItem('scannerFormData');
       if (savedFormData) {
