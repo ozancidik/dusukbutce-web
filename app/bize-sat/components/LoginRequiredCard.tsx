@@ -4,9 +4,12 @@ import Link from 'next/link';
 
 interface LoginRequiredCardProps {
   isMobile: boolean;
+  returnUrl?: string;
 }
 
-export default function LoginRequiredCard({ isMobile }: LoginRequiredCardProps) {
+export default function LoginRequiredCard({ isMobile, returnUrl }: LoginRequiredCardProps) {
+  const loginUrl = returnUrl ? `/login?returnUrl=${encodeURIComponent(returnUrl)}` : '/login';
+  
   return (
     <div style={{
       background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)',
@@ -41,7 +44,7 @@ export default function LoginRequiredCard({ isMobile }: LoginRequiredCardProps) 
         justifyContent: 'center',
         flexWrap: 'wrap'
       }}>
-        <Link href="/login" style={{
+        <Link href={loginUrl} style={{
           background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
           color: 'white',
           padding: isMobile ? '8px 16px' : '10px 20px',

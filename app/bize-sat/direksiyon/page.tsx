@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../hooks/useAuth';
 import SubmissionPopup from '../../../components/SubmissionPopup';
+import LoginRequiredCard from '../components/LoginRequiredCard';
 
 export default function SteeringWheelPage() {
   const { isLoggedIn } = useAuth();
@@ -231,6 +232,9 @@ export default function SteeringWheelPage() {
             Oyuncu direksiyonunuzu satın, en iyi fiyatı alın
           </p>
         </div>
+
+        {/* Login Required Card */}
+        {!isLoggedIn && <LoginRequiredCard isMobile={isMobile} returnUrl="/bize-sat/direksiyon" />}
 
         {/* Form */}
         <form onSubmit={handleSubmit} style={{
