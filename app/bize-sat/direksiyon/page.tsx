@@ -109,11 +109,20 @@ export default function SteeringWheelPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
+    if (!isLoggedIn) {
+      router.push('/login?returnUrl=' + encodeURIComponent('/bize-sat/direksiyon'));
+      return;
+    }
 
+    setIsSubmitting(true);
     try {
       // JWT token al
       const token = localStorage.getItem('token');
+      console.log('📝 Form Data before submit:', formData);
+      
+      // Timeout için AbortController kullan (MongoDB bağlantısı için yeterli süre)
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 120000); // 120 saniye timeout
       
       const response = await fetch('/api/notebook-submissions', {
         method: 'POST',
@@ -123,14 +132,22 @@ export default function SteeringWheelPage() {
         },
         body: JSON.stringify({
           ...formData,
-          category: 'steering-wheel'
+          category: 'steering-wheel',
+          cosmeticCondition: formData.cosmeticCondition || 'Mükemmel'
         }),
+        signal: controller.signal
       });
 
+      clearTimeout(timeoutId);
+      console.log('📥 Response status:', response.status);
+
       if (response.ok) {
+        const data = await response.json();
+        console.log('📥 Response data:', data);
+        
         setPopupType('success');
         setPopupTitle('Teklif Başarıyla Gönderildi!');
-        setPopupMessage('Ürününüz için teklif talebiniz alındı. En kısa sürede size dönüş yapacağız.');
+        setPopupMessage('Direksiyon ürününüz için teklif talebiniz alındı. En kısa sürede size dönüş yapacağız.');
         setShowPopup(true);
         
         // Form verilerini localStorage'dan temizle
@@ -142,7 +159,7 @@ export default function SteeringWheelPage() {
           platform: '',
           connectivity: '',
           description: '',
-          cosmeticCondition: 'İyi',
+          cosmeticCondition: 'Mükemmel',
           hasBox: false,
           hasInvoice: false,
           hasWarranty: false,
@@ -152,16 +169,27 @@ export default function SteeringWheelPage() {
           images: []
         });
       } else {
+        const errorData = await response.json().catch(() => ({ message: 'Bilinmeyen hata' }));
+        console.error('❌ API Error:', errorData);
         setPopupType('error');
         setPopupTitle('Hata Oluştu');
-        setPopupMessage('Teklif talebiniz gönderilemedi. Lütfen tekrar deneyin.');
+        setPopupMessage(errorData.message || 'Teklif talebiniz gönderilemedi. Lütfen tekrar deneyin.');
         setShowPopup(true);
       }
-    } catch (error) {
+    } catch (error: any) {
+      console.error('❌ Submit Error:', error);
       setPopupType('error');
-        setPopupTitle('Hata Oluştu');
+      setPopupTitle('Hata Oluştu');
+      
+      if (error.name === 'AbortError') {
+        setPopupMessage('İstek zaman aşımına uğradı. Lütfen tekrar deneyin.');
+      } else if (error.message) {
+        setPopupMessage(error.message);
+      } else {
         setPopupMessage('Teklif talebiniz gönderilemedi. Lütfen tekrar deneyin.');
-        setShowPopup(true);
+      }
+      
+      setShowPopup(true);
     } finally {
       setIsSubmitting(false);
     }
