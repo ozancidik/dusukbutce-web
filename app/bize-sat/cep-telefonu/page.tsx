@@ -98,9 +98,18 @@ export default function CepTelefonuPage() {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files) {
+      const maxImages = 10;
+      const remainingSlots = maxImages - formData.images.length;
+      
+      if (remainingSlots <= 0) {
+        return; // Maksimum görsel sayısına ulaşıldı
+      }
+      
+      const filesToProcess = Array.from(files).slice(0, remainingSlots);
       const newImages: string[] = [];
       
-      Array.from(files).forEach(async (file) => {
+      filesToProcess.forEach(async (file) => {
+        // Resim boyutunu kontrol et (max 2MB)
         if (file.size > 2 * 1024 * 1024) {
           setShowImageSizeWarning(true);
           setTimeout(() => setShowImageSizeWarning(false), 3000);
@@ -113,7 +122,7 @@ export default function CepTelefonuPage() {
             const base64String = e.target?.result as string;
               const compressedImage = await compressImage(base64String);
               newImages.push(compressedImage);
-              if (newImages.length === files.length) {
+              if (newImages.length === filesToProcess.length) {
               setFormData((prev: any) => ({
                     ...prev,
                 images: [...prev.images, ...newImages]
@@ -122,7 +131,7 @@ export default function CepTelefonuPage() {
             } catch (error) {
             console.error('Resim sıkıştırma hatası:', error);
             newImages.push(e.target?.result as string);
-            if (newImages.length === files.length) {
+            if (newImages.length === filesToProcess.length) {
               setFormData((prev: any) => ({
                 ...prev,
                 images: [...prev.images, ...newImages]

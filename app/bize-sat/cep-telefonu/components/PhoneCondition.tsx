@@ -87,6 +87,13 @@ export default function PhoneCondition({ isMobile, formData, onInputChange }: Ph
             onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
           />
         </div>
+      </div>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
+        gap: '16px',
+        marginTop: '16px'
+      }}>
         <div style={{
           display: 'flex',
           alignItems: 'center',
@@ -94,21 +101,18 @@ export default function PhoneCondition({ isMobile, formData, onInputChange }: Ph
         }}>
           <input
             type="checkbox"
-            id="hasBox"
             checked={formData.hasBox}
             onChange={(e) => onInputChange('hasBox', e.target.checked)}
             style={{
-              width: '18px',
-              height: '18px',
-              accentColor: '#3b82f6'
+              width: '24px',
+              height: '24px'
             }}
           />
-          <label htmlFor="hasBox" style={{
-            fontSize: '14px',
-            fontWeight: '500',
+          <label style={{
+            fontSize: '16px',
             color: '#374151'
           }}>
-            Kutusu Var
+            Kutusu var
           </label>
         </div>
         <div style={{
@@ -118,21 +122,18 @@ export default function PhoneCondition({ isMobile, formData, onInputChange }: Ph
         }}>
           <input
             type="checkbox"
-            id="hasInvoice"
             checked={formData.hasInvoice}
             onChange={(e) => onInputChange('hasInvoice', e.target.checked)}
             style={{
-              width: '18px',
-              height: '18px',
-              accentColor: '#3b82f6'
+              width: '24px',
+              height: '24px'
             }}
           />
-          <label htmlFor="hasInvoice" style={{
-            fontSize: '14px',
-            fontWeight: '500',
+          <label style={{
+            fontSize: '16px',
             color: '#374151'
           }}>
-            Faturası Var
+            Faturası var
           </label>
         </div>
         <div style={{
@@ -142,84 +143,79 @@ export default function PhoneCondition({ isMobile, formData, onInputChange }: Ph
         }}>
           <input
             type="checkbox"
-            id="hasWarranty"
             checked={formData.hasWarranty}
             onChange={(e) => onInputChange('hasWarranty', e.target.checked)}
             style={{
-              width: '18px',
-              height: '18px',
-              accentColor: '#3b82f6'
+              width: '24px',
+              height: '24px'
             }}
           />
-          <label htmlFor="hasWarranty" style={{
-            fontSize: '14px',
-            fontWeight: '500',
+          <label style={{
+            fontSize: '16px',
             color: '#374151'
           }}>
-            Garantisi Var
+            Garanti
           </label>
+          {formData.hasWarranty && (
+            <select
+              value={formData.warrantyDuration}
+              onChange={(e) => onInputChange('warrantyDuration', e.target.value)}
+              style={{
+                marginLeft: '8px',
+                padding: '4px 8px',
+                border: '1px solid #d1d5db',
+                borderRadius: '4px',
+                fontSize: isMobile ? '8px' : '12px',
+                outline: 'none'
+              }}
+            >
+              <option value="">Süre seçin</option>
+              <option value="1 yıl">1 yıl</option>
+              <option value="2 yıl">2 yıl</option>
+              <option value="3 yıl">3 yıl</option>
+              <option value="4 yıl">4 yıl</option>
+            </select>
+          )}
         </div>
-        {formData.hasWarranty && (
-          <>
-            <div>
-              <label style={{
-                display: 'block',
-                fontSize: '14px',
-                fontWeight: '500',
-                color: '#374151',
-                marginBottom: '6px'
-              }}>
-                Garanti Süresi (Ay)
-              </label>
-              <input
-                type="number"
-                value={formData.warrantyDuration}
-                onChange={(e) => onInputChange('warrantyDuration', parseInt(e.target.value))}
-                placeholder="Örn: 12"
-                min="0"
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  outline: 'none',
-                  transition: 'border-color 0.2s'
-                }}
-                onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-              />
-            </div>
-            <div>
-              <label style={{
-                display: 'block',
-                fontSize: '14px',
-                fontWeight: '500',
-                color: '#374151',
-                marginBottom: '6px'
-              }}>
-                Fatura Tarihi
-              </label>
-              <input
-                type="date"
-                value={formData.invoiceDate}
-                onChange={(e) => onInputChange('invoiceDate', e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  outline: 'none',
-                  transition: 'border-color 0.2s'
-                }}
-                onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-              />
-            </div>
-          </>
-        )}
       </div>
+      {formData.hasInvoice && (
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
+          gap: '16px',
+          marginTop: '16px'
+        }}>
+          <div></div>
+          <div>
+            <label style={{
+              display: 'block',
+              fontSize: '14px',
+              fontWeight: '500',
+              color: '#374151',
+              marginBottom: '6px'
+            }}>
+              Fatura Tarihi
+            </label>
+            <input
+              type="date"
+              value={formData.invoiceDate}
+              onChange={(e) => onInputChange('invoiceDate', e.target.value)}
+              style={{
+                width: '100%',
+                padding: '12px',
+                border: '1px solid #d1d5db',
+                borderRadius: '8px',
+                fontSize: '14px',
+                outline: 'none',
+                transition: 'border-color 0.2s'
+              }}
+              onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+              onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+            />
+          </div>
+          <div></div>
+        </div>
+      )}
     </div>
   );
 }
