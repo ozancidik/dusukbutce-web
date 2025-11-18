@@ -181,7 +181,7 @@ export default function ScannerCondition({ isMobile, formData, handleInputChange
               <option value="1 yıl">1 yıl</option>
               <option value="2 yıl">2 yıl</option>
               <option value="3 yıl">3 yıl</option>
-              <option value="5 yıl">5 yıl</option>
+              <option value="4 yıl">4 yıl</option>
             </select>
           )}
         </div>

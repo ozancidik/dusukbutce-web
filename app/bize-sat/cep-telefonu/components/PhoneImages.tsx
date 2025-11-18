@@ -1,3 +1,4 @@
+"use client";
 import React from 'react';
 
 interface PhoneImagesProps {
@@ -8,6 +9,20 @@ interface PhoneImagesProps {
 }
 
 export default function PhoneImages({ isMobile, images, onImageUpload, onImageRemove }: PhoneImagesProps) {
+  const handleBoxClick = () => {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*';
+    fileInput.multiple = true;
+    fileInput.onchange = (e) => {
+      const target = e.target as HTMLInputElement;
+      if (target.files) {
+        onImageUpload({ target } as React.ChangeEvent<HTMLInputElement>);
+      }
+    };
+    fileInput.click();
+  };
+
   return (
     <div style={{ marginBottom: '32px' }}>
       <h2 style={{
@@ -19,71 +34,35 @@ export default function PhoneImages({ isMobile, images, onImageUpload, onImageRe
         alignItems: 'center',
         gap: '8px'
       }}>
-        📸 Ürün Görselleri
+        📸 Fotoğraflar
       </h2>
-      <div style={{
-        border: '2px dashed #d1d5db',
-        borderRadius: '8px',
-        padding: '20px',
-        textAlign: 'center',
-        cursor: 'pointer',
-        transition: 'border-color 0.2s',
-        marginBottom: '20px'
-      }}
-      onDragOver={(e) => { e.preventDefault(); e.currentTarget.style.borderColor = '#3b82f6'; }}
-      onDragLeave={(e) => { e.currentTarget.style.borderColor = '#d1d5db'; }}
-      onDrop={(e) => {
-        e.preventDefault();
-        e.currentTarget.style.borderColor = '#d1d5db';
-        const dataTransfer = new DataTransfer();
-        Array.from(e.dataTransfer.files).forEach(file => dataTransfer.items.add(file));
-        onImageUpload({ target: { files: dataTransfer.files } } as React.ChangeEvent<HTMLInputElement>);
-      }}
-      onClick={() => document.getElementById('imageUpload')?.click()}
-      >
-        <input
-          type="file"
-          id="imageUpload"
-          multiple
-          accept="image/*"
-          onChange={onImageUpload}
-          style={{ display: 'none' }}
-        />
-        <p style={{
-          fontSize: '14px',
-          color: '#6b7280',
-          margin: '0 0 8px 0'
-        }}>
-          Resimleri buraya sürükleyin veya tıklayarak seçin
-        </p>
-        <p style={{
-          fontSize: '12px',
-          color: '#9ca3af'
-        }}>
-          Maksimum 5 resim, her biri 5MB
-        </p>
-      </div>
+      
+      {/* Fotoğraf Grid */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(120px, 1fr))',
-        gap: '12px'
+        gridTemplateColumns: isMobile ? 'repeat(5, 1fr)' : 'repeat(5, 1fr)',
+        gridTemplateRows: isMobile ? 'repeat(2, 1fr)' : 'auto',
+        gap: isMobile ? '8px' : '12px',
+        marginBottom: '16px'
       }}>
+        {/* Mevcut fotoğraflar */}
         {images.map((image, index) => (
           <div key={index} style={{
             position: 'relative',
-            width: '100%',
-            paddingTop: '100%',
+            aspectRatio: '1',
             borderRadius: '8px',
             overflow: 'hidden',
-            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+            border: '1px solid #e5e7eb',
+            background: '#f9fafb',
+            width: isMobile ? '60px' : 'auto',
+            height: isMobile ? '60px' : 'auto',
+            minWidth: isMobile ? '60px' : 'auto',
+            minHeight: isMobile ? '60px' : 'auto'
           }}>
             <img
               src={image}
-              alt={`Ürün Görseli ${index + 1}`}
+              alt={`Fotoğraf ${index + 1}`}
               style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
                 width: '100%',
                 height: '100%',
                 objectFit: 'cover'
@@ -91,30 +70,108 @@ export default function PhoneImages({ isMobile, images, onImageUpload, onImageRe
             />
             <button
               type="button"
-              onClick={(e) => { e.stopPropagation(); onImageRemove(index); }}
+              onClick={() => onImageRemove(index)}
               style={{
                 position: 'absolute',
-                top: '4px',
-                right: '4px',
-                background: 'rgba(220, 38, 38, 0.8)',
+                top: '2px',
+                right: '2px',
+                background: 'rgba(220, 38, 38, 0.9)',
                 color: 'white',
                 border: 'none',
                 borderRadius: '50%',
-                width: '24px',
-                height: '24px',
+                width: isMobile ? '18px' : '24px',
+                height: isMobile ? '18px' : '24px',
+                fontSize: isMobile ? '10px' : '12px',
+                cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '14px',
-                cursor: 'pointer',
-                zIndex: 10
+                transition: 'all 0.2s'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(220, 38, 38, 1)';
+                e.currentTarget.style.transform = 'scale(1.1)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(220, 38, 38, 0.9)';
+                e.currentTarget.style.transform = 'scale(1)';
               }}
             >
               ✕
             </button>
           </div>
         ))}
+        
+        {/* Boş fotoğraf alanları */}
+        {Array.from({ length: Math.max(0, 10 - images.length) }).map((_, index) => (
+          <div key={`empty-${index}`} style={{
+            aspectRatio: '1',
+            borderRadius: '8px',
+            border: '2px dashed #d1d5db',
+            background: '#f9fafb',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            transition: 'all 0.2s',
+            position: 'relative',
+            width: isMobile ? '60px' : 'auto',
+            height: isMobile ? '60px' : 'auto',
+            minWidth: isMobile ? '60px' : 'auto',
+            minHeight: isMobile ? '60px' : 'auto'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = '#3b82f6';
+            e.currentTarget.style.background = '#eff6ff';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = '#d1d5db';
+            e.currentTarget.style.background = '#f9fafb';
+          }}
+          onClick={handleBoxClick}
+          >
+            <div style={{
+              textAlign: 'center',
+              color: '#6b7280'
+            }}>
+              <div style={{
+                fontSize: isMobile ? '16px' : '24px',
+                marginBottom: '2px'
+              }}>
+                📷
+              </div>
+              <div style={{
+                fontSize: isMobile ? '8px' : '12px',
+                fontWeight: '500'
+              }}>
+                {isMobile ? 'Ekle' : 'Fotoğraf Ekle'}
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
+      
+      {/* Dosya seçici (gizli) */}
+      <input
+        type="file"
+        multiple
+        accept="image/*"
+        onChange={onImageUpload}
+        style={{
+          display: 'none'
+        }}
+        id="image-upload-input"
+      />
+      
+      {/* Bilgi metni */}
+      <p style={{
+        fontSize: isMobile ? '8px' : '12px',
+        color: '#6b7280',
+        margin: '8px 0 0 0',
+        textAlign: 'center'
+      }}>
+        Maksimum 10 fotoğraf ekleyebilirsiniz. Her kareye tıklayarak fotoğraf seçebilirsiniz.
+      </p>
     </div>
   );
 }

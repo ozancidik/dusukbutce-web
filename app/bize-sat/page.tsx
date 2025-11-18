@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import '../bize-sat/utils/testAPIs'; // Test utility'sini yükle (browser konsolunda erişilebilir)
 
 export default function BizeSatPage() {
   const [isMobile, setIsMobile] = useState(false);
@@ -33,6 +34,7 @@ export default function BizeSatPage() {
   ];
 
   const rightCategories = [
+    { name: 'Cep Telefonu', path: '/bize-sat/cep-telefonu', icon: '📱' },
     { name: 'Monitör', path: '/bize-sat/monitor', icon: '🖥️' },
     { name: 'Klavye', path: '/bize-sat/klavye', icon: '⌨️' },
     { name: 'Mouse', path: '/bize-sat/mouse', icon: '🖱️' },
@@ -40,7 +42,6 @@ export default function BizeSatPage() {
     { name: 'Kulaklık', path: '/bize-sat/kulaklik', icon: '🎧' },
     { name: 'Ses Sistemi', path: '/bize-sat/ses-sistemi', icon: '/sound-system.png' },
     { name: 'Oyuncu Direksiyonu', path: '/bize-sat/gaming-direksiyon', icon: '/steering-wheel.png' },
-    { name: 'Cep Telefonu', path: '/bize-sat/cep-telefonu', icon: '📱' },
     { name: 'Yazıcı', path: '/bize-sat/yazici', icon: '🖨️' },
     { name: 'Tarayıcı', path: '/bize-sat/tarayici', icon: '🔍' },
     { name: 'Fotokopi Makinesi', path: '/bize-sat/fotokopi-makinesi', icon: '📄' }
