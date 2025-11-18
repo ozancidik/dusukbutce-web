@@ -144,11 +144,20 @@ export default function TabletPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
+    if (!isLoggedIn) {
+      router.push('/login?returnUrl=' + encodeURIComponent('/bize-sat/tablet'));
+      return;
+    }
 
+    setIsSubmitting(true);
     try {
       // JWT token al
       const token = localStorage.getItem('token');
+      console.log('📝 Form Data before submit:', formData);
+      
+      // Timeout için AbortController kullan (MongoDB bağlantısı için yeterli süre)
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 120000); // 120 saniye timeout
       
       const response = await fetch('/api/tablet-submissions', {
         method: 'POST',
@@ -158,15 +167,26 @@ export default function TabletPage() {
         },
         body: JSON.stringify({
           ...formData,
-          category: 'tablet'
+          category: 'tablet',
+          cosmeticCondition: formData.cosmeticCondition || 'Mükemmel'
         }),
+        signal: controller.signal
       });
 
+      clearTimeout(timeoutId);
+      console.log('📥 Response status:', response.status);
+
       if (response.ok) {
+        const data = await response.json();
+        console.log('📥 Response data:', data);
+        
         setPopupType('success');
         setPopupTitle('Teklif Başarıyla Gönderildi!');
-        setPopupMessage('Ürününüz için teklif talebiniz alındı. En kısa sürede size dönüş yapacağız.');
+        setPopupMessage('Tablet ürününüz için teklif talebiniz alındı. En kısa sürede size dönüş yapacağız.');
         setShowPopup(true);
+        
+        localStorage.removeItem('tabletFormData');
+        
         setFormData({
           brand: '',
           model: '',
@@ -185,16 +205,27 @@ export default function TabletPage() {
           images: []
         });
       } else {
+        const errorData = await response.json().catch(() => ({ message: 'Bilinmeyen hata' }));
+        console.error('❌ API Error:', errorData);
         setPopupType('error');
         setPopupTitle('Hata Oluştu');
-        setPopupMessage('Teklif talebiniz gönderilemedi. Lütfen tekrar deneyin.');
+        setPopupMessage(errorData.message || 'Teklif talebiniz gönderilemedi. Lütfen tekrar deneyin.');
         setShowPopup(true);
       }
-    } catch (error) {
+    } catch (error: any) {
+      console.error('❌ Submit Error:', error);
       setPopupType('error');
-        setPopupTitle('Hata Oluştu');
+      setPopupTitle('Hata Oluştu');
+      
+      if (error.name === 'AbortError') {
+        setPopupMessage('İstek zaman aşımına uğradı. Lütfen tekrar deneyin.');
+      } else if (error.message) {
+        setPopupMessage(error.message);
+      } else {
         setPopupMessage('Teklif talebiniz gönderilemedi. Lütfen tekrar deneyin.');
-        setShowPopup(true);
+      }
+      
+      setShowPopup(true);
     } finally {
       setIsSubmitting(false);
     }

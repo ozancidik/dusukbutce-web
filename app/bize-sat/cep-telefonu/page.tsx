@@ -181,10 +181,19 @@ export default function CepTelefonuPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
+    if (!isLoggedIn) {
+      router.push('/login?returnUrl=' + encodeURIComponent('/bize-sat/cep-telefonu'));
+      return;
+    }
 
+    setIsSubmitting(true);
     try {
       const token = localStorage.getItem('token');
+      console.log('📝 Form Data before submit:', formData);
+      
+      // Timeout için AbortController kullan (MongoDB bağlantısı için yeterli süre)
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 120000); // 120 saniye timeout
       
       const response = await fetch('/api/submissions', {
         method: 'POST',
@@ -197,9 +206,16 @@ export default function CepTelefonuPage() {
           category: 'cep-telefonu',
           cosmeticCondition: formData.cosmeticCondition || 'Mükemmel'
         }),
+        signal: controller.signal
       });
 
+      clearTimeout(timeoutId);
+      console.log('📥 Response status:', response.status);
+
       if (response.ok) {
+        const data = await response.json();
+        console.log('📥 Response data:', data);
+        
         setPopupType('success');
         setPopupTitle('Teklif Başarıyla Gönderildi!');
         setPopupMessage('Cep telefonunuz için teklif talebiniz alındı. En kısa sürede size dönüş yapacağız.');
@@ -227,15 +243,26 @@ export default function CepTelefonuPage() {
           images: []
         });
       } else {
+        const errorData = await response.json().catch(() => ({ message: 'Bilinmeyen hata' }));
+        console.error('❌ API Error:', errorData);
         setPopupType('error');
         setPopupTitle('Hata Oluştu');
-        setPopupMessage('Teklif talebiniz gönderilemedi. Lütfen tekrar deneyin.');
+        setPopupMessage(errorData.message || 'Teklif talebiniz gönderilemedi. Lütfen tekrar deneyin.');
         setShowPopup(true);
       }
-    } catch (error) {
+    } catch (error: any) {
+      console.error('❌ Submit Error:', error);
       setPopupType('error');
       setPopupTitle('Hata Oluştu');
-      setPopupMessage('Teklif talebiniz gönderilemedi. Lütfen tekrar deneyin.');
+      
+      if (error.name === 'AbortError') {
+        setPopupMessage('İstek zaman aşımına uğradı. Lütfen tekrar deneyin.');
+      } else if (error.message) {
+        setPopupMessage(error.message);
+      } else {
+        setPopupMessage('Teklif talebiniz gönderilemedi. Lütfen tekrar deneyin.');
+      }
+      
       setShowPopup(true);
     } finally {
       setIsSubmitting(false);

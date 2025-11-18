@@ -74,6 +74,11 @@ export default function GamepadPage() {
     try {
       // JWT token al
       const token = localStorage.getItem('token');
+      console.log('📝 Form Data before submit:', formData);
+      
+      // Timeout için AbortController kullan (MongoDB bağlantısı için yeterli süre)
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 120000); // 120 saniye timeout
       
       const response = await fetch('/api/submissions', {
         method: 'POST',
@@ -84,12 +89,19 @@ export default function GamepadPage() {
         body: JSON.stringify({
           category: 'gamepad',
           brand: 'Gamepad',
-          ...formData
+          ...formData,
+          cosmeticCondition: formData.cosmeticCondition || 'Mükemmel'
         }),
+        signal: controller.signal
       });
 
+      clearTimeout(timeoutId);
+      console.log('📥 Response status:', response.status);
+
       if (response.ok) {
-        const result = await response.json();
+        const data = await response.json();
+        console.log('📥 Response data:', data);
+        
         setPopupType('success');
         setPopupTitle('Teklif Başarıyla Gönderildi!');
         setPopupMessage('Gamepad/Joystick ürününüz için teklif talebiniz alındı. En kısa sürede size dönüş yapacağız.');
@@ -114,17 +126,27 @@ export default function GamepadPage() {
           description: ''
         });
       } else {
+        const errorData = await response.json().catch(() => ({ message: 'Bilinmeyen hata' }));
+        console.error('❌ API Error:', errorData);
         setPopupType('error');
         setPopupTitle('Hata Oluştu');
-        setPopupMessage('Teklif talebiniz gönderilemedi. Lütfen tekrar deneyin.');
+        setPopupMessage(errorData.message || 'Teklif talebiniz gönderilemedi. Lütfen tekrar deneyin.');
         setShowPopup(true);
       }
-    } catch (error) {
-      console.error('Error:', error);
+    } catch (error: any) {
+      console.error('❌ Submit Error:', error);
       setPopupType('error');
-        setPopupTitle('Hata Oluştu');
+      setPopupTitle('Hata Oluştu');
+      
+      if (error.name === 'AbortError') {
+        setPopupMessage('İstek zaman aşımına uğradı. Lütfen tekrar deneyin.');
+      } else if (error.message) {
+        setPopupMessage(error.message);
+      } else {
         setPopupMessage('Teklif talebiniz gönderilemedi. Lütfen tekrar deneyin.');
-        setShowPopup(true);
+      }
+      
+      setShowPopup(true);
     } finally {
       setIsSubmitting(false);
     }
