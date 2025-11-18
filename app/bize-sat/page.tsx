@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import '../bize-sat/utils/testAPIs'; // Test utility'sini yükle (browser konsolunda erişilebilir)
 
 export default function BizeSatPage() {
   const [isMobile, setIsMobile] = useState(false);
