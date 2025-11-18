@@ -147,7 +147,9 @@ function LeftSidebar({ isMobile, isIPhoneSE, isIPadPro, isIPadAir }: LeftSidebar
       }}>
         {/* Sol Sütun */}
         <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-          {[
+          {(isMobile && !isIPadPro && !isIPadAir ? [
+            // Mobil görünümde cep telefonu en üstte
+            { name: 'Cep Telefonu', path: '/bize-sat/cep-telefonu', icon: '📱' },
             { name: 'Dizüstü (Notebook)', path: '/bize-sat/notebook', icon: '💻' },
             { name: 'Masaüstü (Kasa)', path: '/bize-sat/masaustu', icon: '🖥️' },
             { name: 'Monitör', path: '/bize-sat/monitor', icon: '🖥️' },
@@ -156,8 +158,32 @@ function LeftSidebar({ isMobile, isIPhoneSE, isIPadPro, isIPadAir }: LeftSidebar
             { name: 'RAM', path: '/bize-sat/ram', icon: '/ram.png' },
             { name: 'SSD', path: '/bize-sat/ssd', icon: '/ssd.png' },
             { name: 'Soğutucu', path: '/bize-sat/sogutucu', icon: '/sogutucu.png' },
-            { name: 'Boş Kasa', path: '/bize-sat/kasa', icon: '/case.png' }
-          ].map((category, index) => (
+            { name: 'Boş Kasa', path: '/bize-sat/kasa', icon: '/case.png' },
+            { name: 'PlayStation', path: '/bize-sat/playstation', icon: '/playstation.png' },
+            { name: 'Gamepad', path: '/bize-sat/gamepad', icon: '/gamepad.png' },
+            { name: 'Xbox', path: '/bize-sat/xbox', icon: '/xbox.png' },
+            { name: 'Klavye', path: '/bize-sat/klavye', icon: '⌨️' },
+            { name: 'Mouse', path: '/bize-sat/mouse', icon: '🖱️' },
+            { name: 'Tablet', path: '/bize-sat/tablet', icon: '/tablet.png' },
+            { name: 'Kulaklık', path: '/bize-sat/kulaklik', icon: '🎧' },
+            { name: 'Ses Sistemi', path: '/bize-sat/ses-sistemi', icon: '/sound-system.png' },
+            // Mobil görünümde en altta alt alta
+            { name: 'Fotokopi Makinesi', path: '/bize-sat/fotokopi-makinesi', icon: '📄' },
+            { name: 'Yazıcı', path: '/bize-sat/yazici', icon: '🖨️' },
+            { name: 'Tarayıcı', path: '/bize-sat/tarayici', icon: '🔍' }
+          ] : [
+            { name: 'Dizüstü (Notebook)', path: '/bize-sat/notebook', icon: '💻' },
+            { name: 'Masaüstü (Kasa)', path: '/bize-sat/masaustu', icon: '🖥️' },
+            { name: 'Monitör', path: '/bize-sat/monitor', icon: '🖥️' },
+            { name: 'Ekran Kartı', path: '/bize-sat/ekran-karti', icon: '/graphic-card.png' },
+            { name: 'İşlemci', path: '/bize-sat/islemci', icon: '/cpu-tower.png' },
+            { name: 'RAM', path: '/bize-sat/ram', icon: '/ram.png' },
+            { name: 'SSD', path: '/bize-sat/ssd', icon: '/ssd.png' },
+            { name: 'Soğutucu', path: '/bize-sat/sogutucu', icon: '/sogutucu.png' },
+            { name: 'Boş Kasa', path: '/bize-sat/kasa', icon: '/case.png' },
+            { name: 'Fotokopi Makinesi', path: '/bize-sat/fotokopi-makinesi', icon: '📄' },
+            { name: 'Yazıcı', path: '/bize-sat/yazici', icon: '🖨️' }
+          ]).map((category, index) => (
             <Link key={index} href={category.path} style={{ textDecoration: 'none' }}>
               <div style={{
                 display: 'flex',
@@ -211,9 +237,11 @@ function LeftSidebar({ isMobile, isIPhoneSE, isIPadPro, isIPadAir }: LeftSidebar
           ))}
         </div>
 
-        {/* Sağ Sütun */}
+        {/* Sağ Sütun - Desktop ve iPad görünümünde gösterilir */}
+        {(!isMobile || isIPadPro || isIPadAir) && (
         <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
           {[
+            { name: 'Cep Telefonu', path: '/bize-sat/cep-telefonu', icon: '📱' },
             { name: 'PlayStation', path: '/bize-sat/playstation', icon: '/playstation.png' },
             { name: 'Gamepad', path: '/bize-sat/gamepad', icon: '/gamepad.png' },
             { name: 'Xbox', path: '/bize-sat/xbox', icon: '/xbox.png' },
@@ -221,7 +249,8 @@ function LeftSidebar({ isMobile, isIPhoneSE, isIPadPro, isIPadAir }: LeftSidebar
             { name: 'Mouse', path: '/bize-sat/mouse', icon: '🖱️' },
             { name: 'Tablet', path: '/bize-sat/tablet', icon: '/tablet.png' },
             { name: 'Kulaklık', path: '/bize-sat/kulaklik', icon: '🎧' },
-            { name: 'Ses Sistemi', path: '/bize-sat/ses-sistemi', icon: '/sound-system.png' }
+            { name: 'Ses Sistemi', path: '/bize-sat/ses-sistemi', icon: '/sound-system.png' },
+            { name: 'Tarayıcı', path: '/bize-sat/tarayici', icon: '🔍' }
           ].map((category, index) => (
             <Link key={index} href={category.path} style={{ textDecoration: 'none' }}>
               <div style={{
@@ -275,6 +304,7 @@ function LeftSidebar({ isMobile, isIPhoneSE, isIPadPro, isIPadAir }: LeftSidebar
             </Link>
           ))}
         </div>
+        )}
       </div>
     </div>
   );
