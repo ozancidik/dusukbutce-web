@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../hooks/useAuth';
 import SubmissionPopup from '../../../components/SubmissionPopup';
+import LoginRequiredCard from '../components/LoginRequiredCard';
 
 export default function GamepadPage() {
   const [isMobile, setIsMobile] = useState(false);
@@ -214,75 +215,7 @@ export default function GamepadPage() {
         </div>
 
         {/* Login Required Card */}
-        {!isLoggedIn && (
-          <div style={{
-            background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)',
-            borderRadius: '12px',
-            padding: isMobile ? '12px' : '20px',
-            boxShadow: '0 4px 12px rgba(220, 38, 38, 0.1)',
-            marginBottom: '24px',
-            border: '1px solid #fecaca',
-            textAlign: 'center',
-            marginLeft: isMobile ? '0' : '0',
-            marginRight: isMobile ? '0' : '0'
-          }}>
-            <div style={{
-              textAlign: 'center',
-              marginBottom: isMobile ? '10px' : '16px'
-            }}>
-              <h3 style={{
-                fontSize: isMobile ? '13px' : '16px',
-                fontWeight: '600',
-                color: '#dc2626',
-                margin: 0,
-                lineHeight: '1.2'
-              }}>
-                Teklif Alabilmek İçin Giriş Yapmanız Gerekiyor
-              </h3>
-            </div>
-            
-            <button
-              type="button"
-              onClick={() => router.push(`/login?returnUrl=${encodeURIComponent('/bize-sat/gamepad')}`)}
-              style={{
-                background: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',
-                color: 'white',
-                border: 'none',
-                borderRadius: '8px',
-                padding: isMobile ? '8px 12px' : '12px 20px',
-                fontSize: isMobile ? '11px' : '14px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                boxShadow: '0 2px 8px rgba(220, 38, 38, 0.3)',
-                width: '100%',
-                boxSizing: 'border-box'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-1px)';
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.4)';
-                e.currentTarget.style.background = 'linear-gradient(135deg, #b91c1c 0%, #dc2626 100%)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 2px 8px rgba(220, 38, 38, 0.3)';
-                e.currentTarget.style.background = 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)';
-              }}
-            >
-              🚀 Giriş Yap ve Teklif Al
-            </button>
-            
-            <p style={{
-              fontSize: isMobile ? '12px' : '14px',
-              color: '#991b1b',
-              margin: '6px 0 0 0',
-              opacity: 0.8,
-              lineHeight: '1.2'
-            }}>
-              Hesabınız yok mu? <span style={{ fontWeight: '600', cursor: 'pointer', textDecoration: 'underline' }} onClick={() => router.push('/register')}>Kayıt olun</span>
-            </p>
-          </div>
-        )}
+        {!isLoggedIn && <LoginRequiredCard isMobile={isMobile} returnUrl="/bize-sat/gamepad" />}
 
         {/* Form */}
         <form onSubmit={handleSubmit} style={{
