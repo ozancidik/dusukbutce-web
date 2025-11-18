@@ -39,7 +39,11 @@ export default function BizeSatPage() {
     { name: 'Tablet', path: '/bize-sat/tablet', icon: '/tablet.png' },
     { name: 'Kulaklık', path: '/bize-sat/kulaklik', icon: '🎧' },
     { name: 'Ses Sistemi', path: '/bize-sat/ses-sistemi', icon: '/sound-system.png' },
-    { name: 'Oyuncu Direksiyonu', path: '/bize-sat/gaming-direksiyon', icon: '/steering-wheel.png' }
+    { name: 'Oyuncu Direksiyonu', path: '/bize-sat/gaming-direksiyon', icon: '/steering-wheel.png' },
+    { name: 'Cep Telefonu', path: '/bize-sat/cep-telefonu', icon: '📱' },
+    { name: 'Yazıcı', path: '/bize-sat/yazici', icon: '🖨️' },
+    { name: 'Tarayıcı', path: '/bize-sat/tarayici', icon: '🔍' },
+    { name: 'Fotokopi Makinesi', path: '/bize-sat/fotokopi-makinesi', icon: '📄' }
   ];
 
   const gamingCategories = [
