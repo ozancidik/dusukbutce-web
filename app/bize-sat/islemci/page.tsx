@@ -260,7 +260,530 @@ export default function ProcessorPage() {
         </div>
 
         {/* Login Required Card */}
-        {!isLoggedIn && <LoginRequiredCard isMobile={isMobile} returnUrl="/bize-sat/islemci" />}.map((_, index) => (
+        {!isLoggedIn && <LoginRequiredCard isMobile={isMobile} returnUrl="/bize-sat/islemci" />}
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} style={{
+          background: 'white',
+          borderRadius: '16px',
+          padding: isMobile ? '24px' : '32px',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1)',
+          border: '1px solid #e5e7eb'
+        }}>
+          {/* Temel Bilgiler */}
+          <div style={{ marginBottom: '32px' }}>
+            <h2 style={{
+              fontSize: isMobile ? '18px' : '20px',
+              fontWeight: '600',
+              color: '#374151',
+              margin: '0 0 20px 0',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              🔧 Temel Bilgiler
+            </h2>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
+              gap: '16px'
+            }}>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Marka *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.brand}
+                  onChange={(e) => handleInputChange('brand', e.target.value)}
+                  placeholder="Örn: Intel, AMD"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                />
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Model *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.model}
+                  onChange={(e) => handleInputChange('model', e.target.value)}
+                  placeholder="Örn: i7-12700K, Ryzen 7 5800X"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Teknik Özellikler */}
+          <div style={{ marginBottom: '32px' }}>
+            <h2 style={{
+              fontSize: isMobile ? '18px' : '20px',
+              fontWeight: '600',
+              color: '#374151',
+              margin: '0 0 20px 0',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              ⚙️ Teknik Özellikler
+            </h2>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
+              gap: '16px'
+            }}>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Stok Fan Var Mı
+                </label>
+                <select
+                  value={formData.stokFan}
+                  onChange={(e) => handleInputChange('stokFan', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                >
+                  <option value="">Seçin</option>
+                  <option value="Evet">Evet</option>
+                  <option value="Hayır">Hayır</option>
+                </select>
+              </div>
+
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Cache (Önbellek)
+                </label>
+                <input
+                  type="text"
+                  value={formData.cache}
+                  onChange={(e) => handleInputChange('cache', e.target.value)}
+                  placeholder="Örn: 32 MB, 96 MB"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                />
+              </div>
+
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Soket
+                </label>
+                <input
+                  type="text"
+                  value={formData.socket}
+                  onChange={(e) => handleInputChange('socket', e.target.value)}
+                  placeholder="Örn: LGA1700, AM4, AM5"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                />
+              </div>
+
+
+
+
+
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Açıklama
+                </label>
+                <textarea
+                  value={formData.description}
+                  onChange={(e) => handleInputChange('description', e.target.value)}
+                  placeholder="Ürün hakkında ek bilgiler, özellikler, kullanım durumu vb."
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s',
+                    minHeight: '80px',
+                    resize: 'vertical'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                />
+              </div>
+            </div>
+
+          </div>
+
+          {/* Durum Bilgileri */}
+          <div style={{ marginBottom: '32px' }}>
+            <h2 style={{
+              fontSize: isMobile ? '18px' : '20px',
+              fontWeight: '600',
+              color: '#374151',
+              margin: '0 0 20px 0',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              📋 Durum Bilgileri
+            </h2>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
+              gap: '16px'
+            }}>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Kozmetik Durum *
+                </label>
+                <select
+                  required
+                  value={formData.cosmeticCondition}
+                  onChange={(e) => handleInputChange('cosmeticCondition', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                >
+                  <option value="Mükemmel">Mükemmel</option>
+                  <option value="İyi">İyi</option>
+                  <option value="Orta">Orta</option>
+                  <option value="Kötü">Kötü</option>
+                </select>
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Adet *
+                </label>
+                <input
+                  type="number"
+                  required
+                  min="1"
+                  value={formData.quantity}
+                  onChange={(e) => handleInputChange('quantity', parseInt(e.target.value))}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                />
+              </div>
+            </div>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
+              gap: '16px',
+              marginTop: '16px'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                <input
+                  type="checkbox"
+                  checked={formData.hasBox}
+                  onChange={(e) => handleInputChange('hasBox', e.target.checked)}
+                  style={{
+                    width: '24px',
+                    height: '24px'
+                  }}
+                />
+                <label style={{
+                  fontSize: '16px',
+                  color: '#374151'
+                }}>
+                  Kutusu var
+                </label>
+              </div>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                <input
+                  type="checkbox"
+                  checked={formData.hasInvoice}
+                  onChange={(e) => handleInputChange('hasInvoice', e.target.checked)}
+                  style={{
+                    width: '24px',
+                    height: '24px'
+                  }}
+                />
+                <label style={{
+                  fontSize: '16px',
+                  color: '#374151'
+                }}>
+                  Faturası var
+                </label>
+              </div>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                <input
+                  type="checkbox"
+                  checked={formData.hasWarranty}
+                  onChange={(e) => handleInputChange('hasWarranty', e.target.checked)}
+                  style={{
+                    width: '24px',
+                    height: '24px'
+                  }}
+                />
+                <label style={{
+                  fontSize: '16px',
+                  color: '#374151'
+                }}>
+                  Garanti
+                </label>
+                {formData.hasWarranty && (
+                  <select
+                    value={formData.warrantyDuration}
+                    onChange={(e) => handleInputChange('warrantyDuration', e.target.value)}
+                    style={{
+                      marginLeft: '8px',
+                      padding: '4px 8px',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '4px',
+                      fontSize: isMobile ? '8px' : '12px',
+                      outline: 'none'
+                    }}
+                  >
+                    <option value="">Süre seçin</option>
+                    <option value="1 yıl">1 yıl</option>
+                    <option value="2 yıl">2 yıl</option>
+                    <option value="3 yıl">3 yıl</option>
+                    <option value="4 yıl">4 yıl</option>
+                  </select>
+                )}
+              </div>
+            </div>
+            {formData.hasInvoice && (
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
+                gap: '16px',
+                marginTop: '16px'
+              }}>
+                <div></div>
+                <div>
+                  <label style={{
+                    display: 'block',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    color: '#374151',
+                    marginBottom: '6px'
+                  }}>
+                    Fatura Tarihi
+                  </label>
+                  <input
+                    type="date"
+                    value={formData.invoiceDate}
+                    onChange={(e) => handleInputChange('invoiceDate', e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      outline: 'none',
+                      transition: 'border-color 0.2s'
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                    onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                  />
+                </div>
+                <div></div>
+              </div>
+            )}
+          </div>
+
+          {/* Fotoğraflar */}
+          <div style={{ marginBottom: '32px' }}>
+            <h2 style={{
+              fontSize: isMobile ? '18px' : '20px',
+              fontWeight: '600',
+              color: '#374151',
+              margin: '0 0 20px 0',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              📸 Fotoğraflar
+            </h2>
+            
+            {/* Fotoğraf Grid */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: isMobile ? 'repeat(5, 1fr)' : 'repeat(5, 1fr)',
+              gridTemplateRows: isMobile ? 'repeat(2, 1fr)' : 'auto',
+              gap: isMobile ? '8px' : '12px',
+              marginBottom: '16px'
+            }}>
+              {/* Mevcut fotoğraflar */}
+              {formData.images.map((image, index) => (
+                <div key={index} style={{
+                  position: 'relative',
+                  aspectRatio: '1',
+                  borderRadius: '8px',
+                  overflow: 'hidden',
+                  border: '1px solid #e5e7eb',
+                  background: '#f9fafb',
+                  width: isMobile ? '60px' : 'auto',
+                  height: isMobile ? '60px' : 'auto',
+                  minWidth: isMobile ? '60px' : 'auto',
+                  minHeight: isMobile ? '60px' : 'auto'
+                }}>
+                  <img
+                    src={image}
+                    alt={`Fotoğraf ${index + 1}`}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover'
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeImage(index)}
+                    style={{
+                      position: 'absolute',
+                      top: '2px',
+                      right: '2px',
+                      background: 'rgba(220, 38, 38, 0.9)',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '50%',
+                      width: isMobile ? '18px' : '24px',
+                      height: isMobile ? '18px' : '24px',
+                      fontSize: isMobile ? '10px' : '12px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'rgba(220, 38, 38, 1)';
+                      e.currentTarget.style.transform = 'scale(1.1)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'rgba(220, 38, 38, 0.9)';
+                      e.currentTarget.style.transform = 'scale(1)';
+                    }}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+              
+              {/* Boş fotoğraf alanları */}
+              {Array.from({ length: Math.max(0, 10 - formData.images.length) }).map((_, index) => (
                 <div key={`empty-${index}`} style={{
                   aspectRatio: '1',
                   borderRadius: '8px',
