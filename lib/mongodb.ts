@@ -18,35 +18,59 @@ async function connectDB() {
     // readyState: 0 = disconnected, 1 = connected, 2 = connecting, 3 = disconnecting
     if (mongoose.connection.readyState === 1) {
       isConnected = true;
+      console.log('✅ MongoDB zaten bağlı');
       return;
     }
     
-    // Yeni bağlantı kur
+    // Eğer bağlantı kuruluyorsa bekle
+    if (mongoose.connection.readyState === 2) {
+      console.log('⏳ MongoDB bağlantısı bekleniyor...');
+      let waitCount = 0;
+      while (mongoose.connection.readyState === 2 && waitCount < 100) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        waitCount++;
+      }
+      if (mongoose.connection.readyState === 1) {
+        isConnected = true;
+        console.log('✅ MongoDB bağlantısı hazır');
+        return;
+      }
+    }
+    
+    console.log('🔄 MongoDB bağlantısı kuruluyor...');
+    // Yeni bağlantı kur - notebook endpoint ile aynı timeout ayarları
     await mongoose.connect(MONGODB_URI, {
       maxPoolSize: 10,
-      serverSelectionTimeoutMS: 10000, // 10 saniye timeout
+      serverSelectionTimeoutMS: 30000, // 30 saniye timeout (Artırıldı)
       socketTimeoutMS: 45000,
       bufferCommands: false,
-      connectTimeoutMS: 10000
+      connectTimeoutMS: 30000 // 30 saniye (Artırıldı)
     });
     
-    // mongoose.connect() promise resolve olduğunda bağlantı hazır olmalı
-    // Ancak emin olmak için kısa bir kontrol yap
+    console.log('✅ MongoDB connect() resolve oldu, readyState:', mongoose.connection.readyState);
+    
+    // Bağlantının hazır olduğundan emin ol
     let retries = 0;
-    const maxRetries = 10;
-    // readyState: 1 = connected
+    const maxRetries = 100; // 10 saniye (100 * 100ms) - Artırıldı
     while ((mongoose.connection.readyState as number) !== 1 && retries < maxRetries) {
       await new Promise(resolve => setTimeout(resolve, 100));
       retries++;
+      if (retries % 10 === 0) {
+        console.log(`⏳ MongoDB readyState bekleniyor... (${retries}/100)`);
+      }
     }
 
     if ((mongoose.connection.readyState as number) !== 1) {
-      throw new Error('MongoDB connection not ready after connect');
+      console.error('❌ MongoDB readyState:', mongoose.connection.readyState);
+      throw new Error(`MongoDB connection not ready after connect. readyState: ${mongoose.connection.readyState}`);
     }
     
     isConnected = true;
+    console.log('✅ MongoDB bağlantısı tamamlandı');
+    
   } catch (error) {
     isConnected = false;
+    console.error('❌ MongoDB bağlantı hatası:', error);
     throw error;
   }
 }

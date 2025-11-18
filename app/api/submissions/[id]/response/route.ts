@@ -124,33 +124,44 @@ export async function PUT(
       
       console.log('📧 Müşteri bilgileri:', { customerEmail, customerName, productName, offerAmount });
 
+      // Email gönderimini async yap (kullanıcı beklemeden response döndür)
       if (action === 'accepted') {
         // Müşteri kabul etti - admin'e mail gönder
-        const emailSent = await sendCustomerAcceptEmailToAdmin(
+        sendCustomerAcceptEmailToAdmin(
           customerEmail, 
           customerName, 
           productName, 
           offerAmount
-        );
-        if (emailSent) {
-          console.log(`✅ Müşteri kabul maili admin'e gönderildi`);
-        } else {
-          console.log(`❌ Müşteri kabul maili gönderilemedi`);
-        }
+        )
+        .then((emailSent) => {
+          if (emailSent) {
+            console.log(`✅ Müşteri kabul maili admin'e gönderildi`);
+          } else {
+            console.log(`❌ Müşteri kabul maili gönderilemedi`);
+          }
+        })
+        .catch((error) => {
+          console.error('Müşteri kabul maili gönderme hatası:', error);
+        });
       } else if (action === 'rejected') {
         // Müşteri reddetti - admin'e mail gönder
-        const emailSent = await sendCustomerRejectEmailToAdmin(
+        sendCustomerRejectEmailToAdmin(
           customerEmail, 
           customerName, 
           productName, 
           offerAmount, 
           reason
-        );
-        if (emailSent) {
-          console.log(`✅ Müşteri red maili admin'e gönderildi`);
-        } else {
-          console.log(`❌ Müşteri red maili gönderilemedi`);
-        }
+        )
+        .then((emailSent) => {
+          if (emailSent) {
+            console.log(`✅ Müşteri red maili admin'e gönderildi`);
+          } else {
+            console.log(`❌ Müşteri red maili gönderilemedi`);
+          }
+        })
+        .catch((error) => {
+          console.error('Müşteri red maili gönderme hatası:', error);
+        });
       }
     } catch (error) {
       console.error('Mail gönderme hatası:', error);

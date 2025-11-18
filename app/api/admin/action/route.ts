@@ -110,32 +110,47 @@ export async function POST(request: NextRequest) {
     
     const finalProductName = productName || `${submission.brand} ${submission.model}`.trim();
     
-    // Admin action'larına göre mail gönder
+    // Email gönderimini async yap (kullanıcı beklemeden response döndür)
     try {
       if (action === 'offer' && amount && finalCustomerEmail) {
         // Admin teklif verdi - müşteriye mail gönder
-        const emailSent = await sendOfferEmail(finalCustomerEmail, finalCustomerName, finalProductName, amount, notes);
-        if (emailSent) {
-          console.log(`✅ Teklif maili müşteriye gönderildi: ${finalCustomerEmail}`);
-        } else {
-          console.log(`❌ Teklif maili gönderilemedi: ${finalCustomerEmail}`);
-        }
+        sendOfferEmail(finalCustomerEmail, finalCustomerName, finalProductName, amount, notes)
+          .then((emailSent) => {
+            if (emailSent) {
+              console.log(`✅ Teklif maili müşteriye gönderildi: ${finalCustomerEmail}`);
+            } else {
+              console.log(`❌ Teklif maili gönderilemedi: ${finalCustomerEmail}`);
+            }
+          })
+          .catch((error) => {
+            console.error('Teklif maili gönderme hatası:', error);
+          });
       } else if (action === 'reject' && finalCustomerEmail) {
         // Admin reddetti - müşteriye mail gönder
-        const emailSent = await sendAdminRejectEmailToCustomer(finalCustomerEmail, finalCustomerName, finalProductName, reason || notes);
-        if (emailSent) {
-          console.log(`✅ Red maili müşteriye gönderildi: ${finalCustomerEmail}`);
-        } else {
-          console.log(`❌ Red maili gönderilemedi: ${finalCustomerEmail}`);
-        }
+        sendAdminRejectEmailToCustomer(finalCustomerEmail, finalCustomerName, finalProductName, reason || notes)
+          .then((emailSent) => {
+            if (emailSent) {
+              console.log(`✅ Red maili müşteriye gönderildi: ${finalCustomerEmail}`);
+            } else {
+              console.log(`❌ Red maili gönderilemedi: ${finalCustomerEmail}`);
+            }
+          })
+          .catch((error) => {
+            console.error('Red maili gönderme hatası:', error);
+          });
       } else if (action === 'list' && finalCustomerEmail) {
         // Admin ilan oluşturdu - müşteriye mail gönder
-        const emailSent = await sendAdminAcceptEmailToCustomer(finalCustomerEmail, finalCustomerName, finalProductName, amount || 0);
-        if (emailSent) {
-          console.log(`✅ Kabul maili müşteriye gönderildi: ${finalCustomerEmail}`);
-        } else {
-          console.log(`❌ Kabul maili gönderilemedi: ${finalCustomerEmail}`);
-        }
+        sendAdminAcceptEmailToCustomer(finalCustomerEmail, finalCustomerName, finalProductName, amount || 0)
+          .then((emailSent) => {
+            if (emailSent) {
+              console.log(`✅ Kabul maili müşteriye gönderildi: ${finalCustomerEmail}`);
+            } else {
+              console.log(`❌ Kabul maili gönderilemedi: ${finalCustomerEmail}`);
+            }
+          })
+          .catch((error) => {
+            console.error('Kabul maili gönderme hatası:', error);
+          });
       }
     } catch (error) {
       console.error('Mail gönderme hatası:', error);

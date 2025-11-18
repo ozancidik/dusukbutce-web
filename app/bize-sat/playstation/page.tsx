@@ -71,9 +71,13 @@ export default function PlayStationPage() {
 
     setIsSubmitting(true);
     try {
-      console.log('Form data being sent:', formData);
-      // Get token from localStorage
+      // JWT token al
       const token = localStorage.getItem('token');
+      console.log('📝 Form Data before submit:', formData);
+      
+      // Timeout için AbortController kullan (MongoDB bağlantısı için yeterli süre)
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 120000); // 120 saniye timeout
       
       const response = await fetch('/api/submissions', {
         method: 'POST',
@@ -82,11 +86,20 @@ export default function PlayStationPage() {
           ...(token && { 'Authorization': `Bearer ${token}` }),
         },
         body: JSON.stringify({
-          ...formData
+          ...formData,
+          category: 'playstation',
+          cosmeticCondition: formData.cosmeticCondition || 'Mükemmel'
         }),
+        signal: controller.signal
       });
 
+      clearTimeout(timeoutId);
+      console.log('📥 Response status:', response.status);
+
       if (response.ok) {
+        const data = await response.json();
+        console.log('📥 Response data:', data);
+        
         setPopupType('success');
         setPopupTitle('Teklif Başarıyla Gönderildi!');
         setPopupMessage('PlayStation konsolunuz için teklif talebiniz alındı. En kısa sürede size dönüş yapacağız.');
@@ -113,16 +126,26 @@ export default function PlayStationPage() {
           description: ''
         });
       } else {
+        const errorData = await response.json().catch(() => ({ message: 'Bilinmeyen hata' }));
+        console.error('❌ API Error:', errorData);
         setPopupType('error');
         setPopupTitle('Hata Oluştu');
-        setPopupMessage('Teklif talebiniz gönderilemedi. Lütfen tekrar deneyin.');
+        setPopupMessage(errorData.message || 'Teklif talebiniz gönderilemedi. Lütfen tekrar deneyin.');
         setShowPopup(true);
       }
-    } catch (error) {
-      console.error('Error:', error);
+    } catch (error: any) {
+      console.error('❌ Submit Error:', error);
       setPopupType('error');
       setPopupTitle('Hata Oluştu');
-      setPopupMessage('Teklif talebiniz gönderilemedi. Lütfen tekrar deneyin.');
+      
+      if (error.name === 'AbortError') {
+        setPopupMessage('İstek zaman aşımına uğradı. Lütfen tekrar deneyin.');
+      } else if (error.message) {
+        setPopupMessage(error.message);
+      } else {
+        setPopupMessage('Teklif talebiniz gönderilemedi. Lütfen tekrar deneyin.');
+      }
+      
       setShowPopup(true);
     } finally {
       setIsSubmitting(false);
