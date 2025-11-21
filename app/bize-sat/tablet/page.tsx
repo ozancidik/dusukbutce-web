@@ -80,9 +80,9 @@ export default function TabletPage() {
       const ctx = canvas.getContext('2d');
       const img = new Image();
       
-      // Maksimum boyutları belirle (daha küçük = daha hızlı)
-      const maxWidth = 600;
-      const maxHeight = 400;
+      // Maksimum boyutları belirle (daha yüksek çözünürlük için artırıldı)
+      const maxWidth = 1600;
+      const maxHeight = 1200;
       
       let { width, height } = img;
       
@@ -104,8 +104,8 @@ export default function TabletPage() {
       
       ctx?.drawImage(img, 0, 0, width, height);
       
-      // Kaliteyi düşür (0.5 = %50 kalite) - daha hızlı
-      return canvas.toDataURL('image/jpeg', 0.5);
+      // Kaliteyi artır (0.9 = %90 kalite - daha net görüntü için)
+      return canvas.toDataURL('image/jpeg', 0.9);
     } catch (error) {
       console.warn('Resim sıkıştırma hatası:', error);
       return base64String; // Hata durumunda orijinal resmi döndür

@@ -188,9 +188,9 @@ export default function PlayStationPage() {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
         
-        // Maksimum boyutları belirle
-        const maxWidth = 800;
-        const maxHeight = 600;
+        // Maksimum boyutları belirle (daha yüksek çözünürlük için artırıldı)
+        const maxWidth = 1600;
+        const maxHeight = 1200;
         
         let { width, height } = img;
         
@@ -212,8 +212,8 @@ export default function PlayStationPage() {
         
         ctx?.drawImage(img, 0, 0, width, height);
         
-        // JPEG olarak sıkıştır (kalite: 0.8)
-        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
+        // JPEG olarak sıkıştır (kalite: 0.9 - daha net görüntü için)
+        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.9);
         resolve(compressedBase64);
       };
       
