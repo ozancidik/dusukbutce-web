@@ -70,21 +70,85 @@ export default function HeadphonesPage() {
     localStorage.setItem('headphonesFormData', JSON.stringify(newData));
   };
 
+  // Resim sıkıştırma fonksiyonu
+  const compressImage = (base64String: string): Promise<string> => {
+    try {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      return new Promise((resolve) => {
+        img.onload = () => {
+          // Maksimum boyutları belirle (daha yüksek çözünürlük için artırıldı)
+          const maxWidth = 1600;
+          const maxHeight = 1200;
+          
+          let { width, height } = img;
+          
+          // Boyutları orantılı olarak küçült
+          if (width > height) {
+            if (width > maxWidth) {
+              height = (height * maxWidth) / width;
+              width = maxWidth;
+            }
+          } else {
+            if (height > maxHeight) {
+              width = (width * maxHeight) / height;
+              height = maxHeight;
+            }
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          ctx?.drawImage(img, 0, 0, width, height);
+          
+          // Kaliteyi artır (0.9 = %90 kalite - daha net görüntü için)
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.9);
+          resolve(compressedBase64);
+        };
+        
+        img.src = base64String;
+      });
+    } catch (error) {
+      console.warn('Resim sıkıştırma hatası:', error);
+      return Promise.resolve(base64String);
+    }
+  };
+
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files) {
       const newImages: string[] = [];
       
-      Array.from(files).forEach(file => {
+      Array.from(files).forEach(async (file) => {
         const reader = new FileReader();
-        reader.onload = (e) => {
+        reader.onload = async (e) => {
           if (e.target?.result) {
-            newImages.push(e.target.result as string);
-            if (newImages.length === files.length) {
-              setFormData(prev => ({
-                ...prev,
-                images: [...prev.images, ...newImages]
-              }));
+            try {
+              const base64String = e.target.result as string;
+              const compressedImage = await compressImage(base64String);
+              
+              newImages.push(compressedImage);
+              if (newImages.length === files.length) {
+                setFormData(prev => {
+                  const newData = {
+                    ...prev,
+                    images: [...prev.images, ...newImages]
+                  };
+                  
+                  // Form verilerini localStorage'a kaydet
+                  try {
+                    localStorage.setItem('headphonesFormData', JSON.stringify(newData));
+                  } catch (error) {
+                    console.warn('localStorage quota hatası, veriler kaydedilemedi:', error);
+                  }
+                  
+                  return newData;
+                });
+              }
+            } catch (error) {
+              console.error('Resim işleme hatası:', error);
+              newImages.push(e.target.result as string);
             }
           }
         };
