@@ -34,6 +34,8 @@ export interface Submission {
     name: string;
     email: string;
     phone: string;
+    birthDate?: string;
+    address?: string;
   };
   // Ekran kartı özel alanları
   memory?: string;
