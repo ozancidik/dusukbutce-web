@@ -16,6 +16,7 @@ export default function NotebookPage() {
   const [popupType, setPopupType] = useState<'success' | 'error'>('success');
   const [popupTitle, setPopupTitle] = useState('');
   const [popupMessage, setPopupMessage] = useState('');
+  const [showBatteryTooltip, setShowBatteryTooltip] = useState(false);
   const [formData, setFormData] = useState({
     brand: '',
     model: '',
@@ -42,6 +43,8 @@ export default function NotebookPage() {
   });
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     const checkMobile = () => {
       setIsMobile(window.innerWidth <= 768);
     };
@@ -168,9 +171,9 @@ export default function NotebookPage() {
       
       return new Promise((resolve) => {
         img.onload = () => {
-          // Maksimum boyutları belirle
-          const maxWidth = 800;
-          const maxHeight = 600;
+          // Maksimum boyutları belirle (daha yüksek çözünürlük için artırıldı)
+          const maxWidth = 1600;
+          const maxHeight = 1200;
           
           let { width, height } = img;
           
@@ -193,8 +196,8 @@ export default function NotebookPage() {
           // Resmi çiz ve sıkıştır
           ctx?.drawImage(img, 0, 0, width, height);
           
-          // Kaliteyi düşür (0.7 = %70 kalite)
-          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+          // Kaliteyi artır (0.9 = %90 kalite - daha net görüntü için)
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.9);
           resolve(compressedBase64);
         };
         
@@ -235,6 +238,11 @@ export default function NotebookPage() {
     e.preventDefault();
     setIsSubmitting(true);
 
+    // Performans ölçümü için başlangıç zamanı
+    const startTime = performance.now();
+    console.log('🚀 Teklif Al butonuna tıklandı - İstek başlatılıyor...');
+    console.log('⏱️ Başlangıç zamanı:', new Date().toISOString());
+
     try {
       // JWT token al
       const token = localStorage.getItem('token');
@@ -246,6 +254,7 @@ export default function NotebookPage() {
         graphicsCardWatt: formData.graphicsCardWatt
       });
       
+      const requestStartTime = performance.now();
       const response = await fetch('/api/notebook-submissions', {
         method: 'POST',
         headers: {
@@ -259,7 +268,29 @@ export default function NotebookPage() {
         }),
       });
 
+      const requestEndTime = performance.now();
+      const requestDuration = ((requestEndTime - requestStartTime) / 1000).toFixed(2);
+      const totalDuration = ((requestEndTime - startTime) / 1000).toFixed(2);
+
+      console.log('✅ API Response alındı!');
+      console.log('⏱️ API İstek Süresi:', requestDuration, 'saniye');
+      console.log('⏱️ Toplam İşlem Süresi:', totalDuration, 'saniye');
+      console.log('📊 Response Status:', response.status, response.statusText);
+      
+      // Response boyutunu hesapla (eğer mevcutsa)
+      const responseText = await response.text();
+      const responseSize = new Blob([responseText]).size;
+      console.log('📦 Response Boyutu:', (responseSize / 1024).toFixed(2), 'KB');
+
+      let responseData;
+      try {
+        responseData = JSON.parse(responseText);
+      } catch (parseError) {
+        console.warn('⚠️ Response JSON parse edilemedi:', parseError);
+      }
+
       if (response.ok) {
+        console.log('✅ İşlem başarılı! Response:', responseData);
         setPopupType('success');
         setPopupTitle('Teklif Başarıyla Gönderildi!');
         setPopupMessage('Notebook bilgisayarınız için teklif talebiniz alındı. En kısa sürede size dönüş yapacağız.');
@@ -293,17 +324,28 @@ export default function NotebookPage() {
           images: []
         });
       } else {
+        const errorDuration = ((performance.now() - startTime) / 1000).toFixed(2);
+        console.error('❌ İşlem başarısız!');
+        console.error('⏱️ Hata Süresi:', errorDuration, 'saniye');
+        console.error('📊 Response Data:', responseData || responseText);
         setPopupType('error');
         setPopupTitle('Hata Oluştu');
         setPopupMessage('Teklif talebiniz gönderilemedi. Lütfen tekrar deneyin.');
         setShowPopup(true);
       }
     } catch (error) {
+      const errorDuration = ((performance.now() - startTime) / 1000).toFixed(2);
+      console.error('❌ Exception oluştu!');
+      console.error('⏱️ Hata Süresi:', errorDuration, 'saniye');
+      console.error('💥 Hata Detayı:', error);
       setPopupType('error');
       setPopupTitle('Hata Oluştu');
       setPopupMessage('Teklif talebiniz gönderilemedi. Lütfen tekrar deneyin.');
       setShowPopup(true);
     } finally {
+      const finalDuration = ((performance.now() - startTime) / 1000).toFixed(2);
+      console.log('🏁 İşlem tamamlandı - Toplam Süre:', finalDuration, 'saniye');
+      console.log('─────────────────────────────────────');
       setIsSubmitting(false);
     }
   };
@@ -771,13 +813,99 @@ export default function NotebookPage() {
               </div>
               <div>
                 <label style={{
-                  display: 'block',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
                   fontSize: '14px',
                   fontWeight: '500',
                   color: '#374151',
                   marginBottom: '6px'
                 }}>
-                  Pil Durumu
+                  <span>Pil Durumu</span>
+                  <div
+                    style={{
+                      position: 'relative',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                    onMouseEnter={() => setShowBatteryTooltip(true)}
+                    onMouseLeave={() => setShowBatteryTooltip(false)}
+                  >
+                    <div 
+                      style={{
+                        width: '18px',
+                        height: '18px',
+                        borderRadius: '50%',
+                        background: showBatteryTooltip ? '#3b82f6' : '#e5e7eb',
+                        color: showBatteryTooltip ? 'white' : '#6b7280',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        cursor: 'help',
+                        transition: 'all 0.2s'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = '#3b82f6';
+                        e.currentTarget.style.color = 'white';
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!showBatteryTooltip) {
+                          e.currentTarget.style.background = '#e5e7eb';
+                          e.currentTarget.style.color = '#6b7280';
+                        }
+                      }}
+                    >
+                      ?
+                    </div>
+                    {showBatteryTooltip && (
+                      <div style={{
+                        position: 'absolute',
+                        bottom: '100%',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        marginBottom: '8px',
+                        background: '#1f2937',
+                        color: 'white',
+                        padding: '12px 16px',
+                        borderRadius: '8px',
+                        fontSize: isMobile ? '11px' : '13px',
+                        lineHeight: '1.5',
+                        whiteSpace: 'normal',
+                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                        zIndex: 1000,
+                        maxWidth: isMobile ? '250px' : '300px',
+                        width: isMobile ? '250px' : '300px',
+                        textAlign: 'left'
+                      }}>
+                        <div style={{ marginBottom: '8px', fontWeight: '600' }}>
+                          Pil Durumuna Nasıl Bakılır?
+                        </div>
+                        <div style={{ marginBottom: '6px' }}>
+                          <strong>Windows:</strong> Görev çubuğundaki pil ikonuna sağ tıklayın veya Ayarlar {'>'} Sistem {'>'} Güç {'&'} Pil {'>'} Batarya kullanımı
+                        </div>
+                        <div style={{ marginBottom: '6px' }}>
+                          <strong>macOS:</strong> Sistem Tercihleri {'>'} Enerji Tasarrufu {'>'} Batarya durumu veya Terminal'de: <code style={{ background: 'rgba(255,255,255,0.2)', padding: '2px 4px', borderRadius: '3px', fontSize: '11px' }}>ioreg -rn AppleSmartBattery | grep -i "MaxCapacity\|DesignCapacity"</code>
+                        </div>
+                        <div>
+                          <strong>Alternatif:</strong> Üçüncü parti uygulamalar (BatteryInfoView, CoconutBattery vb.) kullanabilirsiniz.
+                        </div>
+                        <div style={{
+                          position: 'absolute',
+                          bottom: '-6px',
+                          left: '50%',
+                          transform: 'translateX(-50%)',
+                          width: 0,
+                          height: 0,
+                          borderLeft: '6px solid transparent',
+                          borderRight: '6px solid transparent',
+                          borderTop: '6px solid #1f2937'
+                        }} />
+                      </div>
+                    )}
+                  </div>
                 </label>
                 <input
                   type="text"
