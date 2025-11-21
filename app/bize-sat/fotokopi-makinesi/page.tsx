@@ -175,8 +175,9 @@ export default function FotokopiMakinesiPage() {
       
       return new Promise((resolve) => {
         img.onload = () => {
-          const maxWidth = 800;
-          const maxHeight = 600;
+          // Maksimum boyutları belirle (daha yüksek çözünürlük için artırıldı)
+          const maxWidth = 1600;
+          const maxHeight = 1200;
           
           let { width, height } = img;
           
@@ -195,7 +196,8 @@ export default function FotokopiMakinesiPage() {
           canvas.width = width;
           canvas.height = height;
           ctx?.drawImage(img, 0, 0, width, height);
-          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+          // Kaliteyi artır (0.9 = %90 kalite - daha net görüntü için)
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.9);
           resolve(compressedBase64);
         };
         

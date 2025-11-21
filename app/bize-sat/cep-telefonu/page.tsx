@@ -157,8 +157,8 @@ export default function CepTelefonuPage() {
       img.src = base64String;
         img.onload = () => {
         const canvas = document.createElement('canvas');
-        const MAX_WIDTH = 800;
-        const MAX_HEIGHT = 600;
+        const MAX_WIDTH = 1600;
+        const MAX_HEIGHT = 1200;
         let width = img.width;
         let height = img.height;
           
@@ -179,7 +179,7 @@ export default function CepTelefonuPage() {
         const ctx = canvas.getContext('2d');
         if (ctx) {
           ctx.drawImage(img, 0, 0, width, height);
-          resolve(canvas.toDataURL('image/jpeg', 0.7)); // 70% quality
+          resolve(canvas.toDataURL('image/jpeg', 0.9)); // 90% quality
         } else {
           reject(new Error('Canvas context not available'));
         }
