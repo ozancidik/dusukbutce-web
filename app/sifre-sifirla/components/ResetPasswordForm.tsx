@@ -94,6 +94,8 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
                   onChange={e => setPassword(e.target.value)}
                   required
                   disabled={isLoading}
+                  autoComplete="new-password"
+                  autoFocus={false}
                   style={{
                     width: '100%',
                     padding: '16px 20px',
@@ -109,6 +111,10 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
                   onFocus={(e) => {
                     e.target.style.borderColor = '#2563eb';
                     e.target.style.boxShadow = '0 0 0 3px rgba(37, 99, 235, 0.1)';
+                    // Focus olduğunda önceki şifreyi temizle
+                    if (e.target.value && e.target.value.length > 0) {
+                      setPassword('');
+                    }
                   }}
                   onBlur={(e) => {
                     e.target.style.borderColor = '#e5e7eb';
@@ -175,6 +181,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
                   onChange={e => setConfirmPassword(e.target.value)}
                   required
                   disabled={isLoading}
+                  autoComplete="new-password"
                   style={{
                     width: '100%',
                     padding: '16px 20px',
@@ -190,6 +197,10 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
                   onFocus={(e) => {
                     e.target.style.borderColor = '#2563eb';
                     e.target.style.boxShadow = '0 0 0 3px rgba(37, 99, 235, 0.1)';
+                    // Focus olduğunda önceki şifreyi temizle
+                    if (e.target.value && e.target.value.length > 0) {
+                      setConfirmPassword('');
+                    }
                   }}
                   onBlur={(e) => {
                     e.target.style.borderColor = '#e5e7eb';
