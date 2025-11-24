@@ -184,35 +184,43 @@ export async function GET(request: NextRequest) {
         </head>
         <body>
           <script>
-            console.log('🔐 Google OAuth Callback: Sending success message');
+            console.log('🔐 Google OAuth Callback: Starting...');
             console.log('📍 Current origin:', window.location.origin);
-            console.log('📍 Target origin:', '${targetOrigin}');
+            console.log('📍 Window opener exists:', !!window.opener);
             
-            if (window.opener) {
-              console.log('✅ Window opener exists, sending message...');
-              try {
-                const messageData = {
-                  type: 'GOOGLE_LOGIN_SUCCESS',
-                  user: {
-                    id: '${String(user._id)}',
-                    email: '${String(user.email)}',
-                    name: ${JSON.stringify(String(user.name || ''))},
-                    isAdmin: ${user.isAdmin}
-                  },
-                  token: '${String(token)}'
-                };
-                window.opener.postMessage(messageData, '*');
-                console.log('✅ Message sent successfully', messageData);
-              } catch (error) {
-                console.error('❌ Error sending message:', error);
-              }
-            } else {
-              console.error('❌ Window opener is null');
-            }
-            
+            // Mesajı göndermeden önce kısa bir bekleme - popup'un hazır olması için
             setTimeout(() => {
-              window.close();
-            }, 100);
+              if (window.opener) {
+                console.log('✅ Window opener exists, sending message...');
+                try {
+                  const messageData = {
+                    type: 'GOOGLE_LOGIN_SUCCESS',
+                    user: {
+                      id: '${String(user._id)}',
+                      email: '${String(user.email)}',
+                      name: ${JSON.stringify(String(user.name || ''))},
+                      isAdmin: ${user.isAdmin}
+                    },
+                    token: '${String(token)}'
+                  };
+                  
+                  console.log('📤 Sending message:', messageData);
+                  window.opener.postMessage(messageData, '*');
+                  console.log('✅ Message sent successfully');
+                  
+                  // Mesaj gönderildikten sonra kapat
+                  setTimeout(() => {
+                    window.close();
+                  }, 500);
+                } catch (error) {
+                  console.error('❌ Error sending message:', error);
+                  window.close();
+                }
+              } else {
+                console.error('❌ Window opener is null - popup may have been closed');
+                window.close();
+              }
+            }, 200);
           </script>
         </body>
       </html>
