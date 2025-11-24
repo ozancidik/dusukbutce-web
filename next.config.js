@@ -17,6 +17,7 @@ const nextConfig = {
               "object-src 'none'",
               "base-uri 'self'",
               "form-action 'self'",
+              "frame-src 'self' https://vercel.live",
               "frame-ancestors 'none'",
               "upgrade-insecure-requests"
             ].join('; ')

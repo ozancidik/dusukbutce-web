@@ -84,10 +84,22 @@ export async function POST(request: NextRequest) {
   } catch (error: any) {
     console.error('❌ Şifre sıfırlama hatası:', error);
     console.error('❌ Hata detayları:', {
-      message: error.message,
-      stack: error.stack,
-      name: error.name
+      message: error?.message || 'Bilinmeyen hata',
+      stack: error?.stack,
+      name: error?.name
     });
+    
+    // Environment variable hatası ise daha açıklayıcı mesaj
+    if (error?.message?.includes('GMAIL_APP_PASSWORD')) {
+      console.error('⚠️ Email gönderme servisi yapılandırılmamış!');
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: 'Email gönderme servisi şu anda kullanılamıyor. Lütfen daha sonra tekrar deneyin veya destek ekibiyle iletişime geçin.' 
+        },
+        { status: 503 }
+      );
+    }
     
     return NextResponse.json(
       { 

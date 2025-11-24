@@ -607,7 +607,9 @@ export default function LoginPage() {
           
           popup?.close();
           window.removeEventListener('message', handleMessage);
-          clearInterval(checkClosed);
+          if ((handleMessage as any).timeoutId) {
+            clearTimeout((handleMessage as any).timeoutId);
+          }
           
           console.log('✅ Google login successful, redirecting...');
           
@@ -626,7 +628,9 @@ export default function LoginPage() {
           setError(event.data.error || "Google ile giriş yapılırken bir hata oluştu.");
           popup?.close();
           window.removeEventListener('message', handleMessage);
-          clearInterval(checkClosed);
+          if ((handleMessage as any).timeoutId) {
+            clearTimeout((handleMessage as any).timeoutId);
+          }
           setSocialLoading("");
         }
       };
@@ -634,33 +638,26 @@ export default function LoginPage() {
       console.log('👂 Adding message listener for Google OAuth');
       window.addEventListener('message', handleMessage);
       
-      // Popup kapandığında loading'i durdur (COOP nedeniyle window.closed çalışmayabilir)
-      const checkClosed = setInterval(() => {
-        try {
-          if (popup?.closed) {
-            clearInterval(checkClosed);
-            window.removeEventListener('message', handleMessage);
-            setSocialLoading("");
-          }
-        } catch (e) {
-          // Cross-Origin-Opener-Policy hatası için - message listener'a güven
-          // Popup kapandığında message gelmeyecek, bu yüzden timeout ile temizle
-        }
-      }, 1000);
+      // COOP nedeniyle window.closed kullanamıyoruz - sadece timeout ile temizle
+      // Message listener başarılı/hatalı durumları handle edecek
+      let timeoutId: NodeJS.Timeout;
       
       // 5 dakika sonra timeout (güvenlik için)
-      setTimeout(() => {
-        clearInterval(checkClosed);
+      timeoutId = setTimeout(() => {
         window.removeEventListener('message', handleMessage);
-        if (popup && !popup.closed) {
-          try {
+        try {
+          if (popup) {
             popup.close();
-          } catch (e) {
-            // Popup zaten kapalı olabilir
           }
+        } catch (e) {
+          // COOP hatası - görmezden gel
         }
         setSocialLoading("");
+        setError("Giriş işlemi zaman aşımına uğradı. Lütfen tekrar deneyin.");
       }, 300000); // 5 dakika
+      
+      // handleMessage içinde timeout'u temizlemek için referans sakla
+      (handleMessage as any).timeoutId = timeoutId;
       
     } catch (err) {
       setError("Google ile giriş yapılırken bir hata oluştu.");
@@ -738,6 +735,11 @@ export default function LoginPage() {
           // Popup'ı kapat
           if (popup) popup.close();
           
+          // Timeout'u temizle
+          if ((handleMessage as any).timeoutId) {
+            clearTimeout((handleMessage as any).timeoutId);
+          }
+          
           // Loading'i kapat
           setSocialLoading("");
           
@@ -759,19 +761,35 @@ export default function LoginPage() {
           
           if (popup) popup.close();
           window.removeEventListener('message', handleMessage);
+          
+          // Timeout'u temizle
+          if ((handleMessage as any).timeoutId) {
+            clearTimeout((handleMessage as any).timeoutId);
+          }
         }
       };
       
       window.addEventListener('message', handleMessage);
       
-      // Popup kapandığında loading'i kapat
-      const checkClosed = setInterval(() => {
-        if (popup && popup.closed) {
-          setSocialLoading("");
-          clearInterval(checkClosed);
-          window.removeEventListener('message', handleMessage);
+      // COOP nedeniyle window.closed kullanamıyoruz - sadece timeout ile temizle
+      let facebookTimeoutId: NodeJS.Timeout;
+      
+      // 5 dakika sonra timeout (güvenlik için)
+      facebookTimeoutId = setTimeout(() => {
+        window.removeEventListener('message', handleMessage);
+        try {
+          if (popup) {
+            popup.close();
+          }
+        } catch (e) {
+          // COOP hatası - görmezden gel
         }
-      }, 1000);
+        setSocialLoading("");
+        setError("Giriş işlemi zaman aşımına uğradı. Lütfen tekrar deneyin.");
+      }, 300000); // 5 dakika
+      
+      // handleMessage içinde timeout'u temizlemek için referans sakla
+      (handleMessage as any).timeoutId = facebookTimeoutId;
       
     } catch (error) {
       console.error('Facebook login error:', error);
