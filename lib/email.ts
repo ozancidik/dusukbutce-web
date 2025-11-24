@@ -9,22 +9,36 @@ interface EmailData {
 
 // Base URL helper fonksiyonu - production ve localhost için ayrı
 function getBaseUrl(): string {
-  // Eğer NEXT_PUBLIC_SITE_URL set edilmişse onu kullan
+  // Eğer NEXT_PUBLIC_SITE_URL set edilmişse onu kullan (en yüksek öncelik)
   if (process.env.NEXT_PUBLIC_SITE_URL) {
     return process.env.NEXT_PUBLIC_SITE_URL;
   }
   
-  // Vercel production ortamı kontrolü
+  // Vercel ortamı kontrolü - Vercel her zaman VERCEL=1 set eder
+  if (process.env.VERCEL === '1') {
+    // Vercel production deployment'ı
+    if (process.env.VERCEL_ENV === 'production') {
+      return 'https://www.dusukbutce.com';
+    }
+    // Vercel preview deployment'ı
+    if (process.env.VERCEL_URL) {
+      return `https://${process.env.VERCEL_URL}`;
+    }
+    // Vercel'de ama URL bilinmiyorsa production URL kullan
+    return 'https://www.dusukbutce.com';
+  }
+  
+  // Vercel URL varsa (fallback)
   if (process.env.VERCEL_URL) {
     return `https://${process.env.VERCEL_URL}`;
   }
   
-  // Production ortamı ama VERCEL_URL yoksa default production URL
+  // Production ortamı kontrolü
   if (process.env.NODE_ENV === 'production') {
     return 'https://www.dusukbutce.com';
   }
   
-  // Development ortamı
+  // Development ortamı - localhost
   return 'http://localhost:3000';
 }
 
