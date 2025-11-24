@@ -18,6 +18,7 @@ export default function GraphicsCardPage() {
   const [showFurmarkHelp, setShowFurmarkHelp] = useState(false);
   const [showCoilWhineHelp, setShowCoilWhineHelp] = useState(false);
   const [showOxidationHelp, setShowOxidationHelp] = useState(false);
+  const [showWarrantyStickerHelp, setShowWarrantyStickerHelp] = useState(false);
   const [formData, setFormData] = useState({
     brand: '',
     chipSet: '',
@@ -706,13 +707,84 @@ export default function GraphicsCardPage() {
               </div>
               <div>
                 <label style={{
-                  display: 'block',
+                  display: 'flex',
+                  alignItems: 'center',
                   fontSize: '14px',
                   fontWeight: '500',
                   color: '#374151',
-                  marginBottom: '6px'
+                  marginBottom: '6px',
+                  gap: '8px'
                 }}>
                   Garanti Etiketi Duruyor mu
+                  <div
+                    onMouseEnter={() => setShowWarrantyStickerHelp(true)}
+                    onMouseLeave={() => setShowWarrantyStickerHelp(false)}
+                    style={{
+                      width: '16px',
+                      height: '16px',
+                      borderRadius: '50%',
+                      background: '#6b7280',
+                      color: 'white',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '10px',
+                      cursor: 'help',
+                      fontWeight: 'bold',
+                      position: 'relative'
+                    }}
+                  >
+                    ?
+                    {showWarrantyStickerHelp && (
+                      <div style={{
+                        position: 'absolute',
+                        bottom: '25px',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        background: 'white',
+                        border: '1px solid #e5e7eb',
+                        borderRadius: '8px',
+                        padding: '16px',
+                        boxShadow: '0 10px 25px rgba(0, 0, 0, 0.15)',
+                        width: '280px',
+                        zIndex: 1000,
+                        fontSize: '13px',
+                        lineHeight: '1.5'
+                      }}>
+                        <div style={{
+                          position: 'absolute',
+                          bottom: '-6px',
+                          left: '50%',
+                          width: '12px',
+                          height: '12px',
+                          background: 'white',
+                          border: '1px solid #e5e7eb',
+                          borderTop: 'none',
+                          borderLeft: 'none',
+                          transform: 'translateX(-50%) rotate(45deg)'
+                        }}></div>
+                        <h4 style={{
+                          margin: '0 0 8px 0',
+                          fontSize: '14px',
+                          fontWeight: '600',
+                          color: '#1f2937'
+                        }}>
+                          🏷️ Garanti Etiketi
+                        </h4>
+                        <div style={{ color: '#374151' }}>
+                          <p style={{ margin: '0 0 8px 0' }}>
+                            Garanti etiketi, ekran kartının üzerinde bulunan ve ürünün orijinal olduğunu gösteren etikettir.
+                          </p>
+                          <p style={{ margin: '0 0 8px 0' }}>
+                            <strong>Önemli:</strong> Etiketin durumu (sağlam, yırtılmış veya yok) ürünün garanti kapsamında olup olmadığını etkileyebilir.
+                          </p>
+                          <p style={{ margin: '0' }}>
+                            Etiket yırtılmış veya yoksa, ürünün garanti kapsamı dışında kalabilir.
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </label>
                 <select
                   value={formData.warrantySticker}

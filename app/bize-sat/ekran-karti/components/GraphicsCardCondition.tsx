@@ -1,5 +1,5 @@
 "use client";
-import React from 'react';
+import React, { useState } from 'react';
 
 interface GraphicsCardConditionProps {
   formData: {
@@ -41,6 +41,8 @@ export default function GraphicsCardCondition({
   setShowCoilWhineHelp,
   setShowOxidationHelp
 }: GraphicsCardConditionProps) {
+  const [showWarrantyStickerTooltip, setShowWarrantyStickerTooltip] = useState(false);
+
   return (
     <div style={{ marginBottom: '32px' }}>
       <h2 style={{
@@ -225,15 +227,78 @@ export default function GraphicsCardCondition({
 
         {/* Garanti Sticker'ı */}
         <div>
-          <label style={{
-            display: 'block',
-            fontSize: '14px',
-            fontWeight: '500',
-            color: '#374151',
-            marginBottom: '6px'
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            marginBottom: '6px',
+            position: 'relative'
           }}>
-            Garanti Sticker'ı *
-          </label>
+            <label style={{
+              fontSize: '14px',
+              fontWeight: '500',
+              color: '#374151'
+            }}>
+              Garanti Sticker'ı *
+            </label>
+            <div
+              style={{
+                width: '18px',
+                height: '18px',
+                borderRadius: '50%',
+                backgroundColor: '#3b82f6',
+                color: 'white',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '12px',
+                fontWeight: 'bold',
+                cursor: 'help',
+                position: 'relative',
+                zIndex: 10
+              }}
+              onMouseEnter={() => setShowWarrantyStickerTooltip(true)}
+              onMouseLeave={() => setShowWarrantyStickerTooltip(false)}
+            >
+              ?
+              {showWarrantyStickerTooltip && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    bottom: '100%',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    marginBottom: '8px',
+                    padding: '12px 14px',
+                    backgroundColor: '#1f2937',
+                    color: 'white',
+                    borderRadius: '8px',
+                    fontSize: '12px',
+                    lineHeight: '1.5',
+                    zIndex: 10000,
+                    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.25)',
+                    maxWidth: '280px',
+                    width: 'max-content',
+                    whiteSpace: 'normal',
+                    pointerEvents: 'none'
+                  }}
+                >
+                  Garanti sticker'ı, ekran kartının üzerinde bulunan ve ürünün orijinal olduğunu gösteren etikettir. Sticker'ın durumu (sağlam, yırtılmış veya yok) ürünün garanti kapsamında olup olmadığını etkileyebilir.
+                  <div style={{
+                    position: 'absolute',
+                    bottom: '-6px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    width: '0',
+                    height: '0',
+                    borderLeft: '6px solid transparent',
+                    borderRight: '6px solid transparent',
+                    borderTop: '6px solid #1f2937'
+                  }}></div>
+                </div>
+              )}
+            </div>
+          </div>
           <select
             value={formData.warrantySticker}
             onChange={(e) => handleInputChange('warrantySticker', e.target.value)}
