@@ -7,6 +7,27 @@ interface EmailData {
   message: string;
 }
 
+// Base URL helper fonksiyonu - production ve localhost için ayrı
+function getBaseUrl(): string {
+  // Eğer NEXT_PUBLIC_SITE_URL set edilmişse onu kullan
+  if (process.env.NEXT_PUBLIC_SITE_URL) {
+    return process.env.NEXT_PUBLIC_SITE_URL;
+  }
+  
+  // Vercel production ortamı kontrolü
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+  
+  // Production ortamı ama VERCEL_URL yoksa default production URL
+  if (process.env.NODE_ENV === 'production') {
+    return 'https://www.dusukbutce.com';
+  }
+  
+  // Development ortamı
+  return 'http://localhost:3000';
+}
+
 // Transporter cache - her seferinde yeni transporter oluşturmamak için
 let cachedTransporter: nodemailer.Transporter | null = null;
 
