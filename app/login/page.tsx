@@ -526,7 +526,31 @@ export default function LoginPage() {
 
       // Popup mesajlarını dinle
       const handleMessage = (event: MessageEvent) => {
-        if (event.origin !== window.location.origin) return;
+        console.log('📨 Message received:', event.data?.type, 'from origin:', event.origin, 'current origin:', window.location.origin);
+        
+        // Origin kontrolü - production'da www ve non-www farklı olabilir
+        const currentOrigin = window.location.origin;
+        const eventOrigin = event.origin;
+        
+        // Origin kontrolünü daha esnek yap - aynı domain'den gelen mesajları kabul et
+        const currentHost = window.location.hostname;
+        const eventHost = new URL(eventOrigin).hostname;
+        
+        // www ve non-www kontrolü
+        const normalizedCurrentHost = currentHost.replace(/^www\./, '');
+        const normalizedEventHost = eventHost.replace(/^www\./, '');
+        
+        if (normalizedCurrentHost !== normalizedEventHost && eventOrigin !== '*' && !eventOrigin.includes(currentHost)) {
+          console.log('🔒 Message origin rejected:', eventOrigin, 'Expected host:', currentHost);
+          return;
+        }
+        
+        if (!event.data || !event.data.type) {
+          console.log('⚠️ Invalid message data:', event.data);
+          return;
+        }
+        
+        console.log('✅ Message accepted:', event.data.type);
         
         if (event.data.type === 'GOOGLE_LOGIN_SUCCESS') {
           const userData = event.data.user;
@@ -583,17 +607,31 @@ export default function LoginPage() {
           
           popup?.close();
           window.removeEventListener('message', handleMessage);
+          clearInterval(checkClosed);
+          
+          console.log('✅ Google login successful, redirecting...');
           
           // returnUrl'e göre yönlendir
           const returnUrl = new URLSearchParams(window.location.search).get('returnUrl') || '/';
-          router.push(decodeURIComponent(returnUrl));
+          
+          // Başarı mesajı göster
+          setLoginSuccess(true);
+          setRedirectMessage("Google ile giriş başarılı! Yönlendiriliyorsunuz...");
+          
+          setTimeout(() => {
+            router.push(decodeURIComponent(returnUrl));
+          }, 1000);
         } else if (event.data.type === 'GOOGLE_LOGIN_ERROR') {
+          console.error('❌ Google login error:', event.data.error);
           setError(event.data.error || "Google ile giriş yapılırken bir hata oluştu.");
           popup?.close();
           window.removeEventListener('message', handleMessage);
+          clearInterval(checkClosed);
+          setSocialLoading("");
         }
       };
 
+      console.log('👂 Adding message listener for Google OAuth');
       window.addEventListener('message', handleMessage);
       
       // Popup kapandığında loading'i durdur (COOP nedeniyle window.closed çalışmayabilir)
