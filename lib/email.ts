@@ -56,10 +56,17 @@ export async function sendPasswordResetEmail(email: string, resetToken: string, 
     
     console.log('📧 Gönderen email:', gmailUser);
     console.log('📧 GMAIL_USER env var:', process.env.GMAIL_USER ? 'SET' : 'NOT SET (using default)');
+    
+    // Base URL belirleme - production ve localhost için ayrı
+    const baseUrl = getBaseUrl();
+    
     console.log('📧 NEXT_PUBLIC_SITE_URL:', process.env.NEXT_PUBLIC_SITE_URL || 'NOT SET');
+    console.log('📧 VERCEL_URL:', process.env.VERCEL_URL || 'NOT SET');
+    console.log('📧 NODE_ENV:', process.env.NODE_ENV || 'NOT SET');
+    console.log('📧 Kullanılan Base URL:', baseUrl);
 
     // Reset URL oluştur
-    const resetUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/sifre-sifirla?token=${resetToken}`;
+    const resetUrl = `${baseUrl}/sifre-sifirla?token=${resetToken}`;
     console.log('🔗 Reset URL:', resetUrl);
     
     // E-posta içeriği
@@ -231,7 +238,7 @@ export async function sendContactNotification(data: EmailData) {
           </div>
           
           <div style="margin-top: 20px; text-align: center;">
-            <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/login" 
+            <a href="${getBaseUrl()}/login" 
                style="background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block;">
               🔐 Giriş Yap
             </a>
@@ -431,7 +438,7 @@ export async function sendAdminAcceptEmailToCustomer(customerEmail: string, cust
           </div>
           
           <div style="margin: 30px 0; text-align: center;">
-            <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/tekliflerim" 
+            <a href="${getBaseUrl()}/tekliflerim" 
                style="background: #059669; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600;">
               📋 Tekliflerimi Görüntüle
             </a>
@@ -496,7 +503,7 @@ export async function sendAdminRejectEmailToCustomer(customerEmail: string, cust
           ` : ''}
           
           <div style="margin: 30px 0; text-align: center;">
-            <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/bize-sat" 
+            <a href="${getBaseUrl()}/bize-sat" 
                style="background: #2563eb; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600;">
               🔄 Yeni Ürün Sat
             </a>
@@ -574,7 +581,7 @@ export async function sendOfferEmail(customerEmail: string, customerName: string
           </div>
           
           <div style="margin: 30px 0; text-align: center;">
-            <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/tekliflerim" 
+            <a href="${getBaseUrl()}/tekliflerim" 
                style="background: #10b981; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600;">
               📋 Tekliflerimi Görüntüle
             </a>
@@ -738,7 +745,7 @@ export async function sendNewSubmissionNotificationToAdmin(submissionData: any) 
           </div>
           
           <div style="margin-top: 20px; text-align: center;">
-            <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/admin" 
+            <a href="${getBaseUrl()}/admin" 
                style="background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block;">
               🔐 Admin Paneline Git
             </a>
@@ -800,7 +807,7 @@ export async function sendEmailVerificationEmail(email: string, verificationToke
           </div>
           
           <div style="margin: 20px 0; text-align: center;">
-            <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/verify-email?token=${verificationToken}" 
+            <a href="${getBaseUrl()}/verify-email?token=${verificationToken}" 
                style="background: #10b981; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600;">
               ✅ Email Adresimi Doğrula
             </a>
@@ -817,7 +824,7 @@ export async function sendEmailVerificationEmail(email: string, verificationToke
               <strong>📧 Sorun mu yaşıyorsunuz?</strong> Eğer yukarıdaki buton çalışmıyorsa, aşağıdaki bağlantıyı kopyalayıp tarayıcınıza yapıştırabilirsiniz:
             </p>
             <p style="color: #2563eb; margin: 10px 0 0 0; font-size: 12px; word-break: break-all;">
-              ${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/verify-email?token=${verificationToken}
+              ${getBaseUrl()}/verify-email?token=${verificationToken}
             </p>
           </div>
         </div>
