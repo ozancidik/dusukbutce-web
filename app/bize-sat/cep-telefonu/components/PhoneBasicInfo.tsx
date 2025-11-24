@@ -278,9 +278,8 @@ export default function PhoneBasicInfo({ isMobile, formData, onInputChange }: Ph
             onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
           >
             <option value="">Kayıt Türü Seçiniz</option>
-            <option value="Garantili">Garantili</option>
-            <option value="Garantisiz">Garantisiz</option>
-            <option value="İthalat">İthalat</option>
+            <option value="Yurtiçi">Yurtiçi</option>
+            <option value="Yurtdışı">Yurtdışı</option>
           </select>
         </div>
         <div style={{ gridColumn: isMobile ? '1' : '1 / -1' }}>
