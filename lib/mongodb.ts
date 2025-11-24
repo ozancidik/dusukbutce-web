@@ -14,6 +14,12 @@ async function connectDB() {
       throw new Error('MONGODB_URI is not defined');
     }
     
+    // MongoDB URI'yi log'la (şifreyi gizle)
+    const maskedUri = MONGODB_URI.replace(/:[^:@]+@/, ':****@');
+    console.log('🔗 MongoDB bağlantı URI (masked):', maskedUri);
+    console.log('🔗 MongoDB URI uzunluğu:', MONGODB_URI.length);
+    console.log('🔗 NODE_ENV:', process.env.NODE_ENV || 'NOT SET');
+    
     // Eğer zaten bağlıysa, mevcut bağlantıyı kullan
     // readyState: 0 = disconnected, 1 = connected, 2 = connecting, 3 = disconnecting
     if ((mongoose.connection.readyState as number) === 1) {
@@ -68,9 +74,36 @@ async function connectDB() {
     isConnected = true;
     console.log('✅ MongoDB bağlantısı tamamlandı');
     
-  } catch (error) {
+  } catch (error: any) {
     isConnected = false;
     console.error('❌ MongoDB bağlantı hatası:', error);
+    
+    // Authentication hatası için detaylı bilgi
+    if (error?.code === 8000 || error?.codeName === 'AtlasError' || error?.message?.includes('authentication failed')) {
+      console.error('🔐 MongoDB Authentication Hatası Detayları:');
+      console.error('  - Hata Kodu:', error?.code);
+      console.error('  - Hata Adı:', error?.codeName);
+      console.error('  - Hata Mesajı:', error?.message);
+      console.error('💡 Çözüm Önerileri:');
+      console.error('  1. Vercel Dashboard > Settings > Environment Variables');
+      console.error('  2. MONGODB_URI değerini kontrol edin');
+      console.error('  3. MongoDB Atlas > Database Access > Kullanıcı şifresini kontrol edin');
+      console.error('  4. MongoDB Atlas > Network Access > IP whitelist kontrol edin');
+      console.error('  5. Connection string formatı: mongodb+srv://username:password@cluster.mongodb.net/dbname');
+      
+      // URI formatını kontrol et (şifreyi gizle)
+      if (MONGODB_URI) {
+        const uriParts = MONGODB_URI.match(/mongodb\+srv:\/\/([^:]+):([^@]+)@(.+)/);
+        if (uriParts) {
+          console.error('  - Kullanıcı adı:', uriParts[1]);
+          console.error('  - Şifre uzunluğu:', uriParts[2].length, 'karakter');
+          console.error('  - Cluster:', uriParts[3]);
+        } else {
+          console.error('  ⚠️ Connection string formatı beklenen formatta değil!');
+        }
+      }
+    }
+    
     throw error;
   }
 }
