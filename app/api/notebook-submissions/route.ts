@@ -137,18 +137,44 @@ export async function GET() {
     
     const { default: connectDB } = await import('../../../lib/mongodb');
     const { default: ProductSubmission } = await import('../../../models/ProductSubmission');
+    const { default: User } = await import('../../../models/User');
     
     await connectDB();
     
     const submissions = await ProductSubmission.find({ 
       category: 'notebook' 
-    }).sort({ createdAt: -1 });
+    }).sort({ createdAt: -1 }).lean();
     
-    console.log('📊 Notebook submissions fetched:', submissions.length);
+    // userId varsa kullanıcı bilgilerini ekle
+    const submissionsWithUser = await Promise.all(submissions.map(async (submission: any) => {
+      if (submission.userId) {
+        try {
+          const user = await User.findById(submission.userId).lean();
+          if (user) {
+            return {
+              ...submission,
+              userId: {
+                _id: user._id,
+                name: user.name || '',
+                email: user.email || '',
+                phone: user.phone || '',
+                birthDate: user.birthDate || user.dogum_tarihi || '',
+                address: user.address || ''
+              }
+            };
+          }
+        } catch (error) {
+          console.error('Kullanıcı bilgileri alınamadı:', error);
+        }
+      }
+      return submission;
+    }));
+    
+    console.log('📊 Notebook submissions fetched:', submissionsWithUser.length);
     
     return NextResponse.json({ 
       success: true, 
-      submissions 
+      submissions: submissionsWithUser
     });
   } catch (error) {
     console.error('Error fetching notebook submissions:', error);
