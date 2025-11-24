@@ -46,12 +46,21 @@ function getTransporter(): nodemailer.Transporter {
 
 export async function sendPasswordResetEmail(email: string, resetToken: string, userName: string) {
   try {
+    console.log('📧 Şifre sıfırlama email gönderiliyor...');
+    console.log('📍 Alıcı:', email);
+    console.log('📍 Kullanıcı adı:', userName);
+    
     // Cached transporter kullan - verify() kontrolünü kaldırdık (hız için)
     const transporter = getTransporter();
     const gmailUser = process.env.GMAIL_USER || 'info@dusukbutce.com';
+    
+    console.log('📧 Gönderen email:', gmailUser);
+    console.log('📧 GMAIL_USER env var:', process.env.GMAIL_USER ? 'SET' : 'NOT SET (using default)');
+    console.log('📧 NEXT_PUBLIC_SITE_URL:', process.env.NEXT_PUBLIC_SITE_URL || 'NOT SET');
 
     // Reset URL oluştur
     const resetUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/sifre-sifirla?token=${resetToken}`;
+    console.log('🔗 Reset URL:', resetUrl);
     
     // E-posta içeriği
     const mailOptions = {
@@ -123,8 +132,19 @@ Düşük Bütçe Destek Ekibi`,
     };
 
     // E-postayı gönder
+    console.log('📤 Email gönderiliyor...');
+    console.log('📧 Mail options:', {
+      from: mailOptions.from,
+      to: mailOptions.to,
+      subject: mailOptions.subject,
+      resetUrl: resetUrl.substring(0, 50) + '...'
+    });
+    
     const info = await transporter.sendMail(mailOptions);
-    console.log('✅ Şifre sıfırlama e-postası gönderildi:', info.messageId);
+    console.log('✅ Şifre sıfırlama e-postası başarıyla gönderildi!');
+    console.log('📬 Message ID:', info.messageId);
+    console.log('📧 Gönderen:', gmailUser);
+    console.log('📧 Alıcı:', email);
     return true;
 
   } catch (error: any) {
