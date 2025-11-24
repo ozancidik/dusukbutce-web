@@ -5,9 +5,31 @@ import User from '@/models/User';
 import jwt from 'jsonwebtoken';
 
 export async function GET(request: NextRequest) {
-  // Environment'a göre redirect URI belirle
-  const isLocalhost = request.headers.get('host')?.includes('localhost');
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || (isLocalhost ? 'http://localhost:3000' : 'https://www.dusukbutce.com');
+  // Base URL belirleme - production ve localhost için ayrı
+  let baseUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  
+  // Production'da localhost içeren NEXT_PUBLIC_SITE_URL'i ignore et
+  if (process.env.VERCEL === '1' && process.env.VERCEL_ENV === 'production') {
+    if (baseUrl && !baseUrl.includes('localhost')) {
+      // Production'da ve localhost değilse kullan
+    } else {
+      // Production'da localhost içeriyorsa ignore et
+      baseUrl = 'https://www.dusukbutce.com';
+    }
+  } else if (!baseUrl || baseUrl.includes('localhost')) {
+    // NEXT_PUBLIC_SITE_URL yoksa veya localhost içeriyorsa
+    const isLocalhost = request.headers.get('host')?.includes('localhost');
+    if (isLocalhost) {
+      baseUrl = 'http://localhost:3000';
+    } else if (process.env.VERCEL_URL) {
+      baseUrl = `https://${process.env.VERCEL_URL}`;
+    } else if (process.env.NODE_ENV === 'production') {
+      baseUrl = 'https://www.dusukbutce.com';
+    } else {
+      baseUrl = 'http://localhost:3000';
+    }
+  }
+  
   const redirectUri = `${baseUrl}/api/auth/facebook/callback`;
 
   // Facebook OAuth yapılandırmasını kontrol et
@@ -18,8 +40,11 @@ export async function GET(request: NextRequest) {
   console.log('Facebook OAuth Callback Debug:');
   console.log('App ID:', facebookAppId ? 'SET' : 'MISSING');
   console.log('App Secret:', facebookAppSecret ? 'SET' : 'MISSING');
+  console.log('NEXT_PUBLIC_SITE_URL:', process.env.NEXT_PUBLIC_SITE_URL || 'NOT SET');
+  console.log('VERCEL:', process.env.VERCEL || 'NOT SET');
+  console.log('VERCEL_ENV:', process.env.VERCEL_ENV || 'NOT SET');
+  console.log('Base URL:', baseUrl);
   console.log('Redirect URI:', redirectUri);
-  console.log('Is Localhost:', isLocalhost);
   
   if (!facebookAppId || facebookAppId === 'your-facebook-app-id') {
     console.error('Facebook OAuth Error: FACEBOOK_APP_ID environment variable is not set');
