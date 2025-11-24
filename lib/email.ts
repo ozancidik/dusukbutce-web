@@ -95,9 +95,12 @@ export async function sendPasswordResetEmail(email: string, resetToken: string, 
     // Base URL belirleme - production ve localhost için ayrı
     const baseUrl = getBaseUrl();
     
-    console.log('📧 NEXT_PUBLIC_SITE_URL:', process.env.NEXT_PUBLIC_SITE_URL || 'NOT SET');
-    console.log('📧 VERCEL_URL:', process.env.VERCEL_URL || 'NOT SET');
-    console.log('📧 NODE_ENV:', process.env.NODE_ENV || 'NOT SET');
+    console.log('📧 Environment Variables:');
+    console.log('  - NEXT_PUBLIC_SITE_URL:', process.env.NEXT_PUBLIC_SITE_URL || 'NOT SET');
+    console.log('  - VERCEL:', process.env.VERCEL || 'NOT SET');
+    console.log('  - VERCEL_ENV:', process.env.VERCEL_ENV || 'NOT SET');
+    console.log('  - VERCEL_URL:', process.env.VERCEL_URL || 'NOT SET');
+    console.log('  - NODE_ENV:', process.env.NODE_ENV || 'NOT SET');
     console.log('📧 Kullanılan Base URL:', baseUrl);
 
     // Reset URL oluştur
