@@ -17,13 +17,14 @@ export async function GET(request: NextRequest) {
         </head>
         <body>
           <script>
+            console.log('❌ Google OAuth Error:', '${error}');
             if (window.opener) {
               window.opener.postMessage({
                 type: 'GOOGLE_LOGIN_ERROR',
                 error: 'Google ile giriş yapılırken bir hata oluştu.'
-              }, window.location.origin);
+              }, '*');
             }
-            window.close();
+            setTimeout(() => window.close(), 100);
           </script>
         </body>
       </html>
@@ -43,13 +44,14 @@ export async function GET(request: NextRequest) {
         </head>
         <body>
           <script>
+            console.log('❌ Google OAuth Error: No authorization code');
             if (window.opener) {
               window.opener.postMessage({
                 type: 'GOOGLE_LOGIN_ERROR',
                 error: 'Yetkilendirme kodu bulunamadı.'
-              }, window.location.origin);
+              }, '*');
             }
-            window.close();
+            setTimeout(() => window.close(), 100);
           </script>
         </body>
       </html>
@@ -170,6 +172,11 @@ export async function GET(request: NextRequest) {
     await user.save();
 
     // Başarılı giriş sayfası
+    const origin = request.headers.get('origin') || request.nextUrl.origin;
+    const protocol = request.nextUrl.protocol;
+    const host = request.headers.get('host') || request.nextUrl.host;
+    const targetOrigin = `${protocol}//${host}`;
+    
     return new Response(`
       <html>
         <head>
@@ -177,19 +184,35 @@ export async function GET(request: NextRequest) {
         </head>
         <body>
           <script>
+            console.log('🔐 Google OAuth Callback: Sending success message');
+            console.log('📍 Current origin:', window.location.origin);
+            console.log('📍 Target origin:', '${targetOrigin}');
+            
             if (window.opener) {
-              window.opener.postMessage({
-                type: 'GOOGLE_LOGIN_SUCCESS',
-                user: {
-                  id: '${user._id}',
-                  email: '${user.email}',
-                  name: '${user.name}',
-                  isAdmin: ${user.isAdmin}
-                },
-                token: '${token}'
-              }, window.location.origin);
+              console.log('✅ Window opener exists, sending message...');
+              try {
+                const messageData = {
+                  type: 'GOOGLE_LOGIN_SUCCESS',
+                  user: {
+                    id: '${String(user._id)}',
+                    email: '${String(user.email)}',
+                    name: ${JSON.stringify(String(user.name || ''))},
+                    isAdmin: ${user.isAdmin}
+                  },
+                  token: '${String(token)}'
+                };
+                window.opener.postMessage(messageData, '*');
+                console.log('✅ Message sent successfully', messageData);
+              } catch (error) {
+                console.error('❌ Error sending message:', error);
+              }
+            } else {
+              console.error('❌ Window opener is null');
             }
-            window.close();
+            
+            setTimeout(() => {
+              window.close();
+            }, 100);
           </script>
         </body>
       </html>
@@ -209,13 +232,14 @@ export async function GET(request: NextRequest) {
         </head>
         <body>
           <script>
+            console.error('❌ Google OAuth Exception:', '${error instanceof Error ? error.message : 'Unknown error'}');
             if (window.opener) {
               window.opener.postMessage({
                 type: 'GOOGLE_LOGIN_ERROR',
                 error: 'Google ile giriş yapılırken bir hata oluştu.'
-              }, window.location.origin);
+              }, '*');
             }
-            window.close();
+            setTimeout(() => window.close(), 100);
           </script>
         </body>
       </html>
