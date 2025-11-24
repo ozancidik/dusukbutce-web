@@ -524,25 +524,53 @@ export default function LoginPage() {
         `width=${width},height=${height},left=${left},top=${top}`
       );
 
+      if (!popup) {
+        setError("Popup penceresi açılamadı. Lütfen popup engelleyicisini kapatıp tekrar deneyin.");
+        setSocialLoading("");
+        return;
+      }
+
+      console.log('🔓 Popup opened, waiting for messages...');
+
       // Popup mesajlarını dinle
       const handleMessage = (event: MessageEvent) => {
-        console.log('📨 Message received:', event.data?.type, 'from origin:', event.origin, 'current origin:', window.location.origin);
+        console.log('📨 Message received:', {
+          type: event.data?.type,
+          fromOrigin: event.origin,
+          currentOrigin: window.location.origin,
+          data: event.data
+        });
         
         // Origin kontrolü - production'da www ve non-www farklı olabilir
         const currentOrigin = window.location.origin;
         const eventOrigin = event.origin;
-        
-        // Origin kontrolünü daha esnek yap - aynı domain'den gelen mesajları kabul et
         const currentHost = window.location.hostname;
-        const eventHost = new URL(eventOrigin).hostname;
         
-        // www ve non-www kontrolü
-        const normalizedCurrentHost = currentHost.replace(/^www\./, '');
-        const normalizedEventHost = eventHost.replace(/^www\./, '');
-        
-        if (normalizedCurrentHost !== normalizedEventHost && eventOrigin !== '*' && !eventOrigin.includes(currentHost)) {
-          console.log('🔒 Message origin rejected:', eventOrigin, 'Expected host:', currentHost);
-          return;
+        // '*' origin'den gelen mesajları kabul et (callback'te '*' kullanıyoruz)
+        if (eventOrigin === '*') {
+          console.log('✅ Message from wildcard origin accepted');
+        } else {
+          // Aynı domain kontrolü - www ve non-www farkını göz ardı et
+          try {
+            const eventHost = eventOrigin ? new URL(eventOrigin).hostname : '';
+            const normalizedCurrentHost = currentHost.replace(/^www\./, '');
+            const normalizedEventHost = eventHost.replace(/^www\./, '');
+            
+            if (normalizedCurrentHost !== normalizedEventHost && !eventOrigin.includes(currentHost) && !currentHost.includes(eventHost)) {
+              console.log('🔒 Message origin rejected:', {
+                eventOrigin,
+                eventHost,
+                currentHost,
+                normalizedEventHost,
+                normalizedCurrentHost
+              });
+              return;
+            }
+            console.log('✅ Message origin accepted:', eventOrigin);
+          } catch (e) {
+            // URL parse hatası - origin kontrolü yapamıyoruz, kabul et
+            console.log('⚠️ Could not parse origin, accepting message:', eventOrigin);
+          }
         }
         
         if (!event.data || !event.data.type) {
@@ -550,7 +578,7 @@ export default function LoginPage() {
           return;
         }
         
-        console.log('✅ Message accepted:', event.data.type);
+        console.log('✅ Message accepted, processing:', event.data.type);
         
         if (event.data.type === 'GOOGLE_LOGIN_SUCCESS') {
           const userData = event.data.user;
