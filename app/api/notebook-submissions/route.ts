@@ -149,7 +149,7 @@ export async function GET() {
     const submissionsWithUser = await Promise.all(submissions.map(async (submission: any) => {
       if (submission.userId) {
         try {
-          const user = await User.findById(submission.userId).lean();
+          const user = await User.findById(submission.userId).lean() as any;
           if (user) {
             return {
               ...submission,
