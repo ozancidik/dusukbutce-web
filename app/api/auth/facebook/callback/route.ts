@@ -25,18 +25,26 @@ export async function GET(request: NextRequest) {
     console.error('Facebook OAuth Error: FACEBOOK_APP_ID environment variable is not set');
     return new Response(`
       <html>
+        <head>
+          <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
+        </head>
         <body>
           <script>
-            window.opener.postMessage({
-              type: 'FACEBOOK_LOGIN_ERROR',
-              error: 'Facebook OAuth yapılandırılmamış. Lütfen .env.local dosyasında FACEBOOK_APP_ID ve FACEBOOK_APP_SECRET değerlerini tanımlayın.'
-            }, window.location.origin);
+            if (window.opener) {
+              window.opener.postMessage({
+                type: 'FACEBOOK_LOGIN_ERROR',
+                error: 'Facebook OAuth yapılandırılmamış. Lütfen .env.local dosyasında FACEBOOK_APP_ID ve FACEBOOK_APP_SECRET değerlerini tanımlayın.'
+              }, window.location.origin);
+            }
             window.close();
           </script>
         </body>
       </html>
     `, {
-      headers: { 'Content-Type': 'text/html' }
+      headers: { 
+        'Content-Type': 'text/html',
+        'Cross-Origin-Opener-Policy': 'same-origin-allow-popups'
+      }
     });
   }
   
@@ -44,18 +52,26 @@ export async function GET(request: NextRequest) {
     console.error('Facebook OAuth Error: FACEBOOK_APP_SECRET environment variable is not set');
     return new Response(`
       <html>
+        <head>
+          <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
+        </head>
         <body>
           <script>
-            window.opener.postMessage({
-              type: 'FACEBOOK_LOGIN_ERROR',
-              error: 'Facebook OAuth yapılandırılmamış. Lütfen .env.local dosyasında FACEBOOK_APP_ID ve FACEBOOK_APP_SECRET değerlerini tanımlayın.'
-            }, window.location.origin);
+            if (window.opener) {
+              window.opener.postMessage({
+                type: 'FACEBOOK_LOGIN_ERROR',
+                error: 'Facebook OAuth yapılandırılmamış. Lütfen .env.local dosyasında FACEBOOK_APP_ID ve FACEBOOK_APP_SECRET değerlerini tanımlayın.'
+              }, window.location.origin);
+            }
             window.close();
           </script>
         </body>
       </html>
     `, {
-      headers: { 'Content-Type': 'text/html' }
+      headers: { 
+        'Content-Type': 'text/html',
+        'Cross-Origin-Opener-Policy': 'same-origin-allow-popups'
+      }
     });
   }
 
@@ -79,18 +95,26 @@ export async function GET(request: NextRequest) {
     console.error('Facebook OAuth error from Facebook:', error);
     return new Response(`
       <html>
+        <head>
+          <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
+        </head>
         <body>
           <script>
-            window.opener.postMessage({
-              type: 'FACEBOOK_LOGIN_ERROR',
-              error: 'Facebook ile giriş yapılırken bir hata oluştu: ${error}'
-            }, window.location.origin);
+            if (window.opener) {
+              window.opener.postMessage({
+                type: 'FACEBOOK_LOGIN_ERROR',
+                error: 'Facebook ile giriş yapılırken bir hata oluştu: ${error}'
+              }, window.location.origin);
+            }
             window.close();
           </script>
         </body>
       </html>
     `, {
-      headers: { 'Content-Type': 'text/html' }
+      headers: { 
+        'Content-Type': 'text/html',
+        'Cross-Origin-Opener-Policy': 'same-origin-allow-popups'
+      }
     });
   }
 
@@ -98,18 +122,26 @@ export async function GET(request: NextRequest) {
     console.error('Facebook OAuth error: No authorization code received');
     return new Response(`
       <html>
+        <head>
+          <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
+        </head>
         <body>
           <script>
-            window.opener.postMessage({
-              type: 'FACEBOOK_LOGIN_ERROR',
-              error: 'Yetkilendirme kodu bulunamadı.'
-            }, window.location.origin);
+            if (window.opener) {
+              window.opener.postMessage({
+                type: 'FACEBOOK_LOGIN_ERROR',
+                error: 'Yetkilendirme kodu bulunamadı.'
+              }, window.location.origin);
+            }
             window.close();
           </script>
         </body>
       </html>
     `, {
-      headers: { 'Content-Type': 'text/html' }
+      headers: { 
+        'Content-Type': 'text/html',
+        'Cross-Origin-Opener-Policy': 'same-origin-allow-popups'
+      }
     });
   }
 
@@ -234,42 +266,58 @@ export async function GET(request: NextRequest) {
     // Başarılı giriş sayfası
     return new Response(`
       <html>
+        <head>
+          <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
+        </head>
         <body>
           <script>
-            window.opener.postMessage({
-              type: 'FACEBOOK_LOGIN_SUCCESS',
-              user: {
-                id: '${user._id}',
-                email: '${user.email}',
-                name: '${user.name}',
-                isAdmin: ${user.isAdmin}
-              },
-              token: '${token}'
-            }, window.location.origin);
+            if (window.opener) {
+              window.opener.postMessage({
+                type: 'FACEBOOK_LOGIN_SUCCESS',
+                user: {
+                  id: '${user._id}',
+                  email: '${user.email}',
+                  name: '${user.name}',
+                  isAdmin: ${user.isAdmin}
+                },
+                token: '${token}'
+              }, window.location.origin);
+            }
             window.close();
           </script>
         </body>
       </html>
     `, {
-      headers: { 'Content-Type': 'text/html' }
+      headers: { 
+        'Content-Type': 'text/html',
+        'Cross-Origin-Opener-Policy': 'same-origin-allow-popups'
+      }
     });
 
   } catch (error) {
     console.error('Facebook OAuth error:', error);
     return new Response(`
       <html>
+        <head>
+          <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
+        </head>
         <body>
           <script>
-            window.opener.postMessage({
-              type: 'FACEBOOK_LOGIN_ERROR',
-              error: 'Facebook ile giriş yapılırken bir hata oluştu: ${error instanceof Error ? error.message : 'Bilinmeyen hata'}'
-            }, window.location.origin);
+            if (window.opener) {
+              window.opener.postMessage({
+                type: 'FACEBOOK_LOGIN_ERROR',
+                error: 'Facebook ile giriş yapılırken bir hata oluştu: ${error instanceof Error ? error.message : 'Bilinmeyen hata'}'
+              }, window.location.origin);
+            }
             window.close();
           </script>
         </body>
       </html>
     `, {
-      headers: { 'Content-Type': 'text/html' }
+      headers: { 
+        'Content-Type': 'text/html',
+        'Cross-Origin-Opener-Policy': 'same-origin-allow-popups'
+      }
     });
   }
 } 
