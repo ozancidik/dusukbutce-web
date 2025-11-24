@@ -1,3 +1,4 @@
 {
-  "/sifremi-unuttum/page": "app/sifremi-unuttum/page.js"
+  "/sifremi-unuttum/page": "app/sifremi-unuttum/page.js",
+  "/sifre-sifirla/page": "app/sifre-sifirla/page.js"
 }

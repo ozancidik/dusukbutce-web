@@ -40,6 +40,21 @@
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/api/auth/forgot-password/route.js"
+    ],
+    "/sifre-sifirla/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/sifre-sifirla/page.js"
+    ],
+    "/api/auth/verify-reset-token/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/auth/verify-reset-token/route.js"
+    ],
+    "/api/auth/facebook/callback/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/auth/facebook/callback/route.js"
     ]
   }
 }
