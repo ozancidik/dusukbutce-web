@@ -55,10 +55,17 @@ export async function POST(request: NextRequest) {
     });
 
     console.log('✅ Şifre sıfırlama token\'ı oluşturuldu:', email);
+    console.log('📧 Production email kontrolü:');
+    console.log('  - GMAIL_USER env var:', process.env.GMAIL_USER || 'NOT SET (will use default: info@dusukbutce.com)');
+    console.log('  - GMAIL_APP_PASSWORD env var:', process.env.GMAIL_APP_PASSWORD ? 'SET' : 'NOT SET');
+    console.log('  - NEXT_PUBLIC_SITE_URL:', process.env.NEXT_PUBLIC_SITE_URL || 'NOT SET');
+    console.log('  - NODE_ENV:', process.env.NODE_ENV || 'NOT SET');
 
     // E-posta gönderme işlemi
     try {
+      console.log('📤 Email gönderme fonksiyonu çağrılıyor...');
       const emailSent = await sendPasswordResetEmail(email, resetToken, user.name);
+      console.log('📧 Email gönderme sonucu:', emailSent ? 'BAŞARILI' : 'BAŞARISIZ');
       
       if (!emailSent) {
         console.error('❌ Şifre sıfırlama e-postası gönderilemedi:', email);
@@ -75,6 +82,20 @@ export async function POST(request: NextRequest) {
       });
     } catch (emailError: any) {
       console.error('❌ E-posta gönderme hatası:', emailError);
+      console.error('❌ Email error details:', {
+        message: emailError?.message,
+        code: emailError?.code,
+        response: emailError?.response,
+        responseCode: emailError?.responseCode,
+        command: emailError?.command
+      });
+      
+      // Gmail authentication hatası
+      if (emailError?.code === 'EAUTH' || emailError?.responseCode === 535) {
+        console.error('🔐 Gmail authentication hatası tespit edildi!');
+        console.error('💡 Production ortamında GMAIL_USER ve GMAIL_APP_PASSWORD kontrol edilmeli');
+      }
+      
       return NextResponse.json({
         success: false,
         error: 'E-posta gönderilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.'
