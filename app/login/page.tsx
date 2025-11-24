@@ -596,19 +596,33 @@ export default function LoginPage() {
 
       window.addEventListener('message', handleMessage);
       
-      // Popup kapandığında loading'i durdur
+      // Popup kapandığında loading'i durdur (COOP nedeniyle window.closed çalışmayabilir)
       const checkClosed = setInterval(() => {
         try {
           if (popup?.closed) {
             clearInterval(checkClosed);
+            window.removeEventListener('message', handleMessage);
             setSocialLoading("");
           }
         } catch (e) {
-          // Cross-Origin-Opener-Policy hatası için
-          clearInterval(checkClosed);
-          setSocialLoading("");
+          // Cross-Origin-Opener-Policy hatası için - message listener'a güven
+          // Popup kapandığında message gelmeyecek, bu yüzden timeout ile temizle
         }
       }, 1000);
+      
+      // 5 dakika sonra timeout (güvenlik için)
+      setTimeout(() => {
+        clearInterval(checkClosed);
+        window.removeEventListener('message', handleMessage);
+        if (popup && !popup.closed) {
+          try {
+            popup.close();
+          } catch (e) {
+            // Popup zaten kapalı olabilir
+          }
+        }
+        setSocialLoading("");
+      }, 300000); // 5 dakika
       
     } catch (err) {
       setError("Google ile giriş yapılırken bir hata oluştu.");

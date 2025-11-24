@@ -12,36 +12,52 @@ export async function GET(request: NextRequest) {
   if (error) {
     return new Response(`
       <html>
+        <head>
+          <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
+        </head>
         <body>
           <script>
-            window.opener.postMessage({
-              type: 'GOOGLE_LOGIN_ERROR',
-              error: 'Google ile giriş yapılırken bir hata oluştu.'
-            }, window.location.origin);
+            if (window.opener) {
+              window.opener.postMessage({
+                type: 'GOOGLE_LOGIN_ERROR',
+                error: 'Google ile giriş yapılırken bir hata oluştu.'
+              }, window.location.origin);
+            }
             window.close();
           </script>
         </body>
       </html>
     `, {
-      headers: { 'Content-Type': 'text/html' }
+      headers: { 
+        'Content-Type': 'text/html',
+        'Cross-Origin-Opener-Policy': 'same-origin-allow-popups'
+      }
     });
   }
 
   if (!code) {
     return new Response(`
       <html>
+        <head>
+          <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
+        </head>
         <body>
           <script>
-            window.opener.postMessage({
-              type: 'GOOGLE_LOGIN_ERROR',
-              error: 'Yetkilendirme kodu bulunamadı.'
-            }, window.location.origin);
+            if (window.opener) {
+              window.opener.postMessage({
+                type: 'GOOGLE_LOGIN_ERROR',
+                error: 'Yetkilendirme kodu bulunamadı.'
+              }, window.location.origin);
+            }
             window.close();
           </script>
         </body>
       </html>
     `, {
-      headers: { 'Content-Type': 'text/html' }
+      headers: { 
+        'Content-Type': 'text/html',
+        'Cross-Origin-Opener-Policy': 'same-origin-allow-popups'
+      }
     });
   }
 
@@ -156,42 +172,58 @@ export async function GET(request: NextRequest) {
     // Başarılı giriş sayfası
     return new Response(`
       <html>
+        <head>
+          <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
+        </head>
         <body>
           <script>
-            window.opener.postMessage({
-              type: 'GOOGLE_LOGIN_SUCCESS',
-              user: {
-                id: '${user._id}',
-                email: '${user.email}',
-                name: '${user.name}',
-                isAdmin: ${user.isAdmin}
-              },
-              token: '${token}'
-            }, window.location.origin);
+            if (window.opener) {
+              window.opener.postMessage({
+                type: 'GOOGLE_LOGIN_SUCCESS',
+                user: {
+                  id: '${user._id}',
+                  email: '${user.email}',
+                  name: '${user.name}',
+                  isAdmin: ${user.isAdmin}
+                },
+                token: '${token}'
+              }, window.location.origin);
+            }
             window.close();
           </script>
         </body>
       </html>
     `, {
-      headers: { 'Content-Type': 'text/html' }
+      headers: { 
+        'Content-Type': 'text/html',
+        'Cross-Origin-Opener-Policy': 'same-origin-allow-popups'
+      }
     });
 
   } catch (error) {
     console.error('Google OAuth error:', error);
     return new Response(`
       <html>
+        <head>
+          <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
+        </head>
         <body>
           <script>
-            window.opener.postMessage({
-              type: 'GOOGLE_LOGIN_ERROR',
-              error: 'Google ile giriş yapılırken bir hata oluştu.'
-            }, window.location.origin);
+            if (window.opener) {
+              window.opener.postMessage({
+                type: 'GOOGLE_LOGIN_ERROR',
+                error: 'Google ile giriş yapılırken bir hata oluştu.'
+              }, window.location.origin);
+            }
             window.close();
           </script>
         </body>
       </html>
     `, {
-      headers: { 'Content-Type': 'text/html' }
+      headers: { 
+        'Content-Type': 'text/html',
+        'Cross-Origin-Opener-Policy': 'same-origin-allow-popups'
+      }
     });
   }
 } 
