@@ -10,6 +10,7 @@ interface SubmissionCardProps {
   onDetail: (submission: Submission) => void;
   onDeliveryInfo: (submission: Submission) => void;
   onReoffer: (submission: Submission) => void;
+  onUserInfo?: (submission: Submission) => void;
   formatDate: (dateString: string) => string;
 }
 
@@ -21,6 +22,7 @@ export default function SubmissionCard({
   onDetail,
   onDeliveryInfo,
   onReoffer,
+  onUserInfo,
   formatDate 
 }: SubmissionCardProps) {
   const getStatusInfo = (status: string) => {
@@ -537,7 +539,40 @@ export default function SubmissionCard({
           </button>
         )}
         
-        {/* 8. Sil */}
+        {/* 8. Kullanıcı Bilgileri */}
+        {submission.userId && onUserInfo && (
+          <button
+            onClick={() => onUserInfo(submission)}
+            style={{
+              background: 'linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '12px',
+              padding: isMobile ? '12px 16px' : '14px 20px',
+              fontSize: isMobile ? '13px' : '14px',
+              cursor: 'pointer',
+              fontWeight: '600',
+              transition: 'all 0.2s',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              boxShadow: '0 4px 12px rgba(124, 58, 237, 0.3)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-1px)';
+              e.currentTarget.style.boxShadow = '0 6px 16px rgba(124, 58, 237, 0.4)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(124, 58, 237, 0.3)';
+            }}
+          >
+            👤 Kullanıcı Bilgileri
+          </button>
+        )}
+        
+        {/* 9. Sil */}
         <button
           onClick={() => onDelete(submission._id)}
           style={{

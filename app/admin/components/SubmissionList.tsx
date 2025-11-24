@@ -14,6 +14,7 @@ interface SubmissionListProps {
   onDetail: (submission: Submission) => void;
   onDeliveryInfo: (submission: Submission) => void;
   onReoffer: (submission: Submission) => void;
+  onUserInfo?: (submission: Submission) => void;
   formatDate: (dateString: string) => string;
 }
 
@@ -27,6 +28,7 @@ export default function SubmissionList({
   onDetail,
   onDeliveryInfo,
   onReoffer,
+  onUserInfo,
   formatDate
 }: SubmissionListProps) {
   if (loading) {
@@ -150,6 +152,7 @@ export default function SubmissionList({
           onDetail={onDetail}
           onDeliveryInfo={onDeliveryInfo}
           onReoffer={onReoffer}
+          onUserInfo={onUserInfo}
           formatDate={formatDate}
         />
       ))}

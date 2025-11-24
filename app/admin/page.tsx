@@ -65,6 +65,12 @@ export default function AdminPage() {
     setShowDetailModal,
     detailSubmission,
     setDetailSubmission,
+    
+    // User Info Modal
+    showUserInfoModal,
+    setShowUserInfoModal,
+    selectedUserInfo,
+    setSelectedUserInfo,
   } = useAdminState();
   const router = useRouter();
 
@@ -241,6 +247,15 @@ export default function AdminPage() {
   const handleDetailSubmission = (submission: Submission) => {
     setDetailSubmission(submission);
     setShowDetailModal(true);
+  };
+
+  const handleUserInfo = (submission: Submission) => {
+    if (submission.userId) {
+      setSelectedUserInfo(submission.userId);
+      setShowUserInfoModal(true);
+    } else {
+      showToastMessage('Kullanıcı bilgileri bulunamadı.', 'error');
+    }
   };
 
   const handleDeliveryInfo = (submission: Submission) => {
@@ -871,6 +886,7 @@ export default function AdminPage() {
           onDetail={handleDetailSubmission}
           onDeliveryInfo={handleDeliveryInfo}
           onReoffer={handleReoffer}
+          onUserInfo={handleUserInfo}
           formatDate={formatDate}
         />
               </div>
@@ -981,6 +997,195 @@ export default function AdminPage() {
         }}
         isMobile={isMobile}
       />
+
+      {/* Kullanıcı Bilgileri Modal */}
+      {showUserInfoModal && selectedUserInfo && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          padding: '20px'
+        }}>
+          <div style={{
+            background: 'white',
+            borderRadius: '16px',
+            padding: isMobile ? '24px' : '32px',
+            width: '100%',
+            maxWidth: isMobile ? '100%' : '500px',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+            border: '1px solid #e5e7eb'
+          }}>
+            <h2 style={{
+              fontSize: isMobile ? '20px' : '24px',
+              fontWeight: '600',
+              color: '#1f2937',
+              margin: '0 0 24px 0',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              👤 Kullanıcı Bilgileri
+            </h2>
+
+            <div style={{
+              display: 'grid',
+              gap: '16px'
+            }}>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '12px',
+                  fontWeight: '500',
+                  color: '#6b7280',
+                  marginBottom: '6px'
+                }}>
+                  Ad Soyad
+                </label>
+                <div style={{
+                  padding: '12px',
+                  background: '#f9fafb',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  color: '#1f2937',
+                  border: '1px solid #e5e7eb'
+                }}>
+                  {selectedUserInfo.name || '-'}
+                </div>
+              </div>
+
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '12px',
+                  fontWeight: '500',
+                  color: '#6b7280',
+                  marginBottom: '6px'
+                }}>
+                  E-posta
+                </label>
+                <div style={{
+                  padding: '12px',
+                  background: '#f9fafb',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  color: '#1f2937',
+                  border: '1px solid #e5e7eb'
+                }}>
+                  {selectedUserInfo.email || '-'}
+                </div>
+              </div>
+
+              {selectedUserInfo.phone && (
+                <div>
+                  <label style={{
+                    display: 'block',
+                    fontSize: '12px',
+                    fontWeight: '500',
+                    color: '#6b7280',
+                    marginBottom: '6px'
+                  }}>
+                    Telefon
+                  </label>
+                  <div style={{
+                    padding: '12px',
+                    background: '#f9fafb',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    color: '#1f2937',
+                    border: '1px solid #e5e7eb'
+                  }}>
+                    {selectedUserInfo.phone || '-'}
+                  </div>
+                </div>
+              )}
+
+              {selectedUserInfo.birthDate && (
+                <div>
+                  <label style={{
+                    display: 'block',
+                    fontSize: '12px',
+                    fontWeight: '500',
+                    color: '#6b7280',
+                    marginBottom: '6px'
+                  }}>
+                    Doğum Tarihi
+                  </label>
+                  <div style={{
+                    padding: '12px',
+                    background: '#f9fafb',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    color: '#1f2937',
+                    border: '1px solid #e5e7eb'
+                  }}>
+                    {typeof selectedUserInfo.birthDate === 'string' 
+                      ? new Date(selectedUserInfo.birthDate).toLocaleDateString('tr-TR')
+                      : selectedUserInfo.birthDate || '-'}
+                  </div>
+                </div>
+              )}
+
+              {selectedUserInfo.address && (
+                <div>
+                  <label style={{
+                    display: 'block',
+                    fontSize: '12px',
+                    fontWeight: '500',
+                    color: '#6b7280',
+                    marginBottom: '6px'
+                  }}>
+                    Adres
+                  </label>
+                  <div style={{
+                    padding: '12px',
+                    background: '#f9fafb',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    color: '#1f2937',
+                    border: '1px solid #e5e7eb',
+                    minHeight: '60px'
+                  }}>
+                    {selectedUserInfo.address || '-'}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div style={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              marginTop: '24px',
+              gap: '12px'
+            }}>
+              <button
+                onClick={() => {
+                  setShowUserInfoModal(false);
+                  setSelectedUserInfo(null);
+                }}
+                style={{
+                  background: '#f3f4f6',
+                  color: '#374151',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: isMobile ? '10px 16px' : '12px 20px',
+                  fontSize: isMobile ? '14px' : '16px',
+                  cursor: 'pointer',
+                  fontWeight: '500'
+                }}
+              >
+                Kapat
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Silme Onay Modalı */}
       {showDeleteModal && (

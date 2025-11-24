@@ -20,6 +20,8 @@ export function useAdminState() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [detailSubmission, setDetailSubmission] = useState<Submission | null>(null);
+  const [showUserInfoModal, setShowUserInfoModal] = useState(false);
+  const [selectedUserInfo, setSelectedUserInfo] = useState<Submission['userId'] | null>(null);
 
   return {
     // Data
@@ -71,5 +73,11 @@ export function useAdminState() {
     setShowDetailModal,
     detailSubmission,
     setDetailSubmission,
+    
+    // User Info Modal
+    showUserInfoModal,
+    setShowUserInfoModal,
+    selectedUserInfo,
+    setSelectedUserInfo,
   };
 }

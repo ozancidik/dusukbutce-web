@@ -199,19 +199,40 @@ export async function GET(request: NextRequest) {
     console.log('📊 Fetching submissions with limit:', limit);
     
     const submissions = await ProductSubmission.find({})
-      .populate({
-        path: 'userId',
-        select: 'name email phone',
-        options: { strictPopulate: false }
-      })
       .sort({ createdAt: -1 })
-      .limit(limit);
+      .limit(limit)
+      .lean();
     
-    console.log('✅ Found submissions:', submissions.length);
+    // userId varsa kullanıcı bilgilerini ekle
+    const submissionsWithUser = await Promise.all(submissions.map(async (submission: any) => {
+      if (submission.userId) {
+        try {
+          const user = await User.findById(submission.userId).lean() as any;
+          if (user && user._id) {
+            return {
+              ...submission,
+              userId: {
+                _id: String(user._id),
+                name: user.name || '',
+                email: user.email || '',
+                phone: user.phone || '',
+                birthDate: user.birthDate || user.dogum_tarihi || '',
+                address: user.address || ''
+              }
+            };
+          }
+        } catch (error) {
+          console.error('Kullanıcı bilgileri alınamadı:', error);
+        }
+      }
+      return submission;
+    }));
+    
+    console.log('✅ Found submissions:', submissionsWithUser.length);
     
     return NextResponse.json({ 
       success: true, 
-      submissions: submissions 
+      submissions: submissionsWithUser 
     });
 
   } catch (error) {
