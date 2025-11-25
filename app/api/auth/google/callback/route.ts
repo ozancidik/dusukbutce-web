@@ -248,14 +248,43 @@ export async function GET(request: NextRequest) {
                 }
               };
               
-              // Önce localStorage'a yaz (her durumda fallback için)
+            // Önce localStorage'a yaz (her durumda fallback için)
+            try {
+              localStorage.setItem('google_oauth_token', fallbackData.token);
+              localStorage.setItem('google_oauth_user', JSON.stringify(fallbackData.user));
+              console.log('✅ Data saved to localStorage as fallback (always)');
+              
+              // Gizli sekme desteği: sessionStorage'a da yaz
               try {
-                localStorage.setItem('google_oauth_token', fallbackData.token);
-                localStorage.setItem('google_oauth_user', JSON.stringify(fallbackData.user));
-                console.log('✅ Data saved to localStorage as fallback (always)');
-              } catch (e) {
-                console.error('❌ Error saving to localStorage:', e);
+                sessionStorage.setItem('google_oauth_token', fallbackData.token);
+                sessionStorage.setItem('google_oauth_user', JSON.stringify(fallbackData.user));
+                console.log('✅ Data also saved to sessionStorage (incognito support)');
+              } catch (e2) {
+                console.warn('⚠️ Could not save to sessionStorage (may be incognito):', e2);
               }
+              
+              // Doğrulama - localStorage'dan oku
+              const savedToken = localStorage.getItem('google_oauth_token');
+              const savedUser = localStorage.getItem('google_oauth_user');
+              console.log('✅ Verification - Token in localStorage:', !!savedToken);
+              console.log('✅ Verification - User in localStorage:', !!savedUser);
+              
+              if (!savedToken || !savedUser) {
+                console.error('❌ CRITICAL: Data not found in localStorage after save!');
+              }
+            } catch (e) {
+              console.error('❌ Error saving to localStorage:', e);
+              console.error('❌ Error details:', e.message, e.stack);
+              
+              // localStorage başarısız olursa sessionStorage'ı dene
+              try {
+                sessionStorage.setItem('google_oauth_token', fallbackData.token);
+                sessionStorage.setItem('google_oauth_user', JSON.stringify(fallbackData.user));
+                console.log('✅ Fallback: Data saved to sessionStorage instead');
+              } catch (e2) {
+                console.error('❌ CRITICAL: Could not save to either localStorage or sessionStorage!');
+              }
+            }
               
               if (window.opener) {
                 console.log('✅ Window opener exists, preparing message...');

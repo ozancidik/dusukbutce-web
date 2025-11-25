@@ -896,16 +896,48 @@ export default function LoginPage() {
         }
         
         fallbackCheckCount++;
-        const googleOAuthToken = localStorage.getItem('google_oauth_token');
-        const googleOAuthUser = localStorage.getItem('google_oauth_user');
+        // Önce localStorage'dan kontrol et
+        let googleOAuthToken = localStorage.getItem('google_oauth_token');
+        let googleOAuthUser = localStorage.getItem('google_oauth_user');
+        
+        // Eğer localStorage'da yoksa, sessionStorage'dan kontrol et (gizli sekme desteği)
+        if (!googleOAuthToken || !googleOAuthUser) {
+          const sessionToken = sessionStorage.getItem('google_oauth_token');
+          const sessionUser = sessionStorage.getItem('google_oauth_user');
+          if (sessionToken && sessionUser) {
+            console.log('🔍 Found token/user in sessionStorage (incognito mode)');
+            googleOAuthToken = sessionToken;
+            googleOAuthUser = sessionUser;
+            // localStorage'a da kopyala
+            try {
+              localStorage.setItem('google_oauth_token', sessionToken);
+              localStorage.setItem('google_oauth_user', sessionUser);
+            } catch (e) {
+              console.warn('⚠️ Could not copy to localStorage:', e);
+            }
+          }
+        }
         
         // Sadece ilk birkaç kontrolü log'la (spam'i azaltmak için)
         if (fallbackCheckCount <= 3 || (googleOAuthToken && googleOAuthUser)) {
           console.log('🔍 Fallback check #' + fallbackCheckCount + ':', {
             hasToken: !!googleOAuthToken,
             hasUser: !!googleOAuthUser,
-            socialLoading: socialLoading
+            socialLoading: socialLoading,
+            tokenLength: googleOAuthToken ? googleOAuthToken.length : 0,
+            userLength: googleOAuthUser ? googleOAuthUser.length : 0
           });
+        }
+        
+        // Debug: localStorage'daki tüm google_oauth ile başlayan key'leri göster
+        if (fallbackCheckCount === 1) {
+          const allKeys = Object.keys(localStorage);
+          const googleKeys = allKeys.filter(key => key.startsWith('google_oauth'));
+          console.log('🔍 All google_oauth keys in localStorage:', googleKeys);
+          
+          const sessionKeys = Object.keys(sessionStorage);
+          const googleSessionKeys = sessionKeys.filter(key => key.startsWith('google_oauth'));
+          console.log('🔍 All google_oauth keys in sessionStorage:', googleSessionKeys);
         }
         
         // Token ve user varsa, socialLoading ne olursa olsun işle
