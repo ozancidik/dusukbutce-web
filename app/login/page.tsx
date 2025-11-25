@@ -39,7 +39,7 @@ export default function LoginPage() {
     fetchCsrfToken();
   }, []);
 
-  // Google OAuth fallback kontrolü (localStorage'dan)
+  // Google OAuth fallback kontrolü (localStorage'dan ve message event'inden)
   React.useEffect(() => {
     const checkGoogleOAuthFallback = () => {
       const googleOAuthToken = localStorage.getItem('google_oauth_token');
@@ -89,6 +89,10 @@ export default function LoginPage() {
           // Custom event'i tetikle
           window.dispatchEvent(new Event('localStorageChange'));
           
+          // URL'den google_oauth_success parametresini kaldır
+          const newUrl = window.location.pathname + (urlParams.get('returnUrl') ? `?returnUrl=${urlParams.get('returnUrl')}` : '');
+          window.history.replaceState({}, '', newUrl);
+          
           // Yönlendir
           const returnUrl = urlParams.get('returnUrl') || '/';
           router.push(decodeURIComponent(returnUrl));
@@ -98,7 +102,63 @@ export default function LoginPage() {
       }
     };
     
+    // Message event listener for fallback (from popup)
+    const handleFallbackMessage = (event: MessageEvent) => {
+      if (event.data && event.data.type === 'GOOGLE_OAUTH_FALLBACK') {
+        console.log('✅ Google OAuth fallback message received');
+        try {
+          const userData = event.data.user;
+          const token = event.data.token;
+          const loginTime = Date.now();
+          const userDataToStore = {
+            userLoggedIn: "true",
+            userEmail: userData.email,
+            userName: userData.name,
+            userId: userData.id,
+            userPhone: userData.phone || '',
+            userBirthDate: userData.birthDate || '',
+            userIsAdmin: userData.isAdmin.toString(),
+            loginTime: loginTime.toString(),
+            token: token,
+            user: JSON.stringify({
+              id: userData.id,
+              email: userData.email,
+              name: userData.name,
+              phone: userData.phone || '',
+              birthDate: userData.birthDate || '',
+              isAdmin: userData.isAdmin
+            })
+          };
+          
+          // localStorage'a kaydet
+          Object.entries(userDataToStore).forEach(([key, value]) => {
+            localStorage.setItem(key, value);
+          });
+          
+          // sessionStorage'a da kaydet
+          Object.entries(userDataToStore).forEach(([key, value]) => {
+            sessionStorage.setItem(key, value);
+          });
+          
+          // Custom event'i tetikle
+          window.dispatchEvent(new Event('localStorageChange'));
+          
+          // Yönlendir
+          const urlParams = new URLSearchParams(window.location.search);
+          const returnUrl = urlParams.get('returnUrl') || '/';
+          router.push(decodeURIComponent(returnUrl));
+        } catch (e) {
+          console.error('❌ Error processing Google OAuth fallback message:', e);
+        }
+      }
+    };
+    
+    window.addEventListener('message', handleFallbackMessage);
     checkGoogleOAuthFallback();
+    
+    return () => {
+      window.removeEventListener('message', handleFallbackMessage);
+    };
   }, [router]);
 
   // Kullanıcı ve admin giriş kontrolü
