@@ -980,15 +980,14 @@ export default function LoginPage() {
         // Maksimum kontrol sayısına ulaşıldıysa durdur
         if (fallbackCheckCount >= maxFallbackChecks) {
           console.log('⏱️ Fallback check timeout - stopping checks');
+          fallbackProcessed = true; // Flag'i set et ki tekrar çalışmasın
           if (fallbackCheckInterval) {
             clearInterval(fallbackCheckInterval);
             fallbackCheckInterval = null;
           }
-          // Loading state'ini temizle
-          if (socialLoading === "google") {
-            setSocialLoading("");
-            setError("Giriş işlemi tamamlanamadı. Lütfen tekrar deneyin.");
-          }
+          // Loading state'ini kesinlikle temizle
+          setSocialLoading("");
+          setError("Giriş işlemi tamamlanamadı. Lütfen tekrar deneyin.");
         }
       }, 1000); // Her saniye kontrol et
       
