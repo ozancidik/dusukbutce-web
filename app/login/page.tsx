@@ -1176,7 +1176,92 @@ export default function LoginPage() {
           }
         } else if (event.data.type === 'FACEBOOK_OAUTH_FALLBACK') {
           console.log('🔄 Facebook OAuth fallback message received');
-          // Fallback mesajı alındı, normal flow'da işlenecek
+          console.log('🔄 Fallback token:', event.data.token ? 'YES' : 'NO');
+          console.log('🔄 Fallback user:', event.data.user ? 'YES' : 'NO');
+          
+          // Fallback mesajı alındı, direkt işle
+          if (event.data.token && event.data.user) {
+            const user = event.data.user;
+            const token = event.data.token;
+            
+            console.log('✅ Processing fallback message...');
+            
+            // Fallback interval'ı temizle
+            if ((handleMessage as any).fallbackCheckInterval) {
+              clearInterval((handleMessage as any).fallbackCheckInterval);
+              (handleMessage as any).fallbackCheckInterval = null;
+            }
+            
+            // Kullanıcı bilgilerini localStorage'a kaydet
+            const loginTime = Date.now();
+            const userDataToStore = {
+              userLoggedIn: 'true',
+              userEmail: user.email,
+              userName: user.name,
+              userId: user.id,
+              userPhone: user.phone || '',
+              userBirthDate: user.birthDate || '',
+              userIsAdmin: user.isAdmin.toString(),
+              loginTime: loginTime.toString(),
+              token: token,
+              user: JSON.stringify({
+                id: user.id,
+                email: user.email,
+                name: user.name,
+                phone: user.phone || '',
+                birthDate: user.birthDate || '',
+                isAdmin: user.isAdmin
+              })
+            };
+            
+            // localStorage'a kaydet
+            Object.entries(userDataToStore).forEach(([key, value]) => {
+              localStorage.setItem(key, value);
+            });
+            
+            // sessionStorage'a da kaydet
+            Object.entries(userDataToStore).forEach(([key, value]) => {
+              sessionStorage.setItem(key, value);
+            });
+            
+            // Admin ise admin bilgilerini de kaydet
+            if (user.isAdmin) {
+              localStorage.setItem('adminLoggedIn', 'true');
+              localStorage.setItem('adminEmail', user.email);
+              localStorage.setItem('adminToken', token);
+              sessionStorage.setItem('adminLoggedIn', 'true');
+              sessionStorage.setItem('adminEmail', user.email);
+              sessionStorage.setItem('adminToken', token);
+            }
+            
+            // Cleanup
+            localStorage.removeItem('facebook_oauth_token');
+            localStorage.removeItem('facebook_oauth_user');
+            
+            // Custom event tetikle
+            window.dispatchEvent(new Event('localStorageChange'));
+            
+            // Popup'ı kapat
+            try {
+              if (popup) popup.close();
+            } catch (e) {
+              // COOP hatası - görmezden gel
+            }
+            
+            // Timeout'u temizle
+            if ((handleMessage as any).timeoutId) {
+              clearTimeout((handleMessage as any).timeoutId);
+            }
+            
+            // Loading'i kapat
+            setSocialLoading("");
+            
+            // Event listener'ı kaldır
+            window.removeEventListener('message', handleMessage);
+            
+            // Yönlendir
+            router.push(decodeURIComponent(returnUrl));
+          }
         }
       };
       
