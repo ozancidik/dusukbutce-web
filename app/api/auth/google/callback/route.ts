@@ -192,6 +192,11 @@ export async function GET(request: NextRequest) {
 
     // Kullanıcıyı kaydet
     await user.save();
+    
+    console.log('✅ Google OAuth callback: User saved, preparing response');
+    console.log('✅ User ID:', String(user._id));
+    console.log('✅ User Email:', user.email);
+    console.log('✅ Token created:', token ? 'YES' : 'NO');
 
     // Başarılı giriş sayfası
     const origin = request.headers.get('origin') || request.nextUrl.origin;
@@ -319,30 +324,38 @@ export async function GET(request: NextRequest) {
                 }
               } else {
                 console.error('❌ Window opener is null - popup may have been closed or opened in same window');
+                console.log('🔄 Attempting fallback mechanism...');
+                
                 // Eğer opener yoksa, belki aynı pencerede açıldı - localStorage'a yazmayı dene
                 try {
-                  localStorage.setItem('google_oauth_token', '${String(token)}');
-                  localStorage.setItem('google_oauth_user', JSON.stringify({
-                    id: '${String(user._id)}',
-                    email: '${String(user.email)}',
-                    name: ${JSON.stringify(String(user.name || ''))},
-                    isAdmin: ${user.isAdmin}
-                  }));
+                  const fallbackData = {
+                    token: '${String(token)}',
+                    user: {
+                      id: '${String(user._id)}',
+                      email: '${String(user.email)}',
+                      name: ${JSON.stringify(String(user.name || ''))},
+                      isAdmin: ${user.isAdmin}
+                    }
+                  };
+                  
+                  localStorage.setItem('google_oauth_token', fallbackData.token);
+                  localStorage.setItem('google_oauth_user', JSON.stringify(fallbackData.user));
                   console.log('✅ Data saved to localStorage as fallback');
+                  console.log('✅ Fallback data:', {
+                    hasToken: !!fallbackData.token,
+                    userEmail: fallbackData.user.email,
+                    userId: fallbackData.user.id
+                  });
                   
                   // Ana pencereye mesaj gönder (eğer parent window varsa)
                   if (window.parent && window.parent !== window) {
                     try {
                       window.parent.postMessage({
                         type: 'GOOGLE_OAUTH_FALLBACK',
-                        token: '${String(token)}',
-                        user: {
-                          id: '${String(user._id)}',
-                          email: '${String(user.email)}',
-                          name: ${JSON.stringify(String(user.name || ''))},
-                          isAdmin: ${user.isAdmin}
-                        }
+                        token: fallbackData.token,
+                        user: fallbackData.user
                       }, '*');
+                      console.log('✅ Message sent to parent window');
                     } catch (e) {
                       console.error('❌ Error sending message to parent:', e);
                     }
@@ -351,14 +364,18 @@ export async function GET(request: NextRequest) {
                   // Popup'ı kapat - Next.js sayfası render etmeye çalışma
                   setTimeout(() => {
                     try {
+                      console.log('🔒 Attempting to close popup window...');
                       window.close();
+                      console.log('✅ Popup close() called');
                     } catch (e) {
+                      console.error('❌ Error closing window:', e);
                       // Eğer kapatılamazsa, basit bir mesaj göster
                       document.body.innerHTML = '<div style="padding: 20px; text-align: center; font-family: Arial, sans-serif;"><h2>✅ Giriş başarılı!</h2><p>Bu pencereyi kapatabilirsiniz.</p></div>';
                     }
-                  }, 100);
+                  }, 200);
                 } catch (e) {
                   console.error('❌ Error saving to localStorage:', e);
+                  console.error('❌ Error details:', e.message, e.stack);
                   // Hata durumunda da kapatmayı dene
                   setTimeout(() => {
                     try {

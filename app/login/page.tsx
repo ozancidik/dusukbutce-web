@@ -875,9 +875,19 @@ export default function LoginPage() {
       (handleMessage as any).timeoutId = timeoutId;
       
       // Fallback kontrolü - periyodik olarak localStorage'ı kontrol et
+      let fallbackCheckCount = 0;
+      const maxFallbackChecks = 30; // 30 saniye (1 saniye * 30)
+      
       const fallbackCheckInterval = setInterval(() => {
+        fallbackCheckCount++;
         const googleOAuthToken = localStorage.getItem('google_oauth_token');
         const googleOAuthUser = localStorage.getItem('google_oauth_user');
+        
+        console.log('🔍 Fallback check #' + fallbackCheckCount + ':', {
+          hasToken: !!googleOAuthToken,
+          hasUser: !!googleOAuthUser,
+          socialLoading: socialLoading
+        });
         
         if (googleOAuthToken && googleOAuthUser && socialLoading === "google") {
           console.log('✅ Fallback detected in localStorage, processing...');
@@ -887,15 +897,24 @@ export default function LoginPage() {
           const currentUrl = new URL(window.location.href);
           currentUrl.searchParams.set('google_oauth_success', 'true');
           window.history.replaceState({}, '', currentUrl.toString());
+          console.log('✅ URL updated with google_oauth_success parameter');
           // Sayfayı yenile (useEffect'in çalışması için)
-          window.location.reload();
+          setTimeout(() => {
+            window.location.reload();
+          }, 500);
+        }
+        
+        // Maksimum kontrol sayısına ulaşıldıysa durdur
+        if (fallbackCheckCount >= maxFallbackChecks) {
+          console.log('⏱️ Fallback check timeout - stopping checks');
+          clearInterval(fallbackCheckInterval);
+          // Loading state'ini temizle
+          if (socialLoading === "google") {
+            setSocialLoading("");
+            setError("Giriş işlemi tamamlanamadı. Lütfen tekrar deneyin.");
+          }
         }
       }, 1000); // Her saniye kontrol et
-      
-      // 30 saniye sonra fallback kontrolünü durdur
-      setTimeout(() => {
-        clearInterval(fallbackCheckInterval);
-      }, 30000);
       
     } catch (err) {
       setError("Google ile giriş yapılırken bir hata oluştu.");
