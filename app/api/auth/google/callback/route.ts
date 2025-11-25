@@ -208,12 +208,13 @@ export async function GET(request: NextRequest) {
           <script>
             console.log('🔐 Google OAuth Callback: Starting...');
             console.log('📍 Current origin:', window.location.origin);
+            console.log('📍 Current URL:', window.location.href);
             console.log('📍 Window opener exists:', !!window.opener);
             
             // Mesajı göndermeden önce kısa bir bekleme - popup'un hazır olması için
             setTimeout(() => {
-              if (window.opener && !window.opener.closed) {
-                console.log('✅ Window opener exists, sending message...');
+              if (window.opener) {
+                console.log('✅ Window opener exists, preparing message...');
                 try {
                   const messageData = {
                     type: 'GOOGLE_LOGIN_SUCCESS',
@@ -226,33 +227,65 @@ export async function GET(request: NextRequest) {
                     token: '${String(token)}'
                   };
                   
-                  console.log('📤 Sending message to opener:', JSON.stringify(messageData, null, 2));
+                  console.log('📤 Message data prepared:', {
+                    type: messageData.type,
+                    userEmail: messageData.user.email,
+                    userId: messageData.user.id,
+                    hasToken: !!messageData.token
+                  });
                   
                   // Mesajı gönder - '*' origin kullanarak tüm origin'lere gönder
-                  window.opener.postMessage(messageData, '*');
-                  console.log('✅ Message sent successfully (attempt 1)');
+                  try {
+                    window.opener.postMessage(messageData, '*');
+                    console.log('✅ Message sent successfully (attempt 1)');
+                  } catch (e1) {
+                    console.error('❌ Error sending message (attempt 1):', e1);
+                  }
                   
                   // Mesajı birkaç kez gönder (güvenlik için)
                   setTimeout(() => {
-                    if (window.opener && !window.opener.closed) {
-                      window.opener.postMessage(messageData, '*');
-                      console.log('✅ Message sent successfully (attempt 2)');
+                    try {
+                      if (window.opener) {
+                        window.opener.postMessage(messageData, '*');
+                        console.log('✅ Message sent successfully (attempt 2)');
+                      }
+                    } catch (e2) {
+                      console.error('❌ Error sending message (attempt 2):', e2);
                     }
                   }, 200);
                   
                   setTimeout(() => {
-                    if (window.opener && !window.opener.closed) {
-                      window.opener.postMessage(messageData, '*');
-                      console.log('✅ Message sent successfully (attempt 3)');
+                    try {
+                      if (window.opener) {
+                        window.opener.postMessage(messageData, '*');
+                        console.log('✅ Message sent successfully (attempt 3)');
+                      }
+                    } catch (e3) {
+                      console.error('❌ Error sending message (attempt 3):', e3);
                     }
                   }, 400);
                   
                   setTimeout(() => {
-                    if (window.opener && !window.opener.closed) {
-                      window.opener.postMessage(messageData, '*');
-                      console.log('✅ Message sent successfully (attempt 4)');
+                    try {
+                      if (window.opener) {
+                        window.opener.postMessage(messageData, '*');
+                        console.log('✅ Message sent successfully (attempt 4)');
+                      }
+                    } catch (e4) {
+                      console.error('❌ Error sending message (attempt 4):', e4);
                     }
                   }, 600);
+                  
+                  setTimeout(() => {
+                    try {
+                      if (window.opener) {
+                        window.opener.postMessage(messageData, '*');
+                        console.log('✅ Message sent successfully (attempt 5)');
+                      }
+                    } catch (e5) {
+                      console.error('❌ Error sending message (attempt 5):', e5);
+                    }
+                  }, 800);
                   
                   // Mesaj gönderildikten sonra kapat
                   setTimeout(() => {
@@ -262,10 +295,10 @@ export async function GET(request: NextRequest) {
                     } catch (e) {
                       console.error('❌ Error closing window:', e);
                     }
-                  }, 1500);
+                  }, 2000);
                 } catch (error) {
-                  console.error('❌ Error sending message:', error);
-                  console.error('❌ Error details:', error.message);
+                  console.error('❌ Error in callback script:', error);
+                  console.error('❌ Error details:', error.message, error.stack);
                   setTimeout(() => {
                     try {
                       window.close();
@@ -275,7 +308,22 @@ export async function GET(request: NextRequest) {
                   }, 500);
                 }
               } else {
-                console.error('❌ Window opener is null or closed - popup may have been closed');
+                console.error('❌ Window opener is null - popup may have been closed or opened in same window');
+                // Eğer opener yoksa, belki aynı pencerede açıldı - localStorage'a yazmayı dene
+                try {
+                  localStorage.setItem('google_oauth_token', '${String(token)}');
+                  localStorage.setItem('google_oauth_user', JSON.stringify({
+                    id: '${String(user._id)}',
+                    email: '${String(user.email)}',
+                    name: ${JSON.stringify(String(user.name || ''))},
+                    isAdmin: ${user.isAdmin}
+                  }));
+                  console.log('✅ Data saved to localStorage as fallback');
+                  // Ana sayfaya yönlendir
+                  window.location.href = '/login?google_oauth_success=true';
+                } catch (e) {
+                  console.error('❌ Error saving to localStorage:', e);
+                }
                 setTimeout(() => {
                   try {
                     window.close();
@@ -284,7 +332,7 @@ export async function GET(request: NextRequest) {
                   }
                 }, 500);
               }
-            }, 500);
+            }, 300);
           </script>
         </body>
       </html>
