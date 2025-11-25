@@ -86,6 +86,9 @@ export default function LoginPage() {
           localStorage.removeItem('google_oauth_token');
           localStorage.removeItem('google_oauth_user');
           
+          // Loading state'ini temizle
+          setSocialLoading("");
+          
           // Custom event'i tetikle
           window.dispatchEvent(new Event('localStorageChange'));
           
