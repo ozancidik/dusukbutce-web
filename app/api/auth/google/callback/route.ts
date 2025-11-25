@@ -347,15 +347,57 @@ export async function GET(request: NextRequest) {
                     }, delay);
                   });
                   
-                  // Mesaj gönderildikten sonra kapat (daha uzun bekle - gizli sekme için)
+                  // Gizli sekme desteği: Ana sayfaya URL parametresi ile yönlendirme yap
+                  // postMessage çalışmazsa, ana sayfa URL parametresini kontrol edecek
                   setTimeout(() => {
-                    console.log('🔒 Closing popup window...');
                     try {
-                      window.close();
+                      if (window.opener) {
+                        // Ana sayfayı yönlendir (COOP nedeniyle bazen çalışmayabilir)
+                        try {
+                          const stateParam = new URLSearchParams(window.location.search).get('state');
+                          let returnUrl = '/';
+                          if (stateParam) {
+                            try {
+                              const state = JSON.parse(decodeURIComponent(stateParam));
+                              returnUrl = state.returnUrl || '/';
+                            } catch (e) {
+                              console.warn('⚠️ Could not parse state parameter:', e);
+                            }
+                          }
+                          const redirectUrl = window.location.origin + '/login?google_oauth_success=true&token=' + encodeURIComponent(fallbackData.token) + '&returnUrl=' + encodeURIComponent(returnUrl);
+                          console.log('🔄 Attempting to redirect parent window to:', redirectUrl);
+                          console.log('🔄 Window opener exists:', !!window.opener);
+                          console.log('🔄 Window opener closed:', window.opener?.closed);
+                          
+                          // COOP nedeniyle location.href çalışmayabilir, bu yüzden try-catch içinde
+                          try {
+                            window.opener.location.href = redirectUrl;
+                            console.log('✅ Parent window redirected successfully');
+                          } catch (e) {
+                            console.warn('⚠️ Could not redirect parent window (COOP restriction):', e);
+                            // Fallback: Popup'ı kapat, ana sayfa localStorage'dan kontrol edecek
+                            // localStorage zaten yazıldı, ana sayfa fallback mekanizması ile kontrol edecek
+                          }
+                        } catch (e) {
+                          console.warn('⚠️ Error preparing redirect:', e);
+                        }
+                      } else {
+                        console.warn('⚠️ Window opener is null');
+                      }
                     } catch (e) {
-                      console.error('❌ Error closing window:', e);
+                      console.warn('⚠️ Could not access window.opener:', e);
                     }
-                  }, 3000);
+                    
+                    // Popup'ı kapat
+                    setTimeout(() => {
+                      console.log('🔒 Closing popup window...');
+                      try {
+                        window.close();
+                      } catch (e) {
+                        console.error('❌ Error closing window:', e);
+                      }
+                    }, 1000);
+                  }, 2000);
                 } catch (error) {
                   console.error('❌ Error in callback script:', error);
                   console.error('❌ Error details:', error.message, error.stack);
