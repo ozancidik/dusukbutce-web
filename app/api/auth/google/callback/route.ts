@@ -238,18 +238,32 @@ export async function GET(request: NextRequest) {
             
             // Mesajı göndermeden önce kısa bir bekleme - popup'un hazır olması için
             setTimeout(() => {
+              const fallbackData = {
+                token: '${String(token)}',
+                user: {
+                  id: '${String(user._id)}',
+                  email: '${String(user.email)}',
+                  name: ${JSON.stringify(String(user.name || ''))},
+                  isAdmin: ${user.isAdmin}
+                }
+              };
+              
+              // Önce localStorage'a yaz (her durumda fallback için)
+              try {
+                localStorage.setItem('google_oauth_token', fallbackData.token);
+                localStorage.setItem('google_oauth_user', JSON.stringify(fallbackData.user));
+                console.log('✅ Data saved to localStorage as fallback (always)');
+              } catch (e) {
+                console.error('❌ Error saving to localStorage:', e);
+              }
+              
               if (window.opener) {
                 console.log('✅ Window opener exists, preparing message...');
                 try {
                   const messageData = {
                     type: 'GOOGLE_LOGIN_SUCCESS',
-                    user: {
-                      id: '${String(user._id)}',
-                      email: '${String(user.email)}',
-                      name: ${JSON.stringify(String(user.name || ''))},
-                      isAdmin: ${user.isAdmin}
-                    },
-                    token: '${String(token)}'
+                    user: fallbackData.user,
+                    token: fallbackData.token
                   };
                   
                   console.log('📤 Message data prepared:', {
