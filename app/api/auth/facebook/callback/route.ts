@@ -307,18 +307,38 @@ export async function GET(request: NextRequest) {
     
     // Target origin belirle - www ve non-www için normalize et
     let targetOrigin = `${protocol}//${host}`;
-    let targetOriginWithWww = targetOrigin;
     
     // Production için www ekle (eğer yoksa)
     if (process.env.VERCEL_ENV === 'production' && !host.includes('localhost') && !host.includes('www.')) {
-      targetOriginWithWww = `${protocol}//www.${host}`;
+      targetOrigin = `${protocol}//www.${host}`;
     } else if (host.includes('www.')) {
       // Eğer www varsa, non-www versiyonunu da hazırla
-      targetOriginWithWww = targetOrigin;
       targetOrigin = targetOrigin.replace('www.', '');
     }
     
-    return new Response(`
+    // State parametresinden returnUrl'i al
+    const searchParams = request.nextUrl.searchParams;
+    const stateParam = searchParams.get('state');
+    let returnUrl = '/';
+    if (stateParam) {
+      try {
+        const state = JSON.parse(decodeURIComponent(stateParam));
+        returnUrl = state.returnUrl || '/';
+      } catch (e) {
+        console.warn('⚠️ Could not parse state parameter:', e);
+      }
+    }
+
+    // Tam sayfa yönlendirme - gizli sekmede çalışır
+    // Token'ı URL parametresi ile gönder, login sayfası verify-token API'den user bilgisini çekecek
+    const loginUrl = `${targetOrigin}/login?facebook_oauth_success=true&token=${encodeURIComponent(token)}&returnUrl=${encodeURIComponent(returnUrl)}`;
+    
+    console.log('🔄 Redirecting to login page with token:', loginUrl);
+    
+    return NextResponse.redirect(loginUrl);
+    
+    // Eski popup kodu - artık kullanılmıyor
+    /* return new Response(`
       <html>
         <head>
           <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
@@ -504,32 +524,12 @@ export async function GET(request: NextRequest) {
         'Content-Type': 'text/html',
         'Cross-Origin-Opener-Policy': 'same-origin-allow-popups'
       }
-    });
+    }); */
 
   } catch (error) {
     console.error('Facebook OAuth error:', error);
-    return new Response(`
-      <html>
-        <head>
-          <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
-        </head>
-        <body>
-          <script>
-            if (window.opener) {
-              window.opener.postMessage({
-                type: 'FACEBOOK_LOGIN_ERROR',
-                error: 'Facebook ile giriş yapılırken bir hata oluştu: ${error instanceof Error ? error.message : 'Bilinmeyen hata'}'
-              }, window.location.origin);
-            }
-            window.close();
-          </script>
-        </body>
-      </html>
-    `, {
-      headers: { 
-        'Content-Type': 'text/html',
-        'Cross-Origin-Opener-Policy': 'same-origin-allow-popups'
-      }
-    });
+    const errorMessage = error instanceof Error ? error.message : 'Bilinmeyen hata';
+    const loginUrl = `${request.nextUrl.origin}/login?error=${encodeURIComponent('Facebook ile giriş yapılırken bir hata oluştu: ' + errorMessage)}`;
+    return NextResponse.redirect(loginUrl);
   }
 } 
