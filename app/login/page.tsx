@@ -614,31 +614,63 @@ export default function LoginPage() {
         const eventOrigin = event.origin;
         const currentHost = window.location.hostname;
         
-        // '*' origin'den gelen mesajları kabul et (callback'te '*' kullanıyoruz)
+        // Güvenlik: Sadece kendi domain'imizden gelen mesajları kabul et
+        // Wildcard '*' artık kullanılmıyor - spesifik origin kontrolü yapıyoruz
+        const allowedOrigins = [
+          'https://www.dusukbutce.com',
+          'https://dusukbutce.com',
+          'http://localhost:3000',
+          'https://dusukbutce-web.vercel.app'
+        ];
+        
+        // Origin kontrolü - www ve non-www farkını göz ardı et
+        let isAllowedOrigin = false;
+        
         if (eventOrigin === '*') {
-          console.log('✅ Message from wildcard origin accepted');
-        } else {
-          // Aynı domain kontrolü - www ve non-www farkını göz ardı et
-          try {
-            const eventHost = eventOrigin ? new URL(eventOrigin).hostname : '';
-            const normalizedCurrentHost = currentHost.replace(/^www\./, '');
-            const normalizedEventHost = eventHost.replace(/^www\./, '');
-            
-            if (normalizedCurrentHost !== normalizedEventHost && !eventOrigin.includes(currentHost) && !currentHost.includes(eventHost)) {
-              console.log('🔒 Message origin rejected:', {
-                eventOrigin,
-                eventHost,
-                currentHost,
-                normalizedEventHost,
-                normalizedCurrentHost
-              });
-              return;
+          // Wildcard origin - güvenlik riski, reddet
+          console.log('🔒 Message from wildcard origin rejected (security risk)');
+          return;
+        }
+        
+        try {
+          const eventHost = eventOrigin ? new URL(eventOrigin).hostname : '';
+          const normalizedCurrentHost = currentHost.replace(/^www\./, '');
+          const normalizedEventHost = eventHost.replace(/^www\./, '');
+          
+          // Allowed origins listesinde var mı kontrol et
+          isAllowedOrigin = allowedOrigins.some(allowed => {
+            try {
+              const allowedHost = new URL(allowed).hostname.replace(/^www\./, '');
+              return normalizedEventHost === allowedHost || normalizedEventHost === normalizedCurrentHost;
+            } catch {
+              return false;
             }
-            console.log('✅ Message origin accepted:', eventOrigin);
-          } catch (e) {
-            // URL parse hatası - origin kontrolü yapamıyoruz, kabul et
-            console.log('⚠️ Could not parse origin, accepting message:', eventOrigin);
+          });
+          
+          // Aynı domain kontrolü (fallback)
+          if (!isAllowedOrigin) {
+            isAllowedOrigin = normalizedCurrentHost === normalizedEventHost || 
+                            eventOrigin.includes(currentHost) || 
+                            currentHost.includes(eventHost);
           }
+          
+          if (!isAllowedOrigin) {
+            console.log('🔒 Message origin rejected:', {
+              eventOrigin,
+              eventHost,
+              currentHost,
+              normalizedEventHost,
+              normalizedCurrentHost,
+              allowedOrigins
+            });
+            return;
+          }
+          
+          console.log('✅ Message origin accepted:', eventOrigin);
+        } catch (e) {
+          // URL parse hatası - origin kontrolü yapamıyoruz, reddet (güvenlik için)
+          console.log('🔒 Could not parse origin, rejecting message for security:', eventOrigin);
+          return;
         }
         
         if (!event.data || !event.data.type) {
