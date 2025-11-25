@@ -286,9 +286,38 @@ export async function GET(request: NextRequest) {
       { expiresIn: '7d' }
     );
 
-    console.log('Facebook OAuth: Login successful, sending success message');
+    console.log('✅ Facebook OAuth callback: User saved, preparing response');
+    console.log('✅ User ID:', String(user._id));
+    console.log('✅ User Email:', user.email);
+    console.log('✅ Token created:', token ? 'YES' : 'NO');
     
     // Başarılı giriş sayfası
+    const origin = request.headers.get('origin') || request.nextUrl.origin;
+    const protocol = request.nextUrl.protocol;
+    const host = request.headers.get('host') || request.nextUrl.host;
+    
+    // Güvenlik: Sadece kendi domain'imizden gelen istekleri kabul et
+    const allowedHosts = ['www.dusukbutce.com', 'dusukbutce.com', 'localhost:3000', 'dusukbutce-web.vercel.app'];
+    const isAllowedHost = allowedHosts.some(allowed => host.includes(allowed));
+    
+    if (!isAllowedHost) {
+      console.error('❌ Unauthorized host:', host);
+      return new Response('Unauthorized', { status: 403 });
+    }
+    
+    // Target origin belirle - www ve non-www için normalize et
+    let targetOrigin = `${protocol}//${host}`;
+    let targetOriginWithWww = targetOrigin;
+    
+    // Production için www ekle (eğer yoksa)
+    if (process.env.VERCEL_ENV === 'production' && !host.includes('localhost') && !host.includes('www.')) {
+      targetOriginWithWww = `${protocol}//www.${host}`;
+    } else if (host.includes('www.')) {
+      // Eğer www varsa, non-www versiyonunu da hazırla
+      targetOriginWithWww = targetOrigin;
+      targetOrigin = targetOrigin.replace('www.', '');
+    }
+    
     return new Response(`
       <html>
         <head>
@@ -296,19 +325,143 @@ export async function GET(request: NextRequest) {
         </head>
         <body>
           <script>
-            if (window.opener) {
-              window.opener.postMessage({
-                type: 'FACEBOOK_LOGIN_SUCCESS',
-                user: {
-                  id: '${user._id}',
-                  email: '${user.email}',
-                  name: '${user.name}',
-                  isAdmin: ${user.isAdmin}
-                },
-                token: '${token}'
-              }, window.location.origin);
+            console.log('🔐 Facebook OAuth Callback: Starting...');
+            console.log('📍 Current origin:', window.location.origin);
+            console.log('📍 Current URL:', window.location.href);
+            console.log('📍 Window opener exists:', !!window.opener);
+            
+            const fallbackData = {
+              token: '${String(token)}',
+              user: {
+                id: '${String(user._id)}',
+                email: '${String(user.email)}',
+                name: ${JSON.stringify(String(user.name || ''))},
+                isAdmin: ${user.isAdmin}
+              }
+            };
+            
+            // Önce localStorage'a yaz (her durumda fallback için)
+            try {
+              localStorage.setItem('facebook_oauth_token', fallbackData.token);
+              localStorage.setItem('facebook_oauth_user', JSON.stringify(fallbackData.user));
+              console.log('✅ Data saved to localStorage as fallback (always)');
+            } catch (e) {
+              console.error('❌ Error saving to localStorage:', e);
             }
-            window.close();
+            
+            // Mesajı göndermeden önce kısa bir bekleme - popup'un hazır olması için
+            setTimeout(() => {
+              if (window.opener) {
+                console.log('✅ Window opener exists, preparing message...');
+                try {
+                  const messageData = {
+                    type: 'FACEBOOK_LOGIN_SUCCESS',
+                    user: fallbackData.user,
+                    token: fallbackData.token
+                  };
+                  
+                  console.log('📤 Message data prepared:', {
+                    type: messageData.type,
+                    userEmail: messageData.user.email,
+                    userId: messageData.user.id,
+                    hasToken: !!messageData.token
+                  });
+                  
+                  // Güvenlik: Spesifik origin'e mesaj gönder (wildcard yerine)
+                  // www ve non-www için her iki origin'i de dene
+                  const allowedOrigins = ['${targetOrigin}', '${targetOriginWithWww}'].filter((v, i, a) => a.indexOf(v) === i);
+                  
+                  console.log('📤 Allowed origins for postMessage:', allowedOrigins);
+                  
+                  // Her allowed origin'e mesaj gönder
+                  allowedOrigins.forEach((allowedOrigin, index) => {
+                    try {
+                      window.opener.postMessage(messageData, allowedOrigin);
+                      console.log('✅ Message sent successfully to ' + allowedOrigin + ' (attempt ' + (index + 1) + ')');
+                    } catch (e) {
+                      console.error('❌ Error sending message to ' + allowedOrigin + ' (attempt ' + (index + 1) + '):', e);
+                    }
+                  });
+                  
+                  // Retry mekanizması - birkaç kez tekrarla
+                  setTimeout(() => {
+                    allowedOrigins.forEach((allowedOrigin, index) => {
+                      try {
+                        if (window.opener) {
+                          window.opener.postMessage(messageData, allowedOrigin);
+                          console.log('✅ Message sent successfully to ' + allowedOrigin + ' (retry ' + (index + 1) + ')');
+                        }
+                      } catch (e) {
+                        console.error('❌ Error sending message to ' + allowedOrigin + ' (retry ' + (index + 1) + '):', e);
+                      }
+                    });
+                  }, 200);
+                  
+                  setTimeout(() => {
+                    allowedOrigins.forEach((allowedOrigin, index) => {
+                      try {
+                        if (window.opener) {
+                          window.opener.postMessage(messageData, allowedOrigin);
+                          console.log('✅ Message sent successfully to ' + allowedOrigin + ' (retry ' + (index + 2) + ')');
+                        }
+                      } catch (e) {
+                        console.error('❌ Error sending message to ' + allowedOrigin + ' (retry ' + (index + 2) + '):', e);
+                      }
+                    });
+                  }, 400);
+                  
+                  // Mesaj gönderildikten sonra kapat
+                  setTimeout(() => {
+                    console.log('🔒 Closing popup window...');
+                    try {
+                      window.close();
+                    } catch (e) {
+                      console.error('❌ Error closing window:', e);
+                    }
+                  }, 2000);
+                } catch (error) {
+                  console.error('❌ Error in callback script:', error);
+                  console.error('❌ Error details:', error.message, error.stack);
+                  setTimeout(() => {
+                    try {
+                      window.close();
+                    } catch (e) {
+                      // Ignore
+                    }
+                  }, 500);
+                }
+              } else {
+                console.error('❌ Window opener is null - popup may have been closed or opened in same window');
+                console.log('🔄 Fallback mechanism will be used (localStorage already saved)');
+                
+                // Ana pencereye mesaj gönder (eğer parent window varsa)
+                if (window.parent && window.parent !== window) {
+                  try {
+                    window.parent.postMessage({
+                      type: 'FACEBOOK_OAUTH_FALLBACK',
+                      token: fallbackData.token,
+                      user: fallbackData.user
+                    }, '*');
+                    console.log('✅ Message sent to parent window');
+                  } catch (e) {
+                    console.error('❌ Error sending message to parent:', e);
+                  }
+                }
+                
+                // Popup'ı kapat
+                setTimeout(() => {
+                  try {
+                    console.log('🔒 Attempting to close popup window...');
+                    window.close();
+                    console.log('✅ Popup close() called');
+                  } catch (e) {
+                    console.error('❌ Error closing window:', e);
+                    // Eğer kapatılamazsa, basit bir mesaj göster
+                    document.body.innerHTML = '<div style="padding: 20px; text-align: center; font-family: Arial, sans-serif;"><h2>✅ Giriş başarılı!</h2><p>Bu pencereyi kapatabilirsiniz.</p></div>';
+                  }
+                }, 200);
+              }
+            }, 300);
           </script>
         </body>
       </html>
