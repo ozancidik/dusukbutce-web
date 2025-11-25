@@ -798,6 +798,9 @@ export default function LoginPage() {
           if ((handleMessage as any).timeoutId) {
             clearTimeout((handleMessage as any).timeoutId);
           }
+          if ((handleMessage as any).popupCheckInterval) {
+            clearInterval((handleMessage as any).popupCheckInterval);
+          }
           
           console.log('✅ Google login successful, redirecting...');
           
@@ -818,6 +821,9 @@ export default function LoginPage() {
           window.removeEventListener('message', handleMessage);
           if ((handleMessage as any).timeoutId) {
             clearTimeout((handleMessage as any).timeoutId);
+          }
+          if ((handleMessage as any).popupCheckInterval) {
+            clearInterval((handleMessage as any).popupCheckInterval);
           }
           setSocialLoading("");
         }
