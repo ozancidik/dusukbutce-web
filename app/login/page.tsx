@@ -808,19 +808,186 @@ export default function LoginPage() {
     setError("");
     
     try {
-      // Gizli sekme desteği: Popup yerine tam sayfa yönlendirme
-      // Popup'lar gizli sekmede localStorage izolasyonu nedeniyle çalışmıyor
       const returnUrl = new URLSearchParams(window.location.search).get('returnUrl') || '/';
       const state = encodeURIComponent(JSON.stringify({ 
         random: Math.random().toString(36).substring(7),
         returnUrl: returnUrl
       }));
       
-      // Tam sayfa yönlendirme - gizli sekmede çalışır
-      window.location.href = `/api/auth/google?state=${state}`;
+      // Popup boyutları - mobil uyumlu
+      let width, height, left, top;
+      if (window.innerWidth <= 768) {
+        width = window.screen.width;
+        height = window.screen.height;
+        left = 0;
+        top = 0;
+      } else {
+        width = 500;
+        height = 600;
+        left = window.screenX + (window.outerWidth - width) / 2;
+        top = window.screenY + (window.outerHeight - height) / 2;
+      }
       
-      // Bu noktaya asla gelmeyecek (sayfa yönlendirilecek)
-      return;
+      const popup = window.open(
+        `/api/auth/google?state=${state}`,
+        'google-login',
+        `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`
+      );
+      
+      if (!popup) {
+        setError("Popup açılamadı. Lütfen popup engelleyicinizi kapatın.");
+        setSocialLoading("");
+        return;
+      }
+      
+      // Message listener
+      const handleMessage = (event: MessageEvent) => {
+        const currentOrigin = window.location.origin;
+        const allowedOrigins = [
+          currentOrigin,
+          currentOrigin.replace('www.', ''),
+          currentOrigin.includes('www.') ? currentOrigin : currentOrigin.replace('://', '://www.')
+        ].filter((v, i, a) => a.indexOf(v) === i);
+        
+        // Origin kontrolü
+        if (!allowedOrigins.includes(event.origin) && event.origin !== '*' && event.origin !== 'null') {
+          return;
+        }
+        
+        if (event.data?.type === 'GOOGLE_LOGIN_SUCCESS') {
+          const user = event.data.user;
+          const token = event.data.token;
+          
+          // Kullanıcı bilgilerini kaydet
+          const loginTime = Date.now();
+          const userDataToStore = {
+            userLoggedIn: "true",
+            userEmail: user.email,
+            userName: user.name,
+            userId: user.id,
+            userPhone: user.phone || '',
+            userBirthDate: user.birthDate || '',
+            userIsAdmin: user.isAdmin.toString(),
+            loginTime: loginTime.toString(),
+            token: token,
+            user: JSON.stringify({
+              id: user.id,
+              email: user.email,
+              name: user.name,
+              phone: user.phone || '',
+              birthDate: user.birthDate || '',
+              isAdmin: user.isAdmin
+            })
+          };
+          
+          Object.entries(userDataToStore).forEach(([key, value]) => {
+            localStorage.setItem(key, value);
+            sessionStorage.setItem(key, value);
+          });
+          
+          if (user.isAdmin) {
+            localStorage.setItem("adminLoggedIn", "true");
+            localStorage.setItem("adminEmail", user.email);
+            localStorage.setItem("adminToken", token);
+            sessionStorage.setItem("adminLoggedIn", "true");
+            sessionStorage.setItem("adminEmail", user.email);
+            sessionStorage.setItem("adminToken", token);
+          }
+          
+          window.dispatchEvent(new Event('localStorageChange'));
+          
+          try {
+            popup.close();
+          } catch (e) {
+            // COOP hatası - görmezden gel
+          }
+          
+          window.removeEventListener('message', handleMessage);
+          if ((handleMessage as any).timeoutId) {
+            clearTimeout((handleMessage as any).timeoutId);
+          }
+          
+          setSocialLoading("");
+          router.push(decodeURIComponent(returnUrl));
+        } else if (event.data?.type === 'GOOGLE_LOGIN_ERROR') {
+          setError(event.data.error || "Google ile giriş yapılırken bir hata oluştu.");
+          setSocialLoading("");
+          try {
+            popup.close();
+          } catch (e) {
+            // COOP hatası - görmezden gel
+          }
+          window.removeEventListener('message', handleMessage);
+          if ((handleMessage as any).timeoutId) {
+            clearTimeout((handleMessage as any).timeoutId);
+          }
+        }
+      };
+      
+      window.addEventListener('message', handleMessage);
+      
+      // Timeout
+      const timeoutId = setTimeout(() => {
+        window.removeEventListener('message', handleMessage);
+        try {
+          if (popup) popup.close();
+        } catch (e) {
+          // COOP hatası
+        }
+        if (socialLoading === "google") {
+          setSocialLoading("");
+          setError("Giriş işlemi zaman aşımına uğradı. Lütfen tekrar deneyin.");
+        }
+      }, 120000);
+      
+      (handleMessage as any).timeoutId = timeoutId;
+      
+      // Fallback: localStorage kontrolü (gizli sekme için)
+      let fallbackCheckCount = 0;
+      const fallbackInterval = setInterval(() => {
+        fallbackCheckCount++;
+        const googleOAuthToken = localStorage.getItem('google_oauth_token');
+        const googleOAuthUser = localStorage.getItem('google_oauth_user');
+        
+        if (googleOAuthToken && googleOAuthUser) {
+          clearInterval(fallbackInterval);
+          try {
+            const userData = JSON.parse(googleOAuthUser);
+            const loginTime = Date.now();
+            const userDataToStore = {
+              userLoggedIn: "true",
+              userEmail: userData.email,
+              userName: userData.name,
+              userId: userData.id,
+              userPhone: userData.phone || '',
+              userBirthDate: userData.birthDate || '',
+              userIsAdmin: userData.isAdmin.toString(),
+              loginTime: loginTime.toString(),
+              token: googleOAuthToken,
+              user: JSON.stringify(userData)
+            };
+            
+            Object.entries(userDataToStore).forEach(([key, value]) => {
+              localStorage.setItem(key, value);
+              sessionStorage.setItem(key, value);
+            });
+            
+            localStorage.removeItem('google_oauth_token');
+            localStorage.removeItem('google_oauth_user');
+            
+            window.dispatchEvent(new Event('localStorageChange'));
+            setSocialLoading("");
+            router.push(decodeURIComponent(returnUrl));
+          } catch (e) {
+            console.error('Fallback error:', e);
+          }
+        }
+        
+        if (fallbackCheckCount >= 10) {
+          clearInterval(fallbackInterval);
+        }
+      }, 1000);
+      
     } catch (error) {
       console.error('Google login error:', error);
       setError("Google ile giriş yapılırken bir hata oluştu.");
@@ -834,15 +1001,183 @@ export default function LoginPage() {
       setSocialLoading("facebook");
       setError("");
       
-      // Return URL'i al
       const returnUrl = new URLSearchParams(window.location.search).get('returnUrl') || '/';
-      
-      // Facebook OAuth sayfasına tam sayfa yönlendirmesi yap
       const facebookAuthUrl = `/api/auth/facebook?returnUrl=${encodeURIComponent(returnUrl)}`;
-      window.location.href = facebookAuthUrl;
       
-      // Bu noktaya asla gelmeyecek (sayfa yönlendirilecek)
-      return;
+      // Popup boyutları - mobil uyumlu
+      let width, height, left, top;
+      if (window.innerWidth <= 768) {
+        width = window.screen.width;
+        height = window.screen.height;
+        left = 0;
+        top = 0;
+      } else {
+        width = 500;
+        height = 600;
+        left = window.screenX + (window.outerWidth - width) / 2;
+        top = window.screenY + (window.outerHeight - height) / 2;
+      }
+      
+      const popup = window.open(
+        facebookAuthUrl,
+        'facebook-login',
+        `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`
+      );
+      
+      if (!popup) {
+        setError("Popup açılamadı. Lütfen popup engelleyicinizi kapatın.");
+        setSocialLoading("");
+        return;
+      }
+      
+      // Message listener
+      const handleMessage = (event: MessageEvent) => {
+        const currentOrigin = window.location.origin;
+        const allowedOrigins = [
+          currentOrigin,
+          currentOrigin.replace('www.', ''),
+          currentOrigin.includes('www.') ? currentOrigin : currentOrigin.replace('://', '://www.')
+        ].filter((v, i, a) => a.indexOf(v) === i);
+        
+        // Origin kontrolü
+        if (!allowedOrigins.includes(event.origin) && event.origin !== '*' && event.origin !== 'null') {
+          return;
+        }
+        
+        if (event.data?.type === 'FACEBOOK_LOGIN_SUCCESS') {
+          const user = event.data.user;
+          const token = event.data.token;
+          
+          // Kullanıcı bilgilerini kaydet
+          const loginTime = Date.now();
+          const userDataToStore = {
+            userLoggedIn: "true",
+            userEmail: user.email,
+            userName: user.name,
+            userId: user.id,
+            userPhone: user.phone || '',
+            userBirthDate: user.birthDate || '',
+            userIsAdmin: user.isAdmin.toString(),
+            loginTime: loginTime.toString(),
+            token: token,
+            user: JSON.stringify({
+              id: user.id,
+              email: user.email,
+              name: user.name,
+              phone: user.phone || '',
+              birthDate: user.birthDate || '',
+              isAdmin: user.isAdmin
+            })
+          };
+          
+          Object.entries(userDataToStore).forEach(([key, value]) => {
+            localStorage.setItem(key, value);
+            sessionStorage.setItem(key, value);
+          });
+          
+          if (user.isAdmin) {
+            localStorage.setItem("adminLoggedIn", "true");
+            localStorage.setItem("adminEmail", user.email);
+            localStorage.setItem("adminToken", token);
+            sessionStorage.setItem("adminLoggedIn", "true");
+            sessionStorage.setItem("adminEmail", user.email);
+            sessionStorage.setItem("adminToken", token);
+          }
+          
+          window.dispatchEvent(new Event('localStorageChange'));
+          
+          try {
+            popup.close();
+          } catch (e) {
+            // COOP hatası - görmezden gel
+          }
+          
+          window.removeEventListener('message', handleMessage);
+          if ((handleMessage as any).timeoutId) {
+            clearTimeout((handleMessage as any).timeoutId);
+          }
+          
+          setSocialLoading("");
+          router.push(decodeURIComponent(returnUrl));
+        } else if (event.data?.type === 'FACEBOOK_LOGIN_ERROR') {
+          setError(event.data.error || "Facebook ile giriş yapılırken bir hata oluştu.");
+          setSocialLoading("");
+          try {
+            popup.close();
+          } catch (e) {
+            // COOP hatası - görmezden gel
+          }
+          window.removeEventListener('message', handleMessage);
+          if ((handleMessage as any).timeoutId) {
+            clearTimeout((handleMessage as any).timeoutId);
+          }
+        }
+      };
+      
+      window.addEventListener('message', handleMessage);
+      
+      // Timeout
+      const timeoutId = setTimeout(() => {
+        window.removeEventListener('message', handleMessage);
+        try {
+          if (popup) popup.close();
+        } catch (e) {
+          // COOP hatası
+        }
+        if (socialLoading === "facebook") {
+          setSocialLoading("");
+          setError("Giriş işlemi zaman aşımına uğradı. Lütfen tekrar deneyin.");
+        }
+      }, 120000);
+      
+      (handleMessage as any).timeoutId = timeoutId;
+      
+      // Fallback: localStorage kontrolü (gizli sekme için)
+      let fallbackCheckCount = 0;
+      const fallbackInterval = setInterval(() => {
+        fallbackCheckCount++;
+        const facebookOAuthToken = localStorage.getItem('facebook_oauth_token');
+        const facebookOAuthUser = localStorage.getItem('facebook_oauth_user');
+        
+        if (facebookOAuthToken && facebookOAuthUser) {
+          clearInterval(fallbackInterval);
+          try {
+            const userData = JSON.parse(facebookOAuthUser);
+            const loginTime = Date.now();
+            const userDataToStore = {
+              userLoggedIn: "true",
+              userEmail: userData.email,
+              userName: userData.name,
+              userId: userData.id,
+              userPhone: userData.phone || '',
+              userBirthDate: userData.birthDate || '',
+              userIsAdmin: userData.isAdmin.toString(),
+              loginTime: loginTime.toString(),
+              token: facebookOAuthToken,
+              user: JSON.stringify(userData)
+            };
+            
+            Object.entries(userDataToStore).forEach(([key, value]) => {
+              localStorage.setItem(key, value);
+              sessionStorage.setItem(key, value);
+            });
+            
+            localStorage.removeItem('facebook_oauth_token');
+            localStorage.removeItem('facebook_oauth_user');
+            
+            window.dispatchEvent(new Event('localStorageChange'));
+            setSocialLoading("");
+            router.push(decodeURIComponent(returnUrl));
+          } catch (e) {
+            console.error('Fallback error:', e);
+          }
+        }
+        
+        if (fallbackCheckCount >= 10) {
+          clearInterval(fallbackInterval);
+        }
+      }, 1000);
+      
     } catch (error) {
       console.error('Facebook login error:', error);
       setError("Facebook ile giriş yapılırken bir hata oluştu.");
