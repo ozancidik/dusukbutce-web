@@ -808,6 +808,11 @@ export default function LoginPage() {
           if ((handleMessage as any).popupCheckInterval) {
             clearInterval((handleMessage as any).popupCheckInterval);
           }
+          // Fallback check interval'ını da temizle (normal flow çalıştığı için)
+          if ((handleMessage as any).fallbackCheckInterval) {
+            clearInterval((handleMessage as any).fallbackCheckInterval);
+            (handleMessage as any).fallbackCheckInterval = null;
+          }
           
           // Loading state'ini temizle
           setSocialLoading("");
@@ -876,31 +881,41 @@ export default function LoginPage() {
       
       // Fallback kontrolü - periyodik olarak localStorage'ı kontrol et
       let fallbackCheckCount = 0;
-      const maxFallbackChecks = 30; // 30 saniye (1 saniye * 30)
+      const maxFallbackChecks = 10; // 10 saniye (1 saniye * 10) - daha kısa süre
       let fallbackProcessed = false; // Fallback işlendi mi kontrolü
+      let fallbackCheckInterval: NodeJS.Timeout | null = null;
       
-      const fallbackCheckInterval = setInterval(() => {
+      fallbackCheckInterval = setInterval(() => {
+        // Eğer daha önce işlendiyse kontrol etme
+        if (fallbackProcessed) {
+          if (fallbackCheckInterval) {
+            clearInterval(fallbackCheckInterval);
+            fallbackCheckInterval = null;
+          }
+          return;
+        }
+        
         fallbackCheckCount++;
         const googleOAuthToken = localStorage.getItem('google_oauth_token');
         const googleOAuthUser = localStorage.getItem('google_oauth_user');
         
-        // Eğer daha önce işlendiyse kontrol etme
-        if (fallbackProcessed) {
-          return;
+        // Sadece ilk birkaç kontrolü log'la (spam'i azaltmak için)
+        if (fallbackCheckCount <= 3 || (googleOAuthToken && googleOAuthUser)) {
+          console.log('🔍 Fallback check #' + fallbackCheckCount + ':', {
+            hasToken: !!googleOAuthToken,
+            hasUser: !!googleOAuthUser,
+            socialLoading: socialLoading
+          });
         }
-        
-        console.log('🔍 Fallback check #' + fallbackCheckCount + ':', {
-          hasToken: !!googleOAuthToken,
-          hasUser: !!googleOAuthUser,
-          socialLoading: socialLoading,
-          fallbackProcessed: fallbackProcessed
-        });
         
         // Token ve user varsa, socialLoading ne olursa olsun işle
         if (googleOAuthToken && googleOAuthUser && !fallbackProcessed) {
           console.log('✅ Fallback detected in localStorage, processing...');
           fallbackProcessed = true;
-          clearInterval(fallbackCheckInterval);
+          if (fallbackCheckInterval) {
+            clearInterval(fallbackCheckInterval);
+            fallbackCheckInterval = null;
+          }
           
           // Loading state'ini temizle
           if (socialLoading === "google") {
@@ -959,12 +974,16 @@ export default function LoginPage() {
             // Hata durumunda sayfa yenileme yerine hata mesajı göster
             setError("Giriş işlemi sırasında bir hata oluştu. Lütfen tekrar deneyin.");
           }
+          return;
         }
         
         // Maksimum kontrol sayısına ulaşıldıysa durdur
         if (fallbackCheckCount >= maxFallbackChecks) {
           console.log('⏱️ Fallback check timeout - stopping checks');
-          clearInterval(fallbackCheckInterval);
+          if (fallbackCheckInterval) {
+            clearInterval(fallbackCheckInterval);
+            fallbackCheckInterval = null;
+          }
           // Loading state'ini temizle
           if (socialLoading === "google") {
             setSocialLoading("");
@@ -972,6 +991,9 @@ export default function LoginPage() {
           }
         }
       }, 1000); // Her saniye kontrol et
+      
+      // handleMessage içinde fallback interval'ı temizlemek için referans sakla
+      (handleMessage as any).fallbackCheckInterval = fallbackCheckInterval;
       
     } catch (err) {
       setError("Google ile giriş yapılırken bir hata oluştu.");
