@@ -345,8 +345,23 @@ export async function GET(request: NextRequest) {
               localStorage.setItem('facebook_oauth_token', fallbackData.token);
               localStorage.setItem('facebook_oauth_user', JSON.stringify(fallbackData.user));
               console.log('✅ Data saved to localStorage as fallback (always)');
+              console.log('✅ Token saved:', fallbackData.token ? 'YES' : 'NO');
+              console.log('✅ User saved:', fallbackData.user ? 'YES' : 'NO');
+              console.log('✅ User email:', fallbackData.user.email);
+              console.log('✅ User ID:', fallbackData.user.id);
+              
+              // Doğrulama - localStorage'dan oku
+              const savedToken = localStorage.getItem('facebook_oauth_token');
+              const savedUser = localStorage.getItem('facebook_oauth_user');
+              console.log('✅ Verification - Token in localStorage:', !!savedToken);
+              console.log('✅ Verification - User in localStorage:', !!savedUser);
+              
+              if (!savedToken || !savedUser) {
+                console.error('❌ CRITICAL: Data not found in localStorage after save!');
+              }
             } catch (e) {
               console.error('❌ Error saving to localStorage:', e);
+              console.error('❌ Error details:', e.message, e.stack);
             }
             
             // Mesajı göndermeden önce kısa bir bekleme - popup'un hazır olması için

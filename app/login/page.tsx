@@ -1233,8 +1233,17 @@ export default function LoginPage() {
           console.log('🔍 Fallback check #' + fallbackCheckCount + ':', {
             hasToken: !!facebookOAuthToken,
             hasUser: !!facebookOAuthUser,
-            socialLoading: socialLoading
+            socialLoading: socialLoading,
+            tokenLength: facebookOAuthToken ? facebookOAuthToken.length : 0,
+            userLength: facebookOAuthUser ? facebookOAuthUser.length : 0
           });
+        }
+        
+        // Debug: localStorage'daki tüm facebook_oauth ile başlayan key'leri göster
+        if (fallbackCheckCount === 1) {
+          const allKeys = Object.keys(localStorage);
+          const facebookKeys = allKeys.filter(key => key.startsWith('facebook_oauth'));
+          console.log('🔍 All facebook_oauth keys in localStorage:', facebookKeys);
         }
         
         // Token ve user varsa, socialLoading ne olursa olsun işle
