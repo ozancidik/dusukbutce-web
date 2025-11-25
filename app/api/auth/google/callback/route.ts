@@ -256,10 +256,7 @@ export async function GET(request: NextRequest) {
                   
                   // Güvenlik: Spesifik origin'e mesaj gönder (wildcard yerine)
                   // www ve non-www için her iki origin'i de dene
-                  const allowedOrigins = [
-                    '${targetOrigin}',
-                    '${targetOrigin.replace(/^https?:\\/\\/(www\\.)?/, (match, www) => www ? match.replace('www.', '') : match.replace(/^https?:\\/\\//, 'https://www.'))}'
-                  ].filter((v, i, a) => a.indexOf(v) === i); // Duplicate'leri kaldır
+                  const allowedOrigins = ['${targetOrigin}', '${targetOriginWithWww}'].filter((v, i, a) => a.indexOf(v) === i);
                   
                   console.log('📤 Allowed origins for postMessage:', allowedOrigins);
                   
