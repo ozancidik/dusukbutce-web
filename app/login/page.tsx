@@ -907,21 +907,57 @@ export default function LoginPage() {
             setSocialLoading("");
           }
           
-          // Fallback mekanizması çalışacak - useEffect'te kontrol ediliyor
-          // URL'e google_oauth_success parametresini ekle
-          const currentUrl = new URL(window.location.href);
-          // Eğer zaten google_oauth_success parametresi varsa ekleme
-          if (!currentUrl.searchParams.has('google_oauth_success')) {
-            currentUrl.searchParams.set('google_oauth_success', 'true');
-            window.history.replaceState({}, '', currentUrl.toString());
-            console.log('✅ URL updated with google_oauth_success parameter');
-            // Sayfayı yenile (useEffect'in çalışması için)
-            setTimeout(() => {
-              window.location.reload();
-            }, 500);
-          } else {
-            // Zaten parametre varsa, sadece useEffect'in çalışmasını bekle
-            console.log('✅ google_oauth_success parameter already exists, waiting for useEffect...');
+          // Fallback mekanizmasını direkt çalıştır (sayfa yenileme yerine)
+          try {
+            const userData = JSON.parse(googleOAuthUser);
+            const loginTime = Date.now();
+            const userDataToStore = {
+              userLoggedIn: "true",
+              userEmail: userData.email,
+              userName: userData.name,
+              userId: userData.id,
+              userPhone: userData.phone || '',
+              userBirthDate: userData.birthDate || '',
+              userIsAdmin: userData.isAdmin.toString(),
+              loginTime: loginTime.toString(),
+              token: googleOAuthToken,
+              user: JSON.stringify({
+                id: userData.id,
+                email: userData.email,
+                name: userData.name,
+                phone: userData.phone || '',
+                birthDate: userData.birthDate || '',
+                isAdmin: userData.isAdmin
+              })
+            };
+            
+            // localStorage'a kaydet
+            Object.entries(userDataToStore).forEach(([key, value]) => {
+              localStorage.setItem(key, value);
+            });
+            
+            // sessionStorage'a da kaydet
+            Object.entries(userDataToStore).forEach(([key, value]) => {
+              sessionStorage.setItem(key, value);
+            });
+            
+            // Cleanup
+            localStorage.removeItem('google_oauth_token');
+            localStorage.removeItem('google_oauth_user');
+            
+            // Custom event'i tetikle
+            window.dispatchEvent(new Event('localStorageChange'));
+            
+            console.log('✅ Fallback processing completed, redirecting...');
+            
+            // Yönlendir (sayfa yenileme yerine)
+            const urlParams = new URLSearchParams(window.location.search);
+            const returnUrl = urlParams.get('returnUrl') || '/';
+            router.push(decodeURIComponent(returnUrl));
+          } catch (e) {
+            console.error('❌ Error processing fallback:', e);
+            // Hata durumunda sayfa yenileme yerine hata mesajı göster
+            setError("Giriş işlemi sırasında bir hata oluştu. Lütfen tekrar deneyin.");
           }
         }
         
