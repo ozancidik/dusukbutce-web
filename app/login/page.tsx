@@ -664,7 +664,31 @@ export default function LoginPage() {
       };
 
       console.log('👂 Adding message listener for Google OAuth');
+      console.log('👂 Current page origin:', window.location.origin);
+      console.log('👂 Current page URL:', window.location.href);
+      
+      // Message listener'ı ekle
       window.addEventListener('message', handleMessage);
+      
+      // Ayrıca popup'un load event'ini dinle
+      if (popup) {
+        try {
+          // Popup'un yüklendiğini kontrol et
+          const checkPopupLoaded = setInterval(() => {
+            try {
+              if (popup.closed) {
+                clearInterval(checkPopupLoaded);
+                console.log('🔒 Popup closed by user');
+                setSocialLoading("");
+              }
+            } catch (e) {
+              // COOP hatası - görmezden gel
+            }
+          }, 500);
+        } catch (e) {
+          // Popup erişim hatası - görmezden gel
+        }
+      }
       
       // COOP nedeniyle window.closed kullanamıyoruz - sadece timeout ile temizle
       // Message listener başarılı/hatalı durumları handle edecek
@@ -672,6 +696,7 @@ export default function LoginPage() {
       
       // 5 dakika sonra timeout (güvenlik için)
       timeoutId = setTimeout(() => {
+        console.log('⏱️ Google OAuth timeout - cleaning up');
         window.removeEventListener('message', handleMessage);
         try {
           if (popup) {
