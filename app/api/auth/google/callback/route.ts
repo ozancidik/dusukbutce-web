@@ -236,13 +236,98 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Tam sayfa yönlendirme - gizli sekmede çalışır
-    // Token'ı URL parametresi ile gönder, login sayfası verify-token API'den user bilgisini çekecek
-    const loginUrl = `${targetOrigin}/login?google_oauth_success=true&token=${encodeURIComponent(token)}&returnUrl=${encodeURIComponent(returnUrl)}`;
-    
-    console.log('🔄 Redirecting to login page with token:', loginUrl);
-    
-    return NextResponse.redirect(loginUrl);
+    // Popup için HTML response - postMessage ile ana pencereye mesaj gönder
+    return new Response(`
+      <html>
+        <head>
+          <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
+        </head>
+        <body>
+          <script>
+            const userData = {
+              id: '${String(user._id)}',
+              email: '${String(user.email)}',
+              name: ${JSON.stringify(String(user.name || ''))},
+              phone: '${String(user.phone || '')}',
+              birthDate: '${String(user.birthDate || '')}',
+              isAdmin: ${user.isAdmin}
+            };
+            
+            const token = '${String(token)}';
+            
+            // localStorage'a fallback olarak kaydet (gizli sekme için)
+            try {
+              localStorage.setItem('google_oauth_token', token);
+              localStorage.setItem('google_oauth_user', JSON.stringify(userData));
+            } catch (e) {
+              console.error('localStorage error:', e);
+            }
+            
+            // Ana pencereye mesaj gönder
+            if (window.opener) {
+              const messageData = {
+                type: 'GOOGLE_LOGIN_SUCCESS',
+                user: userData,
+                token: token
+              };
+              
+              // Spesifik origin'e gönder
+              const allowedOrigins = ['${targetOrigin}'];
+              if (targetOrigin.includes('www.')) {
+                allowedOrigins.push(targetOrigin.replace('www.', ''));
+              } else {
+                allowedOrigins.push(targetOrigin.replace('://', '://www.'));
+              }
+              
+              allowedOrigins.forEach(origin => {
+                try {
+                  window.opener.postMessage(messageData, origin);
+                } catch (e) {
+                  console.warn('postMessage error:', e);
+                }
+              });
+              
+              // Retry mekanizması
+              setTimeout(() => {
+                allowedOrigins.forEach(origin => {
+                  try {
+                    if (window.opener) {
+                      window.opener.postMessage(messageData, origin);
+                    }
+                  } catch (e) {}
+                });
+              }, 200);
+              
+              // Wildcard fallback (son çare)
+              setTimeout(() => {
+                try {
+                  if (window.opener) {
+                    window.opener.postMessage(messageData, '*');
+                  }
+                } catch (e) {}
+              }, 400);
+              
+              // Popup'ı kapat
+              setTimeout(() => {
+                try {
+                  window.close();
+                } catch (e) {
+                  document.body.innerHTML = '<div style="padding: 20px; text-align: center;"><h2>✅ Giriş başarılı!</h2><p>Bu pencereyi kapatabilirsiniz.</p></div>';
+                }
+              }, 1000);
+            } else {
+              // Opener yoksa, localStorage fallback kullanılacak
+              document.body.innerHTML = '<div style="padding: 20px; text-align: center;"><h2>✅ Giriş başarılı!</h2><p>Bu pencereyi kapatabilirsiniz.</p></div>';
+            }
+          </script>
+        </body>
+      </html>
+    `, {
+      headers: { 
+        'Content-Type': 'text/html',
+        'Cross-Origin-Opener-Policy': 'same-origin-allow-popups'
+      }
+    });
   } catch (error) {
     console.error('Google OAuth error:', error);
     return new Response(`
