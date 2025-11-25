@@ -725,37 +725,19 @@ export default function LoginPage() {
     setError("");
     
     try {
-      // Google OAuth popup açma (mobil uyumlu)
-      let width, height, left, top;
+      // Gizli sekme desteği: Popup yerine tam sayfa yönlendirme
+      // Popup'lar gizli sekmede localStorage izolasyonu nedeniyle çalışmıyor
+      const returnUrl = new URLSearchParams(window.location.search).get('returnUrl') || '/';
+      const state = encodeURIComponent(JSON.stringify({ 
+        random: Math.random().toString(36).substring(7),
+        returnUrl: returnUrl
+      }));
       
-      // Mobil cihaz kontrolü
-      if (window.innerWidth <= 768) {
-        // Mobil için tam ekran popup
-        width = window.screen.width;
-        height = window.screen.height;
-        left = 0;
-        top = 0;
-      } else {
-        // Desktop için ortalanmış popup
-        width = 500;
-        height = 600;
-        left = window.screenX + (window.outerWidth - width) / 2;
-        top = window.screenY + (window.outerHeight - height) / 2;
-      }
+      // Tam sayfa yönlendirme - gizli sekmede çalışır
+      window.location.href = `/api/auth/google?state=${state}`;
       
-      const popup = window.open(
-        '/api/auth/google',
-        'google-login',
-        `width=${width},height=${height},left=${left},top=${top}`
-      );
-
-      if (!popup) {
-        setError("Popup penceresi açılamadı. Lütfen popup engelleyicisini kapatıp tekrar deneyin.");
-        setSocialLoading("");
-        return;
-      }
-
-      console.log('🔓 Popup opened, waiting for messages...');
+      // Bu noktaya asla gelmeyecek (sayfa yönlendirilecek)
+      return;
 
       // Popup mesajlarını dinle
       const handleMessage = (event: MessageEvent) => {

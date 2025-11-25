@@ -53,6 +53,13 @@ export async function GET(request: NextRequest) {
     });
   }
 
+  // State parametresini al (returnUrl için)
+  const searchParams = request.nextUrl.searchParams;
+  const state = searchParams.get('state') || encodeURIComponent(JSON.stringify({ 
+    random: Math.random().toString(36).substring(7),
+    returnUrl: '/'
+  }));
+
   // Google OAuth URL'ini oluştur
   const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
     `client_id=${process.env.GOOGLE_CLIENT_ID}&` +
@@ -60,7 +67,8 @@ export async function GET(request: NextRequest) {
     `response_type=code&` +
     `scope=${encodeURIComponent('https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile openid')}&` +
     `access_type=offline&` +
-    `prompt=consent`;
+    `prompt=consent&` +
+    `state=${state}`;
 
   console.log('Google Auth URL:', googleAuthUrl);
 
