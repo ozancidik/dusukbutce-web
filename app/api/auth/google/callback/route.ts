@@ -318,34 +318,36 @@ export async function GET(request: NextRequest) {
                     }
                   });
                   
-                  // Retry mekanizması - birkaç kez tekrarla
-                  setTimeout(() => {
-                    allowedOrigins.forEach((allowedOrigin, index) => {
-                      try {
-                        if (window.opener) {
-                          window.opener.postMessage(messageData, allowedOrigin);
-                          console.log('✅ Message sent successfully to ' + allowedOrigin + ' (retry ' + (index + 1) + ')');
+                  // Retry mekanizması - daha fazla deneme (gizli sekme için)
+                  const retryDelays = [200, 400, 600, 800, 1000, 1500];
+                  retryDelays.forEach((delay, retryIndex) => {
+                    setTimeout(() => {
+                      allowedOrigins.forEach((allowedOrigin, index) => {
+                        try {
+                          if (window.opener) {
+                            window.opener.postMessage(messageData, allowedOrigin);
+                            console.log('✅ Message sent successfully to ' + allowedOrigin + ' (retry ' + (retryIndex + 1) + ')');
+                          }
+                        } catch (e) {
+                          console.error('❌ Error sending message to ' + allowedOrigin + ' (retry ' + (retryIndex + 1) + '):', e);
                         }
-                      } catch (e) {
-                        console.error('❌ Error sending message to ' + allowedOrigin + ' (retry ' + (index + 1) + '):', e);
-                      }
-                    });
-                  }, 200);
-                  
-                  setTimeout(() => {
-                    allowedOrigins.forEach((allowedOrigin, index) => {
-                      try {
-                        if (window.opener) {
-                          window.opener.postMessage(messageData, allowedOrigin);
-                          console.log('✅ Message sent successfully to ' + allowedOrigin + ' (retry ' + (index + 2) + ')');
+                      });
+                      
+                      // Wildcard origin'e de gönder (son çare)
+                      if (retryIndex >= 2) {
+                        try {
+                          if (window.opener) {
+                            window.opener.postMessage(messageData, '*');
+                            console.log('✅ Message sent to wildcard origin (last resort, retry ' + (retryIndex + 1) + ')');
+                          }
+                        } catch (e) {
+                          console.warn('⚠️ Could not send to wildcard origin:', e);
                         }
-                      } catch (e) {
-                        console.error('❌ Error sending message to ' + allowedOrigin + ' (retry ' + (index + 2) + '):', e);
                       }
-                    });
-                  }, 400);
+                    }, delay);
+                  });
                   
-                  // Mesaj gönderildikten sonra kapat
+                  // Mesaj gönderildikten sonra kapat (daha uzun bekle - gizli sekme için)
                   setTimeout(() => {
                     console.log('🔒 Closing popup window...');
                     try {
@@ -353,7 +355,7 @@ export async function GET(request: NextRequest) {
                     } catch (e) {
                       console.error('❌ Error closing window:', e);
                     }
-                  }, 2000);
+                  }, 3000);
                 } catch (error) {
                   console.error('❌ Error in callback script:', error);
                   console.error('❌ Error details:', error.message, error.stack);

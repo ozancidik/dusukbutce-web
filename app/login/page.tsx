@@ -693,10 +693,15 @@ export default function LoginPage() {
         // Origin kontrolü - www ve non-www farkını göz ardı et
         let isAllowedOrigin = false;
         
-        if (eventOrigin === '*') {
-          // Wildcard origin - güvenlik riski, reddet
-          console.log('🔒 Message from wildcard origin rejected (security risk)');
-          return;
+        // Wildcard origin kontrolü - gizli sekme desteği için kabul et (ama sadece GOOGLE_LOGIN_SUCCESS için)
+        if (eventOrigin === '*' || eventOrigin === 'null') {
+          if (event.data?.type === 'GOOGLE_LOGIN_SUCCESS' || event.data?.type === 'FACEBOOK_LOGIN_SUCCESS') {
+            console.log('⚠️ Message from wildcard/null origin accepted for OAuth (incognito support)');
+            isAllowedOrigin = true;
+          } else {
+            console.log('🔒 Message from wildcard origin rejected (security risk, not OAuth)');
+            return;
+          }
         }
         
         try {
@@ -748,8 +753,16 @@ export default function LoginPage() {
         console.log('✅ Message accepted, processing:', event.data.type);
         
         if (event.data.type === 'GOOGLE_LOGIN_SUCCESS') {
+          console.log('✅ GOOGLE_LOGIN_SUCCESS message received from postMessage');
           const userData = event.data.user;
           const token = event.data.token;
+          
+          if (!userData || !token) {
+            console.error('❌ Invalid message data - missing user or token');
+            return;
+          }
+          
+          console.log('✅ Processing login with user:', userData.email);
           const loginTime = Date.now();
           const userDataToStore = {
             userLoggedIn: "true",
@@ -772,14 +785,35 @@ export default function LoginPage() {
           };
           
           // localStorage'a kaydet
-          Object.entries(userDataToStore).forEach(([key, value]) => {
-            localStorage.setItem(key, value);
-          });
+          try {
+            Object.entries(userDataToStore).forEach(([key, value]) => {
+              localStorage.setItem(key, value);
+            });
+            console.log('✅ Data saved to localStorage');
+          } catch (e) {
+            console.error('❌ Error saving to localStorage:', e);
+          }
           
           // sessionStorage'a da kaydet (gizli sekme desteği için)
-          Object.entries(userDataToStore).forEach(([key, value]) => {
-            sessionStorage.setItem(key, value);
-          });
+          try {
+            Object.entries(userDataToStore).forEach(([key, value]) => {
+              sessionStorage.setItem(key, value);
+            });
+            console.log('✅ Data saved to sessionStorage');
+          } catch (e) {
+            console.error('❌ Error saving to sessionStorage:', e);
+          }
+          
+          // Fallback için google_oauth_token ve google_oauth_user'ı da kaydet
+          try {
+            localStorage.setItem('google_oauth_token', token);
+            localStorage.setItem('google_oauth_user', JSON.stringify(userData));
+            sessionStorage.setItem('google_oauth_token', token);
+            sessionStorage.setItem('google_oauth_user', JSON.stringify(userData));
+            console.log('✅ Fallback data also saved to localStorage and sessionStorage');
+          } catch (e) {
+            console.error('❌ Error saving fallback data:', e);
+          }
           
           // Remember Me işaretliyse email'i hatırla
           if (rememberMe) {
