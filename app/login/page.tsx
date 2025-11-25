@@ -1038,21 +1038,66 @@ export default function LoginPage() {
       
       // Popup mesajlarını dinle
       const handleMessage = (event: MessageEvent) => {
-        if (event.origin !== window.location.origin) return;
+        // Origin kontrolü - www ve non-www için esnek
+        const currentOrigin = window.location.origin;
+        const allowedOrigins = [
+          currentOrigin,
+          currentOrigin.replace('www.', ''),
+          currentOrigin.includes('www.') ? currentOrigin : currentOrigin.replace('://', '://www.')
+        ].filter((v, i, a) => a.indexOf(v) === i);
+        
+        if (!allowedOrigins.includes(event.origin)) {
+          console.log('🚫 Message from unauthorized origin:', event.origin, 'Expected:', allowedOrigins);
+          return;
+        }
+        
+        console.log('📨 Facebook OAuth message received:', event.data.type);
+        console.log('📨 Message origin:', event.origin);
+        console.log('📨 Current origin:', currentOrigin);
         
         if (event.data.type === 'FACEBOOK_LOGIN_SUCCESS') {
           const user = event.data.user;
           const token = event.data.token;
           
+          console.log('✅ Facebook login success, processing...');
+          
+          // Fallback interval'ı temizle
+          if ((handleMessage as any).fallbackCheckInterval) {
+            clearInterval((handleMessage as any).fallbackCheckInterval);
+            (handleMessage as any).fallbackCheckInterval = null;
+          }
+          
           // Kullanıcı bilgilerini localStorage'a kaydet
-          localStorage.setItem('userLoggedIn', 'true');
-          localStorage.setItem('userEmail', user.email);
-          localStorage.setItem('userName', user.name);
-          localStorage.setItem('userId', user.id);
-          localStorage.setItem('userPhone', user.phone || '');
-          localStorage.setItem('userBirthDate', user.birthDate || '');
-          localStorage.setItem('userIsAdmin', user.isAdmin.toString());
-          localStorage.setItem('token', token);
+          const loginTime = Date.now();
+          const userDataToStore = {
+            userLoggedIn: 'true',
+            userEmail: user.email,
+            userName: user.name,
+            userId: user.id,
+            userPhone: user.phone || '',
+            userBirthDate: user.birthDate || '',
+            userIsAdmin: user.isAdmin.toString(),
+            loginTime: loginTime.toString(),
+            token: token,
+            user: JSON.stringify({
+              id: user.id,
+              email: user.email,
+              name: user.name,
+              phone: user.phone || '',
+              birthDate: user.birthDate || '',
+              isAdmin: user.isAdmin
+            })
+          };
+          
+          // localStorage'a kaydet
+          Object.entries(userDataToStore).forEach(([key, value]) => {
+            localStorage.setItem(key, value);
+          });
+          
+          // sessionStorage'a da kaydet
+          Object.entries(userDataToStore).forEach(([key, value]) => {
+            sessionStorage.setItem(key, value);
+          });
           
           // Admin ise admin bilgilerini de kaydet
           if (user.isAdmin) {
@@ -1064,11 +1109,19 @@ export default function LoginPage() {
             sessionStorage.setItem('adminToken', token);
           }
           
+          // Cleanup
+          localStorage.removeItem('facebook_oauth_token');
+          localStorage.removeItem('facebook_oauth_user');
+          
           // Custom event tetikle
           window.dispatchEvent(new Event('localStorageChange'));
           
           // Popup'ı kapat
-          if (popup) popup.close();
+          try {
+            if (popup) popup.close();
+          } catch (e) {
+            // COOP hatası - görmezden gel
+          }
           
           // Timeout'u temizle
           if ((handleMessage as any).timeoutId) {
@@ -1078,39 +1131,51 @@ export default function LoginPage() {
           // Loading'i kapat
           setSocialLoading("");
           
-          // Başarı mesajı göster
-          setLoginSuccess(true);
-          setRedirectMessage("Facebook ile giriş başarılı! Yönlendiriliyorsunuz...");
-          
-          // 2 saniye sonra yönlendir
-          setTimeout(() => {
-            router.push(decodeURIComponent(returnUrl));
-          }, 2000);
-          
           // Event listener'ı kaldır
           window.removeEventListener('message', handleMessage);
           
+          // Yönlendir (sayfa yenileme yerine)
+          router.push(decodeURIComponent(returnUrl));
+          
         } else if (event.data.type === 'FACEBOOK_LOGIN_ERROR') {
+          console.error('❌ Facebook login error:', event.data.error);
           setError(event.data.error || 'Facebook ile giriş yapılırken bir hata oluştu.');
           setSocialLoading("");
           
-          if (popup) popup.close();
+          // Fallback interval'ı temizle
+          if ((handleMessage as any).fallbackCheckInterval) {
+            clearInterval((handleMessage as any).fallbackCheckInterval);
+            (handleMessage as any).fallbackCheckInterval = null;
+          }
+          
+          try {
+            if (popup) popup.close();
+          } catch (e) {
+            // COOP hatası - görmezden gel
+          }
           window.removeEventListener('message', handleMessage);
           
           // Timeout'u temizle
           if ((handleMessage as any).timeoutId) {
             clearTimeout((handleMessage as any).timeoutId);
           }
+        } else if (event.data.type === 'FACEBOOK_OAUTH_FALLBACK') {
+          console.log('🔄 Facebook OAuth fallback message received');
+          // Fallback mesajı alındı, normal flow'da işlenecek
         }
       };
       
+      console.log('🔓 Popup opened, waiting for messages...');
+      console.log('👂 Adding message listener for Facebook OAuth');
+      console.log('👂 Current page origin:', window.location.origin);
+      console.log('👂 Current page URL:', window.location.href);
+      
       window.addEventListener('message', handleMessage);
       
-      // COOP nedeniyle window.closed kullanamıyoruz - sadece timeout ile temizle
-      let facebookTimeoutId: NodeJS.Timeout;
-      
-      // 5 dakika sonra timeout (güvenlik için)
-      facebookTimeoutId = setTimeout(() => {
+      // Timeout mekanizması
+      let timeoutId: NodeJS.Timeout;
+      timeoutId = setTimeout(() => {
+        console.log('⏱️ Facebook OAuth timeout - cleaning up');
         window.removeEventListener('message', handleMessage);
         try {
           if (popup) {
@@ -1119,7 +1184,126 @@ export default function LoginPage() {
         } catch (e) {
           // COOP hatası - görmezden gel
         }
-        setSocialLoading("");
+        if (socialLoading === "facebook") {
+          setSocialLoading("");
+          setError("Giriş işlemi zaman aşımına uğradı. Lütfen tekrar deneyin.");
+        }
+      }, 120000); // 2 dakika
+      
+      // handleMessage içinde timeout'u temizlemek için referans sakla
+      (handleMessage as any).timeoutId = timeoutId;
+      
+      // Fallback kontrolü - periyodik olarak localStorage'ı kontrol et
+      let fallbackCheckCount = 0;
+      const maxFallbackChecks = 10; // 10 saniye (1 saniye * 10)
+      let fallbackProcessed = false;
+      let fallbackCheckInterval: NodeJS.Timeout | null = null;
+      
+      fallbackCheckInterval = setInterval(() => {
+        // Eğer daha önce işlendiyse kontrol etme
+        if (fallbackProcessed) {
+          if (fallbackCheckInterval) {
+            clearInterval(fallbackCheckInterval);
+            fallbackCheckInterval = null;
+          }
+          return;
+        }
+        
+        fallbackCheckCount++;
+        const facebookOAuthToken = localStorage.getItem('facebook_oauth_token');
+        const facebookOAuthUser = localStorage.getItem('facebook_oauth_user');
+        
+        // Sadece ilk birkaç kontrolü log'la (spam'i azaltmak için)
+        if (fallbackCheckCount <= 3 || (facebookOAuthToken && facebookOAuthUser)) {
+          console.log('🔍 Fallback check #' + fallbackCheckCount + ':', {
+            hasToken: !!facebookOAuthToken,
+            hasUser: !!facebookOAuthUser,
+            socialLoading: socialLoading
+          });
+        }
+        
+        // Token ve user varsa, socialLoading ne olursa olsun işle
+        if (facebookOAuthToken && facebookOAuthUser && !fallbackProcessed) {
+          console.log('✅ Fallback detected in localStorage, processing...');
+          fallbackProcessed = true;
+          if (fallbackCheckInterval) {
+            clearInterval(fallbackCheckInterval);
+            fallbackCheckInterval = null;
+          }
+          
+          // Loading state'ini temizle
+          if (socialLoading === "facebook") {
+            setSocialLoading("");
+          }
+          
+          // Fallback mekanizmasını direkt çalıştır (sayfa yenileme yerine)
+          try {
+            const userData = JSON.parse(facebookOAuthUser);
+            const loginTime = Date.now();
+            const userDataToStore = {
+              userLoggedIn: "true",
+              userEmail: userData.email,
+              userName: userData.name,
+              userId: userData.id,
+              userPhone: userData.phone || '',
+              userBirthDate: userData.birthDate || '',
+              userIsAdmin: userData.isAdmin.toString(),
+              loginTime: loginTime.toString(),
+              token: facebookOAuthToken,
+              user: JSON.stringify({
+                id: userData.id,
+                email: userData.email,
+                name: userData.name,
+                phone: userData.phone || '',
+                birthDate: userData.birthDate || '',
+                isAdmin: userData.isAdmin
+              })
+            };
+            
+            // localStorage'a kaydet
+            Object.entries(userDataToStore).forEach(([key, value]) => {
+              localStorage.setItem(key, value);
+            });
+            
+            // sessionStorage'a da kaydet
+            Object.entries(userDataToStore).forEach(([key, value]) => {
+              sessionStorage.setItem(key, value);
+            });
+            
+            // Cleanup
+            localStorage.removeItem('facebook_oauth_token');
+            localStorage.removeItem('facebook_oauth_user');
+            
+            // Custom event'i tetikle
+            window.dispatchEvent(new Event('localStorageChange'));
+            
+            console.log('✅ Fallback processing completed, redirecting...');
+            
+            // Yönlendir (sayfa yenileme yerine)
+            router.push(decodeURIComponent(returnUrl));
+          } catch (e) {
+            console.error('❌ Error processing fallback:', e);
+            setError("Giriş işlemi sırasında bir hata oluştu. Lütfen tekrar deneyin.");
+          }
+          return;
+        }
+        
+        // Maksimum kontrol sayısına ulaşıldıysa durdur
+        if (fallbackCheckCount >= maxFallbackChecks) {
+          console.log('⏱️ Fallback check timeout - stopping checks');
+          fallbackProcessed = true;
+          if (fallbackCheckInterval) {
+            clearInterval(fallbackCheckInterval);
+            fallbackCheckInterval = null;
+          }
+          // Loading state'ini kesinlikle temizle
+          setSocialLoading("");
+          setError("Giriş işlemi tamamlanamadı. Lütfen tekrar deneyin.");
+        }
+      }, 1000); // Her saniye kontrol et
+      
+      // handleMessage içinde fallback interval'ı temizlemek için referans sakla
+      (handleMessage as any).fallbackCheckInterval = fallbackCheckInterval;
         setError("Giriş işlemi zaman aşımına uğradı. Lütfen tekrar deneyin.");
       }, 300000); // 5 dakika
       
