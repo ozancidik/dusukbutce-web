@@ -39,13 +39,109 @@ export default function LoginPage() {
     fetchCsrfToken();
   }, []);
 
-  // Google OAuth fallback kontrolü (localStorage'dan ve message event'inden)
+  // Google OAuth fallback kontrolü (localStorage'dan, sessionStorage'dan, URL parametresinden ve message event'inden)
   React.useEffect(() => {
     const checkGoogleOAuthFallback = () => {
-      const googleOAuthToken = localStorage.getItem('google_oauth_token');
-      const googleOAuthUser = localStorage.getItem('google_oauth_user');
       const urlParams = new URLSearchParams(window.location.search);
       const googleOAuthSuccess = urlParams.get('google_oauth_success');
+      const tokenFromUrl = urlParams.get('token');
+      
+      // URL parametresinden token varsa, API'den user bilgisini al
+      if (googleOAuthSuccess === 'true' && tokenFromUrl) {
+        console.log('✅ Google OAuth success detected from URL parameter');
+        
+        // Token'ı localStorage ve sessionStorage'a kaydet
+        try {
+          localStorage.setItem('google_oauth_token', tokenFromUrl);
+          sessionStorage.setItem('google_oauth_token', tokenFromUrl);
+          
+          // API'den user bilgisini al
+          fetch('/api/auth/verify-token', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ token: tokenFromUrl }),
+          })
+            .then(res => res.json())
+            .then(data => {
+              if (data.success && data.user) {
+                console.log('✅ User data fetched from API:', data.user.email);
+                
+                const userData = {
+                  id: data.user._id || data.user.id,
+                  email: data.user.email,
+                  name: data.user.name || '',
+                  phone: data.user.phone || '',
+                  birthDate: data.user.birthDate || '',
+                  isAdmin: data.user.isAdmin || false
+                };
+                
+                // localStorage ve sessionStorage'a kaydet
+                localStorage.setItem('google_oauth_user', JSON.stringify(userData));
+                sessionStorage.setItem('google_oauth_user', JSON.stringify(userData));
+                
+                // Ana login data'yı da kaydet
+                const loginTime = Date.now();
+                const userDataToStore = {
+                  userLoggedIn: "true",
+                  userEmail: userData.email,
+                  userName: userData.name,
+                  userId: userData.id,
+                  userPhone: userData.phone || '',
+                  userBirthDate: userData.birthDate || '',
+                  userIsAdmin: userData.isAdmin.toString(),
+                  loginTime: loginTime.toString(),
+                  token: tokenFromUrl,
+                  user: JSON.stringify(userData)
+                };
+                
+                Object.entries(userDataToStore).forEach(([key, value]) => {
+                  localStorage.setItem(key, value);
+                  sessionStorage.setItem(key, value);
+                });
+                
+                if (userData.isAdmin) {
+                  localStorage.setItem("adminLoggedIn", "true");
+                  localStorage.setItem("adminEmail", userData.email);
+                  localStorage.setItem("adminToken", tokenFromUrl);
+                  sessionStorage.setItem("adminLoggedIn", "true");
+                  sessionStorage.setItem("adminEmail", userData.email);
+                  sessionStorage.setItem("adminToken", tokenFromUrl);
+                }
+                
+                // URL parametrelerini temizle
+                const returnUrl = urlParams.get('returnUrl') || '/';
+                window.history.replaceState({}, '', '/login');
+                
+                // Yönlendir
+                window.dispatchEvent(new Event('localStorageChange'));
+                setTimeout(() => {
+                  router.push(decodeURIComponent(returnUrl));
+                }, 100);
+              } else {
+                console.error('❌ Failed to fetch user data from API');
+                setError('Giriş işlemi tamamlanamadı. Lütfen tekrar deneyin.');
+                setSocialLoading("");
+              }
+            })
+            .catch(err => {
+              console.error('❌ Error fetching user data:', err);
+              setError('Giriş işlemi tamamlanamadı. Lütfen tekrar deneyin.');
+              setSocialLoading("");
+            });
+        } catch (e) {
+          console.error('❌ Error processing URL parameter:', e);
+          setError('Giriş işlemi tamamlanamadı. Lütfen tekrar deneyin.');
+          setSocialLoading("");
+        }
+        
+        return;
+      }
+      
+      // Eski fallback mekanizması (localStorage'dan kontrol)
+      const googleOAuthToken = localStorage.getItem('google_oauth_token') || sessionStorage.getItem('google_oauth_token');
+      const googleOAuthUser = localStorage.getItem('google_oauth_user') || sessionStorage.getItem('google_oauth_user');
       
       if (googleOAuthSuccess === 'true' && googleOAuthToken && googleOAuthUser) {
         console.log('✅ Google OAuth fallback detected, processing...');
