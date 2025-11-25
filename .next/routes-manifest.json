@@ -1,1 +1,663 @@
-{"version":3,"caseSensitive":false,"basePath":"","rewrites":{"beforeFiles":[],"afterFiles":[],"fallback":[]},"redirects":[{"source":"/:path+/","destination":"/:path+","permanent":true,"internal":true,"regex":"^(?:\\/((?:[^\\/]+?)(?:\\/(?:[^\\/]+?))*))\\/$"}],"headers":[{"source":"/(.*)","headers":[{"key":"Content-Security-Policy","value":"default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://static.cloudflareinsights.com https://vercel.live; connect-src 'self' https://www.googletagmanager.com https://www.google-analytics.com https://analytics.google.com https://oauth2.googleapis.com https://www.googleapis.com; img-src 'self' data: https: blob:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'self' https://vercel.live; frame-ancestors 'none'; upgrade-insecure-requests"}],"regex":"^(?:\\/(.*))(?:\\/)?$"},{"source":"/api/auth/google/callback","headers":[{"key":"Cross-Origin-Opener-Policy","value":"same-origin-allow-popups"}],"regex":"^\\/api\\/auth\\/google\\/callback(?:\\/)?$"},{"source":"/api/auth/facebook/callback","headers":[{"key":"Cross-Origin-Opener-Policy","value":"same-origin-allow-popups"}],"regex":"^\\/api\\/auth\\/facebook\\/callback(?:\\/)?$"}]}
+{
+  "version": 3,
+  "pages404": true,
+  "caseSensitive": false,
+  "basePath": "",
+  "redirects": [
+    {
+      "source": "/:path+/",
+      "destination": "/:path+",
+      "internal": true,
+      "statusCode": 308,
+      "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://static.cloudflareinsights.com https://vercel.live; connect-src 'self' https://www.googletagmanager.com https://www.google-analytics.com https://analytics.google.com https://oauth2.googleapis.com https://www.googleapis.com; img-src 'self' data: https: blob:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'self' https://vercel.live; frame-ancestors 'none'; upgrade-insecure-requests"
+        }
+      ],
+      "regex": "^(?:/(.*))(?:/)?$"
+    },
+    {
+      "source": "/api/auth/google/callback",
+      "headers": [
+        {
+          "key": "Cross-Origin-Opener-Policy",
+          "value": "same-origin-allow-popups"
+        }
+      ],
+      "regex": "^/api/auth/google/callback(?:/)?$"
+    },
+    {
+      "source": "/api/auth/facebook/callback",
+      "headers": [
+        {
+          "key": "Cross-Origin-Opener-Policy",
+          "value": "same-origin-allow-popups"
+        }
+      ],
+      "regex": "^/api/auth/facebook/callback(?:/)?$"
+    }
+  ],
+  "rewrites": {
+    "beforeFiles": [],
+    "afterFiles": [],
+    "fallback": []
+  },
+  "dynamicRoutes": [
+    {
+      "page": "/api/admin/categories/[id]",
+      "regex": "^/api/admin/categories/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/admin/categories/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/admin/delete/[id]",
+      "regex": "^/api/admin/delete/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/admin/delete/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/admin/images/[id]",
+      "regex": "^/api/admin/images/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/admin/images/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/admin/prices/[id]",
+      "regex": "^/api/admin/prices/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/admin/prices/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/admin/users/[id]",
+      "regex": "^/api/admin/users/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/admin/users/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/submissions/[id]/reoffer",
+      "regex": "^/api/submissions/([^/]+?)/reoffer(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/submissions/(?<nxtPid>[^/]+?)/reoffer(?:/)?$"
+    },
+    {
+      "page": "/api/submissions/[id]/response",
+      "regex": "^/api/submissions/([^/]+?)/response(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/submissions/(?<nxtPid>[^/]+?)/response(?:/)?$"
+    }
+  ],
+  "staticRoutes": [
+    {
+      "page": "/",
+      "regex": "^/(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/(?:/)?$"
+    },
+    {
+      "page": "/_not-found",
+      "regex": "^/_not\\-found(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_not\\-found(?:/)?$"
+    },
+    {
+      "page": "/admin",
+      "regex": "^/admin(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin(?:/)?$"
+    },
+    {
+      "page": "/admin/access-denied",
+      "regex": "^/admin/access\\-denied(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/access\\-denied(?:/)?$"
+    },
+    {
+      "page": "/admin/categories",
+      "regex": "^/admin/categories(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/categories(?:/)?$"
+    },
+    {
+      "page": "/admin/fiyat",
+      "regex": "^/admin/fiyat(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/fiyat(?:/)?$"
+    },
+    {
+      "page": "/admin/gorsel",
+      "regex": "^/admin/gorsel(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/gorsel(?:/)?$"
+    },
+    {
+      "page": "/admin/images",
+      "regex": "^/admin/images(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/images(?:/)?$"
+    },
+    {
+      "page": "/admin/kategori",
+      "regex": "^/admin/kategori(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/kategori(?:/)?$"
+    },
+    {
+      "page": "/admin/newsletter",
+      "regex": "^/admin/newsletter(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/newsletter(?:/)?$"
+    },
+    {
+      "page": "/admin/prices",
+      "regex": "^/admin/prices(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/prices(?:/)?$"
+    },
+    {
+      "page": "/admin/products",
+      "regex": "^/admin/products(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/products(?:/)?$"
+    },
+    {
+      "page": "/admin/stock",
+      "regex": "^/admin/stock(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/stock(?:/)?$"
+    },
+    {
+      "page": "/admin/stok",
+      "regex": "^/admin/stok(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/stok(?:/)?$"
+    },
+    {
+      "page": "/admin/submissions",
+      "regex": "^/admin/submissions(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/submissions(?:/)?$"
+    },
+    {
+      "page": "/admin/teknik-servis",
+      "regex": "^/admin/teknik\\-servis(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/teknik\\-servis(?:/)?$"
+    },
+    {
+      "page": "/admin/urunler",
+      "regex": "^/admin/urunler(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/urunler(?:/)?$"
+    },
+    {
+      "page": "/admin-users",
+      "regex": "^/admin\\-users(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin\\-users(?:/)?$"
+    },
+    {
+      "page": "/adreslerim",
+      "regex": "^/adreslerim(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/adreslerim(?:/)?$"
+    },
+    {
+      "page": "/banka-hesaplari",
+      "regex": "^/banka\\-hesaplari(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/banka\\-hesaplari(?:/)?$"
+    },
+    {
+      "page": "/bildirimler",
+      "regex": "^/bildirimler(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/bildirimler(?:/)?$"
+    },
+    {
+      "page": "/bize-sat",
+      "regex": "^/bize\\-sat(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/bize\\-sat(?:/)?$"
+    },
+    {
+      "page": "/bize-sat/cep-telefonu",
+      "regex": "^/bize\\-sat/cep\\-telefonu(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/bize\\-sat/cep\\-telefonu(?:/)?$"
+    },
+    {
+      "page": "/bize-sat/direksiyon",
+      "regex": "^/bize\\-sat/direksiyon(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/bize\\-sat/direksiyon(?:/)?$"
+    },
+    {
+      "page": "/bize-sat/ekran-karti",
+      "regex": "^/bize\\-sat/ekran\\-karti(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/bize\\-sat/ekran\\-karti(?:/)?$"
+    },
+    {
+      "page": "/bize-sat/fotokopi-makinesi",
+      "regex": "^/bize\\-sat/fotokopi\\-makinesi(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/bize\\-sat/fotokopi\\-makinesi(?:/)?$"
+    },
+    {
+      "page": "/bize-sat/gamepad",
+      "regex": "^/bize\\-sat/gamepad(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/bize\\-sat/gamepad(?:/)?$"
+    },
+    {
+      "page": "/bize-sat/gaming-direksiyon",
+      "regex": "^/bize\\-sat/gaming\\-direksiyon(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/bize\\-sat/gaming\\-direksiyon(?:/)?$"
+    },
+    {
+      "page": "/bize-sat/islemci",
+      "regex": "^/bize\\-sat/islemci(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/bize\\-sat/islemci(?:/)?$"
+    },
+    {
+      "page": "/bize-sat/kasa",
+      "regex": "^/bize\\-sat/kasa(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/bize\\-sat/kasa(?:/)?$"
+    },
+    {
+      "page": "/bize-sat/klavye",
+      "regex": "^/bize\\-sat/klavye(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/bize\\-sat/klavye(?:/)?$"
+    },
+    {
+      "page": "/bize-sat/kulaklik",
+      "regex": "^/bize\\-sat/kulaklik(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/bize\\-sat/kulaklik(?:/)?$"
+    },
+    {
+      "page": "/bize-sat/masaustu",
+      "regex": "^/bize\\-sat/masaustu(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/bize\\-sat/masaustu(?:/)?$"
+    },
+    {
+      "page": "/bize-sat/monitor",
+      "regex": "^/bize\\-sat/monitor(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/bize\\-sat/monitor(?:/)?$"
+    },
+    {
+      "page": "/bize-sat/mouse",
+      "regex": "^/bize\\-sat/mouse(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/bize\\-sat/mouse(?:/)?$"
+    },
+    {
+      "page": "/bize-sat/notebook",
+      "regex": "^/bize\\-sat/notebook(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/bize\\-sat/notebook(?:/)?$"
+    },
+    {
+      "page": "/bize-sat/playstation",
+      "regex": "^/bize\\-sat/playstation(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/bize\\-sat/playstation(?:/)?$"
+    },
+    {
+      "page": "/bize-sat/ram",
+      "regex": "^/bize\\-sat/ram(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/bize\\-sat/ram(?:/)?$"
+    },
+    {
+      "page": "/bize-sat/ses-sistemi",
+      "regex": "^/bize\\-sat/ses\\-sistemi(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/bize\\-sat/ses\\-sistemi(?:/)?$"
+    },
+    {
+      "page": "/bize-sat/ses-sistemi/sound-system",
+      "regex": "^/bize\\-sat/ses\\-sistemi/sound\\-system(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/bize\\-sat/ses\\-sistemi/sound\\-system(?:/)?$"
+    },
+    {
+      "page": "/bize-sat/sogutucu",
+      "regex": "^/bize\\-sat/sogutucu(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/bize\\-sat/sogutucu(?:/)?$"
+    },
+    {
+      "page": "/bize-sat/ssd",
+      "regex": "^/bize\\-sat/ssd(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/bize\\-sat/ssd(?:/)?$"
+    },
+    {
+      "page": "/bize-sat/tablet",
+      "regex": "^/bize\\-sat/tablet(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/bize\\-sat/tablet(?:/)?$"
+    },
+    {
+      "page": "/bize-sat/tarayici",
+      "regex": "^/bize\\-sat/tarayici(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/bize\\-sat/tarayici(?:/)?$"
+    },
+    {
+      "page": "/bize-sat/xbox",
+      "regex": "^/bize\\-sat/xbox(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/bize\\-sat/xbox(?:/)?$"
+    },
+    {
+      "page": "/bize-sat/yazici",
+      "regex": "^/bize\\-sat/yazici(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/bize\\-sat/yazici(?:/)?$"
+    },
+    {
+      "page": "/blog",
+      "regex": "^/blog(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/blog(?:/)?$"
+    },
+    {
+      "page": "/evimden-al",
+      "regex": "^/evimden\\-al(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/evimden\\-al(?:/)?$"
+    },
+    {
+      "page": "/favoriler",
+      "regex": "^/favoriler(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/favoriler(?:/)?$"
+    },
+    {
+      "page": "/gizlilik-politikasi",
+      "regex": "^/gizlilik\\-politikasi(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/gizlilik\\-politikasi(?:/)?$"
+    },
+    {
+      "page": "/hakkimizda",
+      "regex": "^/hakkimizda(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/hakkimizda(?:/)?$"
+    },
+    {
+      "page": "/icon",
+      "regex": "^/icon(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/icon(?:/)?$"
+    },
+    {
+      "page": "/ilanlar",
+      "regex": "^/ilanlar(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/ilanlar(?:/)?$"
+    },
+    {
+      "page": "/iletisim",
+      "regex": "^/iletisim(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/iletisim(?:/)?$"
+    },
+    {
+      "page": "/ip-adresim",
+      "regex": "^/ip\\-adresim(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/ip\\-adresim(?:/)?$"
+    },
+    {
+      "page": "/iptal-iade-islemlerim",
+      "regex": "^/iptal\\-iade\\-islemlerim(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/iptal\\-iade\\-islemlerim(?:/)?$"
+    },
+    {
+      "page": "/kargo-ile-gonder",
+      "regex": "^/kargo\\-ile\\-gonder(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/kargo\\-ile\\-gonder(?:/)?$"
+    },
+    {
+      "page": "/karsilastir",
+      "regex": "^/karsilastir(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/karsilastir(?:/)?$"
+    },
+    {
+      "page": "/kullanim-sartlari",
+      "regex": "^/kullanim\\-sartlari(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/kullanim\\-sartlari(?:/)?$"
+    },
+    {
+      "page": "/login",
+      "regex": "^/login(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/login(?:/)?$"
+    },
+    {
+      "page": "/markalar",
+      "regex": "^/markalar(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/markalar(?:/)?$"
+    },
+    {
+      "page": "/odeme-iyzico",
+      "regex": "^/odeme\\-iyzico(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/odeme\\-iyzico(?:/)?$"
+    },
+    {
+      "page": "/orders",
+      "regex": "^/orders(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/orders(?:/)?$"
+    },
+    {
+      "page": "/profile",
+      "regex": "^/profile(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/profile(?:/)?$"
+    },
+    {
+      "page": "/register",
+      "regex": "^/register(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/register(?:/)?$"
+    },
+    {
+      "page": "/robots.txt",
+      "regex": "^/robots\\.txt(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/robots\\.txt(?:/)?$"
+    },
+    {
+      "page": "/sat",
+      "regex": "^/sat(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/sat(?:/)?$"
+    },
+    {
+      "page": "/sat/notebook",
+      "regex": "^/sat/notebook(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/sat/notebook(?:/)?$"
+    },
+    {
+      "page": "/satilik-ilanlar",
+      "regex": "^/satilik\\-ilanlar(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/satilik\\-ilanlar(?:/)?$"
+    },
+    {
+      "page": "/satin-al",
+      "regex": "^/satin\\-al(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/satin\\-al(?:/)?$"
+    },
+    {
+      "page": "/satin-al/notebook",
+      "regex": "^/satin\\-al/notebook(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/satin\\-al/notebook(?:/)?$"
+    },
+    {
+      "page": "/satis-sozlesmesi",
+      "regex": "^/satis\\-sozlesmesi(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/satis\\-sozlesmesi(?:/)?$"
+    },
+    {
+      "page": "/search",
+      "regex": "^/search(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/search(?:/)?$"
+    },
+    {
+      "page": "/sepet",
+      "regex": "^/sepet(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/sepet(?:/)?$"
+    },
+    {
+      "page": "/sifre-degistir",
+      "regex": "^/sifre\\-degistir(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/sifre\\-degistir(?:/)?$"
+    },
+    {
+      "page": "/sifre-sifirla",
+      "regex": "^/sifre\\-sifirla(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/sifre\\-sifirla(?:/)?$"
+    },
+    {
+      "page": "/sifremi-unuttum",
+      "regex": "^/sifremi\\-unuttum(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/sifremi\\-unuttum(?:/)?$"
+    },
+    {
+      "page": "/siparisler",
+      "regex": "^/siparisler(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/siparisler(?:/)?$"
+    },
+    {
+      "page": "/sitemap.xml",
+      "regex": "^/sitemap\\.xml(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/sitemap\\.xml(?:/)?$"
+    },
+    {
+      "page": "/sss",
+      "regex": "^/sss(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/sss(?:/)?$"
+    },
+    {
+      "page": "/teklif-teslimat",
+      "regex": "^/teklif\\-teslimat(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/teklif\\-teslimat(?:/)?$"
+    },
+    {
+      "page": "/tekliflerim",
+      "regex": "^/tekliflerim(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/tekliflerim(?:/)?$"
+    },
+    {
+      "page": "/teknik-servis",
+      "regex": "^/teknik\\-servis(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/teknik\\-servis(?:/)?$"
+    },
+    {
+      "page": "/teknik-servis/evimden-al",
+      "regex": "^/teknik\\-servis/evimden\\-al(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/teknik\\-servis/evimden\\-al(?:/)?$"
+    },
+    {
+      "page": "/teknik-servis/kargo-ile-gonder",
+      "regex": "^/teknik\\-servis/kargo\\-ile\\-gonder(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/teknik\\-servis/kargo\\-ile\\-gonder(?:/)?$"
+    },
+    {
+      "page": "/test",
+      "regex": "^/test(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/test(?:/)?$"
+    },
+    {
+      "page": "/urunler",
+      "regex": "^/urunler(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/urunler(?:/)?$"
+    },
+    {
+      "page": "/veri-silme",
+      "regex": "^/veri\\-silme(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/veri\\-silme(?:/)?$"
+    },
+    {
+      "page": "/verify-email",
+      "regex": "^/verify\\-email(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/verify\\-email(?:/)?$"
+    }
+  ],
+  "dataRoutes": [],
+  "rsc": {
+    "header": "rsc",
+    "varyHeader": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+    "prefetchHeader": "next-router-prefetch",
+    "didPostponeHeader": "x-nextjs-postponed",
+    "contentTypeHeader": "text/x-component",
+    "suffix": ".rsc",
+    "prefetchSuffix": ".prefetch.rsc",
+    "prefetchSegmentHeader": "next-router-segment-prefetch",
+    "prefetchSegmentSuffix": ".segment.rsc",
+    "prefetchSegmentDirSuffix": ".segments"
+  },
+  "rewriteHeaders": {
+    "pathHeader": "x-nextjs-rewritten-path",
+    "queryHeader": "x-nextjs-rewritten-query"
+  }
+}

@@ -1319,11 +1319,6 @@ export default function LoginPage() {
       
       // handleMessage içinde fallback interval'ı temizlemek için referans sakla
       (handleMessage as any).fallbackCheckInterval = fallbackCheckInterval;
-        setError("Giriş işlemi zaman aşımına uğradı. Lütfen tekrar deneyin.");
-      }, 300000); // 5 dakika
-      
-      // handleMessage içinde timeout'u temizlemek için referans sakla
-      (handleMessage as any).timeoutId = facebookTimeoutId;
       
     } catch (error) {
       console.error('Facebook login error:', error);
