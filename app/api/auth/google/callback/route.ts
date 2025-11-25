@@ -209,6 +209,7 @@ export async function GET(request: NextRequest) {
             console.log('🔐 Google OAuth Callback: Starting...');
             console.log('📍 Current origin:', window.location.origin);
             console.log('📍 Window opener exists:', !!window.opener);
+            console.log('📍 Window opener location:', window.opener ? window.opener.location.href : 'N/A');
             
             // Mesajı göndermeden önce kısa bir bekleme - popup'un hazır olması için
             setTimeout(() => {
@@ -226,23 +227,39 @@ export async function GET(request: NextRequest) {
                     token: '${String(token)}'
                   };
                   
-                  console.log('📤 Sending message:', messageData);
+                  console.log('📤 Sending message to opener:', messageData);
+                  console.log('📤 Opener origin:', window.opener.location.origin);
+                  
+                  // Mesajı gönder
                   window.opener.postMessage(messageData, '*');
-                  console.log('✅ Message sent successfully');
+                  console.log('✅ Message sent successfully to:', window.opener.location.origin);
+                  
+                  // Mesajı birkaç kez gönder (güvenlik için)
+                  setTimeout(() => {
+                    window.opener.postMessage(messageData, '*');
+                    console.log('✅ Message sent again (retry)');
+                  }, 100);
+                  
+                  setTimeout(() => {
+                    window.opener.postMessage(messageData, '*');
+                    console.log('✅ Message sent again (retry 2)');
+                  }, 200);
                   
                   // Mesaj gönderildikten sonra kapat
                   setTimeout(() => {
+                    console.log('🔒 Closing popup window...');
                     window.close();
-                  }, 500);
+                  }, 1000);
                 } catch (error) {
                   console.error('❌ Error sending message:', error);
-                  window.close();
+                  console.error('❌ Error details:', error.message, error.stack);
+                  setTimeout(() => window.close(), 500);
                 }
               } else {
                 console.error('❌ Window opener is null - popup may have been closed');
-                window.close();
+                setTimeout(() => window.close(), 500);
               }
-            }, 200);
+            }, 300);
           </script>
         </body>
       </html>
