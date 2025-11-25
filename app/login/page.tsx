@@ -874,18 +874,28 @@ export default function LoginPage() {
       // handleMessage içinde timeout'u temizlemek için referans sakla
       (handleMessage as any).timeoutId = timeoutId;
       
-      // Fallback kontrolü - eğer 10 saniye içinde mesaj gelmezse localStorage'ı kontrol et
-      setTimeout(() => {
+      // Fallback kontrolü - periyodik olarak localStorage'ı kontrol et
+      const fallbackCheckInterval = setInterval(() => {
         const googleOAuthToken = localStorage.getItem('google_oauth_token');
         const googleOAuthUser = localStorage.getItem('google_oauth_user');
         
         if (googleOAuthToken && googleOAuthUser && socialLoading === "google") {
-          console.log('✅ Fallback detected after 10 seconds, processing...');
+          console.log('✅ Fallback detected in localStorage, processing...');
+          clearInterval(fallbackCheckInterval);
           // Fallback mekanizması çalışacak - useEffect'te kontrol ediliyor
-          // Sadece loading state'ini temizle
-          setSocialLoading("");
+          // URL'e google_oauth_success parametresini ekle
+          const currentUrl = new URL(window.location.href);
+          currentUrl.searchParams.set('google_oauth_success', 'true');
+          window.history.replaceState({}, '', currentUrl.toString());
+          // Sayfayı yenile (useEffect'in çalışması için)
+          window.location.reload();
         }
-      }, 10000); // 10 saniye
+      }, 1000); // Her saniye kontrol et
+      
+      // 30 saniye sonra fallback kontrolünü durdur
+      setTimeout(() => {
+        clearInterval(fallbackCheckInterval);
+      }, 30000);
       
     } catch (err) {
       setError("Google ile giriş yapılırken bir hata oluştu.");
