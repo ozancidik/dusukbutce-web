@@ -197,7 +197,27 @@ export async function GET(request: NextRequest) {
     const origin = request.headers.get('origin') || request.nextUrl.origin;
     const protocol = request.nextUrl.protocol;
     const host = request.headers.get('host') || request.nextUrl.host;
-    const targetOrigin = `${protocol}//${host}`;
+    
+    // Güvenlik: Sadece kendi domain'imizden gelen istekleri kabul et
+    const allowedHosts = ['www.dusukbutce.com', 'dusukbutce.com', 'localhost:3000', 'dusukbutce-web.vercel.app'];
+    const isAllowedHost = allowedHosts.some(allowed => host.includes(allowed));
+    
+    if (!isAllowedHost) {
+      console.error('❌ Unauthorized host:', host);
+      return new Response('Unauthorized', { status: 403 });
+    }
+    
+    // Target origin belirle - www ve non-www için normalize et
+    let targetOrigin = `${protocol}//${host}`;
+    // Production için www ekle (eğer yoksa)
+    let targetOriginWithWww = targetOrigin;
+    if (process.env.VERCEL_ENV === 'production' && !host.includes('localhost') && !host.includes('www.')) {
+      targetOriginWithWww = `${protocol}//www.${host}`;
+    } else if (host.includes('www.')) {
+      // Eğer www varsa, non-www versiyonunu da hazırla
+      targetOriginWithWww = targetOrigin;
+      targetOrigin = targetOrigin.replace('www.', '');
+    }
     
     return new Response(`
       <html>
@@ -234,58 +254,51 @@ export async function GET(request: NextRequest) {
                     hasToken: !!messageData.token
                   });
                   
-                  // Mesajı gönder - '*' origin kullanarak tüm origin'lere gönder
-                  try {
-                    window.opener.postMessage(messageData, '*');
-                    console.log('✅ Message sent successfully (attempt 1)');
-                  } catch (e1) {
-                    console.error('❌ Error sending message (attempt 1):', e1);
-                  }
+                  // Güvenlik: Spesifik origin'e mesaj gönder (wildcard yerine)
+                  // www ve non-www için her iki origin'i de dene
+                  const allowedOrigins = [
+                    '${targetOrigin}',
+                    '${targetOrigin.replace(/^https?:\\/\\/(www\\.)?/, (match, www) => www ? match.replace('www.', '') : match.replace(/^https?:\\/\\//, 'https://www.'))}'
+                  ].filter((v, i, a) => a.indexOf(v) === i); // Duplicate'leri kaldır
                   
-                  // Mesajı birkaç kez gönder (güvenlik için)
-                  setTimeout(() => {
+                  console.log('📤 Allowed origins for postMessage:', allowedOrigins);
+                  
+                  // Her allowed origin'e mesaj gönder
+                  allowedOrigins.forEach((allowedOrigin, index) => {
                     try {
-                      if (window.opener) {
-                        window.opener.postMessage(messageData, '*');
-                        console.log('✅ Message sent successfully (attempt 2)');
-                      }
-                    } catch (e2) {
-                      console.error('❌ Error sending message (attempt 2):', e2);
+                      window.opener.postMessage(messageData, allowedOrigin);
+                      console.log(\`✅ Message sent successfully to \${allowedOrigin} (attempt \${index + 1})\`);
+                    } catch (e) {
+                      console.error(\`❌ Error sending message to \${allowedOrigin} (attempt \${index + 1}):\`, e);
                     }
+                  });
+                  
+                  // Retry mekanizması - birkaç kez tekrarla
+                  setTimeout(() => {
+                    allowedOrigins.forEach((allowedOrigin, index) => {
+                      try {
+                        if (window.opener) {
+                          window.opener.postMessage(messageData, allowedOrigin);
+                          console.log(\`✅ Message sent successfully to \${allowedOrigin} (retry \${index + 1})\`);
+                        }
+                      } catch (e) {
+                        console.error(\`❌ Error sending message to \${allowedOrigin} (retry \${index + 1}):\`, e);
+                      }
+                    });
                   }, 200);
                   
                   setTimeout(() => {
-                    try {
-                      if (window.opener) {
-                        window.opener.postMessage(messageData, '*');
-                        console.log('✅ Message sent successfully (attempt 3)');
+                    allowedOrigins.forEach((allowedOrigin, index) => {
+                      try {
+                        if (window.opener) {
+                          window.opener.postMessage(messageData, allowedOrigin);
+                          console.log(\`✅ Message sent successfully to \${allowedOrigin} (retry \${index + 2})\`);
+                        }
+                      } catch (e) {
+                        console.error(\`❌ Error sending message to \${allowedOrigin} (retry \${index + 2}):\`, e);
                       }
-                    } catch (e3) {
-                      console.error('❌ Error sending message (attempt 3):', e3);
-                    }
+                    });
                   }, 400);
-                  
-                  setTimeout(() => {
-                    try {
-                      if (window.opener) {
-                        window.opener.postMessage(messageData, '*');
-                        console.log('✅ Message sent successfully (attempt 4)');
-                      }
-                    } catch (e4) {
-                      console.error('❌ Error sending message (attempt 4):', e4);
-                    }
-                  }, 600);
-                  
-                  setTimeout(() => {
-                    try {
-                      if (window.opener) {
-                        window.opener.postMessage(messageData, '*');
-                        console.log('✅ Message sent successfully (attempt 5)');
-                      }
-                    } catch (e5) {
-                      console.error('❌ Error sending message (attempt 5):', e5);
-                    }
-                  }, 800);
                   
                   // Mesaj gönderildikten sonra kapat
                   setTimeout(() => {
