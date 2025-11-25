@@ -538,8 +538,14 @@ export default function LoginPage() {
           type: event.data?.type,
           fromOrigin: event.origin,
           currentOrigin: window.location.origin,
-          data: event.data
+          hasData: !!event.data,
+          dataType: typeof event.data
         });
+        
+        // Tüm mesajları log'la (debug için)
+        if (event.data && event.data.type) {
+          console.log('📨 Message type:', event.data.type);
+        }
         
         // Origin kontrolü - production'da www ve non-www farklı olabilir
         const currentOrigin = window.location.origin;
@@ -670,25 +676,7 @@ export default function LoginPage() {
       // Message listener'ı ekle
       window.addEventListener('message', handleMessage);
       
-      // Ayrıca popup'un load event'ini dinle
-      if (popup) {
-        try {
-          // Popup'un yüklendiğini kontrol et
-          const checkPopupLoaded = setInterval(() => {
-            try {
-              if (popup.closed) {
-                clearInterval(checkPopupLoaded);
-                console.log('🔒 Popup closed by user');
-                setSocialLoading("");
-              }
-            } catch (e) {
-              // COOP hatası - görmezden gel
-            }
-          }, 500);
-        } catch (e) {
-          // Popup erişim hatası - görmezden gel
-        }
-      }
+      // COOP nedeniyle popup.closed kontrolü yapamıyoruz - sadece message listener'a güveniyoruz
       
       // COOP nedeniyle window.closed kullanamıyoruz - sadece timeout ile temizle
       // Message listener başarılı/hatalı durumları handle edecek
