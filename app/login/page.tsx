@@ -143,6 +143,9 @@ export default function LoginPage() {
             sessionStorage.setItem(key, value);
           });
           
+          // Loading state'ini temizle
+          setSocialLoading("");
+          
           // Custom event'i tetikle
           window.dispatchEvent(new Event('localStorageChange'));
           
@@ -152,6 +155,7 @@ export default function LoginPage() {
           router.push(decodeURIComponent(returnUrl));
         } catch (e) {
           console.error('❌ Error processing Google OAuth fallback message:', e);
+          setSocialLoading("");
         }
       }
     };
