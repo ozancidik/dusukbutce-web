@@ -1046,14 +1046,29 @@ export default function LoginPage() {
           currentOrigin.includes('www.') ? currentOrigin : currentOrigin.replace('://', '://www.')
         ].filter((v, i, a) => a.indexOf(v) === i);
         
-        if (!allowedOrigins.includes(event.origin)) {
-          console.log('🚫 Message from unauthorized origin:', event.origin, 'Expected:', allowedOrigins);
+        // Ayrıca callback sayfasının origin'ini de kabul et (aynı domain)
+        const callbackOrigin = window.location.protocol + '//' + window.location.host;
+        const callbackOrigins = [
+          callbackOrigin,
+          callbackOrigin.replace('www.', ''),
+          callbackOrigin.includes('www.') ? callbackOrigin : callbackOrigin.replace('://', '://www.')
+        ];
+        
+        const allAllowedOrigins = [...allowedOrigins, ...callbackOrigins].filter((v, i, a) => a.indexOf(v) === i);
+        
+        // Origin kontrolü - daha esnek (aynı host ise kabul et)
+        const isSameHost = event.origin.replace(/^https?:\/\//, '').replace(/^www\./, '') === 
+                          window.location.host.replace(/^www\./, '');
+        
+        if (!isSameHost && !allAllowedOrigins.includes(event.origin)) {
+          console.log('🚫 Message from unauthorized origin:', event.origin, 'Expected:', allAllowedOrigins, 'Same host:', isSameHost);
           return;
         }
         
         console.log('📨 Facebook OAuth message received:', event.data.type);
         console.log('📨 Message origin:', event.origin);
         console.log('📨 Current origin:', currentOrigin);
+        console.log('📨 Allowed origins:', allAllowedOrigins);
         
         if (event.data.type === 'FACEBOOK_LOGIN_SUCCESS') {
           const user = event.data.user;

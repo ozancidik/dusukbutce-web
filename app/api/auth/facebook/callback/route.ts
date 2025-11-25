@@ -371,7 +371,14 @@ export async function GET(request: NextRequest) {
                   // www ve non-www için her iki origin'i de dene
                   const allowedOrigins = ['${targetOrigin}', '${targetOriginWithWww}'].filter((v, i, a) => a.indexOf(v) === i);
                   
+                  // Ayrıca window.location.origin'i de ekle (callback sayfasının origin'i)
+                  const callbackOrigin = window.location.origin;
+                  if (!allowedOrigins.includes(callbackOrigin)) {
+                    allowedOrigins.push(callbackOrigin);
+                  }
+                  
                   console.log('📤 Allowed origins for postMessage:', allowedOrigins);
+                  console.log('📤 Callback origin:', callbackOrigin);
                   
                   // Her allowed origin'e mesaj gönder
                   allowedOrigins.forEach((allowedOrigin, index) => {
@@ -409,6 +416,18 @@ export async function GET(request: NextRequest) {
                       }
                     });
                   }, 400);
+                  
+                  // Son bir deneme - wildcard ile (güvenlik riski var ama son çare)
+                  setTimeout(() => {
+                    try {
+                      if (window.opener) {
+                        window.opener.postMessage(messageData, '*');
+                        console.log('✅ Message sent with wildcard origin (fallback)');
+                      }
+                    } catch (e) {
+                      console.error('❌ Error sending message with wildcard:', e);
+                    }
+                  }, 600);
                   
                   // Mesaj gönderildikten sonra kapat
                   setTimeout(() => {
