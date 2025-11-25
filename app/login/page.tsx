@@ -847,39 +847,8 @@ export default function LoginPage() {
       window.addEventListener('message', handleMessage);
       
       // Popup'un kapandığını kontrol et (COOP nedeniyle sınırlı)
-      let popupCheckInterval: NodeJS.Timeout;
-      let popupCheckCount = 0;
-      const maxPopupChecks = 60; // 30 saniye (500ms * 60)
-      
-      popupCheckInterval = setInterval(() => {
-        popupCheckCount++;
-        try {
-          // Popup kapandıysa ve mesaj gelmediyse loading'i durdur
-          if (popup && popup.closed) {
-            console.log('🔒 Popup closed, cleaning up...');
-            clearInterval(popupCheckInterval);
-            window.removeEventListener('message', handleMessage);
-            // Eğer hala loading durumundaysa, kullanıcı popup'ı kapattı demektir
-            if (socialLoading === "google") {
-              setSocialLoading("");
-              setError("Giriş işlemi iptal edildi.");
-            }
-            return;
-          }
-        } catch (e) {
-          // COOP hatası - görmezden gel, sadece sayacı artır
-        }
-        
-        // Maksimum kontrol sayısına ulaşıldıysa temizle
-        if (popupCheckCount >= maxPopupChecks) {
-          console.log('⏱️ Popup check timeout - cleaning up');
-          clearInterval(popupCheckInterval);
-          // Loading'i durdur ama hata gösterme (kullanıcı hala işlem yapıyor olabilir)
-          if (socialLoading === "google") {
-            setSocialLoading("");
-          }
-        }
-      }, 500);
+      // COOP nedeniyle popup.closed kontrolü başarısız olabilir, bu yüzden sadece localStorage fallback'e güveniyoruz
+      // Popup check interval'ı kaldırıldı - COOP hatası veriyordu
       
       // COOP nedeniyle popup.closed kontrolü yapamıyoruz - sadece message listener'a güveniyoruz
       // Message listener başarılı/hatalı durumları handle edecek
@@ -888,7 +857,6 @@ export default function LoginPage() {
       // 2 dakika sonra timeout (güvenlik için - daha kısa süre)
       timeoutId = setTimeout(() => {
         console.log('⏱️ Google OAuth timeout - cleaning up');
-        clearInterval(popupCheckInterval);
         window.removeEventListener('message', handleMessage);
         try {
           if (popup) {
@@ -905,7 +873,19 @@ export default function LoginPage() {
       
       // handleMessage içinde timeout'u temizlemek için referans sakla
       (handleMessage as any).timeoutId = timeoutId;
-      (handleMessage as any).popupCheckInterval = popupCheckInterval;
+      
+      // Fallback kontrolü - eğer 10 saniye içinde mesaj gelmezse localStorage'ı kontrol et
+      setTimeout(() => {
+        const googleOAuthToken = localStorage.getItem('google_oauth_token');
+        const googleOAuthUser = localStorage.getItem('google_oauth_user');
+        
+        if (googleOAuthToken && googleOAuthUser && socialLoading === "google") {
+          console.log('✅ Fallback detected after 10 seconds, processing...');
+          // Fallback mekanizması çalışacak - useEffect'te kontrol ediliyor
+          // Sadece loading state'ini temizle
+          setSocialLoading("");
+        }
+      }, 10000); // 10 saniye
       
     } catch (err) {
       setError("Google ile giriş yapılırken bir hata oluştu.");
