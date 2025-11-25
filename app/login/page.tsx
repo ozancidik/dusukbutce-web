@@ -877,31 +877,52 @@ export default function LoginPage() {
       // Fallback kontrolü - periyodik olarak localStorage'ı kontrol et
       let fallbackCheckCount = 0;
       const maxFallbackChecks = 30; // 30 saniye (1 saniye * 30)
+      let fallbackProcessed = false; // Fallback işlendi mi kontrolü
       
       const fallbackCheckInterval = setInterval(() => {
         fallbackCheckCount++;
         const googleOAuthToken = localStorage.getItem('google_oauth_token');
         const googleOAuthUser = localStorage.getItem('google_oauth_user');
         
+        // Eğer daha önce işlendiyse kontrol etme
+        if (fallbackProcessed) {
+          return;
+        }
+        
         console.log('🔍 Fallback check #' + fallbackCheckCount + ':', {
           hasToken: !!googleOAuthToken,
           hasUser: !!googleOAuthUser,
-          socialLoading: socialLoading
+          socialLoading: socialLoading,
+          fallbackProcessed: fallbackProcessed
         });
         
-        if (googleOAuthToken && googleOAuthUser && socialLoading === "google") {
+        // Token ve user varsa, socialLoading ne olursa olsun işle
+        if (googleOAuthToken && googleOAuthUser && !fallbackProcessed) {
           console.log('✅ Fallback detected in localStorage, processing...');
+          fallbackProcessed = true;
           clearInterval(fallbackCheckInterval);
+          
+          // Loading state'ini temizle
+          if (socialLoading === "google") {
+            setSocialLoading("");
+          }
+          
           // Fallback mekanizması çalışacak - useEffect'te kontrol ediliyor
           // URL'e google_oauth_success parametresini ekle
           const currentUrl = new URL(window.location.href);
-          currentUrl.searchParams.set('google_oauth_success', 'true');
-          window.history.replaceState({}, '', currentUrl.toString());
-          console.log('✅ URL updated with google_oauth_success parameter');
-          // Sayfayı yenile (useEffect'in çalışması için)
-          setTimeout(() => {
-            window.location.reload();
-          }, 500);
+          // Eğer zaten google_oauth_success parametresi varsa ekleme
+          if (!currentUrl.searchParams.has('google_oauth_success')) {
+            currentUrl.searchParams.set('google_oauth_success', 'true');
+            window.history.replaceState({}, '', currentUrl.toString());
+            console.log('✅ URL updated with google_oauth_success parameter');
+            // Sayfayı yenile (useEffect'in çalışması için)
+            setTimeout(() => {
+              window.location.reload();
+            }, 500);
+          } else {
+            // Zaten parametre varsa, sadece useEffect'in çalışmasını bekle
+            console.log('✅ google_oauth_success parameter already exists, waiting for useEffect...');
+          }
         }
         
         // Maksimum kontrol sayısına ulaşıldıysa durdur
