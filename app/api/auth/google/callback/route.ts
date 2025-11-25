@@ -264,9 +264,9 @@ export async function GET(request: NextRequest) {
                   allowedOrigins.forEach((allowedOrigin, index) => {
                     try {
                       window.opener.postMessage(messageData, allowedOrigin);
-                      console.log(\`✅ Message sent successfully to \${allowedOrigin} (attempt \${index + 1})\`);
+                      console.log('✅ Message sent successfully to ' + allowedOrigin + ' (attempt ' + (index + 1) + ')');
                     } catch (e) {
-                      console.error(\`❌ Error sending message to \${allowedOrigin} (attempt \${index + 1}):\`, e);
+                      console.error('❌ Error sending message to ' + allowedOrigin + ' (attempt ' + (index + 1) + '):', e);
                     }
                   });
                   
@@ -276,10 +276,10 @@ export async function GET(request: NextRequest) {
                       try {
                         if (window.opener) {
                           window.opener.postMessage(messageData, allowedOrigin);
-                          console.log(\`✅ Message sent successfully to \${allowedOrigin} (retry \${index + 1})\`);
+                          console.log('✅ Message sent successfully to ' + allowedOrigin + ' (retry ' + (index + 1) + ')');
                         }
                       } catch (e) {
-                        console.error(\`❌ Error sending message to \${allowedOrigin} (retry \${index + 1}):\`, e);
+                        console.error('❌ Error sending message to ' + allowedOrigin + ' (retry ' + (index + 1) + '):', e);
                       }
                     });
                   }, 200);
@@ -289,10 +289,10 @@ export async function GET(request: NextRequest) {
                       try {
                         if (window.opener) {
                           window.opener.postMessage(messageData, allowedOrigin);
-                          console.log(\`✅ Message sent successfully to \${allowedOrigin} (retry \${index + 2})\`);
+                          console.log('✅ Message sent successfully to ' + allowedOrigin + ' (retry ' + (index + 2) + ')');
                         }
                       } catch (e) {
-                        console.error(\`❌ Error sending message to \${allowedOrigin} (retry \${index + 2}):\`, e);
+                        console.error('❌ Error sending message to ' + allowedOrigin + ' (retry ' + (index + 2) + '):', e);
                       }
                     });
                   }, 400);
