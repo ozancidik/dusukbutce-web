@@ -809,6 +809,9 @@ export default function LoginPage() {
             clearInterval((handleMessage as any).popupCheckInterval);
           }
           
+          // Loading state'ini temizle
+          setSocialLoading("");
+          
           console.log('✅ Google login successful, redirecting...');
           
           // returnUrl'e göre yönlendir
