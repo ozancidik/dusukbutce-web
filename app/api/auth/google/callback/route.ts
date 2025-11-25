@@ -329,18 +329,45 @@ export async function GET(request: NextRequest) {
                     isAdmin: ${user.isAdmin}
                   }));
                   console.log('✅ Data saved to localStorage as fallback');
-                  // Ana sayfaya yönlendir
-                  window.location.href = '/login?google_oauth_success=true';
+                  
+                  // Ana pencereye mesaj gönder (eğer parent window varsa)
+                  if (window.parent && window.parent !== window) {
+                    try {
+                      window.parent.postMessage({
+                        type: 'GOOGLE_OAUTH_FALLBACK',
+                        token: '${String(token)}',
+                        user: {
+                          id: '${String(user._id)}',
+                          email: '${String(user.email)}',
+                          name: ${JSON.stringify(String(user.name || ''))},
+                          isAdmin: ${user.isAdmin}
+                        }
+                      }, '*');
+                    } catch (e) {
+                      console.error('❌ Error sending message to parent:', e);
+                    }
+                  }
+                  
+                  // Popup'ı kapat - Next.js sayfası render etmeye çalışma
+                  setTimeout(() => {
+                    try {
+                      window.close();
+                    } catch (e) {
+                      // Eğer kapatılamazsa, basit bir mesaj göster
+                      document.body.innerHTML = '<div style="padding: 20px; text-align: center; font-family: Arial, sans-serif;"><h2>✅ Giriş başarılı!</h2><p>Bu pencereyi kapatabilirsiniz.</p></div>';
+                    }
+                  }, 100);
                 } catch (e) {
                   console.error('❌ Error saving to localStorage:', e);
+                  // Hata durumunda da kapatmayı dene
+                  setTimeout(() => {
+                    try {
+                      window.close();
+                    } catch (e2) {
+                      // Ignore
+                    }
+                  }, 500);
                 }
-                setTimeout(() => {
-                  try {
-                    window.close();
-                  } catch (e) {
-                    // Ignore
-                  }
-                }, 500);
               }
             }, 300);
           </script>
