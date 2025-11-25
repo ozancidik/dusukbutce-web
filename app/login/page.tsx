@@ -836,15 +836,49 @@ export default function LoginPage() {
       // Message listener'ı ekle
       window.addEventListener('message', handleMessage);
       
-      // COOP nedeniyle popup.closed kontrolü yapamıyoruz - sadece message listener'a güveniyoruz
+      // Popup'un kapandığını kontrol et (COOP nedeniyle sınırlı)
+      let popupCheckInterval: NodeJS.Timeout;
+      let popupCheckCount = 0;
+      const maxPopupChecks = 60; // 30 saniye (500ms * 60)
       
-      // COOP nedeniyle window.closed kullanamıyoruz - sadece timeout ile temizle
+      popupCheckInterval = setInterval(() => {
+        popupCheckCount++;
+        try {
+          // Popup kapandıysa ve mesaj gelmediyse loading'i durdur
+          if (popup && popup.closed) {
+            console.log('🔒 Popup closed, cleaning up...');
+            clearInterval(popupCheckInterval);
+            window.removeEventListener('message', handleMessage);
+            // Eğer hala loading durumundaysa, kullanıcı popup'ı kapattı demektir
+            if (socialLoading === "google") {
+              setSocialLoading("");
+              setError("Giriş işlemi iptal edildi.");
+            }
+            return;
+          }
+        } catch (e) {
+          // COOP hatası - görmezden gel, sadece sayacı artır
+        }
+        
+        // Maksimum kontrol sayısına ulaşıldıysa temizle
+        if (popupCheckCount >= maxPopupChecks) {
+          console.log('⏱️ Popup check timeout - cleaning up');
+          clearInterval(popupCheckInterval);
+          // Loading'i durdur ama hata gösterme (kullanıcı hala işlem yapıyor olabilir)
+          if (socialLoading === "google") {
+            setSocialLoading("");
+          }
+        }
+      }, 500);
+      
+      // COOP nedeniyle popup.closed kontrolü yapamıyoruz - sadece message listener'a güveniyoruz
       // Message listener başarılı/hatalı durumları handle edecek
       let timeoutId: NodeJS.Timeout;
       
-      // 5 dakika sonra timeout (güvenlik için)
+      // 2 dakika sonra timeout (güvenlik için - daha kısa süre)
       timeoutId = setTimeout(() => {
         console.log('⏱️ Google OAuth timeout - cleaning up');
+        clearInterval(popupCheckInterval);
         window.removeEventListener('message', handleMessage);
         try {
           if (popup) {
@@ -853,12 +887,15 @@ export default function LoginPage() {
         } catch (e) {
           // COOP hatası - görmezden gel
         }
-        setSocialLoading("");
-        setError("Giriş işlemi zaman aşımına uğradı. Lütfen tekrar deneyin.");
-      }, 300000); // 5 dakika
+        if (socialLoading === "google") {
+          setSocialLoading("");
+          setError("Giriş işlemi zaman aşımına uğradı. Lütfen tekrar deneyin.");
+        }
+      }, 120000); // 2 dakika
       
       // handleMessage içinde timeout'u temizlemek için referans sakla
       (handleMessage as any).timeoutId = timeoutId;
+      (handleMessage as any).popupCheckInterval = popupCheckInterval;
       
     } catch (err) {
       setError("Google ile giriş yapılırken bir hata oluştu.");
