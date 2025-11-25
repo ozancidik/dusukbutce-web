@@ -224,69 +224,25 @@ export async function GET(request: NextRequest) {
       targetOrigin = targetOrigin.replace('www.', '');
     }
     
-    return new Response(`
-      <html>
-        <head>
-          <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
-        </head>
-        <body>
-          <script>
-            console.log('🔐 Google OAuth Callback: Starting...');
-            console.log('📍 Current origin:', window.location.origin);
-            console.log('📍 Current URL:', window.location.href);
-            console.log('📍 Window opener exists:', !!window.opener);
-            
-            // Mesajı göndermeden önce kısa bir bekleme - popup'un hazır olması için
-            setTimeout(() => {
-              const fallbackData = {
-                token: '${String(token)}',
-                user: {
-                  id: '${String(user._id)}',
-                  email: '${String(user.email)}',
-                  name: ${JSON.stringify(String(user.name || ''))},
-                  isAdmin: ${user.isAdmin}
-                }
-              };
-              
-            // Önce localStorage'a yaz (her durumda fallback için)
-            try {
-              localStorage.setItem('google_oauth_token', fallbackData.token);
-              localStorage.setItem('google_oauth_user', JSON.stringify(fallbackData.user));
-              console.log('✅ Data saved to localStorage as fallback (always)');
-              
-              // Gizli sekme desteği: sessionStorage'a da yaz
-              try {
-                sessionStorage.setItem('google_oauth_token', fallbackData.token);
-                sessionStorage.setItem('google_oauth_user', JSON.stringify(fallbackData.user));
-                console.log('✅ Data also saved to sessionStorage (incognito support)');
-              } catch (e2) {
-                console.warn('⚠️ Could not save to sessionStorage (may be incognito):', e2);
-              }
-              
-              // Doğrulama - localStorage'dan oku
-              const savedToken = localStorage.getItem('google_oauth_token');
-              const savedUser = localStorage.getItem('google_oauth_user');
-              console.log('✅ Verification - Token in localStorage:', !!savedToken);
-              console.log('✅ Verification - User in localStorage:', !!savedUser);
-              
-              if (!savedToken || !savedUser) {
-                console.error('❌ CRITICAL: Data not found in localStorage after save!');
-              }
-            } catch (e) {
-              console.error('❌ Error saving to localStorage:', e);
-              console.error('❌ Error details:', e.message, e.stack);
-              
-              // localStorage başarısız olursa sessionStorage'ı dene
-              try {
-                sessionStorage.setItem('google_oauth_token', fallbackData.token);
-                sessionStorage.setItem('google_oauth_user', JSON.stringify(fallbackData.user));
-                console.log('✅ Fallback: Data saved to sessionStorage instead');
-              } catch (e2) {
-                console.error('❌ CRITICAL: Could not save to either localStorage or sessionStorage!');
-              }
-            }
-              
-              if (window.opener) {
+    // State parametresinden returnUrl'i al
+    const stateParam = searchParams.get('state');
+    let returnUrl = '/';
+    if (stateParam) {
+      try {
+        const state = JSON.parse(decodeURIComponent(stateParam));
+        returnUrl = state.returnUrl || '/';
+      } catch (e) {
+        console.warn('⚠️ Could not parse state parameter:', e);
+      }
+    }
+
+    // Tam sayfa yönlendirme - gizli sekmede çalışır
+    // Token'ı URL parametresi ile gönder, login sayfası verify-token API'den user bilgisini çekecek
+    const loginUrl = `${targetOrigin}/login?google_oauth_success=true&token=${encodeURIComponent(token)}&returnUrl=${encodeURIComponent(returnUrl)}`;
+    
+    console.log('🔄 Redirecting to login page with token:', loginUrl);
+    
+    return NextResponse.redirect(loginUrl);
                 console.log('✅ Window opener exists, preparing message...');
                 try {
                   const messageData = {
