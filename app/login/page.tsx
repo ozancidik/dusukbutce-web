@@ -855,6 +855,9 @@ export default function LoginPage() {
         }
         
         if (event.data?.type === 'GOOGLE_LOGIN_SUCCESS') {
+          // Yönlendirme flag'ini set et (tekrar yönlendirmeyi önlemek için)
+          redirectExecutedRef.current = true;
+          
           const user = event.data.user;
           const token = event.data.token;
           
@@ -894,21 +897,29 @@ export default function LoginPage() {
             sessionStorage.setItem("adminToken", token);
           }
           
-          window.dispatchEvent(new Event('localStorageChange'));
+          // Loading state'ini temizle
+          setSocialLoading("");
           
+          // Event listener'ları temizle
+          window.removeEventListener('message', handleMessage);
+          if ((handleMessage as any).timeoutId) {
+            clearTimeout((handleMessage as any).timeoutId);
+          }
+          
+          // Popup'ı kapat
           try {
             popup.close();
           } catch (e) {
             // COOP hatası - görmezden gel
           }
           
-          window.removeEventListener('message', handleMessage);
-          if ((handleMessage as any).timeoutId) {
-            clearTimeout((handleMessage as any).timeoutId);
-          }
+          // localStorageChange event'ini tetikle (yönlendirme flag'i set edildikten sonra)
+          window.dispatchEvent(new Event('localStorageChange'));
           
-          setSocialLoading("");
-          router.push(decodeURIComponent(returnUrl));
+          // Yönlendir
+          setTimeout(() => {
+            router.push(decodeURIComponent(returnUrl));
+          }, 100);
         } else if (event.data?.type === 'GOOGLE_LOGIN_ERROR') {
           setError(event.data.error || "Google ile giriş yapılırken bir hata oluştu.");
           setSocialLoading("");
@@ -1045,6 +1056,9 @@ export default function LoginPage() {
         }
         
         if (event.data?.type === 'FACEBOOK_LOGIN_SUCCESS') {
+          // Yönlendirme flag'ini set et (tekrar yönlendirmeyi önlemek için)
+          redirectExecutedRef.current = true;
+          
           const user = event.data.user;
           const token = event.data.token;
           
@@ -1084,21 +1098,29 @@ export default function LoginPage() {
             sessionStorage.setItem("adminToken", token);
           }
           
-          window.dispatchEvent(new Event('localStorageChange'));
+          // Loading state'ini temizle
+          setSocialLoading("");
           
+          // Event listener'ları temizle
+          window.removeEventListener('message', handleMessage);
+          if ((handleMessage as any).timeoutId) {
+            clearTimeout((handleMessage as any).timeoutId);
+          }
+          
+          // Popup'ı kapat
           try {
             popup.close();
           } catch (e) {
             // COOP hatası - görmezden gel
           }
           
-          window.removeEventListener('message', handleMessage);
-          if ((handleMessage as any).timeoutId) {
-            clearTimeout((handleMessage as any).timeoutId);
-          }
+          // localStorageChange event'ini tetikle (yönlendirme flag'i set edildikten sonra)
+          window.dispatchEvent(new Event('localStorageChange'));
           
-          setSocialLoading("");
-          router.push(decodeURIComponent(returnUrl));
+          // Yönlendir
+          setTimeout(() => {
+            router.push(decodeURIComponent(returnUrl));
+          }, 100);
         } else if (event.data?.type === 'FACEBOOK_LOGIN_ERROR') {
           setError(event.data.error || "Facebook ile giriş yapılırken bir hata oluştu.");
           setSocialLoading("");
@@ -1141,6 +1163,9 @@ export default function LoginPage() {
         
         if (facebookOAuthToken && facebookOAuthUser) {
           clearInterval(fallbackInterval);
+          // Yönlendirme flag'ini set et (tekrar yönlendirmeyi önlemek için)
+          redirectExecutedRef.current = true;
+          
           try {
             const userData = JSON.parse(facebookOAuthUser);
             const loginTime = Date.now();
@@ -1165,11 +1190,32 @@ export default function LoginPage() {
             localStorage.removeItem('facebook_oauth_token');
             localStorage.removeItem('facebook_oauth_user');
             
-            window.dispatchEvent(new Event('localStorageChange'));
+            // Loading state'ini temizle
             setSocialLoading("");
-            router.push(decodeURIComponent(returnUrl));
+            
+            // Event listener'ları temizle
+            window.removeEventListener('message', handleMessage);
+            if ((handleMessage as any).timeoutId) {
+              clearTimeout((handleMessage as any).timeoutId);
+            }
+            
+            // Popup'ı kapat
+            try {
+              if (popup) popup.close();
+            } catch (e) {
+              // COOP hatası - görmezden gel
+            }
+            
+            // localStorageChange event'ini tetikle (yönlendirme flag'i set edildikten sonra)
+            window.dispatchEvent(new Event('localStorageChange'));
+            
+            // Yönlendir
+            setTimeout(() => {
+              router.push(decodeURIComponent(returnUrl));
+            }, 100);
           } catch (e) {
             console.error('Fallback error:', e);
+            setSocialLoading("");
           }
         }
         
