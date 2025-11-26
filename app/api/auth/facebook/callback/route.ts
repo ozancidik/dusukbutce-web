@@ -49,8 +49,10 @@ export async function GET(request: NextRequest) {
   if (!facebookAppId || facebookAppId === 'your-facebook-app-id') {
     console.error('Facebook OAuth Error: FACEBOOK_APP_ID environment variable is not set');
     return new Response(`
-      <html>
+      <!DOCTYPE html>
+      <html lang="tr">
         <head>
+          <meta charset="UTF-8">
           <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
         </head>
         <body>
@@ -67,7 +69,7 @@ export async function GET(request: NextRequest) {
       </html>
     `, {
       headers: { 
-        'Content-Type': 'text/html',
+        'Content-Type': 'text/html; charset=utf-8',
         'Cross-Origin-Opener-Policy': 'same-origin-allow-popups'
       }
     });
@@ -76,8 +78,10 @@ export async function GET(request: NextRequest) {
   if (!facebookAppSecret || facebookAppSecret === 'your-facebook-app-secret') {
     console.error('Facebook OAuth Error: FACEBOOK_APP_SECRET environment variable is not set');
     return new Response(`
-      <html>
+      <!DOCTYPE html>
+      <html lang="tr">
         <head>
+          <meta charset="UTF-8">
           <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
         </head>
         <body>
@@ -94,7 +98,7 @@ export async function GET(request: NextRequest) {
       </html>
     `, {
       headers: { 
-        'Content-Type': 'text/html',
+        'Content-Type': 'text/html; charset=utf-8',
         'Cross-Origin-Opener-Policy': 'same-origin-allow-popups'
       }
     });
@@ -119,8 +123,10 @@ export async function GET(request: NextRequest) {
   if (error) {
     console.error('Facebook OAuth error from Facebook:', error);
     return new Response(`
-      <html>
+      <!DOCTYPE html>
+      <html lang="tr">
         <head>
+          <meta charset="UTF-8">
           <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
         </head>
         <body>
@@ -137,7 +143,7 @@ export async function GET(request: NextRequest) {
       </html>
     `, {
       headers: { 
-        'Content-Type': 'text/html',
+        'Content-Type': 'text/html; charset=utf-8',
         'Cross-Origin-Opener-Policy': 'same-origin-allow-popups'
       }
     });
@@ -146,8 +152,10 @@ export async function GET(request: NextRequest) {
   if (!code) {
     console.error('Facebook OAuth error: No authorization code received');
     return new Response(`
-      <html>
+      <!DOCTYPE html>
+      <html lang="tr">
         <head>
+          <meta charset="UTF-8">
           <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
         </head>
         <body>
@@ -164,7 +172,7 @@ export async function GET(request: NextRequest) {
       </html>
     `, {
       headers: { 
-        'Content-Type': 'text/html',
+        'Content-Type': 'text/html; charset=utf-8',
         'Cross-Origin-Opener-Policy': 'same-origin-allow-popups'
       }
     });
@@ -333,9 +341,12 @@ export async function GET(request: NextRequest) {
 
     // Popup için HTML response - postMessage ile ana pencereye mesaj gönder
     return new Response(`
-      <html>
+      <!DOCTYPE html>
+      <html lang="tr">
         <head>
+          <meta charset="UTF-8">
           <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
+          <title>Giriş Başarılı</title>
         </head>
         <body>
           <script>
@@ -402,24 +413,44 @@ export async function GET(request: NextRequest) {
                 } catch (e) {}
               }, 400);
               
-              // Popup'ı kapat
-              setTimeout(() => {
+              // Popup'ı kapat - birden fazla deneme
+              let closeAttempts = 0;
+              const tryClose = () => {
+                closeAttempts++;
                 try {
-                  window.close();
+                  if (window.opener) {
+                    window.close();
+                  } else {
+                    window.close();
+                  }
+                  // Eğer hala açıksa, birkaç kez daha dene
+                  if (closeAttempts < 5) {
+                    setTimeout(tryClose, 200);
+                  } else {
+                    // Son çare: kullanıcıya mesaj göster
+                    document.body.innerHTML = '<div style="padding: 20px; text-align: center; font-family: Arial, sans-serif;"><h2 style="color: #22c55e;">✓ Giriş başarılı!</h2><p>Bu pencereyi kapatabilirsiniz.</p></div>';
+                  }
                 } catch (e) {
-                  document.body.innerHTML = '<div style="padding: 20px; text-align: center;"><h2>✅ Giriş başarılı!</h2><p>Bu pencereyi kapatabilirsiniz.</p></div>';
+                  if (closeAttempts < 5) {
+                    setTimeout(tryClose, 200);
+                  } else {
+                    document.body.innerHTML = '<div style="padding: 20px; text-align: center; font-family: Arial, sans-serif;"><h2 style="color: #22c55e;">✓ Giriş başarılı!</h2><p>Bu pencereyi kapatabilirsiniz.</p></div>';
+                  }
                 }
-              }, 1000);
+              };
+              
+              // İlk kapatma denemesi
+              setTimeout(tryClose, 500);
             } else {
               // Opener yoksa, localStorage fallback kullanılacak
-              document.body.innerHTML = '<div style="padding: 20px; text-align: center;"><h2>✅ Giriş başarılı!</h2><p>Bu pencereyi kapatabilirsiniz.</p></div>';
+              document.body.innerHTML = '<div style="padding: 20px; text-align: center; font-family: Arial, sans-serif;"><h2 style="color: #22c55e;">✓ Giriş başarılı!</h2><p>Bu pencereyi kapatabilirsiniz.</p></div>';
             }
           </script>
         </body>
       </html>
     `, {
       headers: { 
-        'Content-Type': 'text/html',
+        'Content-Type': 'text/html; charset=utf-8',
         'Cross-Origin-Opener-Policy': 'same-origin-allow-popups'
       }
     });
