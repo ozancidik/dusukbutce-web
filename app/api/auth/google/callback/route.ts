@@ -314,37 +314,74 @@ export async function GET(request: NextRequest) {
                 } catch (e) {}
               }, 400);
               
-              // Popup'ı kapat - birden fazla deneme
-              let closeAttempts = 0;
-              const tryClose = () => {
-                closeAttempts++;
+              // Popup'ı hemen kapat - agresif kapatma stratejisi
+              const closePopup = () => {
                 try {
+                  // Body'yi boşalt (bazı tarayıcılarda kapatmayı kolaylaştırır)
+                  document.body.innerHTML = '';
+                  // Farklı yöntemleri dene
                   if (window.opener) {
-                    window.close();
-                  } else {
-                    window.close();
+                    window.opener.focus();
                   }
+                  window.close();
+                  self.close();
+                  top.close();
                   // Eğer hala açıksa, birkaç kez daha dene
-                  if (closeAttempts < 5) {
-                    setTimeout(tryClose, 200);
-                  } else {
-                    // Son çare: kullanıcıya mesaj göster
-                    document.body.innerHTML = '<div style="padding: 20px; text-align: center; font-family: Arial, sans-serif;"><h2 style="color: #22c55e;">✓ Giriş başarılı!</h2><p>Bu pencereyi kapatabilirsiniz.</p></div>';
-                  }
+                  setTimeout(() => {
+                    try {
+                      window.close();
+                      self.close();
+                    } catch (e) {}
+                  }, 50);
+                  setTimeout(() => {
+                    try {
+                      window.close();
+                      self.close();
+                    } catch (e) {}
+                  }, 150);
+                  setTimeout(() => {
+                    try {
+                      window.close();
+                      self.close();
+                    } catch (e) {}
+                  }, 300);
                 } catch (e) {
-                  if (closeAttempts < 5) {
-                    setTimeout(tryClose, 200);
-                  } else {
-                    document.body.innerHTML = '<div style="padding: 20px; text-align: center; font-family: Arial, sans-serif;"><h2 style="color: #22c55e;">✓ Giriş başarılı!</h2><p>Bu pencereyi kapatabilirsiniz.</p></div>';
-                  }
+                  // Sessizce devam et
                 }
               };
               
-              // İlk kapatma denemesi
-              setTimeout(tryClose, 500);
+              // Hemen kapatmayı dene
+              closePopup();
+              
+              // postMessage gönderildikten hemen sonra da kapat
+              setTimeout(closePopup, 50);
+              setTimeout(closePopup, 100);
+              setTimeout(closePopup, 200);
             } else {
-              // Opener yoksa, localStorage fallback kullanılacak
-              document.body.innerHTML = '<div style="padding: 20px; text-align: center; font-family: Arial, sans-serif;"><h2 style="color: #22c55e;">✓ Giriş başarılı!</h2><p>Bu pencereyi kapatabilirsiniz.</p></div>';
+              // Opener yoksa da kapatmayı dene
+              const closePopup = () => {
+                try {
+                  document.body.innerHTML = '';
+                  window.close();
+                  self.close();
+                  top.close();
+                  setTimeout(() => {
+                    try {
+                      window.close();
+                      self.close();
+                    } catch (e) {}
+                  }, 50);
+                  setTimeout(() => {
+                    try {
+                      window.close();
+                      self.close();
+                    } catch (e) {}
+                  }, 150);
+                } catch (e) {}
+              };
+              closePopup();
+              setTimeout(closePopup, 50);
+              setTimeout(closePopup, 100);
             }
           </script>
         </body>
