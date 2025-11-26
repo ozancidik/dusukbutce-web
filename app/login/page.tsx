@@ -470,12 +470,6 @@ export default function LoginPage() {
 
     // localStorage değişikliklerini dinle (sadece login sayfasındayken)
     const handleStorageChange = () => {
-      // Eğer daha önce yönlendirme yapıldıysa, tekrar yapma
-      if (redirectExecutedRef.current) {
-        console.log("👤 [LOGIN PAGE] Yönlendirme zaten yapıldı, tekrar yönlendirme yapılmıyor.");
-        return;
-      }
-      
       // Sadece login sayfasındayken yönlendirme yap
       const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
       if (currentPath !== '/login') {
@@ -489,6 +483,12 @@ export default function LoginPage() {
       const adminEmail = localStorage.getItem("adminEmail") || sessionStorage.getItem("adminEmail");
       const userLoggedIn = localStorage.getItem("userLoggedIn") || sessionStorage.getItem("userLoggedIn");
       const userEmail = localStorage.getItem("userEmail") || sessionStorage.getItem("userEmail");
+      
+      // Eğer daha önce yönlendirme yapıldıysa, tekrar yapma (ama socialLoading aktifse yönlendirme yapılmalı)
+      if (redirectExecutedRef.current && (socialLoading === "" || !socialLoading)) {
+        console.log("👤 [LOGIN PAGE] Yönlendirme zaten yapıldı, tekrar yönlendirme yapılmıyor.");
+        return;
+      }
       
       // Herhangi bir giriş yapıldıysa kontrol et
       if ((adminLoggedIn === "true" && adminEmail) || (userLoggedIn === "true" && userEmail)) {
@@ -897,9 +897,6 @@ export default function LoginPage() {
             sessionStorage.setItem("adminToken", token);
           }
           
-          // Loading state'ini temizle
-          setSocialLoading("");
-          
           // Event listener'ları temizle
           window.removeEventListener('message', handleMessage);
           if ((handleMessage as any).timeoutId) {
@@ -915,6 +912,9 @@ export default function LoginPage() {
           
           // localStorageChange event'ini tetikle (yönlendirme flag'i set edildikten sonra)
           window.dispatchEvent(new Event('localStorageChange'));
+          
+          // Loading state'ini temizle (yönlendirmeden önce)
+          setSocialLoading("");
           
           // Yönlendir
           setTimeout(() => {
