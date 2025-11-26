@@ -1098,9 +1098,6 @@ export default function LoginPage() {
             sessionStorage.setItem("adminToken", token);
           }
           
-          // Loading state'ini temizle
-          setSocialLoading("");
-          
           // Event listener'ları temizle
           window.removeEventListener('message', handleMessage);
           if ((handleMessage as any).timeoutId) {
@@ -1116,6 +1113,9 @@ export default function LoginPage() {
           
           // localStorageChange event'ini tetikle (yönlendirme flag'i set edildikten sonra)
           window.dispatchEvent(new Event('localStorageChange'));
+          
+          // Loading state'ini temizle (yönlendirmeden önce)
+          setSocialLoading("");
           
           // Yönlendir
           setTimeout(() => {
