@@ -41,13 +41,25 @@ export const useOAuth = ({ socialLoading, setSocialLoading, setError, redirectEx
       
       const allowedOrigins = getAllowedOrigins();
       
+      console.log('🔍 [useOAuth] Google login started');
+      console.log('🔍 [useOAuth] Allowed origins:', allowedOrigins);
+      console.log('🔍 [useOAuth] Current origin:', window.location.origin);
+      
       // Message listener
       const handleMessage = (event: MessageEvent) => {
+        console.log('📨 [useOAuth] Message received:', {
+          origin: event.origin,
+          type: event.data?.type,
+          allowed: isOriginAllowed(event.origin, allowedOrigins)
+        });
+        
         if (!isOriginAllowed(event.origin, allowedOrigins)) {
+          console.warn('⚠️ [useOAuth] Message from disallowed origin:', event.origin);
           return;
         }
         
         if (event.data?.type === 'GOOGLE_LOGIN_SUCCESS') {
+          console.log('✅ [useOAuth] GOOGLE_LOGIN_SUCCESS received');
           const user: UserData = event.data.user;
           const token = event.data.token;
           
@@ -98,14 +110,23 @@ export const useOAuth = ({ socialLoading, setSocialLoading, setError, redirectEx
       
       (handleMessage as any).timeoutId = timeoutId;
       
-      // Fallback: localStorage kontrolü (gizli sekme için)
+      // Fallback: localStorage kontrolü (gizli sekme için) - daha agresif
+      console.log('🔄 [useOAuth] Starting localStorage fallback check...');
       let fallbackCheckCount = 0;
       const fallbackInterval = setInterval(() => {
         fallbackCheckCount++;
         const googleOAuthToken = localStorage.getItem('google_oauth_token');
         const googleOAuthUser = localStorage.getItem('google_oauth_user');
         
+        if (fallbackCheckCount % 5 === 0) {
+          console.log('🔄 [useOAuth] Fallback check:', fallbackCheckCount, {
+            hasToken: !!googleOAuthToken,
+            hasUser: !!googleOAuthUser
+          });
+        }
+        
         if (googleOAuthToken && googleOAuthUser) {
+          console.log('✅ [useOAuth] Fallback data found, processing...');
           clearInterval(fallbackInterval);
           
           // Event listener'ları temizle
@@ -124,7 +145,9 @@ export const useOAuth = ({ socialLoading, setSocialLoading, setError, redirectEx
           processOAuthFallback(googleOAuthToken, googleOAuthUser, returnUrl, redirectExecutedRef, setSocialLoading);
         }
         
-        if (fallbackCheckCount >= 10) {
+        // 30 saniye boyunca kontrol et (30 kez, 1 saniye aralıkla)
+        if (fallbackCheckCount >= 30) {
+          console.warn('⚠️ [useOAuth] Fallback timeout reached');
           clearInterval(fallbackInterval);
         }
       }, 1000);
@@ -160,13 +183,24 @@ export const useOAuth = ({ socialLoading, setSocialLoading, setError, redirectEx
       
       const allowedOrigins = getAllowedOrigins();
       
+      console.log('🔍 [useOAuth] Facebook login started');
+      console.log('🔍 [useOAuth] Allowed origins:', allowedOrigins);
+      
       // Message listener
       const handleMessage = (event: MessageEvent) => {
+        console.log('📨 [useOAuth] Message received:', {
+          origin: event.origin,
+          type: event.data?.type,
+          allowed: isOriginAllowed(event.origin, allowedOrigins)
+        });
+        
         if (!isOriginAllowed(event.origin, allowedOrigins)) {
+          console.warn('⚠️ [useOAuth] Message from disallowed origin:', event.origin);
           return;
         }
         
         if (event.data?.type === 'FACEBOOK_LOGIN_SUCCESS') {
+          console.log('✅ [useOAuth] FACEBOOK_LOGIN_SUCCESS received');
           const user: UserData = event.data.user;
           const token = event.data.token;
           
@@ -217,14 +251,23 @@ export const useOAuth = ({ socialLoading, setSocialLoading, setError, redirectEx
       
       (handleMessage as any).timeoutId = timeoutId;
       
-      // Fallback: localStorage kontrolü (gizli sekme için)
+      // Fallback: localStorage kontrolü (gizli sekme için) - daha agresif
+      console.log('🔄 [useOAuth] Starting localStorage fallback check for Facebook...');
       let fallbackCheckCount = 0;
       const fallbackInterval = setInterval(() => {
         fallbackCheckCount++;
         const facebookOAuthToken = localStorage.getItem('facebook_oauth_token');
         const facebookOAuthUser = localStorage.getItem('facebook_oauth_user');
         
+        if (fallbackCheckCount % 5 === 0) {
+          console.log('🔄 [useOAuth] Fallback check:', fallbackCheckCount, {
+            hasToken: !!facebookOAuthToken,
+            hasUser: !!facebookOAuthUser
+          });
+        }
+        
         if (facebookOAuthToken && facebookOAuthUser) {
+          console.log('✅ [useOAuth] Fallback data found, processing...');
           clearInterval(fallbackInterval);
           
           // Event listener'ları temizle
@@ -243,7 +286,9 @@ export const useOAuth = ({ socialLoading, setSocialLoading, setError, redirectEx
           processOAuthFallback(facebookOAuthToken, facebookOAuthUser, returnUrl, redirectExecutedRef, setSocialLoading);
         }
         
-        if (fallbackCheckCount >= 10) {
+        // 30 saniye boyunca kontrol et (30 kez, 1 saniye aralıkla)
+        if (fallbackCheckCount >= 30) {
+          console.warn('⚠️ [useOAuth] Fallback timeout reached');
           clearInterval(fallbackInterval);
         }
       }, 1000);
