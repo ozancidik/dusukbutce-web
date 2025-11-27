@@ -361,9 +361,11 @@ export async function GET(request: NextRequest) {
               }, 300);
             }
               
-              // Popup'ı hemen kapat - agresif kapatma stratejisi
+              // Popup'ı kapat - postMessage gönderildikten SONRA
+              // Önce mesajın gönderildiğinden emin ol, sonra kapat
               const closePopup = () => {
                 try {
+                  console.log('🔒 Attempting to close popup...');
                   // Body'yi boşalt (bazı tarayıcılarda kapatmayı kolaylaştırır)
                   document.body.innerHTML = '';
                   // Farklı yöntemleri dene
@@ -373,37 +375,19 @@ export async function GET(request: NextRequest) {
                   window.close();
                   self.close();
                   top.close();
-                  // Eğer hala açıksa, birkaç kez daha dene
-                  setTimeout(() => {
-                    try {
-                      window.close();
-                      self.close();
-                    } catch (e) {}
-                  }, 50);
-                  setTimeout(() => {
-                    try {
-                      window.close();
-                      self.close();
-                    } catch (e) {}
-                  }, 150);
-                  setTimeout(() => {
-                    try {
-                      window.close();
-                      self.close();
-                    } catch (e) {}
-                  }, 300);
                 } catch (e) {
-                  // Sessizce devam et
+                  console.warn('⚠️ Close popup error:', e);
                 }
               };
               
-              // Hemen kapatmayı dene
-              closePopup();
-              
-              // postMessage gönderildikten hemen sonra da kapat
-              setTimeout(closePopup, 50);
-              setTimeout(closePopup, 100);
-              setTimeout(closePopup, 200);
+              // postMessage gönderildikten SONRA kapat (1 saniye bekle)
+              // Bu, postMessage'ın ana pencereye ulaşması için zaman verir
+              setTimeout(() => {
+                closePopup();
+                // Eğer hala açıksa, birkaç kez daha dene
+                setTimeout(closePopup, 200);
+                setTimeout(closePopup, 500);
+              }, 1000);
             } else {
               // Opener yoksa da kapatmayı dene
               const closePopup = () => {
