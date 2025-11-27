@@ -145,6 +145,40 @@ export const useOAuth = ({ socialLoading, setSocialLoading, setError, redirectEx
       
       // Fallback: localStorage kontrolü (gizli sekme için) - daha agresif
       console.log('🔄 [useOAuth] Starting localStorage fallback check...');
+      
+      // Storage event listener ekle (localStorage değişikliklerini dinle)
+      const handleStorageChange = (e: StorageEvent) => {
+        if (e.key === 'google_oauth_token' || e.key === 'google_oauth_user') {
+          console.log('📦 [useOAuth] Storage event detected:', e.key);
+          const googleOAuthToken = localStorage.getItem('google_oauth_token');
+          const googleOAuthUser = localStorage.getItem('google_oauth_user');
+          
+          if (googleOAuthToken && googleOAuthUser) {
+            console.log('✅ [useOAuth] Fallback data found via storage event!');
+            window.removeEventListener('storage', handleStorageChange);
+            clearInterval(fallbackInterval);
+            clearInterval(checkPopupStatus);
+            
+            // Event listener'ları temizle
+            window.removeEventListener('message', handleMessage);
+            window.removeEventListener('message', debugMessageHandler);
+            if ((handleMessage as any).timeoutId) {
+              clearTimeout((handleMessage as any).timeoutId);
+            }
+            
+            // Popup'ı kapat
+            try {
+              if (popup) popup.close();
+            } catch (e) {
+              // COOP hatası - görmezden gel
+            }
+            
+            processOAuthFallback(googleOAuthToken, googleOAuthUser, returnUrl, redirectExecutedRef, setSocialLoading);
+          }
+        }
+      };
+      window.addEventListener('storage', handleStorageChange);
+      
       let fallbackCheckCount = 0;
       const fallbackInterval = setInterval(() => {
         fallbackCheckCount++;
@@ -154,7 +188,8 @@ export const useOAuth = ({ socialLoading, setSocialLoading, setError, redirectEx
         if (fallbackCheckCount % 5 === 0) {
           console.log('🔄 [useOAuth] Fallback check:', fallbackCheckCount, {
             hasToken: !!googleOAuthToken,
-            hasUser: !!googleOAuthUser
+            hasUser: !!googleOAuthUser,
+            tokenPreview: googleOAuthToken ? googleOAuthToken.substring(0, 20) + '...' : null
           });
         }
         
@@ -162,6 +197,7 @@ export const useOAuth = ({ socialLoading, setSocialLoading, setError, redirectEx
           console.log('✅ [useOAuth] Fallback data found, processing...');
           clearInterval(fallbackInterval);
           clearInterval(checkPopupStatus);
+          window.removeEventListener('storage', handleStorageChange);
           
           // Event listener'ları temizle
           window.removeEventListener('message', handleMessage);
@@ -184,6 +220,8 @@ export const useOAuth = ({ socialLoading, setSocialLoading, setError, redirectEx
         if (fallbackCheckCount >= 30) {
           console.warn('⚠️ [useOAuth] Fallback timeout reached');
           clearInterval(fallbackInterval);
+          clearInterval(checkPopupStatus);
+          window.removeEventListener('storage', handleStorageChange);
         }
       }, 1000);
       
@@ -288,6 +326,38 @@ export const useOAuth = ({ socialLoading, setSocialLoading, setError, redirectEx
       
       // Fallback: localStorage kontrolü (gizli sekme için) - daha agresif
       console.log('🔄 [useOAuth] Starting localStorage fallback check for Facebook...');
+      
+      // Storage event listener ekle
+      const handleStorageChangeFB = (e: StorageEvent) => {
+        if (e.key === 'facebook_oauth_token' || e.key === 'facebook_oauth_user') {
+          console.log('📦 [useOAuth] Storage event detected for Facebook:', e.key);
+          const facebookOAuthToken = localStorage.getItem('facebook_oauth_token');
+          const facebookOAuthUser = localStorage.getItem('facebook_oauth_user');
+          
+          if (facebookOAuthToken && facebookOAuthUser) {
+            console.log('✅ [useOAuth] Fallback data found via storage event!');
+            window.removeEventListener('storage', handleStorageChangeFB);
+            clearInterval(fallbackInterval);
+            
+            // Event listener'ları temizle
+            window.removeEventListener('message', handleMessage);
+            if ((handleMessage as any).timeoutId) {
+              clearTimeout((handleMessage as any).timeoutId);
+            }
+            
+            // Popup'ı kapat
+            try {
+              if (popup) popup.close();
+            } catch (e) {
+              // COOP hatası - görmezden gel
+            }
+            
+            processOAuthFallback(facebookOAuthToken, facebookOAuthUser, returnUrl, redirectExecutedRef, setSocialLoading);
+          }
+        }
+      };
+      window.addEventListener('storage', handleStorageChangeFB);
+      
       let fallbackCheckCount = 0;
       const fallbackInterval = setInterval(() => {
         fallbackCheckCount++;
@@ -304,6 +374,7 @@ export const useOAuth = ({ socialLoading, setSocialLoading, setError, redirectEx
         if (facebookOAuthToken && facebookOAuthUser) {
           console.log('✅ [useOAuth] Fallback data found, processing...');
           clearInterval(fallbackInterval);
+          window.removeEventListener('storage', handleStorageChangeFB);
           
           // Event listener'ları temizle
           window.removeEventListener('message', handleMessage);
@@ -325,6 +396,7 @@ export const useOAuth = ({ socialLoading, setSocialLoading, setError, redirectEx
         if (fallbackCheckCount >= 30) {
           console.warn('⚠️ [useOAuth] Fallback timeout reached');
           clearInterval(fallbackInterval);
+          window.removeEventListener('storage', handleStorageChangeFB);
         }
       }, 1000);
       
