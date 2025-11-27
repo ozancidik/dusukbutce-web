@@ -917,11 +917,11 @@ export default function LoginPage() {
             // COOP hatası - görmezden gel
           }
           
-          // localStorageChange event'ini tetikle (yönlendirme flag'i set edildikten sonra)
-          window.dispatchEvent(new Event('localStorageChange'));
-          
-          // Yönlendir (hemen, setTimeout olmadan)
+          // Yönlendir (hemen, localStorageChange event'inden önce)
           router.push(decodeURIComponent(returnUrl));
+          
+          // localStorageChange event'ini tetikle (yönlendirme yapıldıktan sonra)
+          window.dispatchEvent(new Event('localStorageChange'));
         } else if (event.data?.type === 'GOOGLE_LOGIN_ERROR') {
           setError(event.data.error || "Google ile giriş yapılırken bir hata oluştu.");
           setSocialLoading("");
@@ -1221,11 +1221,11 @@ export default function LoginPage() {
               // COOP hatası - görmezden gel
             }
             
-            // localStorageChange event'ini tetikle (yönlendirme flag'i set edildikten sonra)
-            window.dispatchEvent(new Event('localStorageChange'));
-            
-            // Yönlendir (hemen, setTimeout olmadan)
+            // Yönlendir (hemen, localStorageChange event'inden önce)
             router.push(decodeURIComponent(returnUrl));
+            
+            // localStorageChange event'ini tetikle (yönlendirme yapıldıktan sonra)
+            window.dispatchEvent(new Event('localStorageChange'));
           } catch (e) {
             console.error('Fallback error:', e);
             setSocialLoading("");
