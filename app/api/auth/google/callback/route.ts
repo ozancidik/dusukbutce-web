@@ -272,6 +272,7 @@ export async function GET(request: NextRequest) {
             const token = '${String(token)}';
             
             // localStorage'a fallback olarak kaydet (gizli sekme için)
+            // ÖNCE localStorage'a yaz, sonra postMessage gönder
             try {
               localStorage.setItem('google_oauth_token', token);
               localStorage.setItem('google_oauth_user', JSON.stringify(userData));
@@ -279,12 +280,14 @@ export async function GET(request: NextRequest) {
               console.log('✅ [CALLBACK] Token saved:', token.substring(0, 20) + '...');
               console.log('✅ [CALLBACK] User saved:', userData.email);
               
-              // Ana pencereye localStorage değişikliği bildir
-              window.dispatchEvent(new StorageEvent('storage', {
-                key: 'google_oauth_token',
-                newValue: token,
-                storageArea: localStorage
-              }));
+              // Custom event tetikle (ana pencere için)
+              try {
+                window.dispatchEvent(new Event('storage'));
+                window.dispatchEvent(new Event('localStorageChange'));
+                console.log('✅ [CALLBACK] Storage events dispatched');
+              } catch (e) {
+                console.warn('⚠️ [CALLBACK] Could not dispatch storage events:', e);
+              }
             } catch (e) {
               console.error('❌ [CALLBACK] localStorage error:', e);
             }
