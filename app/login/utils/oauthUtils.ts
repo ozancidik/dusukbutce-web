@@ -93,43 +93,5 @@ export const processOAuthUser = (
   window.location.href = decodeURIComponent(returnUrl);
 };
 
-/**
- * OAuth fallback verilerini işler
- */
-export const processOAuthFallback = (
-  token: string,
-  userDataString: string,
-  returnUrl: string,
-  redirectExecutedRef: React.MutableRefObject<boolean>,
-  setSocialLoading: (value: string) => void
-): void => {
-  try {
-    const userData: UserData = JSON.parse(userDataString);
-    const loginTime = Date.now();
-    
-    // Kullanıcı bilgilerini kaydet
-    saveUserData(userData, token, false);
-
-    // OAuth token'larını temizle
-    localStorage.removeItem('google_oauth_token');
-    localStorage.removeItem('google_oauth_user');
-    localStorage.removeItem('facebook_oauth_token');
-    localStorage.removeItem('facebook_oauth_user');
-
-    // Loading state'ini temizle
-    setSocialLoading("");
-
-    // Yönlendirme flag'ini set et
-    redirectExecutedRef.current = true;
-
-    // localStorageChange event'ini tetikle
-    window.dispatchEvent(new Event('localStorageChange'));
-
-    // Yönlendir
-    window.location.href = decodeURIComponent(returnUrl);
-  } catch (e) {
-    console.error('OAuth fallback error:', e);
-    setSocialLoading("");
-  }
-};
+// processOAuthFallback kaldırıldı - artık sadece postMessage kullanıyoruz
 
