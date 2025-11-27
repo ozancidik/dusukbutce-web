@@ -113,78 +113,6 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/admin/access-denied": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/admin/access-denied",
-      "dataRoute": "/admin/access-denied.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
-    "/admin/kategori": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/admin/kategori",
-      "dataRoute": "/admin/kategori.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
-    "/admin/products": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/admin/products",
-      "dataRoute": "/admin/products.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
     "/admin/prices": {
       "experimentalBypassFor": [
         {
@@ -257,6 +185,126 @@
         "x-next-revalidate-tag-token"
       ]
     },
+    "/admin/kategori": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/admin/kategori",
+      "dataRoute": "/admin/kategori.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
+    "/admin/products": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/admin/products",
+      "dataRoute": "/admin/products.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
+    "/admin/access-denied": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/admin/access-denied",
+      "dataRoute": "/admin/access-denied.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
+    "/admin/gorsel": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/admin/gorsel",
+      "dataRoute": "/admin/gorsel.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
+    "/admin/stok": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/admin/stok",
+      "dataRoute": "/admin/stok.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
     "/admin": {
       "experimentalBypassFor": [
         {
@@ -272,54 +320,6 @@
       "initialRevalidateSeconds": false,
       "srcRoute": "/admin",
       "dataRoute": "/admin.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
-    "/admin/newsletter": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/admin/newsletter",
-      "dataRoute": "/admin/newsletter.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
-    "/admin/stock": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/admin/stock",
-      "dataRoute": "/admin/stock.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -353,30 +353,6 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/admin/urunler": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/admin/urunler",
-      "dataRoute": "/admin/urunler.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
     "/adreslerim": {
       "experimentalBypassFor": [
         {
@@ -401,6 +377,30 @@
         "x-next-revalidate-tag-token"
       ]
     },
+    "/admin/urunler": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/admin/urunler",
+      "dataRoute": "/admin/urunler.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
     "/admin/teknik-servis": {
       "experimentalBypassFor": [
         {
@@ -416,6 +416,30 @@
       "initialRevalidateSeconds": false,
       "srcRoute": "/admin/teknik-servis",
       "dataRoute": "/admin/teknik-servis.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
+    "/admin/submissions": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/admin/submissions",
+      "dataRoute": "/admin/submissions.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -473,54 +497,6 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/admin/stok": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/admin/stok",
-      "dataRoute": "/admin/stok.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
-    "/admin/submissions": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/admin/submissions",
-      "dataRoute": "/admin/submissions.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
     "/bildirimler": {
       "experimentalBypassFor": [
         {
@@ -536,102 +512,6 @@
       "initialRevalidateSeconds": false,
       "srcRoute": "/bildirimler",
       "dataRoute": "/bildirimler.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
-    "/admin/gorsel": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/admin/gorsel",
-      "dataRoute": "/admin/gorsel.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
-    "/bize-sat/direksiyon": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/bize-sat/direksiyon",
-      "dataRoute": "/bize-sat/direksiyon.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
-    "/bize-sat/cep-telefonu": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/bize-sat/cep-telefonu",
-      "dataRoute": "/bize-sat/cep-telefonu.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
-    "/bize-sat/ekran-karti": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/bize-sat/ekran-karti",
-      "dataRoute": "/bize-sat/ekran-karti.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -665,7 +545,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/bize-sat/gaming-direksiyon": {
+    "/bize-sat/cep-telefonu": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -678,8 +558,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/bize-sat/gaming-direksiyon",
-      "dataRoute": "/bize-sat/gaming-direksiyon.rsc",
+      "srcRoute": "/bize-sat/cep-telefonu",
+      "dataRoute": "/bize-sat/cep-telefonu.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -689,7 +569,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/bize-sat/gamepad": {
+    "/bize-sat/direksiyon": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -702,8 +582,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/bize-sat/gamepad",
-      "dataRoute": "/bize-sat/gamepad.rsc",
+      "srcRoute": "/bize-sat/direksiyon",
+      "dataRoute": "/bize-sat/direksiyon.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -737,7 +617,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/bize-sat/klavye": {
+    "/bize-sat/gamepad": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -750,8 +630,56 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/bize-sat/klavye",
-      "dataRoute": "/bize-sat/klavye.rsc",
+      "srcRoute": "/bize-sat/gamepad",
+      "dataRoute": "/bize-sat/gamepad.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
+    "/bize-sat/gaming-direksiyon": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/bize-sat/gaming-direksiyon",
+      "dataRoute": "/bize-sat/gaming-direksiyon.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
+    "/bize-sat/ekran-karti": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/bize-sat/ekran-karti",
+      "dataRoute": "/bize-sat/ekran-karti.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -785,7 +713,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/bize-sat/masaustu": {
+    "/bize-sat/klavye": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -798,8 +726,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/bize-sat/masaustu",
-      "dataRoute": "/bize-sat/masaustu.rsc",
+      "srcRoute": "/bize-sat/klavye",
+      "dataRoute": "/bize-sat/klavye.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -833,6 +761,30 @@
         "x-next-revalidate-tag-token"
       ]
     },
+    "/bize-sat": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/bize-sat",
+      "dataRoute": "/bize-sat.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
     "/bize-sat/mouse": {
       "experimentalBypassFor": [
         {
@@ -848,6 +800,78 @@
       "initialRevalidateSeconds": false,
       "srcRoute": "/bize-sat/mouse",
       "dataRoute": "/bize-sat/mouse.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
+    "/bize-sat/masaustu": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/bize-sat/masaustu",
+      "dataRoute": "/bize-sat/masaustu.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
+    "/bize-sat/notebook": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/bize-sat/notebook",
+      "dataRoute": "/bize-sat/notebook.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
+    "/bize-sat/monitor": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/bize-sat/monitor",
+      "dataRoute": "/bize-sat/monitor.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -905,30 +929,6 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/bize-sat/ram": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/bize-sat/ram",
-      "dataRoute": "/bize-sat/ram.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
     "/bize-sat/sogutucu": {
       "experimentalBypassFor": [
         {
@@ -944,30 +944,6 @@
       "initialRevalidateSeconds": false,
       "srcRoute": "/bize-sat/sogutucu",
       "dataRoute": "/bize-sat/sogutucu.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
-    "/bize-sat/notebook": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/bize-sat/notebook",
-      "dataRoute": "/bize-sat/notebook.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -1001,7 +977,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/bize-sat/monitor": {
+    "/bize-sat/tarayici": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -1014,8 +990,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/bize-sat/monitor",
-      "dataRoute": "/bize-sat/monitor.rsc",
+      "srcRoute": "/bize-sat/tarayici",
+      "dataRoute": "/bize-sat/tarayici.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -1049,30 +1025,6 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/bize-sat/tarayici": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/bize-sat/tarayici",
-      "dataRoute": "/bize-sat/tarayici.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
     "/bize-sat/tablet": {
       "experimentalBypassFor": [
         {
@@ -1097,7 +1049,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/bize-sat": {
+    "/bize-sat/ram": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -1110,32 +1062,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/bize-sat",
-      "dataRoute": "/bize-sat.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
-    "/bize-sat/xbox": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/bize-sat/xbox",
-      "dataRoute": "/bize-sat/xbox.rsc",
+      "srcRoute": "/bize-sat/ram",
+      "dataRoute": "/bize-sat/ram.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -1169,54 +1097,6 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/favoriler": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/favoriler",
-      "dataRoute": "/favoriler.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
-    "/bize-sat/yazici": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/bize-sat/yazici",
-      "dataRoute": "/bize-sat/yazici.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
     "/blog": {
       "experimentalBypassFor": [
         {
@@ -1232,6 +1112,30 @@
       "initialRevalidateSeconds": false,
       "srcRoute": "/blog",
       "dataRoute": "/blog.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
+    "/bize-sat/xbox": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/bize-sat/xbox",
+      "dataRoute": "/bize-sat/xbox.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -1265,7 +1169,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/hakkimizda": {
+    "/bize-sat/yazici": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -1278,8 +1182,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/hakkimizda",
-      "dataRoute": "/hakkimizda.rsc",
+      "srcRoute": "/bize-sat/yazici",
+      "dataRoute": "/bize-sat/yazici.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -1313,6 +1217,30 @@
         "x-next-revalidate-tag-token"
       ]
     },
+    "/hakkimizda": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/hakkimizda",
+      "dataRoute": "/hakkimizda.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
     "/iletisim": {
       "experimentalBypassFor": [
         {
@@ -1328,6 +1256,30 @@
       "initialRevalidateSeconds": false,
       "srcRoute": "/iletisim",
       "dataRoute": "/iletisim.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
+    "/favoriler": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/favoriler",
+      "dataRoute": "/favoriler.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -1361,7 +1313,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/kargo-ile-gonder": {
+    "/login": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -1374,56 +1326,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/kargo-ile-gonder",
-      "dataRoute": "/kargo-ile-gonder.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
-    "/odeme-iyzico": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/odeme-iyzico",
-      "dataRoute": "/odeme-iyzico.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
-    "/markalar": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/markalar",
-      "dataRoute": "/markalar.rsc",
+      "srcRoute": "/login",
+      "dataRoute": "/login.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -1457,30 +1361,6 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/iptal-iade-islemlerim": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/iptal-iade-islemlerim",
-      "dataRoute": "/iptal-iade-islemlerim.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
     "/karsilastir": {
       "experimentalBypassFor": [
         {
@@ -1505,7 +1385,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/orders": {
+    "/iptal-iade-islemlerim": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -1518,56 +1398,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/orders",
-      "dataRoute": "/orders.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
-    "/login": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/login",
-      "dataRoute": "/login.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
-    "/profile": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/profile",
-      "dataRoute": "/profile.rsc",
+      "srcRoute": "/iptal-iade-islemlerim",
+      "dataRoute": "/iptal-iade-islemlerim.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -1601,6 +1433,78 @@
         "x-next-revalidate-tag-token"
       ]
     },
+    "/markalar": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/markalar",
+      "dataRoute": "/markalar.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
+    "/profile": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/profile",
+      "dataRoute": "/profile.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
+    "/odeme-iyzico": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/odeme-iyzico",
+      "dataRoute": "/odeme-iyzico.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
     "/sat/notebook": {
       "experimentalBypassFor": [
         {
@@ -1625,7 +1529,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/satis-sozlesmesi": {
+    "/": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -1638,80 +1542,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/satis-sozlesmesi",
-      "dataRoute": "/satis-sozlesmesi.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
-    "/satin-al/notebook": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/satin-al/notebook",
-      "dataRoute": "/satin-al/notebook.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
-    "/sepet": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/sepet",
-      "dataRoute": "/sepet.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
-    "/satilik-ilanlar": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/satilik-ilanlar",
-      "dataRoute": "/satilik-ilanlar.rsc",
+      "srcRoute": "/",
+      "dataRoute": "/index.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -1745,7 +1577,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/teknik-servis/evimden-al": {
+    "/satilik-ilanlar": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -1758,8 +1590,104 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/teknik-servis/evimden-al",
-      "dataRoute": "/teknik-servis/evimden-al.rsc",
+      "srcRoute": "/satilik-ilanlar",
+      "dataRoute": "/satilik-ilanlar.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
+    "/satin-al/notebook": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/satin-al/notebook",
+      "dataRoute": "/satin-al/notebook.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
+    "/search": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/search",
+      "dataRoute": "/search.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
+    "/satin-al": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/satin-al",
+      "dataRoute": "/satin-al.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
+    "/sepet": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/sepet",
+      "dataRoute": "/sepet.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -1793,30 +1721,6 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/sss": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/sss",
-      "dataRoute": "/sss.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
     "/sifre-degistir": {
       "experimentalBypassFor": [
         {
@@ -1841,7 +1745,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/siparisler": {
+    "/sss": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -1854,8 +1758,56 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/siparisler",
-      "dataRoute": "/siparisler.rsc",
+      "srcRoute": "/sss",
+      "dataRoute": "/sss.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
+    "/satis-sozlesmesi": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/satis-sozlesmesi",
+      "dataRoute": "/satis-sozlesmesi.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
+    "/sifremi-unuttum": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/sifremi-unuttum",
+      "dataRoute": "/sifremi-unuttum.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -1889,7 +1841,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/teknik-servis": {
+    "/siparisler": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -1902,8 +1854,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/teknik-servis",
-      "dataRoute": "/teknik-servis.rsc",
+      "srcRoute": "/siparisler",
+      "dataRoute": "/siparisler.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -1913,7 +1865,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/urunler": {
+    "/teknik-servis/evimden-al": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -1926,8 +1878,32 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/urunler",
-      "dataRoute": "/urunler.rsc",
+      "srcRoute": "/teknik-servis/evimden-al",
+      "dataRoute": "/teknik-servis/evimden-al.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
+    "/teknik-servis/kargo-ile-gonder": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/teknik-servis/kargo-ile-gonder",
+      "dataRoute": "/teknik-servis/kargo-ile-gonder.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -1985,7 +1961,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/satin-al": {
+    "/teknik-servis": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -1998,8 +1974,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/satin-al",
-      "dataRoute": "/satin-al.rsc",
+      "srcRoute": "/teknik-servis",
+      "dataRoute": "/teknik-servis.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -2009,7 +1985,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/": {
+    "/kargo-ile-gonder": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -2022,8 +1998,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/",
-      "dataRoute": "/index.rsc",
+      "srcRoute": "/kargo-ile-gonder",
+      "dataRoute": "/kargo-ile-gonder.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -2057,6 +2033,30 @@
         "x-next-revalidate-tag-token"
       ]
     },
+    "/urunler": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/urunler",
+      "dataRoute": "/urunler.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
     "/verify-email": {
       "experimentalBypassFor": [
         {
@@ -2081,7 +2081,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/search": {
+    "/orders": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -2094,8 +2094,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/search",
-      "dataRoute": "/search.rsc",
+      "srcRoute": "/orders",
+      "dataRoute": "/orders.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -2105,7 +2105,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/teknik-servis/kargo-ile-gonder": {
+    "/admin/newsletter": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -2118,8 +2118,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/teknik-servis/kargo-ile-gonder",
-      "dataRoute": "/teknik-servis/kargo-ile-gonder.rsc",
+      "srcRoute": "/admin/newsletter",
+      "dataRoute": "/admin/newsletter.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -2129,7 +2129,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/sifremi-unuttum": {
+    "/admin/stock": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -2142,8 +2142,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/sifremi-unuttum",
-      "dataRoute": "/sifremi-unuttum.rsc",
+      "srcRoute": "/admin/stock",
+      "dataRoute": "/admin/stock.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
