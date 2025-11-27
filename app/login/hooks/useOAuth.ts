@@ -39,22 +39,41 @@ export const useOAuth = ({ socialLoading, setSocialLoading, setError, redirectEx
         return;
       }
       
+      console.log('✅ [useOAuth] Popup opened:', popup);
+      
+      // Popup durumunu kontrol et
+      const checkPopupStatus = setInterval(() => {
+        try {
+          if (popup.closed) {
+            console.log('🔒 [useOAuth] Popup closed');
+            clearInterval(checkPopupStatus);
+          } else {
+            console.log('🔄 [useOAuth] Popup still open, location:', popup.location?.href || 'unknown');
+          }
+        } catch (e) {
+          // Cross-origin hatası - popup başka bir sayfada
+          console.log('🌐 [useOAuth] Popup is on different origin (expected during OAuth)');
+        }
+      }, 1000);
+      
       const allowedOrigins = getAllowedOrigins();
       
       console.log('🔍 [useOAuth] Google login started');
       console.log('🔍 [useOAuth] Allowed origins:', allowedOrigins);
       console.log('🔍 [useOAuth] Current origin:', window.location.origin);
+      console.log('🔍 [useOAuth] Message listener will be added...');
       
       // Message listener
       const handleMessage = (event: MessageEvent) => {
         console.log('📨 [useOAuth] Message received:', {
           origin: event.origin,
           type: event.data?.type,
+          data: event.data,
           allowed: isOriginAllowed(event.origin, allowedOrigins)
         });
         
         if (!isOriginAllowed(event.origin, allowedOrigins)) {
-          console.warn('⚠️ [useOAuth] Message from disallowed origin:', event.origin);
+          console.warn('⚠️ [useOAuth] Message from disallowed origin:', event.origin, 'Allowed:', allowedOrigins);
           return;
         }
         
@@ -93,10 +112,24 @@ export const useOAuth = ({ socialLoading, setSocialLoading, setError, redirectEx
       };
       
       window.addEventListener('message', handleMessage);
+      console.log('✅ [useOAuth] Message listener added to window');
+      
+      // Tüm message event'lerini logla (debug için)
+      const debugMessageHandler = (event: MessageEvent) => {
+        console.log('🔍 [useOAuth] ALL messages (debug):', {
+          origin: event.origin,
+          type: event.data?.type,
+          source: event.source
+        });
+      };
+      window.addEventListener('message', debugMessageHandler);
       
       // Timeout
       const timeoutId = setTimeout(() => {
+        console.warn('⏰ [useOAuth] Timeout reached (120 seconds)');
         window.removeEventListener('message', handleMessage);
+        window.removeEventListener('message', debugMessageHandler);
+        clearInterval(checkPopupStatus);
         try {
           if (popup) popup.close();
         } catch (e) {
@@ -128,9 +161,11 @@ export const useOAuth = ({ socialLoading, setSocialLoading, setError, redirectEx
         if (googleOAuthToken && googleOAuthUser) {
           console.log('✅ [useOAuth] Fallback data found, processing...');
           clearInterval(fallbackInterval);
+          clearInterval(checkPopupStatus);
           
           // Event listener'ları temizle
           window.removeEventListener('message', handleMessage);
+          window.removeEventListener('message', debugMessageHandler);
           if ((handleMessage as any).timeoutId) {
             clearTimeout((handleMessage as any).timeoutId);
           }
