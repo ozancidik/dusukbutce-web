@@ -484,9 +484,13 @@ export default function LoginPage() {
       const userLoggedIn = localStorage.getItem("userLoggedIn") || sessionStorage.getItem("userLoggedIn");
       const userEmail = localStorage.getItem("userEmail") || sessionStorage.getItem("userEmail");
       
-      // Eğer daha önce yönlendirme yapıldıysa, tekrar yapma (ama socialLoading aktifse yönlendirme yapılmalı)
-      if (redirectExecutedRef.current && (socialLoading === "" || !socialLoading)) {
+      // Eğer daha önce yönlendirme yapıldıysa, tekrar yapma
+      if (redirectExecutedRef.current) {
         console.log("👤 [LOGIN PAGE] Yönlendirme zaten yapıldı, tekrar yönlendirme yapılmıyor.");
+        // Ama loading state'ini temizle
+        if (socialLoading !== "") {
+          setSocialLoading("");
+        }
         return;
       }
       
