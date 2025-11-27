@@ -1,3 +1,4 @@
+"use client";
 // Storage utility fonksiyonları
 
 export interface UserData {
@@ -78,6 +79,16 @@ export const saveUserData = (userData: UserData, token: string, rememberMe: bool
  * Kullanıcı giriş durumunu kontrol eder
  */
 export const getUserLoginStatus = () => {
+  if (typeof window === 'undefined') {
+    return {
+      adminLoggedIn: null,
+      adminEmail: null,
+      adminToken: null,
+      userLoggedIn: null,
+      userEmail: null
+    };
+  }
+  
   const adminLoggedIn = localStorage.getItem("adminLoggedIn") || sessionStorage.getItem("adminLoggedIn");
   const adminEmail = localStorage.getItem("adminEmail") || sessionStorage.getItem("adminEmail");
   const adminToken = localStorage.getItem("adminToken") || sessionStorage.getItem("adminToken");
@@ -97,6 +108,10 @@ export const getUserLoginStatus = () => {
  * Admin token'ını doğrular ve geçersizse temizler
  */
 export const validateAndCleanAdminToken = (): void => {
+  if (typeof window === 'undefined') {
+    return;
+  }
+  
   const adminToken = localStorage.getItem("adminToken") || sessionStorage.getItem("adminToken");
   
   if (!adminToken) {
@@ -149,6 +164,10 @@ export const validateAndCleanAdminToken = (): void => {
  * Rate limiting bilgilerini sıfırlar
  */
 export const resetRateLimiting = (): void => {
+  if (typeof window === 'undefined') {
+    return;
+  }
+  
   localStorage.setItem("loginAttempts", "0");
   localStorage.removeItem("lastLoginAttempt");
   localStorage.removeItem("isRealPasswordAttempt");

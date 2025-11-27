@@ -1,11 +1,17 @@
+"use client";
 // OAuth utility fonksiyonları
 
+import React from 'react';
 import { UserData, saveUserData } from './storageUtils';
 
 /**
  * Popup boyutlarını hesaplar (mobil uyumlu)
  */
 export const getPopupDimensions = () => {
+  if (typeof window === 'undefined') {
+    return { width: 500, height: 600, left: 0, top: 0 }; // Default for SSR
+  }
+  
   if (window.innerWidth <= 768) {
     return {
       width: window.screen.width,
@@ -27,6 +33,10 @@ export const getPopupDimensions = () => {
  * İzin verilen origin'leri döndürür
  */
 export const getAllowedOrigins = (): string[] => {
+  if (typeof window === 'undefined') {
+    return []; // Default for SSR
+  }
+  
   const currentOrigin = window.location.origin;
   return [
     currentOrigin,
