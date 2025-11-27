@@ -117,11 +117,12 @@ export const useOAuth = ({ socialLoading, setSocialLoading, setError, redirectEx
         console.warn('⏰ [useOAuth] Timeout reached (120 seconds)');
         window.removeEventListener('message', handleMessage);
         window.removeEventListener('message', debugMessageHandler);
-        clearInterval(checkPopupStatus);
         try {
-          if (popup) popup.close();
+          popup.close();
+          console.log('🔒 [useOAuth] Attempted to close popup due to timeout.');
         } catch (e) {
-          // COOP hatası
+          // COOP hatası - görmezden gel
+          console.log('ℹ️ [useOAuth] Popup close attempt on timeout (COOP may block, this is OK)');
         }
         if (socialLoading === "google") {
           setSocialLoading("");
@@ -145,7 +146,6 @@ export const useOAuth = ({ socialLoading, setSocialLoading, setError, redirectEx
             console.log('✅ [useOAuth] Fallback data found via storage event!');
             window.removeEventListener('storage', handleStorageChange);
             clearInterval(fallbackInterval);
-            clearInterval(checkPopupStatus);
             
             // Event listener'ları temizle
             window.removeEventListener('message', handleMessage);
@@ -154,11 +154,13 @@ export const useOAuth = ({ socialLoading, setSocialLoading, setError, redirectEx
               clearTimeout((handleMessage as any).timeoutId);
             }
             
-            // Popup'ı kapat
+            // Popup'ı kapatmayı dene (COOP hatası olabilir, görmezden gel)
             try {
-              if (popup) popup.close();
+              popup.close();
+              console.log('🔒 [useOAuth] Attempted to close popup by fallback mechanism.');
             } catch (e) {
               // COOP hatası - görmezden gel
+              console.log('ℹ️ [useOAuth] Popup close attempt by fallback (COOP may block, this is OK)');
             }
             
             processOAuthFallback(googleOAuthToken, googleOAuthUser, returnUrl, redirectExecutedRef, setSocialLoading);
@@ -184,7 +186,6 @@ export const useOAuth = ({ socialLoading, setSocialLoading, setError, redirectEx
         if (googleOAuthToken && googleOAuthUser) {
           console.log('✅ [useOAuth] Fallback data found, processing...');
           clearInterval(fallbackInterval);
-          clearInterval(checkPopupStatus);
           window.removeEventListener('storage', handleStorageChange);
           
           // Event listener'ları temizle
@@ -194,11 +195,13 @@ export const useOAuth = ({ socialLoading, setSocialLoading, setError, redirectEx
             clearTimeout((handleMessage as any).timeoutId);
           }
           
-          // Popup'ı kapat
+          // Popup'ı kapatmayı dene (COOP hatası olabilir, görmezden gel)
           try {
-            if (popup) popup.close();
+            popup.close();
+            console.log('🔒 [useOAuth] Attempted to close popup by fallback mechanism.');
           } catch (e) {
             // COOP hatası - görmezden gel
+            console.log('ℹ️ [useOAuth] Popup close attempt by fallback (COOP may block, this is OK)');
           }
           
           processOAuthFallback(googleOAuthToken, googleOAuthUser, returnUrl, redirectExecutedRef, setSocialLoading);
@@ -208,7 +211,6 @@ export const useOAuth = ({ socialLoading, setSocialLoading, setError, redirectEx
         if (fallbackCheckCount >= 30) {
           console.warn('⚠️ [useOAuth] Fallback timeout reached');
           clearInterval(fallbackInterval);
-          clearInterval(checkPopupStatus);
           window.removeEventListener('storage', handleStorageChange);
         }
       }, 1000);
