@@ -256,6 +256,10 @@ export async function GET(request: NextRequest) {
         </head>
         <body>
           <script>
+            console.log('🚀 [CALLBACK] Script started');
+            console.log('🚀 [CALLBACK] window.location:', window.location.href);
+            console.log('🚀 [CALLBACK] window.opener:', window.opener);
+            
             const userData = {
               id: '${String(user._id)}',
               email: '${String(user.email)}',
