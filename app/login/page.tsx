@@ -897,6 +897,9 @@ export default function LoginPage() {
             sessionStorage.setItem("adminToken", token);
           }
           
+          // Loading state'ini önce temizle
+          setSocialLoading("");
+          
           // Event listener'ları temizle
           window.removeEventListener('message', handleMessage);
           if ((handleMessage as any).timeoutId) {
@@ -913,13 +916,8 @@ export default function LoginPage() {
           // localStorageChange event'ini tetikle (yönlendirme flag'i set edildikten sonra)
           window.dispatchEvent(new Event('localStorageChange'));
           
-          // Loading state'ini temizle (yönlendirmeden önce)
-          setSocialLoading("");
-          
-          // Yönlendir
-          setTimeout(() => {
-            router.push(decodeURIComponent(returnUrl));
-          }, 100);
+          // Yönlendir (hemen, setTimeout olmadan)
+          router.push(decodeURIComponent(returnUrl));
         } else if (event.data?.type === 'GOOGLE_LOGIN_ERROR') {
           setError(event.data.error || "Google ile giriş yapılırken bir hata oluştu.");
           setSocialLoading("");
@@ -986,8 +984,23 @@ export default function LoginPage() {
             localStorage.removeItem('google_oauth_token');
             localStorage.removeItem('google_oauth_user');
             
-            window.dispatchEvent(new Event('localStorageChange'));
+            // Loading state'ini önce temizle
             setSocialLoading("");
+            
+            // Event listener'ları temizle
+            window.removeEventListener('message', handleMessage);
+            if ((handleMessage as any).timeoutId) {
+              clearTimeout((handleMessage as any).timeoutId);
+            }
+            
+            // Popup'ı kapat
+            try {
+              if (popup) popup.close();
+            } catch (e) {
+              // COOP hatası - görmezden gel
+            }
+            
+            window.dispatchEvent(new Event('localStorageChange'));
             router.push(decodeURIComponent(returnUrl));
           } catch (e) {
             console.error('Fallback error:', e);
@@ -1098,6 +1111,9 @@ export default function LoginPage() {
             sessionStorage.setItem("adminToken", token);
           }
           
+          // Loading state'ini önce temizle
+          setSocialLoading("");
+          
           // Event listener'ları temizle
           window.removeEventListener('message', handleMessage);
           if ((handleMessage as any).timeoutId) {
@@ -1114,13 +1130,8 @@ export default function LoginPage() {
           // localStorageChange event'ini tetikle (yönlendirme flag'i set edildikten sonra)
           window.dispatchEvent(new Event('localStorageChange'));
           
-          // Loading state'ini temizle (yönlendirmeden önce)
-          setSocialLoading("");
-          
-          // Yönlendir
-          setTimeout(() => {
-            router.push(decodeURIComponent(returnUrl));
-          }, 100);
+          // Yönlendir (hemen, setTimeout olmadan)
+          router.push(decodeURIComponent(returnUrl));
         } else if (event.data?.type === 'FACEBOOK_LOGIN_ERROR') {
           setError(event.data.error || "Facebook ile giriş yapılırken bir hata oluştu.");
           setSocialLoading("");
@@ -1190,7 +1201,7 @@ export default function LoginPage() {
             localStorage.removeItem('facebook_oauth_token');
             localStorage.removeItem('facebook_oauth_user');
             
-            // Loading state'ini temizle
+            // Loading state'ini önce temizle
             setSocialLoading("");
             
             // Event listener'ları temizle
@@ -1209,10 +1220,8 @@ export default function LoginPage() {
             // localStorageChange event'ini tetikle (yönlendirme flag'i set edildikten sonra)
             window.dispatchEvent(new Event('localStorageChange'));
             
-            // Yönlendir
-            setTimeout(() => {
-              router.push(decodeURIComponent(returnUrl));
-            }, 100);
+            // Yönlendir (hemen, setTimeout olmadan)
+            router.push(decodeURIComponent(returnUrl));
           } catch (e) {
             console.error('Fallback error:', e);
             setSocialLoading("");
