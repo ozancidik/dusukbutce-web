@@ -141,7 +141,14 @@ export async function GET(request: NextRequest) {
     let phoneNumber = '';
 
     // MongoDB'ye bağlan
-    await connectDB();
+    console.log('🔄 [CALLBACK] MongoDB bağlantısı başlatılıyor...');
+    try {
+      await connectDB();
+      console.log('✅ [CALLBACK] MongoDB bağlantısı başarılı');
+    } catch (dbError: any) {
+      console.error('❌ [CALLBACK] MongoDB bağlantı hatası:', dbError?.message || dbError);
+      throw dbError;
+    }
 
     // Kullanıcıyı email ile bul
     let user = await User.findOne({ email: userData.email });
@@ -201,10 +208,10 @@ export async function GET(request: NextRequest) {
     // Kullanıcıyı kaydet
     await user.save();
     
-    console.log('✅ Google OAuth callback: User saved, preparing response');
-    console.log('✅ User ID:', String(user._id));
-    console.log('✅ User Email:', user.email);
-    console.log('✅ Token created:', token ? 'YES' : 'NO');
+    console.log('✅ [CALLBACK] Google OAuth callback: User saved, preparing response');
+    console.log('✅ [CALLBACK] User ID:', String(user._id));
+    console.log('✅ [CALLBACK] User Email:', user.email);
+    console.log('✅ [CALLBACK] Token created:', token ? 'YES' : 'NO');
 
     // Başarılı giriş sayfası
     const origin = request.headers.get('origin') || request.nextUrl.origin;
@@ -222,6 +229,7 @@ export async function GET(request: NextRequest) {
     
     // Target origin belirle - www ve non-www için normalize et
     let targetOrigin = `${protocol}//${host}`;
+    console.log('✅ [CALLBACK] Target origin:', targetOrigin);
     // Production için www ekle (eğer yoksa)
     let targetOriginWithWww = targetOrigin;
     if (process.env.VERCEL_ENV === 'production' && !host.includes('localhost') && !host.includes('www.')) {
@@ -254,7 +262,14 @@ export async function GET(request: NextRequest) {
           <meta http-equiv="Cross-Origin-Embedder-Policy" content="unsafe-none">
           <title>Giriş Başarılı</title>
         </head>
-        <body>
+        <body style="font-family: Arial, sans-serif; padding: 20px; text-align: center; background: #f0f0f0; margin: 0;">
+          <div style="background: white; padding: 30px; border-radius: 8px; max-width: 400px; margin: 50px auto; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            <h2 style="color: #4CAF50; margin-bottom: 20px; margin-top: 0;">✅ Giriş Başarılı!</h2>
+            <p style="color: #666; margin-bottom: 30px;">Giriş işlemi tamamlandı. Bu pencereyi kapatabilirsiniz.</p>
+            <button onclick="window.close()" style="background: #4CAF50; color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-size: 16px;">
+              Pencereyi Kapat
+            </button>
+          </div>
           <script>
             console.log('🚀 [CALLBACK] Script started');
             console.log('🚀 [CALLBACK] window.location:', window.location.href);
@@ -383,33 +398,24 @@ export async function GET(request: NextRequest) {
               }, 300);
             }
             
-            // Popup'ı kapat - postMessage gönderildikten SONRA
-            // Önce mesajın gönderildiğinden emin ol, sonra kapat
+            // Popup'ı kapatmayı dene (ama zorunlu değil)
+            // Kullanıcı manuel olarak da kapatabilir
             const closePopup = () => {
               try {
                 console.log('🔒 [CALLBACK] Attempting to close popup...');
-                // Body'yi boşalt (bazı tarayıcılarda kapatmayı kolaylaştırır)
-                document.body.innerHTML = '';
-                // Farklı yöntemleri dene
                 if (window.opener) {
                   window.opener.focus();
                 }
                 window.close();
-                self.close();
-                top.close();
               } catch (e) {
                 console.warn('⚠️ [CALLBACK] Close popup error:', e);
               }
             };
             
-            // postMessage gönderildikten SONRA kapat (1 saniye bekle)
-            // Bu, postMessage'ın ana pencereye ulaşması için zaman verir
+            // 3 saniye sonra otomatik kapatmayı dene (ama zorunlu değil)
             setTimeout(() => {
               closePopup();
-              // Eğer hala açıksa, birkaç kez daha dene
-              setTimeout(closePopup, 200);
-              setTimeout(closePopup, 500);
-            }, 1000);
+            }, 3000);
           </script>
         </body>
       </html>
@@ -420,8 +426,16 @@ export async function GET(request: NextRequest) {
         'Cross-Origin-Embedder-Policy': 'unsafe-none'
       }
     });
-  } catch (error) {
-    console.error('Google OAuth error:', error);
+  } catch (error: any) {
+    console.error('❌ Google OAuth error:', error);
+    
+    // MongoDB authentication hatası için özel mesaj
+    let errorMessage = 'Google ile giriş yapılırken bir hata oluştu.';
+    if (error?.code === 8000 || error?.codeName === 'AtlasError' || error?.message?.includes('authentication failed') || error?.message?.includes('bad auth')) {
+      errorMessage = 'Veritabanı bağlantı hatası. Lütfen MongoDB şifrenizi kontrol edin.';
+      console.error('🔐 MongoDB Authentication Hatası - .env.local dosyasındaki MONGODB_URI şifresini kontrol edin');
+    }
+    
     return new Response(`
       <!DOCTYPE html>
       <html lang="tr">
@@ -432,14 +446,28 @@ export async function GET(request: NextRequest) {
         </head>
         <body>
           <script>
-            console.error('❌ Google OAuth Exception:', '${error instanceof Error ? error.message : 'Unknown error'}');
+            console.error('❌ [CALLBACK] Google OAuth Exception:', ${JSON.stringify(error?.message || 'Unknown error')});
+            console.error('❌ [CALLBACK] Error details:', ${JSON.stringify({
+              code: error?.code,
+              codeName: error?.codeName,
+              name: error?.name
+            })});
             if (window.opener) {
               window.opener.postMessage({
                 type: 'GOOGLE_LOGIN_ERROR',
-                error: 'Google ile giriş yapılırken bir hata oluştu.'
+                error: ${JSON.stringify(errorMessage)}
               }, '*');
+              console.log('✅ [CALLBACK] Error message sent to opener');
+            } else {
+              console.error('❌ [CALLBACK] window.opener is null, cannot send error message');
             }
-            setTimeout(() => window.close(), 100);
+            setTimeout(() => {
+              try {
+                window.close();
+              } catch (e) {
+                console.warn('⚠️ [CALLBACK] Cannot close popup:', e);
+              }
+            }, 100);
           </script>
         </body>
       </html>

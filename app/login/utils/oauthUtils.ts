@@ -77,20 +77,32 @@ export const processOAuthUser = (
   redirectExecutedRef: React.MutableRefObject<boolean>,
   setSocialLoading: (value: string) => void
 ): void => {
+  console.log('🚀 [processOAuthUser] Başlatılıyor...', { userEmail: user.email, returnUrl });
+  
   // Yönlendirme flag'ini set et
   redirectExecutedRef.current = true;
+  console.log('✅ [processOAuthUser] redirectExecutedRef set edildi');
 
   // Kullanıcı bilgilerini kaydet
+  console.log('💾 [processOAuthUser] Kullanıcı bilgileri kaydediliyor...');
   saveUserData(user, token, false);
+  console.log('✅ [processOAuthUser] Kullanıcı bilgileri kaydedildi');
 
   // Loading state'ini temizle
   setSocialLoading("");
+  console.log('✅ [processOAuthUser] Loading state temizlendi');
 
   // localStorageChange event'ini tetikle
+  console.log('📢 [processOAuthUser] localStorageChange event tetikleniyor...');
   window.dispatchEvent(new Event('localStorageChange'));
+  console.log('✅ [processOAuthUser] localStorageChange event tetiklendi');
 
   // Yönlendir
-  window.location.href = decodeURIComponent(returnUrl);
+  const finalUrl = decodeURIComponent(returnUrl);
+  console.log('🔄 [processOAuthUser] Yönlendiriliyor:', finalUrl);
+  console.log('🔄 [processOAuthUser] window.location.href:', window.location.href);
+  window.location.href = finalUrl;
+  console.log('✅ [processOAuthUser] window.location.href set edildi');
 };
 
 // processOAuthFallback kaldırıldı - artık sadece postMessage kullanıyoruz
