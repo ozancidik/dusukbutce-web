@@ -36,10 +36,25 @@ export const getAllowedOrigins = (): string[] => {
 };
 
 /**
- * Origin kontrolü yapar
+ * Origin kontrolü yapar - daha esnek kontrol
  */
 export const isOriginAllowed = (origin: string, allowedOrigins: string[]): boolean => {
-  return allowedOrigins.includes(origin) || origin === '*' || origin === 'null';
+  // Wildcard veya null origin'e izin ver
+  if (origin === '*' || origin === 'null' || !origin) {
+    return true;
+  }
+  
+  // Tam eşleşme kontrolü
+  if (allowedOrigins.includes(origin)) {
+    return true;
+  }
+  
+  // www ve non-www varyasyonlarını kontrol et
+  const normalizedOrigin = origin.replace(/^https?:\/\/(www\.)?/, '');
+  return allowedOrigins.some(allowed => {
+    const normalizedAllowed = allowed.replace(/^https?:\/\/(www\.)?/, '');
+    return normalizedOrigin === normalizedAllowed;
+  });
 };
 
 /**
