@@ -1,8 +1,8 @@
 {
   "app/components/Header.tsx -> ./Search": {
-    "id": 4814,
+    "id": "app/components/Header.tsx -> ./Search",
     "files": [
-      "static/chunks/4814.ddddbb2dfaf71d66.js"
+      "static/chunks/_app-pages-browser_app_components_Search_tsx.js"
     ]
   }
 }
