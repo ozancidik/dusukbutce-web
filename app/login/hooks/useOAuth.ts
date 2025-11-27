@@ -48,19 +48,24 @@ export const useOAuth = ({ socialLoading, setSocialLoading, setError, redirectEx
             console.log('🔒 [useOAuth] Popup closed - checking localStorage immediately...');
             clearInterval(checkPopupStatus);
             
-            // Popup kapandıktan sonra localStorage'ı kontrol et
+            // Popup kapandıktan sonra localStorage'ı kontrol et (agresif kontrol)
             // Callback sayfası popup kapandıktan sonra localStorage'a yazmış olabilir
-            setTimeout(() => {
+            let postCloseCheckCount = 0;
+            const postCloseInterval = setInterval(() => {
+              postCloseCheckCount++;
               const googleOAuthToken = localStorage.getItem('google_oauth_token');
               const googleOAuthUser = localStorage.getItem('google_oauth_user');
               
-              console.log('🔍 [useOAuth] Post-popup-close check:', {
-                hasToken: !!googleOAuthToken,
-                hasUser: !!googleOAuthUser
-              });
+              if (postCloseCheckCount % 2 === 0) {
+                console.log('🔍 [useOAuth] Post-popup-close check:', postCloseCheckCount, {
+                  hasToken: !!googleOAuthToken,
+                  hasUser: !!googleOAuthUser
+                });
+              }
               
               if (googleOAuthToken && googleOAuthUser) {
                 console.log('✅ [useOAuth] Found data after popup closed!');
+                clearInterval(postCloseInterval);
                 window.removeEventListener('message', handleMessage);
                 window.removeEventListener('message', debugMessageHandler);
                 if ((handleMessage as any).timeoutId) {
@@ -68,10 +73,14 @@ export const useOAuth = ({ socialLoading, setSocialLoading, setError, redirectEx
                 }
                 
                 processOAuthFallback(googleOAuthToken, googleOAuthUser, returnUrl, redirectExecutedRef, setSocialLoading);
-              } else {
-                console.warn('⚠️ [useOAuth] No data found after popup closed');
               }
-            }, 500);
+              
+              // 10 saniye boyunca kontrol et
+              if (postCloseCheckCount >= 10) {
+                console.warn('⚠️ [useOAuth] Post-close check timeout');
+                clearInterval(postCloseInterval);
+              }
+            }, 1000);
           } else {
             try {
               console.log('🔄 [useOAuth] Popup still open, location:', popup.location?.href || 'unknown');
