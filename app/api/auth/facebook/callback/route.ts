@@ -345,11 +345,22 @@ export async function GET(request: NextRequest) {
       <html lang="tr">
         <head>
           <meta charset="UTF-8">
-          <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
+          <meta http-equiv="Cross-Origin-Opener-Policy" content="unsafe-none">
+          <meta http-equiv="Cross-Origin-Embedder-Policy" content="unsafe-none">
           <title>Giriş Başarılı</title>
         </head>
-        <body>
+        <body style="font-family: Arial, sans-serif; padding: 20px; text-align: center; background: #f0f0f0; margin: 0;">
+          <div style="background: white; padding: 30px; border-radius: 8px; max-width: 400px; margin: 50px auto; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            <h2 style="color: #4CAF50; margin-bottom: 20px; margin-top: 0;">✅ Giriş Başarılı!</h2>
+            <p style="color: #666; margin-bottom: 30px;">Giriş işlemi tamamlandı. Bu pencereyi kapatabilirsiniz.</p>
+            <button onclick="window.close()" style="background: #4CAF50; color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-size: 16px;">
+              Pencereyi Kapat
+            </button>
+          </div>
           <script>
+            console.log('🚀 [CALLBACK] Script started (Facebook)');
+            console.log('🚀 [CALLBACK] window.location:', window.location.href);
+            console.log('🚀 [CALLBACK] window.opener:', window.opener);
             const userData = {
               id: '${String(user._id)}',
               email: '${String(user.email)}',
@@ -365,130 +376,136 @@ export async function GET(request: NextRequest) {
             try {
               localStorage.setItem('facebook_oauth_token', token);
               localStorage.setItem('facebook_oauth_user', JSON.stringify(userData));
+              console.log('✅ [CALLBACK] Data saved to localStorage');
+              console.log('✅ [CALLBACK] Token saved:', token.substring(0, 20) + '...');
+              console.log('✅ [CALLBACK] User saved:', userData.email);
             } catch (e) {
-              console.error('localStorage error:', e);
+              console.error('❌ [CALLBACK] localStorage error:', e);
+            }
+            
+            // Storage event'lerini tetikle
+            try {
+              window.dispatchEvent(new Event('storage'));
+              window.dispatchEvent(new Event('localStorageChange'));
+              console.log('✅ [CALLBACK] Storage events dispatched');
+            } catch (e) {
+              console.warn('⚠️ [CALLBACK] Storage event dispatch error:', e);
             }
             
             // Ana pencereye mesaj gönder
-            if (window.opener) {
-              const messageData = {
-                type: 'FACEBOOK_LOGIN_SUCCESS',
-                user: userData,
-                token: token
-              };
-              
-              // Spesifik origin'e gönder
-              const allowedOrigins = ['${targetOrigin}'];
-              if (targetOrigin.includes('www.')) {
-                allowedOrigins.push(targetOrigin.replace('www.', ''));
-              } else {
-                allowedOrigins.push(targetOrigin.replace('://', '://www.'));
+            const messageData = {
+              type: 'FACEBOOK_LOGIN_SUCCESS',
+              user: userData,
+              token: token
+            };
+            
+            console.log('🔍 [CALLBACK] window.opener check:', window.opener);
+            console.log('🔍 [CALLBACK] window.location.origin:', window.location.origin);
+            console.log('🔍 [CALLBACK] targetOrigin:', '${targetOrigin}');
+            
+            // window.opener kontrolü ve postMessage
+            const sendMessage = () => {
+              if (!window.opener) {
+                console.error('❌ [CALLBACK] window.opener is null - COOP may be blocking');
+                console.error('❌ [CALLBACK] This means postMessage will NOT work');
+                console.error('❌ [CALLBACK] Relying on localStorage fallback only');
+                return false;
               }
               
-              allowedOrigins.forEach(origin => {
-                try {
-                  window.opener.postMessage(messageData, origin);
-                } catch (e) {
-                  console.warn('postMessage error:', e);
-                }
-              });
+              console.log('✅ [CALLBACK] window.opener exists, sending message...');
               
-              // Retry mekanizması
-              setTimeout(() => {
+              try {
+                // Önce spesifik origin'e gönder
+                const allowedOrigins = ['${targetOrigin}'];
+                if (targetOrigin.includes('www.')) {
+                  allowedOrigins.push(targetOrigin.replace('www.', ''));
+                } else {
+                  allowedOrigins.push(targetOrigin.replace('://', '://www.'));
+                }
+                
+                console.log('📤 [CALLBACK] Sending to origins:', allowedOrigins);
+                
+                // Her origin'e gönder
+                let successCount = 0;
                 allowedOrigins.forEach(origin => {
                   try {
-                    if (window.opener) {
-                      window.opener.postMessage(messageData, origin);
-                    }
-                  } catch (e) {}
+                    window.opener.postMessage(messageData, origin);
+                    console.log('✅ [CALLBACK] postMessage sent to:', origin);
+                    successCount++;
+                  } catch (e) {
+                    console.warn('⚠️ [CALLBACK] postMessage error for origin:', origin, e);
+                  }
                 });
-              }, 200);
-              
-              // Wildcard fallback (son çare)
-              setTimeout(() => {
+                
+                // Wildcard fallback (güvenlik riski var ama gerekli)
                 try {
-                  if (window.opener) {
-                    window.opener.postMessage(messageData, '*');
-                  }
-                } catch (e) {}
-              }, 400);
-              
-              // Popup'ı hemen kapat - agresif kapatma stratejisi
-              const closePopup = () => {
-                try {
-                  // Body'yi boşalt (bazı tarayıcılarda kapatmayı kolaylaştırır)
-                  document.body.innerHTML = '';
-                  // Farklı yöntemleri dene
-                  if (window.opener) {
-                    window.opener.focus();
-                  }
-                  window.close();
-                  self.close();
-                  top.close();
-                  // Eğer hala açıksa, birkaç kez daha dene
-                  setTimeout(() => {
-                    try {
-                      window.close();
-                      self.close();
-                    } catch (e) {}
-                  }, 50);
-                  setTimeout(() => {
-                    try {
-                      window.close();
-                      self.close();
-                    } catch (e) {}
-                  }, 150);
-                  setTimeout(() => {
-                    try {
-                      window.close();
-                      self.close();
-                    } catch (e) {}
-                  }, 300);
+                  window.opener.postMessage(messageData, '*');
+                  console.log('✅ [CALLBACK] postMessage sent to wildcard');
+                  successCount++;
                 } catch (e) {
-                  // Sessizce devam et
+                  console.warn('⚠️ [CALLBACK] postMessage wildcard error:', e);
                 }
-              };
-              
-              // Hemen kapatmayı dene
-              closePopup();
-              
-              // postMessage gönderildikten hemen sonra da kapat
-              setTimeout(closePopup, 50);
-              setTimeout(closePopup, 100);
-              setTimeout(closePopup, 200);
-            } else {
-              // Opener yoksa da kapatmayı dene
-              const closePopup = () => {
-                try {
-                  document.body.innerHTML = '';
-                  window.close();
-                  self.close();
-                  top.close();
-                  setTimeout(() => {
-                    try {
-                      window.close();
-                      self.close();
-                    } catch (e) {}
-                  }, 50);
-                  setTimeout(() => {
-                    try {
-                      window.close();
-                      self.close();
-                    } catch (e) {}
-                  }, 150);
-                } catch (e) {}
-              };
-              closePopup();
-              setTimeout(closePopup, 50);
-              setTimeout(closePopup, 100);
+                
+                console.log('📊 [CALLBACK] Total successful sends:', successCount);
+                return successCount > 0;
+              } catch (e) {
+                console.error('❌ [CALLBACK] postMessage failed:', e);
+                return false;
+              }
+            };
+            
+            // Hemen gönder
+            console.log('🚀 [CALLBACK] Attempting to send message...');
+            const initialSuccess = sendMessage();
+            console.log('📊 [CALLBACK] Initial send result:', initialSuccess);
+            
+            // Retry mekanizması - 5 kez dene (daha agresif)
+            if (!initialSuccess) {
+              console.warn('⚠️ [CALLBACK] Initial send failed, starting retry mechanism...');
+              let retryCount = 0;
+              const retryInterval = setInterval(() => {
+                retryCount++;
+                console.log('🔄 [CALLBACK] Retry attempt:', retryCount);
+                
+                if (retryCount > 5) {
+                  console.error('❌ [CALLBACK] Max retries reached, giving up');
+                  clearInterval(retryInterval);
+                  return;
+                }
+                
+                if (sendMessage()) {
+                  console.log('✅ [CALLBACK] Retry successful!');
+                  clearInterval(retryInterval);
+                }
+              }, 300);
             }
+            
+            // Popup'ı kapatmayı dene (ama zorunlu değil)
+            // Kullanıcı manuel olarak da kapatabilir
+            const closePopup = () => {
+              try {
+                console.log('🔒 [CALLBACK] Attempting to close popup...');
+                if (window.opener) {
+                  window.opener.focus();
+                }
+                window.close();
+              } catch (e) {
+                console.warn('⚠️ [CALLBACK] Close popup error:', e);
+              }
+            };
+            
+            // 3 saniye sonra otomatik kapatmayı dene (ama zorunlu değil)
+            setTimeout(() => {
+              closePopup();
+            }, 3000);
           </script>
         </body>
       </html>
     `, {
       headers: { 
         'Content-Type': 'text/html; charset=utf-8',
-        'Cross-Origin-Opener-Policy': 'same-origin-allow-popups'
+        'Cross-Origin-Opener-Policy': 'unsafe-none',
+        'Cross-Origin-Embedder-Policy': 'unsafe-none'
       }
     });
 
