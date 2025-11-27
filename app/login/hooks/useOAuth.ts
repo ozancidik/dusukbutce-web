@@ -41,59 +41,8 @@ export const useOAuth = ({ socialLoading, setSocialLoading, setError, redirectEx
       
       console.log('✅ [useOAuth] Popup opened:', popup);
       
-      // Popup durumunu kontrol et
-      const checkPopupStatus = setInterval(() => {
-        try {
-          if (popup.closed) {
-            console.log('🔒 [useOAuth] Popup closed - checking localStorage immediately...');
-            clearInterval(checkPopupStatus);
-            
-            // Popup kapandıktan sonra localStorage'ı kontrol et (agresif kontrol)
-            // Callback sayfası popup kapandıktan sonra localStorage'a yazmış olabilir
-            let postCloseCheckCount = 0;
-            const postCloseInterval = setInterval(() => {
-              postCloseCheckCount++;
-              const googleOAuthToken = localStorage.getItem('google_oauth_token');
-              const googleOAuthUser = localStorage.getItem('google_oauth_user');
-              
-              if (postCloseCheckCount % 2 === 0) {
-                console.log('🔍 [useOAuth] Post-popup-close check:', postCloseCheckCount, {
-                  hasToken: !!googleOAuthToken,
-                  hasUser: !!googleOAuthUser
-                });
-              }
-              
-              if (googleOAuthToken && googleOAuthUser) {
-                console.log('✅ [useOAuth] Found data after popup closed!');
-                clearInterval(postCloseInterval);
-                window.removeEventListener('message', handleMessage);
-                window.removeEventListener('message', debugMessageHandler);
-                if ((handleMessage as any).timeoutId) {
-                  clearTimeout((handleMessage as any).timeoutId);
-                }
-                
-                processOAuthFallback(googleOAuthToken, googleOAuthUser, returnUrl, redirectExecutedRef, setSocialLoading);
-              }
-              
-              // 10 saniye boyunca kontrol et
-              if (postCloseCheckCount >= 10) {
-                console.warn('⚠️ [useOAuth] Post-close check timeout');
-                clearInterval(postCloseInterval);
-              }
-            }, 1000);
-          } else {
-            try {
-              console.log('🔄 [useOAuth] Popup still open, location:', popup.location?.href || 'unknown');
-            } catch (e) {
-              // Cross-origin hatası - popup başka bir sayfada
-              console.log('🌐 [useOAuth] Popup is on different origin (expected during OAuth)');
-            }
-          }
-        } catch (e) {
-          // Cross-origin hatası - popup başka bir sayfada
-          console.log('🌐 [useOAuth] Popup is on different origin (expected during OAuth)');
-        }
-      }, 1000);
+      // NOT: popup.closed kontrolü COOP nedeniyle çalışmıyor
+      // Sadece postMessage ve localStorage fallback kullanıyoruz
       
       const allowedOrigins = getAllowedOrigins();
       
@@ -322,11 +271,13 @@ export const useOAuth = ({ socialLoading, setSocialLoading, setError, redirectEx
             clearTimeout((handleMessage as any).timeoutId);
           }
           
-          // Popup'ı kapat
+          // Popup'ı kapatmayı dene (COOP hatası olabilir, görmezden gel)
           try {
             popup.close();
+            console.log('🔒 [useOAuth] Attempted to close popup after FACEBOOK_LOGIN_SUCCESS.');
           } catch (e) {
             // COOP hatası - görmezden gel
+            console.log('ℹ️ [useOAuth] Popup close attempt (COOP may block, this is OK)');
           }
           
           processOAuthUser(user, token, returnUrl, redirectExecutedRef, setSocialLoading);
@@ -335,8 +286,10 @@ export const useOAuth = ({ socialLoading, setSocialLoading, setError, redirectEx
           setSocialLoading("");
           try {
             popup.close();
+            console.log('🔒 [useOAuth] Attempted to close popup after FACEBOOK_LOGIN_ERROR.');
           } catch (e) {
             // COOP hatası - görmezden gel
+            console.log('ℹ️ [useOAuth] Popup close attempt (COOP may block, this is OK)');
           }
           window.removeEventListener('message', handleMessage);
           if ((handleMessage as any).timeoutId) {
@@ -351,9 +304,11 @@ export const useOAuth = ({ socialLoading, setSocialLoading, setError, redirectEx
       const timeoutId = setTimeout(() => {
         window.removeEventListener('message', handleMessage);
         try {
-          if (popup) popup.close();
+          popup.close();
+          console.log('🔒 [useOAuth] Attempted to close popup due to timeout (Facebook).');
         } catch (e) {
-          // COOP hatası
+          // COOP hatası - görmezden gel
+          console.log('ℹ️ [useOAuth] Popup close attempt on timeout (COOP may block, this is OK)');
         }
         if (socialLoading === "facebook") {
           setSocialLoading("");
@@ -421,11 +376,13 @@ export const useOAuth = ({ socialLoading, setSocialLoading, setError, redirectEx
             clearTimeout((handleMessage as any).timeoutId);
           }
           
-          // Popup'ı kapat
+          // Popup'ı kapatmayı dene (COOP hatası olabilir, görmezden gel)
           try {
-            if (popup) popup.close();
+            popup.close();
+            console.log('🔒 [useOAuth] Attempted to close popup by fallback mechanism (Facebook).');
           } catch (e) {
             // COOP hatası - görmezden gel
+            console.log('ℹ️ [useOAuth] Popup close attempt by fallback (COOP may block, this is OK)');
           }
           
           processOAuthFallback(facebookOAuthToken, facebookOAuthUser, returnUrl, redirectExecutedRef, setSocialLoading);
