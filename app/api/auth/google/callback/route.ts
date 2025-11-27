@@ -275,8 +275,18 @@ export async function GET(request: NextRequest) {
             try {
               localStorage.setItem('google_oauth_token', token);
               localStorage.setItem('google_oauth_user', JSON.stringify(userData));
+              console.log('✅ [CALLBACK] Data saved to localStorage');
+              console.log('✅ [CALLBACK] Token saved:', token.substring(0, 20) + '...');
+              console.log('✅ [CALLBACK] User saved:', userData.email);
+              
+              // Ana pencereye localStorage değişikliği bildir
+              window.dispatchEvent(new StorageEvent('storage', {
+                key: 'google_oauth_token',
+                newValue: token,
+                storageArea: localStorage
+              }));
             } catch (e) {
-              console.error('localStorage error:', e);
+              console.error('❌ [CALLBACK] localStorage error:', e);
             }
             
             // Ana pencereye mesaj gönder
