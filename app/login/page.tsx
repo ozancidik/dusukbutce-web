@@ -444,12 +444,12 @@ export default function LoginPage() {
         
         if (returnUrl) {
           console.log("👤 [LOGIN PAGE] Kullanıcı giriş yapmış, returnUrl'e yönlendiriliyor:", returnUrl);
-          // Yönlendirmeyi hemen yap (setTimeout gereksiz)
-          router.push(decodeURIComponent(returnUrl));
+          // Yönlendirmeyi hemen yap (window.location.href ile kesin yönlendirme)
+          window.location.href = decodeURIComponent(returnUrl);
         } else {
           console.log("👤 [LOGIN PAGE] Kullanıcı giriş yapmış, anasayfaya yönlendiriliyor...");
-          // Yönlendirmeyi hemen yap (setTimeout gereksiz)
-          router.push("/");
+          // Yönlendirmeyi hemen yap (window.location.href ile kesin yönlendirme)
+          window.location.href = "/";
         }
         return;
       } else if (userLoggedIn === "true" && userEmail && currentPath !== '/login') {
