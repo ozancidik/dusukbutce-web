@@ -297,19 +297,22 @@ export async function GET(request: NextRequest) {
             };
             
             // window.opener kontrolü - ChatGPT önerisi
-            console.log('🔍 window.opener check:', window.opener);
-            console.log('🔍 window.location.origin:', window.location.origin);
-            console.log('🔍 targetOrigin:', '${targetOrigin}');
+            console.log('🔍 [CALLBACK] window.opener check:', window.opener);
+            console.log('🔍 [CALLBACK] window.location.origin:', window.location.origin);
+            console.log('🔍 [CALLBACK] targetOrigin:', '${targetOrigin}');
+            console.log('🔍 [CALLBACK] window.location.href:', window.location.href);
             
             // window.opener kontrolü ve postMessage
             const sendMessage = () => {
               if (!window.opener) {
-                console.error('❌ window.opener is null - COOP may be blocking');
-                console.error('❌ This means postMessage will NOT work');
+                console.error('❌ [CALLBACK] window.opener is null - COOP may be blocking');
+                console.error('❌ [CALLBACK] This means postMessage will NOT work');
+                console.error('❌ [CALLBACK] Relying on localStorage fallback only');
+                // window.opener null olsa bile localStorage'a yazıldı, bu yeterli
                 return false;
               }
               
-              console.log('✅ window.opener exists, sending message...');
+              console.log('✅ [CALLBACK] window.opener exists, sending message...');
               
               try {
                 // Önce spesifik origin'e gönder
@@ -320,56 +323,58 @@ export async function GET(request: NextRequest) {
                   allowedOrigins.push(targetOrigin.replace('://', '://www.'));
                 }
                 
-                console.log('📤 Sending to origins:', allowedOrigins);
+                console.log('📤 [CALLBACK] Sending to origins:', allowedOrigins);
                 
                 // Her origin'e gönder
                 let successCount = 0;
                 allowedOrigins.forEach(origin => {
                   try {
                     window.opener.postMessage(messageData, origin);
-                    console.log('✅ postMessage sent to:', origin);
+                    console.log('✅ [CALLBACK] postMessage sent to:', origin);
                     successCount++;
                   } catch (e) {
-                    console.warn('⚠️ postMessage error for origin:', origin, e);
+                    console.warn('⚠️ [CALLBACK] postMessage error for origin:', origin, e);
                   }
                 });
                 
                 // Wildcard fallback (güvenlik riski var ama gerekli)
                 try {
                   window.opener.postMessage(messageData, '*');
-                  console.log('✅ postMessage sent to wildcard');
+                  console.log('✅ [CALLBACK] postMessage sent to wildcard');
                   successCount++;
                 } catch (e) {
-                  console.warn('⚠️ postMessage wildcard error:', e);
+                  console.warn('⚠️ [CALLBACK] postMessage wildcard error:', e);
                 }
                 
-                console.log('📊 Total successful sends:', successCount);
+                console.log('📊 [CALLBACK] Total successful sends:', successCount);
                 return successCount > 0;
               } catch (e) {
-                console.error('❌ postMessage failed:', e);
+                console.error('❌ [CALLBACK] postMessage failed:', e);
                 return false;
               }
             };
             
             // Hemen gönder
+            console.log('🚀 [CALLBACK] Attempting to send message...');
             const initialSuccess = sendMessage();
+            console.log('📊 [CALLBACK] Initial send result:', initialSuccess);
             
             // Retry mekanizması - 5 kez dene (daha agresif)
             if (!initialSuccess) {
-              console.warn('⚠️ Initial send failed, starting retry mechanism...');
+              console.warn('⚠️ [CALLBACK] Initial send failed, starting retry mechanism...');
               let retryCount = 0;
               const retryInterval = setInterval(() => {
                 retryCount++;
-                console.log('🔄 Retry attempt:', retryCount);
+                console.log('🔄 [CALLBACK] Retry attempt:', retryCount);
                 
                 if (retryCount > 5) {
-                  console.error('❌ Max retries reached, giving up');
+                  console.error('❌ [CALLBACK] Max retries reached, giving up');
                   clearInterval(retryInterval);
                   return;
                 }
                 
                 if (sendMessage()) {
-                  console.log('✅ Retry successful!');
+                  console.log('✅ [CALLBACK] Retry successful!');
                   clearInterval(retryInterval);
                 }
               }, 300);

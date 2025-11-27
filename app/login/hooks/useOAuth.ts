@@ -45,10 +45,40 @@ export const useOAuth = ({ socialLoading, setSocialLoading, setError, redirectEx
       const checkPopupStatus = setInterval(() => {
         try {
           if (popup.closed) {
-            console.log('🔒 [useOAuth] Popup closed');
+            console.log('🔒 [useOAuth] Popup closed - checking localStorage immediately...');
             clearInterval(checkPopupStatus);
+            
+            // Popup kapandıktan sonra localStorage'ı kontrol et
+            // Callback sayfası popup kapandıktan sonra localStorage'a yazmış olabilir
+            setTimeout(() => {
+              const googleOAuthToken = localStorage.getItem('google_oauth_token');
+              const googleOAuthUser = localStorage.getItem('google_oauth_user');
+              
+              console.log('🔍 [useOAuth] Post-popup-close check:', {
+                hasToken: !!googleOAuthToken,
+                hasUser: !!googleOAuthUser
+              });
+              
+              if (googleOAuthToken && googleOAuthUser) {
+                console.log('✅ [useOAuth] Found data after popup closed!');
+                window.removeEventListener('message', handleMessage);
+                window.removeEventListener('message', debugMessageHandler);
+                if ((handleMessage as any).timeoutId) {
+                  clearTimeout((handleMessage as any).timeoutId);
+                }
+                
+                processOAuthFallback(googleOAuthToken, googleOAuthUser, returnUrl, redirectExecutedRef, setSocialLoading);
+              } else {
+                console.warn('⚠️ [useOAuth] No data found after popup closed');
+              }
+            }, 500);
           } else {
-            console.log('🔄 [useOAuth] Popup still open, location:', popup.location?.href || 'unknown');
+            try {
+              console.log('🔄 [useOAuth] Popup still open, location:', popup.location?.href || 'unknown');
+            } catch (e) {
+              // Cross-origin hatası - popup başka bir sayfada
+              console.log('🌐 [useOAuth] Popup is on different origin (expected during OAuth)');
+            }
           }
         } catch (e) {
           // Cross-origin hatası - popup başka bir sayfada
