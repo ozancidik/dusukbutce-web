@@ -389,30 +389,24 @@ export async function GET(request: NextRequest) {
                 setTimeout(closePopup, 500);
               }, 1000);
             } else {
-              // Opener yoksa da kapatmayı dene
+              // Opener yoksa - localStorage fallback'e güven
+              console.error('❌ window.opener is null - relying on localStorage fallback');
+              console.log('💾 Data saved to localStorage, parent window should check fallback');
+              
+              // Popup'ı kapat
               const closePopup = () => {
                 try {
                   document.body.innerHTML = '';
                   window.close();
                   self.close();
                   top.close();
-                  setTimeout(() => {
-                    try {
-                      window.close();
-                      self.close();
-                    } catch (e) {}
-                  }, 50);
-                  setTimeout(() => {
-                    try {
-                      window.close();
-                      self.close();
-                    } catch (e) {}
-                  }, 150);
-                } catch (e) {}
+                } catch (e) {
+                  console.warn('⚠️ Close popup error:', e);
+                }
               };
-              closePopup();
-              setTimeout(closePopup, 50);
-              setTimeout(closePopup, 100);
+              
+              // localStorage'a kaydedildikten sonra kapat
+              setTimeout(closePopup, 500);
             }
           </script>
         </body>
