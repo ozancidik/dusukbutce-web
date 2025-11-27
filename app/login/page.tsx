@@ -917,11 +917,11 @@ export default function LoginPage() {
             // COOP hatası - görmezden gel
           }
           
-          // Yönlendir (hemen, localStorageChange event'inden önce)
-          router.push(decodeURIComponent(returnUrl));
-          
-          // localStorageChange event'ini tetikle (yönlendirme yapıldıktan sonra)
+          // localStorageChange event'ini tetikle (yönlendirme yapılmadan önce)
           window.dispatchEvent(new Event('localStorageChange'));
+          
+          // Yönlendir (window.location.href ile kesin yönlendirme)
+          window.location.href = decodeURIComponent(returnUrl);
         } else if (event.data?.type === 'GOOGLE_LOGIN_ERROR') {
           setError(event.data.error || "Google ile giriş yapılırken bir hata oluştu.");
           setSocialLoading("");
@@ -1004,8 +1004,8 @@ export default function LoginPage() {
               // COOP hatası - görmezden gel
             }
             
-            router.push(decodeURIComponent(returnUrl));
             window.dispatchEvent(new Event('localStorageChange'));
+            window.location.href = decodeURIComponent(returnUrl);
           } catch (e) {
             console.error('Fallback error:', e);
           }
@@ -1131,11 +1131,11 @@ export default function LoginPage() {
             // COOP hatası - görmezden gel
           }
           
-          // Yönlendir (hemen, localStorageChange event'inden önce)
-          router.push(decodeURIComponent(returnUrl));
-          
-          // localStorageChange event'ini tetikle (yönlendirme yapıldıktan sonra)
+          // localStorageChange event'ini tetikle (yönlendirme yapılmadan önce)
           window.dispatchEvent(new Event('localStorageChange'));
+          
+          // Yönlendir (window.location.href ile kesin yönlendirme)
+          window.location.href = decodeURIComponent(returnUrl);
         } else if (event.data?.type === 'FACEBOOK_LOGIN_ERROR') {
           setError(event.data.error || "Facebook ile giriş yapılırken bir hata oluştu.");
           setSocialLoading("");
@@ -1221,11 +1221,11 @@ export default function LoginPage() {
               // COOP hatası - görmezden gel
             }
             
-            // Yönlendir (hemen, localStorageChange event'inden önce)
-            router.push(decodeURIComponent(returnUrl));
-            
-            // localStorageChange event'ini tetikle (yönlendirme yapıldıktan sonra)
+            // localStorageChange event'ini tetikle (yönlendirme yapılmadan önce)
             window.dispatchEvent(new Event('localStorageChange'));
+            
+            // Yönlendir (window.location.href ile kesin yönlendirme)
+            window.location.href = decodeURIComponent(returnUrl);
           } catch (e) {
             console.error('Fallback error:', e);
             setSocialLoading("");
