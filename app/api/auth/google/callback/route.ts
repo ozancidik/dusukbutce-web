@@ -15,7 +15,8 @@ export async function GET(request: NextRequest) {
       <html lang="tr">
         <head>
           <meta charset="UTF-8">
-          <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
+          <meta http-equiv="Cross-Origin-Opener-Policy" content="unsafe-none">
+          <meta http-equiv="Cross-Origin-Embedder-Policy" content="unsafe-none">
         </head>
         <body>
           <script>
@@ -33,7 +34,8 @@ export async function GET(request: NextRequest) {
     `, {
       headers: { 
         'Content-Type': 'text/html; charset=utf-8',
-        'Cross-Origin-Opener-Policy': 'same-origin-allow-popups'
+        'Cross-Origin-Opener-Policy': 'unsafe-none',
+        'Cross-Origin-Embedder-Policy': 'unsafe-none'
       }
     });
   }
@@ -44,7 +46,8 @@ export async function GET(request: NextRequest) {
       <html lang="tr">
         <head>
           <meta charset="UTF-8">
-          <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
+          <meta http-equiv="Cross-Origin-Opener-Policy" content="unsafe-none">
+          <meta http-equiv="Cross-Origin-Embedder-Policy" content="unsafe-none">
         </head>
         <body>
           <script>
@@ -62,7 +65,8 @@ export async function GET(request: NextRequest) {
     `, {
       headers: { 
         'Content-Type': 'text/html; charset=utf-8',
-        'Cross-Origin-Opener-Policy': 'same-origin-allow-popups'
+        'Cross-Origin-Opener-Policy': 'unsafe-none',
+        'Cross-Origin-Embedder-Policy': 'unsafe-none'
       }
     });
   }
@@ -246,7 +250,8 @@ export async function GET(request: NextRequest) {
       <html lang="tr">
         <head>
           <meta charset="UTF-8">
-          <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
+          <meta http-equiv="Cross-Origin-Opener-Policy" content="unsafe-none">
+          <meta http-equiv="Cross-Origin-Embedder-Policy" content="unsafe-none">
           <title>Giriş Başarılı</title>
         </head>
         <body>
@@ -271,48 +276,74 @@ export async function GET(request: NextRequest) {
             }
             
             // Ana pencereye mesaj gönder
-            if (window.opener) {
-              const messageData = {
-                type: 'GOOGLE_LOGIN_SUCCESS',
-                user: userData,
-                token: token
-              };
-              
-              // Spesifik origin'e gönder
-              const allowedOrigins = ['${targetOrigin}'];
-              if (targetOrigin.includes('www.')) {
-                allowedOrigins.push(targetOrigin.replace('www.', ''));
-              } else {
-                allowedOrigins.push(targetOrigin.replace('://', '://www.'));
+            const messageData = {
+              type: 'GOOGLE_LOGIN_SUCCESS',
+              user: userData,
+              token: token
+            };
+            
+            // window.opener kontrolü ve postMessage
+            const sendMessage = () => {
+              if (!window.opener) {
+                console.warn('⚠️ window.opener is null - COOP may be blocking');
+                return false;
               }
               
-              allowedOrigins.forEach(origin => {
-                try {
-                  window.opener.postMessage(messageData, origin);
-                } catch (e) {
-                  console.warn('postMessage error:', e);
+              try {
+                // Önce spesifik origin'e gönder
+                const allowedOrigins = ['${targetOrigin}'];
+                if (targetOrigin.includes('www.')) {
+                  allowedOrigins.push(targetOrigin.replace('www.', ''));
+                } else {
+                  allowedOrigins.push(targetOrigin.replace('://', '://www.'));
                 }
-              });
-              
-              // Retry mekanizması
-              setTimeout(() => {
+                
+                // Her origin'e gönder
                 allowedOrigins.forEach(origin => {
                   try {
-                    if (window.opener) {
-                      window.opener.postMessage(messageData, origin);
-                    }
-                  } catch (e) {}
-                });
-              }, 200);
-              
-              // Wildcard fallback (son çare)
-              setTimeout(() => {
-                try {
-                  if (window.opener) {
-                    window.opener.postMessage(messageData, '*');
+                    window.opener.postMessage(messageData, origin);
+                    console.log('✅ postMessage sent to:', origin);
+                  } catch (e) {
+                    console.warn('postMessage error for origin:', origin, e);
                   }
-                } catch (e) {}
-              }, 400);
+                });
+                
+                // Wildcard fallback (güvenlik riski var ama gerekli)
+                try {
+                  window.opener.postMessage(messageData, '*');
+                  console.log('✅ postMessage sent to wildcard');
+                } catch (e) {
+                  console.warn('postMessage wildcard error:', e);
+                }
+                
+                return true;
+              } catch (e) {
+                console.error('❌ postMessage failed:', e);
+                return false;
+              }
+            };
+            
+            // Hemen gönder
+            sendMessage();
+            
+            // Retry mekanizması - 3 kez dene
+            let retryCount = 0;
+            const retryInterval = setInterval(() => {
+              retryCount++;
+              if (retryCount > 3) {
+                clearInterval(retryInterval);
+                return;
+              }
+              
+              if (sendMessage()) {
+                clearInterval(retryInterval);
+              }
+            }, 200);
+            
+            // window.opener kontrolü
+            if (!window.opener) {
+              console.error('❌ window.opener is null - cannot send message');
+            }
               
               // Popup'ı hemen kapat - agresif kapatma stratejisi
               const closePopup = () => {
@@ -389,7 +420,8 @@ export async function GET(request: NextRequest) {
     `, {
       headers: { 
         'Content-Type': 'text/html; charset=utf-8',
-        'Cross-Origin-Opener-Policy': 'same-origin-allow-popups'
+        'Cross-Origin-Opener-Policy': 'unsafe-none',
+        'Cross-Origin-Embedder-Policy': 'unsafe-none'
       }
     });
   } catch (error) {
@@ -399,7 +431,8 @@ export async function GET(request: NextRequest) {
       <html lang="tr">
         <head>
           <meta charset="UTF-8">
-          <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
+          <meta http-equiv="Cross-Origin-Opener-Policy" content="unsafe-none">
+          <meta http-equiv="Cross-Origin-Embedder-Policy" content="unsafe-none">
         </head>
         <body>
           <script>
@@ -417,7 +450,8 @@ export async function GET(request: NextRequest) {
     `, {
       headers: { 
         'Content-Type': 'text/html; charset=utf-8',
-        'Cross-Origin-Opener-Policy': 'same-origin-allow-popups'
+        'Cross-Origin-Opener-Policy': 'unsafe-none',
+        'Cross-Origin-Embedder-Policy': 'unsafe-none'
       }
     });
   }
