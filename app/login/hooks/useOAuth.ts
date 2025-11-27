@@ -47,8 +47,17 @@ export const useOAuth = ({ socialLoading, setSocialLoading, setError, redirectEx
       
       // Tek bir message listener - postMessage tabanlı
       const handleMessage = (event: MessageEvent) => {
+        // Debug: Tüm mesajları logla
+        console.log('📨 [useOAuth] Message received:', {
+          origin: event.origin,
+          type: event.data?.type,
+          allowedOrigins: allowedOrigins,
+          isAllowed: isOriginAllowed(event.origin, allowedOrigins)
+        });
+        
         // Origin kontrolü
         if (!isOriginAllowed(event.origin, allowedOrigins)) {
+          console.warn('⚠️ [useOAuth] Message from disallowed origin:', event.origin);
           return;
         }
         

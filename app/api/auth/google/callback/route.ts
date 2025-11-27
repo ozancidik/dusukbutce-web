@@ -362,7 +362,7 @@ export async function GET(request: NextRequest) {
             const initialSuccess = sendMessage();
             console.log('📊 [CALLBACK] Initial send result:', initialSuccess);
             
-            // Retry mekanizması - 5 kez dene (daha agresif)
+            // Retry mekanizması - 5 kez dene
             if (!initialSuccess) {
               console.warn('⚠️ [CALLBACK] Initial send failed, starting retry mechanism...');
               let retryCount = 0;
@@ -382,54 +382,34 @@ export async function GET(request: NextRequest) {
                 }
               }, 300);
             }
-              
-              // Popup'ı kapat - postMessage gönderildikten SONRA
-              // Önce mesajın gönderildiğinden emin ol, sonra kapat
-              const closePopup = () => {
-                try {
-                  console.log('🔒 Attempting to close popup...');
-                  // Body'yi boşalt (bazı tarayıcılarda kapatmayı kolaylaştırır)
-                  document.body.innerHTML = '';
-                  // Farklı yöntemleri dene
-                  if (window.opener) {
-                    window.opener.focus();
-                  }
-                  window.close();
-                  self.close();
-                  top.close();
-                } catch (e) {
-                  console.warn('⚠️ Close popup error:', e);
+            
+            // Popup'ı kapat - postMessage gönderildikten SONRA
+            // Önce mesajın gönderildiğinden emin ol, sonra kapat
+            const closePopup = () => {
+              try {
+                console.log('🔒 [CALLBACK] Attempting to close popup...');
+                // Body'yi boşalt (bazı tarayıcılarda kapatmayı kolaylaştırır)
+                document.body.innerHTML = '';
+                // Farklı yöntemleri dene
+                if (window.opener) {
+                  window.opener.focus();
                 }
-              };
-              
-              // postMessage gönderildikten SONRA kapat (1 saniye bekle)
-              // Bu, postMessage'ın ana pencereye ulaşması için zaman verir
-              setTimeout(() => {
-                closePopup();
-                // Eğer hala açıksa, birkaç kez daha dene
-                setTimeout(closePopup, 200);
-                setTimeout(closePopup, 500);
-              }, 1000);
-            } else {
-              // Opener yoksa - localStorage fallback'e güven
-              console.error('❌ window.opener is null - relying on localStorage fallback');
-              console.log('💾 Data saved to localStorage, parent window should check fallback');
-              
-              // Popup'ı kapat
-              const closePopup = () => {
-                try {
-                  document.body.innerHTML = '';
-                  window.close();
-                  self.close();
-                  top.close();
-                } catch (e) {
-                  console.warn('⚠️ Close popup error:', e);
-                }
-              };
-              
-              // localStorage'a kaydedildikten sonra kapat
+                window.close();
+                self.close();
+                top.close();
+              } catch (e) {
+                console.warn('⚠️ [CALLBACK] Close popup error:', e);
+              }
+            };
+            
+            // postMessage gönderildikten SONRA kapat (1 saniye bekle)
+            // Bu, postMessage'ın ana pencereye ulaşması için zaman verir
+            setTimeout(() => {
+              closePopup();
+              // Eğer hala açıksa, birkaç kez daha dene
+              setTimeout(closePopup, 200);
               setTimeout(closePopup, 500);
-            }
+            }, 1000);
           </script>
         </body>
       </html>
