@@ -9,7 +9,7 @@ interface ResetPasswordInvalidProps {
 const ResetPasswordInvalid: React.FC<ResetPasswordInvalidProps> = ({ message }) => {
   return (
     <div style={{
-      minHeight: '100vh',
+      minHeight: '20vh',
       background: '#f8fafc',
       display: 'flex',
       alignItems: 'center',
