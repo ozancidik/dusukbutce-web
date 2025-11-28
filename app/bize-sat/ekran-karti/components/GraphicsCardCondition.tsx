@@ -234,13 +234,13 @@ export default function GraphicsCardCondition({
             marginBottom: '6px',
             position: 'relative'
           }}>
-            <label style={{
-              fontSize: '14px',
-              fontWeight: '500',
+          <label style={{
+            fontSize: '14px',
+            fontWeight: '500',
               color: '#374151'
-            }}>
-              Garanti Sticker'ı *
-            </label>
+          }}>
+            Garanti Sticker'ı *
+          </label>
             <div
               style={{
                 width: '18px',
