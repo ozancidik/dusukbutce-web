@@ -166,7 +166,7 @@ function ResetPasswordContent() {
   if (isCheckingToken) {
     return (
       <div style={{
-        minHeight: '100vh',
+        minHeight: '20vh',
         background: '#f8fafc',
         display: 'flex',
         alignItems: 'center',
@@ -193,10 +193,10 @@ function ResetPasswordContent() {
             animation: 'spin 1s linear infinite'
           }} />
           <h2 style={{ color: '#374151', margin: '0 0 16px 0' }}>
-            Token Doğrulanıyor...
+            Güvenlik Kontrolü Yapılıyor...
           </h2>
           <p style={{ color: '#6b7280', margin: 0 }}>
-            Lütfen bekleyin, şifre sıfırlama bağlantısı kontrol ediliyor.
+            Şifre sıfırlama bağlantınız güvenlik kontrolünden geçiriliyor. Lütfen kısa bir süre bekleyin.
           </p>
         </div>
       </div>
@@ -206,7 +206,7 @@ function ResetPasswordContent() {
   if (!isValidToken) {
     return (
       <div style={{
-        minHeight: '100vh',
+        minHeight: '20vh',
         background: '#f8fafc',
         display: 'flex',
         alignItems: 'center',
@@ -277,7 +277,7 @@ function ResetPasswordContent() {
   if (isSuccess) {
     return (
       <div style={{
-        minHeight: '100vh',
+        minHeight: '20vh',
         background: '#f8fafc',
         display: 'flex',
         alignItems: 'center',
@@ -691,7 +691,7 @@ export default function ResetPasswordPage() {
   return (
     <Suspense fallback={
       <div style={{
-        minHeight: '100vh',
+        minHeight: '20vh',
         background: '#f8fafc',
         display: 'flex',
         alignItems: 'center',
