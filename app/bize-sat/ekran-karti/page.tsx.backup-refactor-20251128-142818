@@ -4,9 +4,6 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '../../hooks/useAuth';
 import SubmissionPopup from '../../../components/SubmissionPopup';
 import LoginRequiredCard from '../components/LoginRequiredCard';
-import { compressImage } from '../utils/imageUtils';
-import { saveFormData, loadFormData, clearFormData } from '../utils/formHelpers';
-import { submitProductOffer } from '../utils/submissionHelper';
 
 export default function GraphicsCardPage() {
   const router = useRouter();
@@ -58,10 +55,18 @@ export default function GraphicsCardPage() {
     window.addEventListener('resize', checkMobile);
     
     // localStorage'dan kaydedilmiş form verilerini yükle
-    const savedFormData = loadFormData('graphicsCardFormData');
+    const savedFormData = localStorage.getItem('graphicsCardFormData');
     if (savedFormData) {
-      setFormData(savedFormData);
-      console.log('📝 Kaydedilmiş ekran kartı form verileri yüklendi');
+          // JWT token al
+    const token = localStorage.getItem('token');
+    
+    try {
+        const parsedData = JSON.parse(savedFormData);
+        setFormData(parsedData);
+        console.log('📝 Kaydedilmiş ekran kartı form verileri yüklendi');
+      } catch (error) {
+        console.error('Form verileri yüklenirken hata:', error);
+      }
     }
     
     return () => {
@@ -82,12 +87,56 @@ export default function GraphicsCardPage() {
       }
       
       // Form verilerini localStorage'a kaydet
-      saveFormData('graphicsCardFormData', newData);
+      localStorage.setItem('graphicsCardFormData', JSON.stringify(newData));
       
       return newData;
     });
   };
 
+  // Resim sıkıştırma fonksiyonu
+  const compressImage = (base64String: string): Promise<string> => {
+    try {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      return new Promise((resolve) => {
+        img.onload = () => {
+          // Maksimum boyutları belirle (daha yüksek çözünürlük için artırıldı)
+          const maxWidth = 1600;
+          const maxHeight = 1200;
+          
+          let { width, height } = img;
+          
+          // Boyutları orantılı olarak küçült
+          if (width > height) {
+            if (width > maxWidth) {
+              height = (height * maxWidth) / width;
+              width = maxWidth;
+            }
+          } else {
+            if (height > maxHeight) {
+              width = (width * maxHeight) / height;
+              height = maxHeight;
+            }
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          ctx?.drawImage(img, 0, 0, width, height);
+          
+          // Kaliteyi artır (0.9 = %90 kalite - daha net görüntü için)
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.9);
+          resolve(compressedBase64);
+        };
+        
+        img.src = base64String;
+      });
+    } catch (error) {
+      console.warn('Resim sıkıştırma hatası:', error);
+      return Promise.resolve(base64String);
+    }
+  };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -111,7 +160,11 @@ export default function GraphicsCardPage() {
                   };
                   
                   // Form verilerini localStorage'a kaydet
-                  saveFormData('graphicsCardFormData', newData);
+                  try {
+                    localStorage.setItem('graphicsCardFormData', JSON.stringify(newData));
+                  } catch (error) {
+                    console.warn('localStorage quota hatası, veriler kaydedilemedi:', error);
+                  }
                   
                   return newData;
                 });
@@ -135,7 +188,7 @@ export default function GraphicsCardPage() {
       };
       
       // Form verilerini localStorage'a kaydet
-      saveFormData('graphicsCardFormData', newData);
+      localStorage.setItem('graphicsCardFormData', JSON.stringify(newData));
       
       return newData;
     });
@@ -150,24 +203,43 @@ export default function GraphicsCardPage() {
 
     setIsSubmitting(true);
     try {
+      // JWT token al
       const token = localStorage.getItem('token');
+      console.log('📝 Form Data before submit:', formData);
       
-      const result = await submitProductOffer({
-        apiEndpoint: '/api/graphics-card-submissions',
-        category: 'graphics-card',
-        formData,
-        token,
-        successMessage: 'Ekran kartı ürününüz için teklif talebiniz alındı. En kısa sürede size dönüş yapacağız.',
-        localStorageKey: 'graphicsCardFormData'
+      // Timeout için AbortController kullan (MongoDB bağlantısı için yeterli süre)
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 120000); // 120 saniye timeout
+      
+      const response = await fetch('/api/graphics-card-submissions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` }),
+        },
+        body: JSON.stringify({
+          ...formData,
+          category: 'graphics-card',
+          cosmeticCondition: formData.cosmeticCondition || 'Mükemmel'
+        }),
+        signal: controller.signal
       });
 
-      if (result.success) {
+      clearTimeout(timeoutId);
+      console.log('📥 Response status:', response.status);
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('📥 Response data:', data);
+        
         setPopupType('success');
         setPopupTitle('Teklif Başarıyla Gönderildi!');
-        setPopupMessage(result.message || 'Ekran kartı ürününüz için teklif talebiniz alındı. En kısa sürede size dönüş yapacağız.');
+        setPopupMessage('Ekran kartı ürününüz için teklif talebiniz alındı. En kısa sürede size dönüş yapacağız.');
         setShowPopup(true);
         
-        // Form başarıyla gönderildikten sonra formu sıfırla
+        // Form başarıyla gönderildikten sonra localStorage'ı temizle
+        localStorage.removeItem('graphicsCardFormData');
+        
         setFormData({
           brand: '',
           chipSet: '',
@@ -195,16 +267,26 @@ export default function GraphicsCardPage() {
           images: []
         });
       } else {
+        const errorData = await response.json().catch(() => ({ message: 'Bilinmeyen hata' }));
+        console.error('❌ API Error:', errorData);
         setPopupType('error');
         setPopupTitle('Hata Oluştu');
-        setPopupMessage(result.message || 'Teklif talebiniz gönderilemedi. Lütfen tekrar deneyin.');
+        setPopupMessage(errorData.message || 'Teklif talebiniz gönderilemedi. Lütfen tekrar deneyin.');
         setShowPopup(true);
       }
     } catch (error: any) {
       console.error('❌ Submit Error:', error);
       setPopupType('error');
       setPopupTitle('Hata Oluştu');
-      setPopupMessage('Teklif talebiniz gönderilemedi. Lütfen tekrar deneyin.');
+      
+      if (error.name === 'AbortError') {
+        setPopupMessage('İstek zaman aşımına uğradı. Lütfen tekrar deneyin.');
+      } else if (error.message) {
+        setPopupMessage(error.message);
+      } else {
+        setPopupMessage('Teklif talebiniz gönderilemedi. Lütfen tekrar deneyin.');
+      }
+      
       setShowPopup(true);
     } finally {
       setIsSubmitting(false);

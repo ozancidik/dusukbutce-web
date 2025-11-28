@@ -4,6 +4,9 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '../../hooks/useAuth';
 import SubmissionPopup from '../../../components/SubmissionPopup';
 import LoginRequiredCard from '../components/LoginRequiredCard';
+import { compressImage } from '../utils/imageUtils';
+import { saveFormData, loadFormData, clearFormData } from '../utils/formHelpers';
+import { submitProductOffer } from '../utils/submissionHelper';
 
 export default function NotebookPage() {
   const router = useRouter();
@@ -53,24 +56,10 @@ export default function NotebookPage() {
     window.addEventListener('resize', checkMobile);
     
     // localStorage'dan kaydedilmiş form verilerini yükle
-        // JWT token al
-    const token = localStorage.getItem('token');
-    
-    try {
-      const savedFormData = localStorage.getItem('notebookFormData');
-      if (savedFormData) {
-        const parsedData = JSON.parse(savedFormData);
-        setFormData(parsedData);
-        console.log('📝 Kaydedilmiş form verileri yüklendi');
-      }
-    } catch (error) {
-      console.warn('localStorage\'dan veri yüklenirken hata:', error);
-      // localStorage'ı temizle
-      try {
-        localStorage.removeItem('notebookFormData');
-      } catch (innerError) {
-        console.error('localStorage temizlenemedi:', innerError);
-      }
+    const savedFormData = loadFormData('notebookFormData');
+    if (savedFormData) {
+      setFormData(savedFormData);
+      console.log('📝 Kaydedilmiş form verileri yüklendi');
     }
     
     return () => {
@@ -86,19 +75,8 @@ export default function NotebookPage() {
         [field]: value
       };
       
-      // Form verilerini localStorage'a kaydet (hata yakalama ile)
-      try {
-        localStorage.setItem('notebookFormData', JSON.stringify(newData));
-      } catch (error) {
-        console.warn('localStorage quota hatası, veriler kaydedilemedi:', error);
-        // Resimleri olmadan kaydetmeyi dene
-        const dataWithoutImages = { ...newData, images: [] };
-        try {
-          localStorage.setItem('notebookFormData', JSON.stringify(dataWithoutImages));
-        } catch (innerError) {
-          console.error('localStorage tamamen dolu:', innerError);
-        }
-      }
+      // Form verilerini localStorage'a kaydet
+      saveFormData('notebookFormData', newData);
       
       return newData;
     });
@@ -132,19 +110,8 @@ export default function NotebookPage() {
                     images: [...prev.images, ...newImages]
                   };
                   
-                  // Form verilerini localStorage'a kaydet (hata yakalama ile)
-                  try {
-                    localStorage.setItem('notebookFormData', JSON.stringify(newData));
-                  } catch (error) {
-                    console.warn('localStorage quota hatası, veriler kaydedilemedi:', error);
-                    // Eski resimleri temizle
-                    const dataWithoutImages = { ...newData, images: [] };
-                    try {
-                      localStorage.setItem('notebookFormData', JSON.stringify(dataWithoutImages));
-                    } catch (innerError) {
-                      console.error('localStorage tamamen dolu:', innerError);
-                    }
-                  }
+                  // Form verilerini localStorage'a kaydet
+                  saveFormData('notebookFormData', newData);
                   
                   return newData;
                 });
@@ -161,53 +128,6 @@ export default function NotebookPage() {
     }
   };
 
-  // Resim sıkıştırma fonksiyonu
-  const compressImage = (base64String: string): Promise<string> => {
-    try {
-      // Canvas kullanarak resmi sıkıştır
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      const img = new Image();
-      
-      return new Promise((resolve) => {
-        img.onload = () => {
-          // Maksimum boyutları belirle (daha yüksek çözünürlük için artırıldı)
-          const maxWidth = 1600;
-          const maxHeight = 1200;
-          
-          let { width, height } = img;
-          
-          // Boyutları orantılı olarak küçült
-          if (width > height) {
-            if (width > maxWidth) {
-              height = (height * maxWidth) / width;
-              width = maxWidth;
-            }
-          } else {
-            if (height > maxHeight) {
-              width = (width * maxHeight) / height;
-              height = maxHeight;
-            }
-          }
-          
-          canvas.width = width;
-          canvas.height = height;
-          
-          // Resmi çiz ve sıkıştır
-          ctx?.drawImage(img, 0, 0, width, height);
-          
-          // Kaliteyi artır (0.9 = %90 kalite - daha net görüntü için)
-          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.9);
-          resolve(compressedBase64);
-        };
-        
-        img.src = base64String;
-      });
-    } catch (error) {
-      console.warn('Resim sıkıştırma hatası:', error);
-      return Promise.resolve(base64String); // Hata durumunda orijinal resmi döndür
-    }
-  };
 
   const removeImage = (index: number) => {
     setFormData(prev => {
@@ -216,19 +136,8 @@ export default function NotebookPage() {
         images: prev.images.filter((_, i) => i !== index)
       };
       
-      // Form verilerini localStorage'a kaydet (hata yakalama ile)
-      try {
-        localStorage.setItem('notebookFormData', JSON.stringify(newData));
-      } catch (error) {
-        console.warn('localStorage quota hatası, veriler kaydedilemedi:', error);
-        // Resimleri olmadan kaydetmeyi dene
-        const dataWithoutImages = { ...newData, images: [] };
-        try {
-          localStorage.setItem('notebookFormData', JSON.stringify(dataWithoutImages));
-        } catch (innerError) {
-          console.error('localStorage tamamen dolu:', innerError);
-        }
-      }
+      // Form verilerini localStorage'a kaydet
+      saveFormData('notebookFormData', newData);
       
       return newData;
     });
@@ -244,7 +153,6 @@ export default function NotebookPage() {
     console.log('⏱️ Başlangıç zamanı:', new Date().toISOString());
 
     try {
-      // JWT token al
       const token = localStorage.getItem('token');
       console.log('📝 Form Data before submit:', formData);
       console.log('🔍 Dropdown values:', {
@@ -255,17 +163,14 @@ export default function NotebookPage() {
       });
       
       const requestStartTime = performance.now();
-      const response = await fetch('/api/notebook-submissions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token && { 'Authorization': `Bearer ${token}` }),
-        },
-        body: JSON.stringify({
-          ...formData,
-          category: 'notebook',
-          cosmeticCondition: formData.cosmeticCondition || 'Mükemmel'
-        }),
+      
+      const result = await submitProductOffer({
+        apiEndpoint: '/api/notebook-submissions',
+        category: 'notebook',
+        formData,
+        token,
+        successMessage: 'Notebook bilgisayarınız için teklif talebiniz alındı. En kısa sürede size dönüş yapacağız.',
+        localStorageKey: 'notebookFormData'
       });
 
       const requestEndTime = performance.now();
@@ -275,30 +180,15 @@ export default function NotebookPage() {
       console.log('✅ API Response alındı!');
       console.log('⏱️ API İstek Süresi:', requestDuration, 'saniye');
       console.log('⏱️ Toplam İşlem Süresi:', totalDuration, 'saniye');
-      console.log('📊 Response Status:', response.status, response.statusText);
-      
-      // Response boyutunu hesapla (eğer mevcutsa)
-      const responseText = await response.text();
-      const responseSize = new Blob([responseText]).size;
-      console.log('📦 Response Boyutu:', (responseSize / 1024).toFixed(2), 'KB');
 
-      let responseData;
-      try {
-        responseData = JSON.parse(responseText);
-      } catch (parseError) {
-        console.warn('⚠️ Response JSON parse edilemedi:', parseError);
-      }
-
-      if (response.ok) {
-        console.log('✅ İşlem başarılı! Response:', responseData);
+      if (result.success) {
+        console.log('✅ İşlem başarılı! Response:', result.data);
         setPopupType('success');
         setPopupTitle('Teklif Başarıyla Gönderildi!');
-        setPopupMessage('Notebook bilgisayarınız için teklif talebiniz alındı. En kısa sürede size dönüş yapacağız.');
+        setPopupMessage(result.message || 'Notebook bilgisayarınız için teklif talebiniz alındı. En kısa sürede size dönüş yapacağız.');
         setShowPopup(true);
         
-        // Form başarıyla gönderildikten sonra localStorage'ı temizle
-        localStorage.removeItem('notebookFormData');
-        
+        // Form başarıyla gönderildikten sonra formu sıfırla
         setFormData({
           brand: '',
           model: '',
@@ -327,10 +217,10 @@ export default function NotebookPage() {
         const errorDuration = ((performance.now() - startTime) / 1000).toFixed(2);
         console.error('❌ İşlem başarısız!');
         console.error('⏱️ Hata Süresi:', errorDuration, 'saniye');
-        console.error('📊 Response Data:', responseData || responseText);
+        console.error('📊 Response Data:', result.error);
         setPopupType('error');
         setPopupTitle('Hata Oluştu');
-        setPopupMessage('Teklif talebiniz gönderilemedi. Lütfen tekrar deneyin.');
+        setPopupMessage(result.message || 'Teklif talebiniz gönderilemedi. Lütfen tekrar deneyin.');
         setShowPopup(true);
       }
     } catch (error) {

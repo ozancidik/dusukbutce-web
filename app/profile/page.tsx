@@ -777,7 +777,7 @@ export default function ProfilePage() {
       const birthDateEditedFromStorage = localStorage.getItem('birthDateEdited') === 'true' || 
                                           sessionStorage.getItem('birthDateEdited') === 'true';
       const birthDateEditedFromUserInfo = (userInfo as any)?.birthDateEdited === true;
-      const canEdit = isBirthDateEditable();
+      const canEdit = isBirthDateEditable(userInfo);
       
       console.log('🔍 handleSave: Doğum tarihi kontrolü:');
       console.log('🔍 canEditBirthDate state:', canEditBirthDate);

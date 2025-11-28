@@ -41,9 +41,14 @@ export default function HomePage() {
   const [startX, setStartX] = useState(0);
   const [currentX, setCurrentX] = useState(0);
   const [dragOffset, setDragOffset] = useState(0);
+  const [isIPhoneSE, setIsIPhoneSE] = useState(false);
+  const [isIPadPro, setIsIPadPro] = useState(false);
+  const [isIPadAir, setIsIPadAir] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {
+      if (typeof window === 'undefined') return;
+      
       const width = window.innerWidth;
       const height = window.innerHeight;
       
@@ -52,6 +57,15 @@ export default function HomePage() {
       
       // 1024px ve altı veya tablet boyutları için mobile layout
       setIsMobile(width <= 1024 || isTablet);
+      
+      // iPhone SE için özel kontrol
+      setIsIPhoneSE(width === 375 && height === 667);
+      
+      // iPad Pro (1024x1366) için özel kontrol
+      setIsIPadPro(width === 1024 && height === 1366);
+      
+      // iPad Air (820x1180) için özel kontrol
+      setIsIPadAir(width === 820 && height === 1180);
     };
     
     checkMobile();
@@ -69,15 +83,6 @@ export default function HomePage() {
       window.removeEventListener('resize', checkMobile);
     };
   }, [isDragging]);
-
-  // iPhone SE için özel kontrol
-  const isIPhoneSE = isMobile && window.innerWidth === 375 && window.innerHeight === 667;
-  
-  // iPad Pro (1024x1366) için özel kontrol
-  const isIPadPro = isMobile && window.innerWidth === 1024 && window.innerHeight === 1366;
-  
-  // iPad Air (820x1180) için özel kontrol
-  const isIPadAir = isMobile && window.innerWidth === 820 && window.innerHeight === 1180;
 
 
   // Slider fonksiyonları

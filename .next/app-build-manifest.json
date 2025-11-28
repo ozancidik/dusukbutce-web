@@ -11,40 +11,40 @@
       "static/chunks/main-app.js",
       "static/chunks/app/not-found.js"
     ],
-    "/tekliflerim/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/tekliflerim/page.js"
-    ],
     "/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/page.js"
+    ],
+    "/sifremi-unuttum/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/sifremi-unuttum/page.js"
     ],
     "/icon/route": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/icon/route.js"
     ],
-    "/api/submissions/route": [
+    "/api/auth/forgot-password/route": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/api/submissions/route.js"
+      "static/chunks/app/api/auth/forgot-password/route.js"
     ],
-    "/profile/page": [
+    "/teknik-servis/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/profile/page.js"
+      "static/chunks/app/teknik-servis/page.js"
     ],
-    "/api/auth/update-profile/route": [
+    "/login/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/api/auth/update-profile/route.js"
+      "static/chunks/app/login/page.js"
     ],
-    "/sifre-degistir/page": [
+    "/api/auth/csrf-token/route": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/sifre-degistir/page.js"
+      "static/chunks/app/api/auth/csrf-token/route.js"
     ]
   }
 }
