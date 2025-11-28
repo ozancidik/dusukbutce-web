@@ -77,10 +77,14 @@ function getTransporter(): nodemailer.Transporter | null {
       user: gmailUser,
       pass: gmailPassword
     },
-    // Daha kısa timeout'lar - hızlı hata dönüşü için
-    connectionTimeout: 5000,
-    greetingTimeout: 5000,
-    socketTimeout: 5000
+    // Production ortamında daha uzun timeout'lar (Vercel serverless için)
+    connectionTimeout: process.env.NODE_ENV === 'production' ? 30000 : 10000,
+    greetingTimeout: process.env.NODE_ENV === 'production' ? 30000 : 10000,
+    socketTimeout: process.env.NODE_ENV === 'production' ? 30000 : 10000,
+    // Retry mekanizması
+    pool: true,
+    maxConnections: 1,
+    maxMessages: 3
   });
 
   return cachedTransporter;
@@ -187,7 +191,7 @@ Düşük Bütçe Destek Ekibi`,
       `
     };
 
-    // E-postayı gönder
+    // E-postayı gönder (retry mekanizması ile)
     console.log('📤 Email gönderiliyor...');
     console.log('📧 Mail options:', {
       from: mailOptions.from,
@@ -196,12 +200,48 @@ Düşük Bütçe Destek Ekibi`,
       resetUrl: resetUrl.substring(0, 50) + '...'
     });
     
-    const info = await transporter.sendMail(mailOptions);
-    console.log('✅ Şifre sıfırlama e-postası başarıyla gönderildi!');
-    console.log('📬 Message ID:', info.messageId);
-    console.log('📧 Gönderen:', gmailUser);
-    console.log('📧 Alıcı:', email);
-    return true;
+    // Retry mekanizması - 3 deneme
+    let lastError: any = null;
+    const maxRetries = 3;
+    const retryDelay = 2000; // 2 saniye
+    
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        console.log(`📤 Email gönderme denemesi ${attempt}/${maxRetries}...`);
+        const info = await transporter.sendMail(mailOptions);
+        console.log('✅ Şifre sıfırlama e-postası başarıyla gönderildi!');
+        console.log('📬 Message ID:', info.messageId);
+        console.log('📧 Gönderen:', gmailUser);
+        console.log('📧 Alıcı:', email);
+        return true;
+      } catch (error: any) {
+        lastError = error;
+        console.error(`❌ Email gönderme denemesi ${attempt}/${maxRetries} başarısız:`, error.message);
+        
+        // Timeout hatası ise retry yap
+        if (error.code === 'ETIMEDOUT' || error.code === 'ECONNRESET' || error.code === 'ESOCKETTIMEDOUT') {
+          if (attempt < maxRetries) {
+            console.log(`⏳ ${retryDelay}ms sonra tekrar denenecek...`);
+            await new Promise(resolve => setTimeout(resolve, retryDelay));
+            // Transporter cache'i temizle ve yeniden oluştur
+            cachedTransporter = null;
+            const newTransporter = getTransporter();
+            if (!newTransporter) {
+              console.error('❌ Yeni transporter oluşturulamadı!');
+              break;
+            }
+            continue;
+          }
+        } else {
+          // Timeout dışı hata ise retry yapma
+          throw error;
+        }
+      }
+    }
+    
+    // Tüm denemeler başarısız
+    console.error('❌ Email gönderme tüm denemeler başarısız oldu:', lastError);
+    throw lastError;
 
   } catch (error: any) {
     console.error('❌ Şifre sıfırlama e-postası gönderim hatası:', error);

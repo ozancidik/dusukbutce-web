@@ -1,9 +1,4 @@
 {
-  "/api/auth/forgot-password/route": "app/api/auth/forgot-password/route.js",
-  "/icon/route": "app/icon/route.js",
-  "/api/auth/csrf-token/route": "app/api/auth/csrf-token/route.js",
   "/sifremi-unuttum/page": "app/sifremi-unuttum/page.js",
-  "/page": "app/page.js",
-  "/teknik-servis/page": "app/teknik-servis/page.js",
   "/login/page": "app/login/page.js"
 }
