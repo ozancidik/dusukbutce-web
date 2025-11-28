@@ -1,5 +1,6 @@
 {
-  "/api/auth/google/route": "app/api/auth/google/route.js",
-  "/api/auth/google/callback/route": "app/api/auth/google/callback/route.js",
-  "/login/page": "app/login/page.js"
+  "/icon/route": "app/icon/route.js",
+  "/api/submissions/route": "app/api/submissions/route.js",
+  "/tekliflerim/page": "app/tekliflerim/page.js",
+  "/page": "app/page.js"
 }

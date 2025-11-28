@@ -11,30 +11,25 @@
       "static/chunks/main-app.js",
       "static/chunks/app/not-found.js"
     ],
-    "/login/page": [
+    "/tekliflerim/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/login/page.js"
+      "static/chunks/app/tekliflerim/page.js"
     ],
-    "/api/auth/csrf-token/route": [
+    "/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/api/auth/csrf-token/route.js"
+      "static/chunks/app/page.js"
     ],
     "/icon/route": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/icon/route.js"
     ],
-    "/api/auth/google/route": [
+    "/api/submissions/route": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/api/auth/google/route.js"
-    ],
-    "/api/auth/google/callback/route": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/api/auth/google/callback/route.js"
+      "static/chunks/app/api/submissions/route.js"
     ]
   }
 }

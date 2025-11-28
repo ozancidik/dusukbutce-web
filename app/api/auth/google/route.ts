@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     }
   } else if (!baseUrl || baseUrl.includes('localhost')) {
     // NEXT_PUBLIC_SITE_URL yoksa veya localhost içeriyorsa
-    const isLocalhost = request.headers.get('host')?.includes('localhost');
+  const isLocalhost = request.headers.get('host')?.includes('localhost');
     if (isLocalhost) {
       baseUrl = 'http://localhost:3000';
     } else if (process.env.VERCEL_URL) {
