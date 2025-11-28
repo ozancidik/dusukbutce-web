@@ -8,9 +8,9 @@ const ResetPasswordSuccess: React.FC = () => {
       minHeight: '20vh',
       background: '#f8fafc',
       display: 'flex',
-      alignItems: 'center',
+      alignItems: 'flex-start',
       justifyContent: 'center',
-      padding: '20px',
+      padding: '40px 20px',
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
     }}>
       <div style={{
