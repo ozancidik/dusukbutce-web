@@ -4,19 +4,18 @@ import Link from 'next/link';
 
 interface ProfileNavigationProps {
   isMobile: boolean;
+  isAdmin?: boolean;
 }
 
-export default function ProfileNavigation({ isMobile }: ProfileNavigationProps) {
+export default function ProfileNavigation({ isMobile, isAdmin = false }: ProfileNavigationProps) {
   const menuItems = [
-    { href: "/orders", icon: "📦", text: "Siparişlerim" },
-    { href: "/tekliflerim", icon: "💰", text: "Tekliflerim" },
-    { href: "/iptal-iade-islemlerim", icon: "🔄", text: "İptal/İade İşlemlerim" },
     { href: "/adreslerim", icon: "📍", text: "Adreslerim" },
-    { href: "/banka-hesaplari", icon: "🏦", text: "Banka Hesaplarım" },
-    { href: "/bildirimler", icon: "🔔", text: "Bildirimlerim" },
-    { href: "/favoriler", icon: "❤️", text: "Favorilerim" },
-    { href: "/sifre-degistir", icon: "🔒", text: "Şifre Değiştir" },
-    { href: "/veri-silme", icon: "🗑️", text: "Veri Silme" }
+    { href: "/sifre-degistir", icon: "🔐", text: "Şifre Değiştir" },
+    { href: "/siparisler", icon: "📦", text: "Siparişlerim" },
+    { href: "/tekliflerim", icon: "💰", text: "Tekliflerim" },
+    { href: "/iptal-iade-islemlerim", icon: "🔄", text: "İptal ve İade İşlemlerim" },
+    { href: "/bildirimler", icon: "🔔", text: "Bildirimler" },
+    ...(isAdmin ? [{ href: "/admin", icon: "⚙️", text: "Admin Paneli" }] : [])
   ];
 
   return (

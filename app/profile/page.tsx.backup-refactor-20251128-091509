@@ -2,15 +2,12 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { safeDecodeName, formatPhoneNumber, isBirthDateEditable } from "./utils/helpers";
-import ProfileHeader from "./components/ProfileHeader";
-import ProfileDisplay from "./components/ProfileDisplay";
-import ProfileForm from "./components/ProfileForm";
-import ProfileNavigation from "./components/ProfileNavigation";
-import ProfileActions from "./components/ProfileActions";
-import ProfileModals from "./components/ProfileModals";
 
 export default function ProfilePage() {
+  console.log('🔍 ProfilePage component loaded!');
+  console.log('🔍 React version:', React.version);
+  console.log('🔍 useState available:', typeof useState);
+  
   const [userInfo, setUserInfo] = useState<any>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -20,8 +17,6 @@ export default function ProfilePage() {
   const [emailVerificationCode, setEmailVerificationCode] = useState('');
   const [isCodeInvalid, setIsCodeInvalid] = useState(false);
   const [isVerifyingEmail, setIsVerifyingEmail] = useState(false);
-  const [isSendingCode, setIsSendingCode] = useState(false);
-  const [isCodeSent, setIsCodeSent] = useState(false);
   const [originalEmail, setOriginalEmail] = useState('');
   const [editForm, setEditForm] = useState({
     firstName: '',
@@ -49,6 +44,108 @@ export default function ProfilePage() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // Güvenli Türkçe karakter decode fonksiyonu
+  const safeDecodeName = (name: string): string => {
+    if (!name) return '';
+    
+    // Eğer isim zaten düzeltilmişse (Türkçe karakterler doğru), direkt döndür
+    if (!name.includes('Ä±') && !name.includes('Ä°') && !name.includes('Ä±')) {
+      return name;
+    }
+    
+    try {
+      // Sadece bozuk karakterler varsa decode et
+      return decodeURIComponent(escape(name));
+    } catch (error) {
+      console.warn('Karakter decode hatası:', error);
+      // Hata durumunda orijinal ismi döndür
+      return name;
+    }
+  };
+
+  // Telefon numarasını formatlayan yardımcı fonksiyon
+  const formatPhoneNumber = (phone: string): string => {
+    if (!phone) return '';
+    
+    // Sadece rakamları al
+    let digits = phone.replace(/\D/g, '');
+    
+    if (digits.length === 0) return '';
+    
+    // Eğer 0 ile başlıyorsa (05123543233), 0'ı kaldır
+    if (digits.startsWith('0')) {
+      digits = digits.substring(1);
+    }
+    
+    // (5xx) xxx xx xx formatına çevir
+    let formattedValue = '';
+    
+    if (digits.length > 0) {
+      // İlk rakam 5 olmalı
+      if (digits[0] !== '5') {
+        return '';
+      }
+      
+      formattedValue = '(' + digits.substring(0, 3);
+      
+      if (digits.length > 3) {
+        formattedValue += ') ' + digits.substring(3, 6);
+      }
+      
+      if (digits.length > 6) {
+        formattedValue += ' ' + digits.substring(6, 8);
+      }
+      
+      if (digits.length > 8) {
+        formattedValue += ' ' + digits.substring(8, 10);
+      }
+    }
+    
+    return formattedValue;
+  };
+
+  // Doğum tarihi düzenlenebilir mi kontrol fonksiyonu
+  const isBirthDateEditable = (): boolean => {
+    // userInfo yoksa, düzenlenemez
+    if (!userInfo) {
+      return false;
+    }
+    
+    // Çoklu kontrol: userInfo.birthDateEdited, localStorage, authProviders, birthDate
+    const birthDateEditedFromStorage = localStorage.getItem('birthDateEdited') === 'true' || 
+                                        sessionStorage.getItem('birthDateEdited') === 'true';
+    const birthDateEditedFromUserInfo = (userInfo as any)?.birthDateEdited === true;
+    const birthDate = (userInfo as any)?.birthDate || '';
+    
+    // OAuth kullanıcısı kontrolü (authProviders'dan)
+    const authProviders = (userInfo as any)?.authProviders || [];
+    const hasSocialProvider = authProviders.some((provider: any) => 
+      provider.provider === 'google' || provider.provider === 'facebook'
+    );
+    const hasLocalProvider = authProviders.some((provider: any) => 
+      provider.provider === 'local'
+    );
+    
+    // Local authentication kullanıcıları için doğum tarihi düzenlenemez
+    if (hasLocalProvider) {
+      return false;
+    }
+    
+    // Eğer OAuth kullanıcısı ise ve zaten bir doğum tarihi varsa, düzenlenemez (migration için)
+    // Bu, eski kayıtlar için geçerli - zaten bir doğum tarihi varsa, artık düzenlenemez
+    if (hasSocialProvider && birthDate && !hasLocalProvider) {
+      console.log('🔒 isBirthDateEditable: OAuth kullanıcısı ve zaten doğum tarihi var, düzenlenemez');
+      return false;
+    }
+    
+    // Eğer herhangi biri true ise, düzenlenemez
+    if (birthDateEditedFromUserInfo || birthDateEditedFromStorage) {
+      return false;
+    }
+    
+    // Sadece OAuth kullanıcıları, daha önce düzenlenmemişse ve doğum tarihi yoksa düzenlenebilir
+    return hasSocialProvider && !birthDateEditedFromUserInfo && !birthDateEditedFromStorage && !birthDate;
+  };
 
   // Kullanıcı verilerini yükleme fonksiyonu
   const loadUserData = async () => {
@@ -152,6 +249,15 @@ export default function ProfilePage() {
         // 3. Sosyal medya + daha önce düzenlenmişse → düzenlenemez
         // 4. Sosyal medya + zaten bir doğum tarihi varsa → düzenlenemez (migration)
         const canEdit = hasSocialProvider && !birthDateEdited && !birthDate;
+        
+        console.log('🔍 Doğum tarihi düzenleme kontrolü:');
+        console.log('🔍 authProviders:', authProviders);
+        console.log('🔍 hasSocialProvider:', hasSocialProvider);
+        console.log('🔍 hasLocalProvider:', hasLocalProvider);
+        console.log('🔍 birthDateEdited:', birthDateEdited);
+        console.log('🔍 birthDate:', birthDate);
+        console.log('🔍 canEditBirthDate:', canEdit);
+        console.log('🔍 userData.birthDate:', userData.birthDate);
         
         setIsSocialLogin(hasSocialProvider);
         setCanEditBirthDate(canEdit);
@@ -388,13 +494,7 @@ export default function ProfilePage() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     
-    if (name === 'emailVerificationCode') {
-      const numericValue = value.replace(/\D/g, '').slice(0, 6);
-      setEmailVerificationCode(numericValue);
-      if (isCodeInvalid) {
-        setIsCodeInvalid(false);
-      }
-    } else if (name === 'firstName' || name === 'lastName') {
+    if (name === 'firstName' || name === 'lastName') {
       // Sadece Türkçe harfler, boşluk ve tire (-) karakterine izin ver
       const nameRegex = /^[a-zA-ZğüşıöçĞÜŞİÖÇ\s-]*$/;
       
@@ -407,21 +507,46 @@ export default function ProfilePage() {
       const emailRegex = /^[a-zA-Z0-9@._-]*$/;
       if (emailRegex.test(value) || value === '') {
         setEditForm({ ...editForm, [name]: value.toLowerCase() });
-        // Email değişikliğini tespit et
-        const isChanged = value.toLowerCase() !== originalEmail;
-        setIsEmailChanged(isChanged);
-        setIsCodeSent(false);
-        if (!isChanged) {
-          setEmailVerificationCode('');
-        }
       }
     } else if (name === 'phone') {
-      // Telefon numarası formatlama
-      const formatted = formatPhoneNumber(value);
-      setEditForm({ ...editForm, [name]: formatted });
+      // Sadece rakam, parantez ve boşluk karakterlerine izin ver
+      const phoneRegex = /^[0-9\s\(\)]*$/;
+      if (phoneRegex.test(value)) {
+        // Sadece rakamları al
+        let digits = value.replace(/\s/g, '').replace(/[\(\)]/g, '');
+        
+        // Maksimum 10 rakam (alan kodu + 7 rakam)
+        digits = digits.substring(0, 10);
+        
+        let formattedValue = '';
+        
+        if (digits.length > 0) {
+          // İlk rakam 5 olmalı
+          if (digits.length > 0 && digits[0] !== '5') {
+            return; // 5 ile başlamıyorsa güncelleme yapma
+          }
+          
+          // (5xx) xxx xx xx formatına çevir
+          formattedValue = '(' + digits.substring(0, 3);
+          
+          if (digits.length > 3) {
+            formattedValue += ') ' + digits.substring(3, 6);
+          }
+          
+          if (digits.length > 6) {
+            formattedValue += ' ' + digits.substring(6, 8);
+          }
+          
+          if (digits.length > 8) {
+            formattedValue += ' ' + digits.substring(8, 10);
+          }
+        }
+        
+        setEditForm({ ...editForm, [name]: formattedValue });
+      }
     } else if (name === 'birthDate') {
       // Doğum tarihi düzenlenebilir mi kontrol et
-      if (!isBirthDateEditable(userInfo)) {
+      if (!isBirthDateEditable()) {
         return; // Düzenlenemezse, değişiklik yapma
       }
       // Doğum tarihi için sadece geçerli tarih formatına izin ver
@@ -430,9 +555,30 @@ export default function ProfilePage() {
       }
     } else {
       setEditForm({ ...editForm, [name]: value });
+      
+      // Email değişikliğini tespit et
+      if (name === 'email') {
+        const isChanged = value !== originalEmail;
+        setIsEmailChanged(isChanged);
+        if (!isChanged) {
+          setEmailVerificationCode('');
+        }
+      }
     }
   };
 
+  const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    
+    // Sadece rakam girişine izin ver ve maksimum 6 karakter
+    const numericValue = value.replace(/\D/g, '').slice(0, 6);
+    setEmailVerificationCode(numericValue);
+    
+    // Kod değiştiğinde hata durumunu sıfırla
+    if (isCodeInvalid) {
+      setIsCodeInvalid(false);
+    }
+  };
 
   const handleSendEmailVerification = async () => {
     if (!editForm.email || editForm.email === originalEmail) {
@@ -441,7 +587,7 @@ export default function ProfilePage() {
       return;
     }
 
-    setIsSendingCode(true);
+    setIsVerifyingEmail(true);
     setMessage('');
 
     try {
@@ -460,7 +606,6 @@ export default function ProfilePage() {
         setMessage('Doğrulama kodu yeni email adresinize gönderildi. Lütfen kodu girin.');
         setMessageType('success');
         setIsEmailChanged(true);
-        setIsCodeSent(true);
       } else {
         setMessage(data.error || 'Doğrulama kodu gönderilemedi.');
         setMessageType('error');
@@ -469,7 +614,7 @@ export default function ProfilePage() {
       setMessage('Bağlantı hatası oluştu.');
       setMessageType('error');
     } finally {
-      setIsSendingCode(false);
+      setIsVerifyingEmail(false);
     }
   };
 
@@ -605,7 +750,6 @@ export default function ProfilePage() {
   const handleCancel = () => {
     setIsEditing(false);
     setIsEmailChanged(false);
-    setIsCodeSent(false);
     setEmailVerificationCode('');
     setIsCodeInvalid(false);
     if (!userInfo) return;
@@ -618,7 +762,6 @@ export default function ProfilePage() {
       phone: formatPhoneNumber(userInfo.phone || ''),
       birthDate: userInfo.birthDate || ''
     });
-    setOriginalEmail(userInfo.email || '');
   };
 
 
@@ -1142,7 +1285,210 @@ export default function ProfilePage() {
                 Panelim
               </h3>
             </div>
-            <ProfileNavigation isMobile={isMobile} isAdmin={userInfo.isAdmin} />
+            
+            {/* Menü Öğeleri */}
+            <div style={{ 
+              display: 'flex',
+              flexDirection: 'column'
+            }}>
+              <Link href="/adreslerim" style={{ textDecoration: 'none' }}>
+                <div style={{ 
+                  padding: isMobile ? '12px 20px' : '16px 24px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  borderBottom: '1px solid #f1f5f9',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#f8fafc';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                }}
+                >
+                  <div style={{ fontSize: '18px' }}>📍</div>
+                  <span style={{ 
+                    color: '#1e293b', 
+                    fontSize: isMobile ? '14px' : '15px',
+                    fontWeight: '500'
+                  }}>
+                    Adreslerim
+                  </span>
+                </div>
+              </Link>
+
+              <Link href="/sifre-degistir" style={{ textDecoration: 'none' }}>
+                <div style={{ 
+                  padding: isMobile ? '12px 20px' : '16px 24px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  borderBottom: '1px solid #f1f5f9',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#f8fafc';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                }}
+                >
+                  <div style={{ fontSize: '18px' }}>🔐</div>
+                  <span style={{ 
+                    color: '#1e293b', 
+                    fontSize: isMobile ? '14px' : '15px',
+                    fontWeight: '500'
+                  }}>
+                    Şifre Değiştir
+                  </span>
+                </div>
+              </Link>
+
+              <Link href="/siparisler" style={{ textDecoration: 'none' }}>
+                <div style={{ 
+                  padding: isMobile ? '12px 20px' : '16px 24px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  borderBottom: '1px solid #f1f5f9',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#f8fafc';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                }}
+                >
+                  <div style={{ fontSize: '18px' }}>📦</div>
+                  <span style={{ 
+                    color: '#1e293b', 
+                    fontSize: isMobile ? '14px' : '15px',
+                    fontWeight: '500'
+                  }}>
+                    Siparişlerim
+                  </span>
+                </div>
+              </Link>
+
+              <Link href="/tekliflerim" style={{ textDecoration: 'none' }}>
+                <div style={{ 
+                  padding: isMobile ? '12px 20px' : '16px 24px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  borderBottom: '1px solid #f1f5f9',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#f8fafc';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                }}
+                >
+                  <div style={{ fontSize: '18px' }}>💰</div>
+                  <span style={{ 
+                    color: '#1e293b', 
+                    fontSize: isMobile ? '14px' : '15px',
+                    fontWeight: '500'
+                  }}>
+                    Tekliflerim
+                  </span>
+                </div>
+              </Link>
+
+              <Link href="/iptal-iade-islemlerim" style={{ textDecoration: 'none' }}>
+                <div style={{ 
+                  padding: isMobile ? '12px 20px' : '16px 24px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  borderBottom: '1px solid #f1f5f9',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#f8fafc';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                }}
+                >
+                  <div style={{ fontSize: '18px' }}>🔄</div>
+                  <span style={{ 
+                    color: '#1e293b', 
+                    fontSize: isMobile ? '14px' : '15px',
+                    fontWeight: '500'
+                  }}>
+                    İptal ve İade İşlemlerim
+                  </span>
+                </div>
+              </Link>
+
+              <Link href="/bildirimler" style={{ textDecoration: 'none' }}>
+                <div style={{ 
+                  padding: isMobile ? '12px 20px' : '16px 24px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  borderBottom: '1px solid #f1f5f9',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#f8fafc';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                }}
+                >
+                  <div style={{ fontSize: '18px' }}>🔔</div>
+                  <span style={{ 
+                    color: '#1e293b', 
+                    fontSize: isMobile ? '14px' : '15px',
+                    fontWeight: '500'
+                  }}>
+                    Bildirimler
+                  </span>
+                </div>
+              </Link>
+
+              {userInfo.isAdmin && (
+                <Link href="/admin" style={{ textDecoration: 'none' }}>
+                  <div style={{ 
+                    padding: isMobile ? '12px 20px' : '16px 24px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    borderBottom: '1px solid #f1f5f9',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = '#f8fafc';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'transparent';
+                  }}
+                  >
+                    <div style={{ fontSize: '18px' }}>⚙️</div>
+                    <span style={{ 
+                      color: '#1e293b', 
+                      fontSize: isMobile ? '14px' : '15px',
+                      fontWeight: '500'
+                    }}>
+                      Admin Paneli
+                    </span>
+                  </div>
+                </Link>
+              )}
+            </div>
           </div>
         </div>
 
@@ -1160,60 +1506,465 @@ export default function ProfilePage() {
           marginBottom: '24px'
         }}>
           {/* Profil Header */}
-          <ProfileHeader userInfo={userInfo} isMobile={isMobile} safeDecodeName={safeDecodeName} />
+          <div style={{ 
+            background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+            padding: isMobile ? '24px 16px' : '32px',
+            textAlign: 'center',
+            color: 'white'
+          }}>
+            <div style={{ 
+              width: '80px', 
+              height: '80px', 
+              borderRadius: '50%', 
+              background: 'rgba(255, 255, 255, 0.2)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 16px',
+              fontSize: '32px'
+            }}>
+              {userInfo.name?.charAt(0)?.toUpperCase() || 'U'}
+            </div>
+            <h1 style={{ margin: '0 0 8px 0', fontSize: '24px', fontWeight: '600' }}>
+              {userInfo.name ? safeDecodeName(userInfo.name) : 'Kullanıcı'}
+            </h1>
+            <p style={{ margin: '0', opacity: '0.9', fontSize: '16px' }}>
+              {userInfo.email}
+            </p>
+            {userInfo.isAdmin && (
+              <div style={{ 
+                background: 'rgba(255, 255, 255, 0.2)', 
+                padding: '4px 12px', 
+                borderRadius: '20px', 
+                fontSize: '12px', 
+                marginTop: '8px',
+                display: 'inline-block'
+              }}>
+                Admin
+              </div>
+            )}
+            
+                            {/* Çıkış Yap Butonu */}
+                <div style={{ marginTop: '20px' }}>
+                  <button
+                    onClick={handleLogout}
+                    style={{
+                      background: '#dc2626',
+                      color: 'white',
+                      border: '2px solid #b91c1c',
+                      borderRadius: '8px',
+                      padding: '10px 24px',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#b91c1c';
+                      e.currentTarget.style.borderColor = '#991b1b';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = '#dc2626';
+                      e.currentTarget.style.borderColor = '#b91c1c';
+                    }}
+                  >
+                    🚪 Çıkış Yap
+                  </button>
+                </div>
+          </div>
 
           {/* Profil İçeriği */}
           <div style={{ padding: isMobile ? '20px 16px' : '32px' }}>
             {isEditing ? (
-              <>
-                <ProfileForm
-                  editForm={editForm}
-                  isMobile={isMobile}
-                  isEmailChanged={isEmailChanged}
-                  emailVerificationCode={emailVerificationCode}
-                  isCodeInvalid={isCodeInvalid}
-                  isVerifyingEmail={isVerifyingEmail}
-                  isSendingCode={isSendingCode}
-                  isCodeSent={isCodeSent}
-                  canEditBirthDate={canEditBirthDate}
-                  isSocialLogin={isSocialLogin}
-                  handleChange={handleChange}
-                  handleSendEmailVerification={handleSendEmailVerification}
-                  handleVerifyEmailCode={handleVerifyEmailCode}
-                  message={message}
-                  messageType={messageType}
-                />
-                <ProfileActions
-                  isMobile={isMobile}
-                  isEditing={isEditing}
-                  handleSave={handleSave}
-                  handleCancel={handleCancel}
-                  handleEdit={handleEdit}
-                  handleLogout={handleLogout}
-                />
-              </>
+              /* Düzenleme Formu */
+              <form onSubmit={(e) => { e.preventDefault(); console.log('Form submitted!'); handleSave(); }}>
+                <h3 style={{ margin: '0 0 24px 0', color: '#1e293b', fontSize: isMobile ? '18px' : '20px' }}>
+                  Profil Bilgilerini Düzenle
+                </h3>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? '12px' : '16px', marginBottom: isMobile ? '12px' : '16px' }}>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: isMobile ? '6px' : '8px', fontWeight: '500', color: '#374151', fontSize: isMobile ? '13px' : '14px' }}>
+                      Ad
+                    </label>
+                    <input
+                      type="text"
+                      name="firstName"
+                      value={editForm.firstName}
+                      onChange={handleChange}
+                      style={{
+                        width: '100%',
+                        padding: isMobile ? '10px' : '12px',
+                        borderRadius: '8px',
+                        border: '1px solid #d1d5db',
+                        fontSize: isMobile ? '14px' : '16px'
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: isMobile ? '6px' : '8px', fontWeight: '500', color: '#374151', fontSize: isMobile ? '13px' : '14px' }}>
+                      Soyad
+                    </label>
+                    <input
+                      type="text"
+                      name="lastName"
+                      value={editForm.lastName}
+                      onChange={handleChange}
+                      style={{
+                        width: '100%',
+                        padding: isMobile ? '10px' : '12px',
+                        borderRadius: '8px',
+                        border: '1px solid #d1d5db',
+                        fontSize: isMobile ? '14px' : '16px'
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div style={{ marginBottom: isMobile ? '20px' : '24px' }}>
+                  <label style={{ display: 'block', marginBottom: isMobile ? '6px' : '8px', fontWeight: '500', color: '#374151', fontSize: isMobile ? '13px' : '14px' }}>
+                    E-posta
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={editForm.email}
+                    onChange={handleChange}
+                    style={{
+                      width: '100%',
+                      padding: isMobile ? '10px' : '12px',
+                      borderRadius: '8px',
+                      border: '1px solid #d1d5db',
+                      fontSize: isMobile ? '14px' : '16px'
+                    }}
+                  />
+                  
+                  {editForm.email !== originalEmail && (
+                    <div style={{ marginTop: '12px' }}>
+                      <div style={{ 
+                        display: 'flex', 
+                        gap: '8px', 
+                        marginBottom: '8px',
+                        flexDirection: isMobile ? 'column' : 'row',
+                        alignItems: isMobile ? 'stretch' : 'center'
+                      }}>
+                        <input
+                          type="text"
+                          placeholder="Doğrulama kodu (6 rakam)"
+                          value={emailVerificationCode}
+                          onChange={handleCodeChange}
+                          maxLength={6}
+                          style={{
+                            flex: 1,
+                            padding: isMobile ? '10px' : '12px',
+                            borderRadius: '8px',
+                            border: isCodeInvalid ? '2px solid #dc2626' : '1px solid #d1d5db',
+                            fontSize: isMobile ? '14px' : '16px',
+                            backgroundColor: isCodeInvalid ? '#fef2f2' : '#ffffff',
+                            color: isCodeInvalid ? '#dc2626' : '#374151'
+                          }}
+                        />
+                        <button
+                          type="button"
+                          onClick={isEmailChanged ? handleVerifyEmailCode : handleSendEmailVerification}
+                          disabled={isVerifyingEmail || !editForm.email || (isEmailChanged && (!emailVerificationCode || emailVerificationCode.length !== 6))}
+                          style={{
+                            padding: isMobile ? '10px 16px' : '12px 20px',
+                            borderRadius: '8px',
+                            border: 'none',
+                            backgroundColor: isVerifyingEmail || !editForm.email || (isEmailChanged && (!emailVerificationCode || emailVerificationCode.length !== 6)) ? '#9ca3af' : '#3b82f6',
+                            color: 'white',
+                            fontSize: isMobile ? '14px' : '16px',
+                            cursor: isVerifyingEmail || !editForm.email || (isEmailChanged && (!emailVerificationCode || emailVerificationCode.length !== 6)) ? 'not-allowed' : 'pointer',
+                            whiteSpace: 'nowrap'
+                          }}
+                        >
+                          {isVerifyingEmail ? (isEmailChanged ? 'Doğrulanıyor...' : 'Gönderiliyor...') : (isEmailChanged ? 'Doğrula' : 'Kod Gönder')}
+                        </button>
+                      </div>
+                      <div style={{ 
+                        fontSize: '12px', 
+                        color: '#6b7280',
+                        fontStyle: 'italic',
+                        marginBottom: '4px'
+                      }}>
+                        Email adresini değiştirmek için doğrulama kodu gerekli.
+                      </div>
+                      {isCodeInvalid && (
+                        <div style={{ 
+                          fontSize: '12px', 
+                          color: '#dc2626',
+                          fontWeight: '500',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}>
+                          ⚠️ Geçersiz doğrulama kodu. Lütfen tekrar deneyin.
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                <div style={{ marginBottom: isMobile ? '12px' : '16px' }}>
+                  <label style={{ display: 'block', marginBottom: isMobile ? '6px' : '8px', fontWeight: '500', color: '#374151', fontSize: isMobile ? '13px' : '14px' }}>
+                    Telefon
+                  </label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={editForm.phone}
+                    onChange={handleChange}
+                    placeholder="(5XX) XXX XX XX"
+                    style={{
+                      width: '100%',
+                      padding: isMobile ? '10px' : '12px',
+                      borderRadius: '8px',
+                      border: '1px solid #d1d5db',
+                      fontSize: isMobile ? '14px' : '16px'
+                    }}
+                  />
+                </div>
+
+                <div style={{ marginBottom: isMobile ? '20px' : '24px' }}>
+                  <label style={{ 
+                    display: 'block', 
+                    marginBottom: isMobile ? '6px' : '8px', 
+                    fontWeight: '500', 
+                    color: isSocialLogin ? '#6b7280' : '#374151', 
+                    fontSize: isMobile ? '13px' : '14px' 
+                  }}>
+                    Doğum Tarihi
+                  </label>
+                  <input
+                    type="date"
+                    name="birthDate"
+                    value={editForm.birthDate}
+                    onChange={handleChange}
+                    disabled={!isBirthDateEditable()}
+                    readOnly={!isBirthDateEditable()}
+                    style={{
+                      width: '100%',
+                      padding: isMobile ? '10px' : '12px',
+                      borderRadius: '8px',
+                      border: '1px solid #d1d5db',
+                      fontSize: isMobile ? '14px' : '16px',
+                      backgroundColor: isBirthDateEditable() ? '#ffffff' : '#f9fafb',
+                      color: isBirthDateEditable() ? '#374151' : '#9ca3af',
+                      cursor: isBirthDateEditable() ? 'text' : 'not-allowed',
+                      pointerEvents: isBirthDateEditable() ? 'auto' : 'none'
+                    }}
+                    onKeyDown={(e) => {
+                      // Eğer düzenlenemezse, klavye girişlerini engelle
+                      if (!isBirthDateEditable()) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }
+                    }}
+                    onFocus={(e) => {
+                      // Eğer düzenlenemezse, focus'u engelle
+                      if (!isBirthDateEditable()) {
+                        e.target.blur();
+                      }
+                    }}
+                  />
+                  {isSocialLogin && (
+                    <div style={{ 
+                      marginTop: '8px',
+                      fontSize: '12px', 
+                      color: isBirthDateEditable() ? '#f59e0b' : '#9ca3af',
+                      fontStyle: 'italic',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}>
+                      {isBirthDateEditable() ? (
+                        <>
+                          ⚠️ Doğum tarihi sadece 1 kez değiştirilebilir. Lütfen dikkatli seçin.
+                        </>
+                      ) : (
+                        <>
+                          🔒 Doğum tarihi daha önce belirlenmiş. Artık değiştirilemez.
+                        </>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+
+                {message && (
+                  <div style={{ 
+                    padding: '12px', 
+                    borderRadius: '8px', 
+                    marginBottom: '16px',
+                    background: messageType === 'success' ? '#dcfce7' : '#fee2e2',
+                    color: messageType === 'success' ? '#166534' : '#dc2626',
+                    border: `1px solid ${messageType === 'success' ? '#bbf7d0' : '#fecaca'}`
+                  }}>
+                    {message}
+                  </div>
+                )}
+
+                <div style={{ display: 'flex', gap: '12px', flexDirection: isMobile ? 'column' : 'row' }}>
+                  <button
+                    type="button"
+                    onClick={() => { console.log('Kaydet clicked!'); handleSave(); }}
+                    style={{
+                      background: '#2563eb',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '8px',
+                      padding: '12px 24px',
+                      fontSize: '16px',
+                      fontWeight: '500',
+                      cursor: 'pointer',
+                      flex: isMobile ? 'none' : 1
+                    }}
+                  >
+                    Kaydet
+                  </button>
+                  <button
+                    onClick={handleCancel}
+                    style={{
+                      background: '#f3f4f6',
+                      color: '#374151',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '8px',
+                      padding: '12px 24px',
+                      fontSize: '16px',
+                      fontWeight: '500',
+                      cursor: 'pointer',
+                      flex: isMobile ? 'none' : 1
+                    }}
+                  >
+                    İptal
+                  </button>
+                </div>
+              </form>
             ) : (
-              <>
+              /* Görüntüleme Modu */
+              <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: isMobile ? '16px' : '24px' }}>
                   <h3 style={{ margin: '0', color: '#1e293b', fontSize: isMobile ? '18px' : '20px' }}>
                     Hesap Bilgileri
                   </h3>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button
+                      onClick={handleEdit}
+                      style={{
+                        background: '#2563eb',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        padding: isMobile ? '6px 12px' : '8px 16px',
+                        fontSize: isMobile ? '12px' : '14px',
+                        fontWeight: '500',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Düzenle
+                    </button>
+                  </div>
                 </div>
-                <ProfileDisplay
-                  userInfo={userInfo}
-                  isMobile={isMobile}
-                  safeDecodeName={safeDecodeName}
-                  formatPhoneNumber={formatPhoneNumber}
-                />
-                <ProfileActions
-                  isMobile={isMobile}
-                  isEditing={isEditing}
-                  handleSave={handleSave}
-                  handleCancel={handleCancel}
-                  handleEdit={handleEdit}
-                  handleLogout={handleLogout}
-                />
-              </>
+
+                <div style={{ display: 'grid', gap: isMobile ? '12px' : '16px' }}>
+                  <div style={{ 
+                    display: 'grid', 
+                    gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', 
+                    gap: isMobile ? '12px' : '16px' 
+                  }}>
+                    <div style={{ 
+                      padding: isMobile ? '12px' : '16px', 
+                      background: '#f8fafc', 
+                      borderRadius: '8px',
+                      border: '1px solid #e2e8f0'
+                    }}>
+                      <div style={{ fontSize: isMobile ? '11px' : '12px', color: '#64748b', marginBottom: isMobile ? '2px' : '4px' }}>Ad</div>
+                      <div style={{ fontSize: isMobile ? '14px' : '16px', color: '#1e293b', fontWeight: '500' }}>
+                        {userInfo.name ? safeDecodeName(userInfo.name).split(' ')[0] : 'Belirtilmemiş'}
+                      </div>
+                    </div>
+                    <div style={{ 
+                      padding: isMobile ? '12px' : '16px', 
+                      background: '#f8fafc', 
+                      borderRadius: '8px',
+                      border: '1px solid #e2e8f0'
+                    }}>
+                      <div style={{ fontSize: isMobile ? '11px' : '12px', color: '#64748b', marginBottom: isMobile ? '2px' : '4px' }}>Soyad</div>
+                      <div style={{ fontSize: isMobile ? '14px' : '16px', color: '#1e293b', fontWeight: '500' }}>
+                        {userInfo.name ? safeDecodeName(userInfo.name).split(' ').slice(1).join(' ') : 'Belirtilmemiş'}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style={{ 
+                    padding: isMobile ? '12px' : '16px', 
+                    background: '#f8fafc', 
+                    borderRadius: '8px',
+                    border: '1px solid #e2e8f0'
+                  }}>
+                    <div style={{ fontSize: isMobile ? '11px' : '12px', color: '#64748b', marginBottom: isMobile ? '2px' : '4px' }}>E-posta</div>
+                    <div style={{ fontSize: isMobile ? '14px' : '16px', color: '#1e293b', fontWeight: '500' }}>
+                      {userInfo.email || 'Belirtilmemiş'}
+                    </div>
+                  </div>
+
+                  <div style={{ 
+                    padding: isMobile ? '12px' : '16px', 
+                    background: '#f8fafc', 
+                    borderRadius: '8px',
+                    border: '1px solid #e2e8f0'
+                  }}>
+                    <div style={{ fontSize: isMobile ? '11px' : '12px', color: '#64748b', marginBottom: isMobile ? '2px' : '4px' }}>Cep Telefonu</div>
+                    <div style={{ fontSize: isMobile ? '14px' : '16px', color: '#1e293b', fontWeight: '500' }}>
+                      {userInfo.phone ? formatPhoneNumber(userInfo.phone) : 'Belirtilmemiş'}
+                    </div>
+                  </div>
+
+                  <div style={{ 
+                    padding: isMobile ? '12px' : '16px', 
+                    background: isSocialLogin ? '#f8fafc' : '#f9fafb', 
+                    borderRadius: '8px',
+                    border: '1px solid #e2e8f0'
+                  }}>
+                    <div style={{ 
+                      fontSize: isMobile ? '11px' : '12px', 
+                      color: isSocialLogin ? '#64748b' : '#9ca3af', 
+                      marginBottom: isMobile ? '2px' : '4px' 
+                    }}>
+                      Doğum Tarihi
+                    </div>
+                    <div style={{ 
+                      fontSize: isMobile ? '14px' : '16px', 
+                      color: isSocialLogin ? '#1e293b' : '#9ca3af', 
+                      fontWeight: '500' 
+                    }}>
+                      {userInfo.birthDate ? new Date(userInfo.birthDate).toLocaleDateString('tr-TR') : 'Belirtilmemiş'}
+                    </div>
+                    {isSocialLogin && (
+                      <div style={{ 
+                        marginTop: '8px',
+                        fontSize: '11px', 
+                        color: (userInfo as any).birthDateEdited ? '#9ca3af' : '#f59e0b',
+                        fontStyle: 'italic',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}>
+                        {(userInfo as any).birthDateEdited ? (
+                          <>
+                            🔒 Doğum tarihi daha önce belirlenmiş. Artık değiştirilemez.
+                          </>
+                        ) : (
+                          <>
+                            ⚠️ Doğum tarihi sadece 1 kez değiştirilebilir. Profil düzenleme modunda değiştirebilirsiniz.
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
             )}
           </div>
         </div>
@@ -1221,12 +1972,187 @@ export default function ProfilePage() {
 
       </div>
       
-      <ProfileModals
-        showSuccessPopup={showSuccessPopup}
-        showErrorPopup={showErrorPopup}
-        errorMessage={errorMessage}
-        successMessage="✅ Profil bilgileriniz güncellendi"
-      />
+      {/* Başarı Popup'ı */}
+      {showSuccessPopup && (
+        <div>
+          <div style={{
+          position: 'fixed',
+          top: '20px',
+          right: '20px',
+          background: 'linear-gradient(135deg, #10b981, #059669)',
+          color: 'white',
+          padding: '20px 24px',
+          borderRadius: '12px',
+          boxShadow: '0 10px 25px rgba(16, 185, 129, 0.3)',
+          zIndex: 1000,
+          minWidth: '320px',
+          animation: 'slideInRight 0.3s ease-out',
+          border: '1px solid rgba(255, 255, 255, 0.2)'
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px'
+          }}>
+            <div style={{
+              background: 'rgba(255, 255, 255, 0.2)',
+              borderRadius: '50%',
+              width: '40px',
+              height: '40px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '20px'
+            }}>
+              ✅
+            </div>
+            <div>
+              <h4 style={{
+                margin: '0 0 4px 0',
+                fontSize: '16px',
+                fontWeight: '600'
+              }}>
+                Başarıyla Kaydedildi!
+              </h4>
+              <p style={{
+                margin: '0',
+                fontSize: '14px',
+                opacity: '0.9'
+              }}>
+                Profil bilgileriniz güncellendi
+              </p>
+            </div>
+          </div>
+          
+          <button
+            onClick={() => setShowSuccessPopup(false)}
+            style={{
+              position: 'absolute',
+              top: '8px',
+              right: '8px',
+              background: 'rgba(255, 255, 255, 0.2)',
+              border: 'none',
+              borderRadius: '50%',
+              width: '24px',
+              height: '24px',
+              color: 'white',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '12px',
+              transition: 'background 0.2s'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
+            }}
+          >
+            ✕
+          </button>
+        </div>
+        </div>
+      )}
+      
+      {/* Hata Popup'ı */}
+      {showErrorPopup && (
+        <div style={{
+          position: 'fixed',
+          top: '20px',
+          right: '20px',
+          background: 'linear-gradient(135deg, #ef4444, #dc2626)',
+          color: 'white',
+          padding: '20px 24px',
+          borderRadius: '12px',
+          boxShadow: '0 10px 25px rgba(239, 68, 68, 0.3)',
+          zIndex: 1000,
+          minWidth: '320px',
+          animation: 'slideInRight 0.3s ease-out',
+          border: '1px solid rgba(255, 255, 255, 0.2)'
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px'
+          }}>
+            <div style={{
+              background: 'rgba(255, 255, 255, 0.2)',
+              borderRadius: '50%',
+              width: '40px',
+              height: '40px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '20px'
+            }}>
+              ❌
+            </div>
+            <div>
+              <h4 style={{
+                margin: '0 0 4px 0',
+                fontSize: '16px',
+                fontWeight: '600'
+              }}>
+                Hata Oluştu!
+              </h4>
+              <p style={{
+                margin: '0',
+                fontSize: '14px',
+                opacity: '0.9',
+                maxWidth: '250px',
+                wordWrap: 'break-word'
+              }}>
+                {errorMessage}
+              </p>
+            </div>
+          </div>
+          
+          <button
+            onClick={() => setShowErrorPopup(false)}
+            style={{
+              position: 'absolute',
+              top: '8px',
+              right: '8px',
+              background: 'rgba(255, 255, 255, 0.2)',
+              border: 'none',
+              borderRadius: '50%',
+              width: '24px',
+              height: '24px',
+              color: 'white',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '12px',
+              transition: 'background 0.2s'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
+            }}
+          >
+            ✕
+          </button>
+        </div>
+      )}
+      
+      {/* CSS Animasyonları */}
+      <style jsx>{`
+        @keyframes slideInRight {
+          from {
+            transform: translateX(100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+      `}</style>
     </div>
   );
-}
+} 
