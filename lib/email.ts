@@ -50,7 +50,7 @@ function getBaseUrl(): string {
 // Transporter cache - her seferinde yeni transporter oluşturmamak için
 let cachedTransporter: nodemailer.Transporter | null = null;
 
-function getTransporter(): nodemailer.Transporter {
+function getTransporter(): nodemailer.Transporter | null {
   if (cachedTransporter) {
     return cachedTransporter;
   }
@@ -59,14 +59,16 @@ function getTransporter(): nodemailer.Transporter {
   let gmailPassword = process.env.GMAIL_APP_PASSWORD;
   
   if (!gmailPassword) {
-    throw new Error('GMAIL_APP_PASSWORD environment değişkeni tanımlı değil!');
+    console.error('❌ GMAIL_APP_PASSWORD environment değişkeni tanımlı değil!');
+    return null;
   }
   
   // Boşlukları temizle
   gmailPassword = gmailPassword.replace(/\s+/g, '').trim();
   
   if (!gmailPassword || gmailPassword.length < 16) {
-    throw new Error('GMAIL_APP_PASSWORD geçersiz! (çok kısa veya boş)');
+    console.error('❌ GMAIL_APP_PASSWORD geçersiz! (çok kısa veya boş)');
+    return null;
   }
 
   cachedTransporter = nodemailer.createTransport({
@@ -92,6 +94,10 @@ export async function sendPasswordResetEmail(email: string, resetToken: string, 
     
     // Cached transporter kullan - verify() kontrolünü kaldırdık (hız için)
     const transporter = getTransporter();
+    if (!transporter) {
+      console.error('❌ Email transporter oluşturulamadı! GMAIL_APP_PASSWORD kontrol edin.');
+      return false;
+    }
     const gmailUser = process.env.GMAIL_USER || 'info@dusukbutce.com';
     
     console.log('📧 Gönderen email:', gmailUser);
