@@ -40,12 +40,12 @@ export default function ForgotPasswordPage() {
 
   return (
     <div style={{
-      minHeight: '100vh',
+      minHeight: '20vh',
       background: '#f8fafc',
       display: 'flex',
       alignItems: 'flex-start',
       justifyContent: 'center',
-      padding: '60px 20px 20px 20px',
+      padding: '60px 20px 60px 20px',
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
     }}>
       <div style={{
@@ -98,7 +98,7 @@ export default function ForgotPasswordPage() {
         </div>
 
         {/* Form */}
-        <div style={{ padding: '40px 32px 32px 32px' }}>
+        <div style={{ padding: '40px 32px 16px 32px' }}>
           {!isSuccess ? (
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
               <div>
@@ -276,7 +276,7 @@ export default function ForgotPasswordPage() {
 
           {/* Footer */}
           <div style={{
-            marginTop: '32px',
+            marginTop: '16px',
             paddingTop: '24px',
             borderTop: '1px solid #f3f4f6',
             textAlign: 'center'
