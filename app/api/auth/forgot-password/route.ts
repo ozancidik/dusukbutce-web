@@ -123,16 +123,52 @@ export async function POST(request: NextRequest) {
     // Kullanıcı adını belirle
     const userName = user.name || user.firstName || user.email?.split('@')[0] || 'Kullanıcı';
     
-    // Email gönderme işlemini arka planda başlat (await etmeden)
-    // Kullanıcıya hemen response döndür, email arka planda gönderilsin
-    sendPasswordResetEmail(email, resetToken, userName).catch((emailError: any) => {
-      console.error('❌ E-posta gönderme hatası (arka plan):', emailError);
-      if (emailError?.code === 'EAUTH' || emailError?.responseCode === 535) {
-        console.error('🔐 Gmail authentication hatası tespit edildi!');
-      }
-    });
+    // Production ortamında email gönderme işlemini await et (hata kontrolü için)
+    // Development ortamında arka plana al (hızlı response için)
+    const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1';
     
-    // Hemen başarılı response döndür (email arka planda gönderiliyor)
+    if (isProduction) {
+      console.log('🏭 Production ortamı: Email gönderme işlemi await ediliyor...');
+      try {
+        const emailSent = await sendPasswordResetEmail(email, resetToken, userName);
+        if (!emailSent) {
+          console.error('❌ [PRODUCTION] Şifre sıfırlama e-postası gönderilemedi:', email);
+          console.error('❌ [PRODUCTION] GMAIL_USER:', process.env.GMAIL_USER || 'NOT SET');
+          console.error('❌ [PRODUCTION] GMAIL_APP_PASSWORD:', process.env.GMAIL_APP_PASSWORD ? 'SET' : 'NOT SET');
+          return NextResponse.json({
+            success: false,
+            error: 'E-posta gönderilemedi. Lütfen daha sonra tekrar deneyin veya destek ekibiyle iletişime geçin.'
+          }, { status: 500 });
+        }
+        console.log('✅ [PRODUCTION] Şifre sıfırlama e-postası başarıyla gönderildi:', email);
+      } catch (emailError: any) {
+        console.error('❌ [PRODUCTION] E-posta gönderme hatası:', emailError);
+        console.error('❌ [PRODUCTION] Hata detayları:', {
+          message: emailError?.message,
+          code: emailError?.code,
+          responseCode: emailError?.responseCode,
+          command: emailError?.command
+        });
+        if (emailError?.code === 'EAUTH' || emailError?.responseCode === 535) {
+          console.error('🔐 [PRODUCTION] Gmail authentication hatası tespit edildi!');
+          console.error('💡 [PRODUCTION] Vercel Dashboard > Settings > Environment Variables kontrol edin');
+        }
+        return NextResponse.json({
+          success: false,
+          error: 'E-posta gönderilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.'
+        }, { status: 500 });
+      }
+    } else {
+      // Development ortamında arka plana al (hızlı response için)
+      sendPasswordResetEmail(email, resetToken, userName).catch((emailError: any) => {
+        console.error('❌ E-posta gönderme hatası (arka plan):', emailError);
+        if (emailError?.code === 'EAUTH' || emailError?.responseCode === 535) {
+          console.error('🔐 Gmail authentication hatası tespit edildi!');
+        }
+      });
+    }
+    
+    // Başarılı response döndür
     return NextResponse.json({
       success: true,
       message: 'Şifre sıfırlama bağlantısı e-posta adresinize gönderildi. Lütfen gelen kutunuzu kontrol edin.'
