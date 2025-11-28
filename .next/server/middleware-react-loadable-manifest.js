@@ -1,1 +1,0 @@
-self.__REACT_LOADABLE_MANIFEST="{\"app/components/Header.tsx -> ./Search\":{\"id\":\"app/components/Header.tsx -> ./Search\",\"files\":[\"static/chunks/_app-pages-browser_app_components_Search_tsx.js\"]}}"
