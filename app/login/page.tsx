@@ -170,17 +170,29 @@ export default function LoginPage() {
     const realAttempt = localStorage.getItem("isRealPasswordAttempt") === "true";
     const now = Date.now();
     
+    // Referrer kontrolü - eğer başka bir sayfadan geliyorsa flag'i temizle
+    const referrer = typeof window !== 'undefined' ? document.referrer : '';
+    const isFromLoginPage = referrer.includes('/login');
+    
     // Sadece gerçek şifre denemesi yapıldıysa ve süre dolmamışsa göster
     if (lastAttemptTime && realAttempt) {
       const timeDiff = now - parseInt(lastAttemptTime);
-      if (timeDiff >= 15 * 60 * 1000) { // 15 dakika geçmişse sıfırla
+      
+      // Başka bir sayfadan geliyorsa veya 30 saniyeden fazla geçmişse flag'i temizle
+      if (!isFromLoginPage || timeDiff >= 30 * 1000) {
+        // Kullanıcı başka sayfaya gidip geri dönmüşse veya 30 saniye geçmişse uyarı gösterme
+        localStorage.removeItem("isRealPasswordAttempt");
+        setLoginAttempts(0);
+        setIsRealPasswordAttempt(false);
+      } else if (timeDiff >= 15 * 60 * 1000) {
+        // 15 dakika geçmişse tamamen sıfırla
         localStorage.setItem("loginAttempts", "0");
         localStorage.removeItem("lastLoginAttempt");
         localStorage.removeItem("isRealPasswordAttempt");
         setLoginAttempts(0);
         setIsRealPasswordAttempt(false);
       } else {
-        // Süre dolmamışsa ve gerçek deneme varsa göster
+        // 30 saniyeden az geçmişse ve hala login sayfasındaysa göster
         setLoginAttempts(parseInt(attempts));
         setIsRealPasswordAttempt(true);
       }
