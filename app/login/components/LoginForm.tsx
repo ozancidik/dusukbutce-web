@@ -13,6 +13,7 @@ interface LoginFormProps {
   isEmailSent: boolean;
   isResendingEmail: boolean;
   loginAttempts: number;
+  isRealPasswordAttempt: boolean;
   requiresPasswordSetup?: boolean;
   setEmail: (email: string) => void;
   setPassword: (password: string) => void;
@@ -34,6 +35,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
   isEmailSent,
   isResendingEmail,
   loginAttempts,
+  isRealPasswordAttempt,
   requiresPasswordSetup = false,
   setEmail,
   setPassword,
@@ -284,8 +286,8 @@ const LoginForm: React.FC<LoginFormProps> = ({
         </div>
       )}
 
-      {/* Rate Limiting Uyarısı - sadece email doğrulama hatası yoksa göster */}
-      {loginAttempts > 0 && !emailVerificationError && (
+      {/* Rate Limiting Uyarısı - sadece gerçek şifre denemesi yapıldığında ve email doğrulama hatası yoksa göster */}
+      {loginAttempts > 0 && !emailVerificationError && isRealPasswordAttempt && (
         <div
           style={{
             background: "#fef3c7",
