@@ -14,6 +14,7 @@ interface UseLoginFormProps {
   setLoginSuccess: (value: boolean) => void;
   setRedirectMessage: (message: string) => void;
   setLoginAttempts: (attempts: number) => void;
+  setIsRealPasswordAttempt: (value: boolean) => void;
   setEmailVerificationError: (value: boolean) => void;
   setRequiresPasswordSetup: (value: boolean) => void;
   redirectExecutedRef: React.MutableRefObject<boolean>;
@@ -33,6 +34,7 @@ export const useLoginForm = ({
   setLoginSuccess,
   setRedirectMessage,
   setLoginAttempts,
+  setIsRealPasswordAttempt,
   setEmailVerificationError,
   setRequiresPasswordSetup,
   redirectExecutedRef
@@ -95,6 +97,7 @@ export const useLoginForm = ({
         // Rate limiting'i sıfırla
         resetRateLimiting();
         setLoginAttempts(0);
+        setIsRealPasswordAttempt(false);
         
         // Yönlendirme flag'ini set et
         redirectExecutedRef.current = true;
@@ -147,6 +150,7 @@ export const useLoginForm = ({
           setError(data.message || "Email adresinizi doğrulamanız gerekiyor. Email kutunuzu kontrol edin.");
           resetRateLimiting();
           setLoginAttempts(0);
+          setIsRealPasswordAttempt(false);
         } else if (data.requiresPasswordSetup) {
           // OAuth kullanıcısı için şifre oluşturma yönlendirmesi
           setRequiresPasswordSetup(true);
@@ -154,6 +158,7 @@ export const useLoginForm = ({
           setError(data.message || "Şifre ile giriş yapmak için önce şifre oluşturmanız gerekiyor.");
           resetRateLimiting();
           setLoginAttempts(0);
+          setIsRealPasswordAttempt(false);
         } else {
           setRequiresPasswordSetup(false);
           // Sadece yanlış şifre hatası için rate limiting'i artır
@@ -163,10 +168,12 @@ export const useLoginForm = ({
             localStorage.setItem("lastLoginAttempt", Date.now().toString());
             localStorage.setItem("isRealPasswordAttempt", "true");
             setLoginAttempts(newAttempts);
+            setIsRealPasswordAttempt(true);
           } else {
             // Diğer hatalar için sayacı sıfırla
             resetRateLimiting();
             setLoginAttempts(0);
+            setIsRealPasswordAttempt(false);
           }
           
           setError(data.message || "Giriş yapılırken bir hata oluştu.");
@@ -176,6 +183,7 @@ export const useLoginForm = ({
       // Bağlantı hatası durumunda sayacı sıfırla
       resetRateLimiting();
       setLoginAttempts(0);
+      setIsRealPasswordAttempt(false);
       setError("Bağlantı hatası oluştu.");
     } finally {
       setIsLoading(false);
@@ -191,6 +199,7 @@ export const useLoginForm = ({
     setLoginSuccess,
     setRedirectMessage,
     setLoginAttempts,
+    setIsRealPasswordAttempt,
     setEmailVerificationError,
     setRequiresPasswordSetup,
     redirectExecutedRef,

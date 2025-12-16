@@ -148,6 +148,7 @@ export default function LoginPage() {
     setLoginSuccess,
     setRedirectMessage,
     setLoginAttempts,
+    setIsRealPasswordAttempt,
     setEmailVerificationError,
     setRequiresPasswordSetup,
     redirectExecutedRef
