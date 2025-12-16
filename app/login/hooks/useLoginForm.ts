@@ -163,7 +163,9 @@ export const useLoginForm = ({
           setRequiresPasswordSetup(false);
           // Sadece yanlış şifre hatası için rate limiting'i artır
           if (data.message && data.message.includes("Email veya şifre hatalı")) {
-            const newAttempts = loginAttempts + 1;
+            // Mevcut loginAttempts değerini localStorage'dan oku (başka sayfadan dönmüş olabilir)
+            const currentAttempts = parseInt(localStorage.getItem("loginAttempts") || "0");
+            const newAttempts = currentAttempts + 1;
             localStorage.setItem("loginAttempts", newAttempts.toString());
             localStorage.setItem("lastLoginAttempt", Date.now().toString());
             localStorage.setItem("isRealPasswordAttempt", "true");

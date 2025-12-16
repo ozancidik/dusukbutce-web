@@ -174,15 +174,19 @@ export default function LoginPage() {
     const referrer = typeof window !== 'undefined' ? document.referrer : '';
     const isFromLoginPage = referrer.includes('/login');
     
+    // loginAttempts değerini her zaman localStorage'dan oku ve state'e set et (sayacı koru)
+    const attemptsValue = parseInt(attempts);
+    setLoginAttempts(attemptsValue);
+    
     // Sadece gerçek şifre denemesi yapıldıysa ve süre dolmamışsa göster
     if (lastAttemptTime && realAttempt) {
       const timeDiff = now - parseInt(lastAttemptTime);
       
-      // Başka bir sayfadan geliyorsa veya 30 saniyeden fazla geçmişse flag'i temizle
+      // Başka bir sayfadan geliyorsa veya 30 saniyeden fazla geçmişse flag'i temizle (ama sayacı koru)
       if (!isFromLoginPage || timeDiff >= 30 * 1000) {
         // Kullanıcı başka sayfaya gidip geri dönmüşse veya 30 saniye geçmişse uyarı gösterme
+        // Ama loginAttempts değerini koru, sadece flag'i temizle
         localStorage.removeItem("isRealPasswordAttempt");
-        setLoginAttempts(0);
         setIsRealPasswordAttempt(false);
       } else if (timeDiff >= 15 * 60 * 1000) {
         // 15 dakika geçmişse tamamen sıfırla
@@ -193,16 +197,29 @@ export default function LoginPage() {
         setIsRealPasswordAttempt(false);
       } else {
         // 30 saniyeden az geçmişse ve hala login sayfasındaysa göster
-        setLoginAttempts(parseInt(attempts));
         setIsRealPasswordAttempt(true);
       }
-    } else {
-      // Gerçek şifre denemesi yoksa veya süre dolmuşsa sıfırla
-      localStorage.setItem("loginAttempts", "0");
-      localStorage.removeItem("lastLoginAttempt");
-      localStorage.removeItem("isRealPasswordAttempt");
-      setLoginAttempts(0);
+    } else if (lastAttemptTime && attemptsValue > 0) {
+      // loginAttempts değeri var ama isRealPasswordAttempt false ise
+      // Bu durumda sayacı koru ama uyarı gösterme
       setIsRealPasswordAttempt(false);
+      
+      // 15 dakika geçmişse tamamen sıfırla
+      const timeDiff = now - parseInt(lastAttemptTime);
+      if (timeDiff >= 15 * 60 * 1000) {
+        localStorage.setItem("loginAttempts", "0");
+        localStorage.removeItem("lastLoginAttempt");
+        localStorage.removeItem("isRealPasswordAttempt");
+        setLoginAttempts(0);
+        setIsRealPasswordAttempt(false);
+      }
+    } else {
+      // Hiç deneme yoksa sıfırla
+      if (attemptsValue === 0) {
+        localStorage.removeItem("lastLoginAttempt");
+        localStorage.removeItem("isRealPasswordAttempt");
+        setIsRealPasswordAttempt(false);
+      }
     }
   }, []);
 
