@@ -21,6 +21,7 @@ export default function LoginPage() {
   const [loginSuccess, setLoginSuccess] = useState(false);
   const [redirectMessage, setRedirectMessage] = useState("");
   const [loginAttempts, setLoginAttempts] = useState(0);
+  const [isRealPasswordAttempt, setIsRealPasswordAttempt] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [isResendingEmail, setIsResendingEmail] = useState(false);
   const [emailVerificationError, setEmailVerificationError] = useState(false);
@@ -165,26 +166,30 @@ export default function LoginPage() {
   useEffect(() => {
     const attempts = localStorage.getItem("loginAttempts") || "0";
     const lastAttemptTime = localStorage.getItem("lastLoginAttempt");
+    const realAttempt = localStorage.getItem("isRealPasswordAttempt") === "true";
     const now = Date.now();
     
-    if (lastAttemptTime) {
+    // Sadece gerçek şifre denemesi yapıldıysa ve süre dolmamışsa göster
+    if (lastAttemptTime && realAttempt) {
       const timeDiff = now - parseInt(lastAttemptTime);
-      if (timeDiff >= 15 * 60 * 1000) { // 15 dakika
+      if (timeDiff >= 15 * 60 * 1000) { // 15 dakika geçmişse sıfırla
         localStorage.setItem("loginAttempts", "0");
         localStorage.removeItem("lastLoginAttempt");
+        localStorage.removeItem("isRealPasswordAttempt");
         setLoginAttempts(0);
+        setIsRealPasswordAttempt(false);
       } else {
-        const isRealPasswordAttempt = localStorage.getItem("isRealPasswordAttempt") === "true";
-        if (isRealPasswordAttempt) {
-          setLoginAttempts(parseInt(attempts));
-        } else {
-          localStorage.setItem("loginAttempts", "0");
-          localStorage.removeItem("lastLoginAttempt");
-          setLoginAttempts(0);
-        }
+        // Süre dolmamışsa ve gerçek deneme varsa göster
+        setLoginAttempts(parseInt(attempts));
+        setIsRealPasswordAttempt(true);
       }
     } else {
+      // Gerçek şifre denemesi yoksa veya süre dolmuşsa sıfırla
+      localStorage.setItem("loginAttempts", "0");
+      localStorage.removeItem("lastLoginAttempt");
+      localStorage.removeItem("isRealPasswordAttempt");
       setLoginAttempts(0);
+      setIsRealPasswordAttempt(false);
     }
   }, []);
 
@@ -284,6 +289,7 @@ export default function LoginPage() {
             isEmailSent={isEmailSent}
             isResendingEmail={isResendingEmail}
             loginAttempts={loginAttempts}
+            isRealPasswordAttempt={isRealPasswordAttempt}
             requiresPasswordSetup={requiresPasswordSetup}
             setEmail={setEmail}
             setPassword={setPassword}

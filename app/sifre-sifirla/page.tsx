@@ -151,6 +151,11 @@ function ResetPasswordContent() {
       const data = await response.json();
       
       if (data.success) {
+        // Şifre sıfırlama başarılı olduğunda rate limiting bilgilerini temizle
+        localStorage.setItem("loginAttempts", "0");
+        localStorage.removeItem("lastLoginAttempt");
+        localStorage.removeItem("isRealPasswordAttempt");
+        
         setIsSuccess(true);
         setMessage("Şifreniz başarıyla güncellendi!");
       } else {
