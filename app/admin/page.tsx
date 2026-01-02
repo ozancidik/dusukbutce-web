@@ -201,7 +201,7 @@ export default function AdminPage() {
     setLoading(true);
     
     try {
-      const result = await submitAction(selectedSubmission._id, modalType, formData);
+      const result = await submitAction(selectedSubmission._id, modalType, formData, selectedSubmission);
 
       if (result.success) {
         // Submissions listesini güncelle
