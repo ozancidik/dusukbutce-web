@@ -52,10 +52,53 @@ export const submitAction = async (
     // Hassas bilgiler loglanmıyor - sadece durum kontrolü
     console.log('Admin status:', { isLoggedIn: !!adminLoggedIn, hasEmail: !!adminEmail, hasToken: !!adminToken });
     
+    if (!adminToken) {
+      return { success: false, message: 'Yetkisiz erişim: Lütfen tekrar giriş yapın' };
+    }
+
+    // İlan oluşturma: fiyat girişi zorunlu ve bu işlem için doğru endpoint /api/admin/submissions
+    if (modalType === 'listing') {
+      const priceNumber = Number(formData.price);
+      if (!Number.isFinite(priceNumber) || priceNumber <= 0) {
+        return { success: false, message: 'Geçerli bir ilan fiyatı girin' };
+      }
+
+      const listingTitle =
+        (formData.title && String(formData.title).trim()) ||
+        (submission ? `${submission.brand || ''} ${submission.model || ''}`.trim() : '');
+
+      const listingDescription =
+        (formData.description && String(formData.description).trim()) ||
+        (formData.notes && String(formData.notes).trim()) ||
+        '';
+
+      const response = await fetch('/api/admin/submissions', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${adminToken}`
+        },
+        body: JSON.stringify({
+          submissionId,
+          action: 'createListing',
+          data: {
+            price: priceNumber,
+            title: listingTitle,
+            description: listingDescription
+          }
+        }),
+      });
+
+      const result = await response.json();
+      return {
+        success: !!result.success,
+        message: result.message || (result.success ? 'İlan oluşturuldu' : 'İlan oluşturulamadı')
+      };
+    }
+
     const requestBody: any = {
       submissionId,
-      action: modalType === 'offer' ? 'offer' : 
-              modalType === 'listing' ? 'list' : 
+      action: modalType === 'offer' ? 'offer' :
               modalType === 'reject' ? 'reject' : modalType,
       amount: formData.amount,
       notes: formData.notes

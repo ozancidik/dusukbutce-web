@@ -2,10 +2,34 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
+type ListingSubmission = {
+  _id: string;
+  category?: string;
+  brand?: string;
+  model?: string;
+  cosmeticCondition?: string;
+  hasWarranty?: boolean;
+  warrantyDuration?: string;
+  hasBox?: boolean;
+  hasInvoice?: boolean;
+  invoiceDate?: string;
+  images?: string[];
+  createdAt?: string;
+  listing?: {
+    price?: number;
+    title?: string;
+    description?: string;
+    date?: string;
+  };
+};
+
 export default function BizdenAlPage() {
   const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [listings, setListings] = useState<ListingSubmission[]>([]);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -17,6 +41,35 @@ export default function BizdenAlPage() {
     
     return () => {
       window.removeEventListener('resize', checkMobile);
+    };
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+    const loadListings = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const res = await fetch('/api/listings', { cache: 'no-store' });
+        if (!res.ok) {
+          throw new Error('İlanlar getirilemedi');
+        }
+        const data = await res.json();
+        if (isMounted) {
+          setListings(Array.isArray(data) ? data : []);
+        }
+      } catch (e) {
+        if (isMounted) {
+          setError(e instanceof Error ? e.message : 'Bir hata oluştu');
+          setListings([]);
+        }
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
+    };
+    loadListings();
+    return () => {
+      isMounted = false;
     };
   }, []);
 
@@ -35,56 +88,17 @@ export default function BizdenAlPage() {
     { id: 'tablet', name: 'Tablet', icon: '/tablet.png', color: '#f43f5e' }
   ];
 
-  const featuredProducts = [
-    {
-      id: 1,
-      name: 'MacBook Air M2 13" 256GB',
-      price: '32.999 TL',
-      originalPrice: '39.999 TL',
-      discount: '18%',
-      image: '/logo.png',
-      category: 'notebook',
-      rating: 4.8,
-      reviews: 127
-    },
-    {
-      id: 2,
-      name: 'Samsung 27" Odyssey G5 Gaming Monitor',
-      price: '4.999 TL',
-      originalPrice: '6.499 TL',
-      discount: '23%',
-      image: '/logo.png',
-      category: 'monitor',
-      rating: 4.6,
-      reviews: 89
-    },
-    {
-      id: 3,
-      name: 'Logitech MX Master 3S Wireless Mouse',
-      price: '1.299 TL',
-      originalPrice: '1.599 TL',
-      discount: '19%',
-      image: '/logo.png',
-      category: 'mouse',
-      rating: 4.9,
-      reviews: 234
-    },
-    {
-      id: 4,
-      name: 'Corsair K100 RGB Mechanical Keyboard',
-      price: '2.899 TL',
-      originalPrice: '3.299 TL',
-      discount: '12%',
-      image: '/logo.png',
-      category: 'keyboard',
-      rating: 4.7,
-      reviews: 156
-    }
-  ];
+  const filteredListings = selectedCategory === 'all'
+    ? listings
+    : listings.filter((l) => (l.category || '') === selectedCategory);
 
-  const filteredProducts = selectedCategory === 'all' 
-    ? featuredProducts 
-    : featuredProducts.filter(product => product.category === selectedCategory);
+  const getCategoryLabel = (categoryId?: string) => {
+    if (!categoryId) return '-';
+    const found = categories.find((c) => c.id === categoryId);
+    return found?.name || categoryId;
+  };
+
+  const formatBool = (value?: boolean) => (value ? 'Var' : 'Yok');
 
   return (
     <div style={{
@@ -261,17 +275,34 @@ export default function BizdenAlPage() {
             margin: '0 0 24px 0',
             textAlign: 'center'
           }}>
-            {selectedCategory === 'all' ? 'Öne Çıkan Ürünler' : `${categories.find(c => c.id === selectedCategory)?.name} Ürünleri`}
+            {selectedCategory === 'all' ? 'Satılık İlanlar' : `${categories.find(c => c.id === selectedCategory)?.name} İlanları`}
           </h2>
           
+          {isLoading && (
+            <div style={{ textAlign: 'center', padding: '40px', color: '#6b7280' }}>
+              Yükleniyor...
+            </div>
+          )}
+
+          {!isLoading && error && (
+            <div style={{ textAlign: 'center', padding: '40px', color: '#dc2626' }}>
+              {error}
+            </div>
+          )}
+
           <div style={{
             display: 'grid',
             gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(280px, 1fr))',
             gap: '24px'
           }}>
-            {filteredProducts.map((product) => (
+            {!isLoading && !error && filteredListings.map((item) => {
+              const title = item.listing?.title || `${item.brand || ''} ${item.model || ''}`.trim() || 'İlan';
+              const price = item.listing?.price;
+              const imageSrc = item.images && item.images.length > 0 ? item.images[0] : '';
+
+              return (
               <div
-                key={product.id}
+                key={item._id}
                 style={{
                   background: 'white',
                   borderRadius: '16px',
@@ -293,24 +324,30 @@ export default function BizdenAlPage() {
                 {/* Ürün Görseli */}
                 <div style={{
                   width: '100%',
-                  height: '200px',
+                  height: isMobile ? '160px' : '140px',
                   background: '#f9fafb',
                   borderRadius: '12px',
                   marginBottom: '16px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  border: '1px solid #e5e7eb'
+                  border: '1px solid #e5e7eb',
+                  overflow: 'hidden'
                 }}>
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    style={{
-                      width: '80px',
-                      height: '80px',
-                      objectFit: 'contain'
-                    }}
-                  />
+                  {imageSrc ? (
+                    <img
+                      src={imageSrc}
+                      alt={title}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'contain',
+                        background: '#f9fafb'
+                      }}
+                    />
+                  ) : (
+                    <div style={{ color: '#9ca3af', fontSize: '48px' }}>🖼️</div>
+                  )}
                 </div>
 
                 {/* Ürün Bilgileri */}
@@ -322,109 +359,131 @@ export default function BizdenAlPage() {
                     margin: '0 0 8px 0',
                     lineHeight: '1.4'
                   }}>
-                    {product.name}
+                    {title}
                   </h3>
                   
                   {/* Fiyat */}
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    marginBottom: '12px'
-                  }}>
-                    <span style={{
-                      fontSize: '20px',
-                      fontWeight: '700',
-                      color: '#dc2626'
-                    }}>
-                      {product.price}
-                    </span>
-                    <span style={{
-                      fontSize: '16px',
-                      color: '#9ca3af',
-                      textDecoration: 'line-through'
-                    }}>
-                      {product.originalPrice}
-                    </span>
-                    <span style={{
-                      background: '#dc2626',
-                      color: 'white',
-                      padding: '4px 8px',
-                      borderRadius: '6px',
-                      fontSize: '12px',
-                      fontWeight: '600'
-                    }}>
-                      {product.discount} İndirim
-                    </span>
-                  </div>
-
-                  {/* Rating */}
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    marginBottom: '16px'
-                  }}>
-                    <div style={{
-                      display: 'flex',
-                      gap: '2px'
-                    }}>
-                      {[...Array(5)].map((_, i) => (
-                        <span key={i} style={{
-                          color: i < Math.floor(product.rating) ? '#fbbf24' : '#e5e7eb',
-                          fontSize: '16px'
-                        }}>
-                          ★
-                        </span>
-                      ))}
-                    </div>
-                    <span style={{
-                      fontSize: '14px',
-                      color: '#6b7280'
-                    }}>
-                      {product.rating} ({product.reviews} değerlendirme)
+                  <div style={{ marginBottom: '12px' }}>
+                    <span style={{ fontSize: '20px', fontWeight: '700', color: '#dc2626' }}>
+                      {typeof price === 'number' ? `${price.toLocaleString('tr-TR')} TL` : 'Fiyat bilgisi yok'}
                     </span>
                   </div>
                 </div>
 
-                {/* Satın Al Butonu */}
-                <button
-                  style={{
-                    width: '100%',
-                    background: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '12px',
-                    padding: '14px',
-                    fontSize: '16px',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    boxShadow: '0 4px 12px rgba(220, 38, 38, 0.3)'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(220, 38, 38, 0.4)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.3)';
-                  }}
-                >
-                  🛒 Satın Al
-                </button>
+                {/* İlan Bilgileri */}
+                <div style={{
+                  background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '12px',
+                  padding: '14px',
+                  display: 'grid',
+                  gap: '10px'
+                }}>
+                  <div style={{
+                    fontSize: '14px',
+                    fontWeight: '700',
+                    color: '#0f172a',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}>
+                    📌 İlan Bilgileri
+                  </div>
+
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gap: '10px'
+                  }}>
+                    <div>
+                      <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '2px' }}>Kategori</div>
+                      <div style={{ fontSize: '14px', color: '#1f2937', fontWeight: '600' }}>
+                        {getCategoryLabel(item.category)}
+                      </div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '2px' }}>Marka</div>
+                      <div style={{ fontSize: '14px', color: '#1f2937', fontWeight: '600' }}>
+                        {item.brand || '-'}
+                      </div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '2px' }}>Model</div>
+                      <div style={{ fontSize: '14px', color: '#1f2937', fontWeight: '600' }}>
+                        {item.model || '-'}
+                      </div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '2px' }}>Kozmetik Durum</div>
+                      <div style={{ fontSize: '14px', color: '#1f2937', fontWeight: '600' }}>
+                        {item.cosmeticCondition || '-'}
+                      </div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '2px' }}>Garanti</div>
+                      <div style={{ fontSize: '14px', color: '#1f2937', fontWeight: '600' }}>
+                        {formatBool(item.hasWarranty)}{item.hasWarranty && item.warrantyDuration ? ` (${item.warrantyDuration})` : ''}
+                      </div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '2px' }}>Kutu</div>
+                      <div style={{ fontSize: '14px', color: '#1f2937', fontWeight: '600' }}>
+                        {formatBool(item.hasBox)}
+                      </div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '2px' }}>Fatura</div>
+                      <div style={{ fontSize: '14px', color: '#1f2937', fontWeight: '600' }}>
+                        {formatBool(item.hasInvoice)}{item.hasInvoice && item.invoiceDate ? ` (${item.invoiceDate})` : ''}
+                      </div>
+                    </div>
+                  </div>
+
+                  {!!item.listing?.description && (
+                    <div>
+                      <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '4px' }}>Açıklama</div>
+                      <div style={{ fontSize: '14px', color: '#334155', lineHeight: '1.5' }}>
+                        {item.listing.description}
+                      </div>
+                    </div>
+                  )}
+
+                  {item.images && item.images.length > 1 && (
+                    <div>
+                      <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '6px' }}>Fotoğraflar</div>
+                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                        {item.images.slice(0, 6).map((src, idx) => (
+                          <img
+                            key={`${item._id}-thumb-${idx}`}
+                            src={src}
+                            alt={`${title} fotoğraf ${idx + 1}`}
+                            style={{
+                              width: '56px',
+                              height: '56px',
+                              objectFit: 'cover',
+                              borderRadius: '10px',
+                              border: '1px solid #e5e7eb',
+                              background: '#fff'
+                            }}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
-            ))}
+              );
+            })}
           </div>
 
-          {filteredProducts.length === 0 && (
+          {!isLoading && !error && filteredListings.length === 0 && (
             <div style={{
               textAlign: 'center',
               padding: '40px',
               color: '#6b7280'
             }}>
               <div style={{ fontSize: '48px', marginBottom: '16px' }}>🔍</div>
-              <p>Bu kategoride henüz ürün bulunmuyor.</p>
+              <p>Bu kategoride henüz ilan bulunmuyor.</p>
             </div>
           )}
         </div>

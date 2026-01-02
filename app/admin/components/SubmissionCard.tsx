@@ -62,6 +62,7 @@ export default function SubmissionCard({
   };
 
   const statusInfo = getStatusInfo(submission.status);
+  const canCreateListing = submission.status === 'delivery_confirmed';
 
   return (
     <div style={{
@@ -349,14 +350,12 @@ export default function SubmissionCard({
           💰 {submission.status === 'offered' ? 'Teklif Verildi' : 'Teklif Ver'}
         </button>
         
-        {/* 2. İlan Oluştur */}
+        {/* 2. Satılık İlana Ekle (Admin Onayı) */}
         <button
-          onClick={() => (submission.status === 'delivery_completed' || submission.status === 'accepted') ? onAction(submission, 'listing') : null}
-          disabled={submission.status !== 'delivery_completed' && submission.status !== 'accepted'}
+          onClick={() => (canCreateListing ? onAction(submission, 'listing') : null)}
+          disabled={!canCreateListing && submission.status !== 'listed'}
           style={{
-            background: (submission.status === 'delivery_completed' || submission.status === 'accepted')
-              ? 'linear-gradient(135deg, #059669 0%, #10b981 100%)'
-              : submission.status === 'listed'
+            background: (canCreateListing || submission.status === 'listed')
               ? 'linear-gradient(135deg, #059669 0%, #10b981 100%)'
               : 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)',
             color: 'white',
@@ -364,54 +363,21 @@ export default function SubmissionCard({
             borderRadius: '12px',
             padding: isMobile ? '12px 16px' : '14px 20px',
             fontSize: isMobile ? '13px' : '14px',
-            cursor: (submission.status === 'delivery_completed' || submission.status === 'accepted') ? 'pointer' : 'not-allowed',
+            cursor: canCreateListing ? 'pointer' : 'not-allowed',
             fontWeight: '600',
             transition: 'all 0.2s',
-            opacity: (submission.status === 'delivery_completed' || submission.status === 'accepted') ? 1 : 0.6,
+            opacity: canCreateListing ? 1 : 0.6,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             gap: '8px',
-            boxShadow: (submission.status === 'delivery_completed' || submission.status === 'accepted')
+            boxShadow: canCreateListing
               ? '0 4px 12px rgba(5, 150, 105, 0.3)'
               : '0 2px 4px rgba(0, 0, 0, 0.1)'
           }}
         >
-          📋 {submission.status === 'listed' ? '✅ İlan Oluşturuldu' : 'İlan Oluştur'}
+          📋 {submission.status === 'listed' ? '✅ İlanda' : 'Satılık İlana Ekle'}
         </button>
-        
-        {/* 3. Teslimat Tamamlandı - Sadece delivery_confirmed durumunda */}
-        {submission.status === 'delivery_confirmed' && (
-          <button
-            onClick={() => onAction(submission, 'delivery_completed')}
-            style={{
-              background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
-              color: 'white',
-              border: 'none',
-              borderRadius: '12px',
-              padding: isMobile ? '12px 16px' : '14px 20px',
-              fontSize: isMobile ? '13px' : '14px',
-              cursor: 'pointer',
-              fontWeight: '600',
-              transition: 'all 0.2s',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              boxShadow: '0 4px 12px rgba(5, 150, 105, 0.3)'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-1px)';
-              e.currentTarget.style.boxShadow = '0 6px 16px rgba(5, 150, 105, 0.4)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(5, 150, 105, 0.3)';
-            }}
-          >
-            ✅ Teslimat Tamamlandı
-          </button>
-        )}
 
         {/* 4. Teslimat - Sadece customerInfo varsa */}
         {(submission as any).customerInfo && (

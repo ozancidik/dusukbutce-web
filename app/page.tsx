@@ -3,36 +3,23 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
+type ListingSubmission = {
+  _id: string;
+  brand?: string;
+  model?: string;
+  images?: string[];
+  listing?: {
+    price?: number;
+    title?: string;
+  };
+};
 
-
-
-const sliderItems = [
-  {
-    title: "iPhone 13 128 GB Siyah",
-    price: "33.999 TL",
-    img: "/logo.png",
-  },
-  {
-    title: "Asus Vivobook 15",
-    price: "12.999 TL",
-    img: "/logo.png",
-  },
-  {
-    title: "Samsung 75\" Neo QLED",
-    price: "69.959 TL",
-    img: "/logo.png",
-  },
-  {
-    title: "Lenovo Tab Plus 2",
-    price: "11.949 TL",
-    img: "/logo.png",
-  },
-  {
-    title: "Monster Abra A5",
-    price: "29.999 TL",
-    img: "/logo.png",
-  },
-];
+type SliderItem = {
+  id: string;
+  title: string;
+  price: string;
+  img: string;
+};
 
 export default function HomePage() {
   const [current, setCurrent] = useState(0);
@@ -44,6 +31,8 @@ export default function HomePage() {
   const [isIPhoneSE, setIsIPhoneSE] = useState(false);
   const [isIPadPro, setIsIPadPro] = useState(false);
   const [isIPadAir, setIsIPadAir] = useState(false);
+  const [sliderItems, setSliderItems] = useState<SliderItem[]>([]);
+  const [sliderLoading, setSliderLoading] = useState(true);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -73,7 +62,7 @@ export default function HomePage() {
     
     // Sadece kullanıcı etkileşimde bulunmadığında otomatik geçiş
     const timer = setInterval(() => {
-      if (!isDragging) {
+      if (!isDragging && sliderItems.length > 1) {
         setCurrent((prev) => (prev + 1) % sliderItems.length);
       }
     }, 3000);
@@ -82,7 +71,44 @@ export default function HomePage() {
       clearInterval(timer);
       window.removeEventListener('resize', checkMobile);
     };
-  }, [isDragging]);
+  }, [isDragging, sliderItems.length]);
+
+  useEffect(() => {
+    let isMounted = true;
+    const loadSliderListings = async () => {
+      try {
+        setSliderLoading(true);
+        const res = await fetch('/api/listings', { cache: 'no-store' });
+        if (!res.ok) throw new Error('İlanlar getirilemedi');
+        const data = (await res.json()) as ListingSubmission[];
+        const items: SliderItem[] = (Array.isArray(data) ? data : [])
+          .slice(0, 8)
+          .map((l) => {
+            const title = l.listing?.title || `${l.brand || ''} ${l.model || ''}`.trim() || 'Satılık İlan';
+            const priceValue = l.listing?.price;
+            const price = typeof priceValue === 'number'
+              ? `${priceValue.toLocaleString('tr-TR')} TL`
+              : 'Fiyat bilgisi yok';
+            const img = l.images && l.images.length > 0 ? l.images[0] : '/logo.png';
+            return { id: l._id, title, price, img };
+          });
+        if (isMounted) {
+          setSliderItems(items);
+          setCurrent(0);
+        }
+      } catch {
+        if (isMounted) {
+          setSliderItems([]);
+        }
+      } finally {
+        if (isMounted) setSliderLoading(false);
+      }
+    };
+    loadSliderListings();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
 
   // Slider fonksiyonları
@@ -101,6 +127,7 @@ export default function HomePage() {
 
   const handleMouseUp = () => {
     if (!isDragging) return;
+    if (sliderItems.length === 0) return;
     setIsDragging(false);
     
     const threshold = 50; // Minimum kaydırma mesafesi
@@ -131,6 +158,7 @@ export default function HomePage() {
 
   const handleTouchEnd = () => {
     if (!isDragging) return;
+    if (sliderItems.length === 0) return;
     setIsDragging(false);
     
     const threshold = 30; // Mobil için daha küçük threshold
@@ -805,7 +833,36 @@ export default function HomePage() {
                   touchAction: "pan-y",
                 }}
               >
-                {sliderItems.map((item, idx) => {
+                {sliderLoading ? (
+                  <div style={{
+                    width: "100%",
+                    height: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#6b7280",
+                    fontWeight: "600"
+                  }}>
+                    Yükleniyor...
+                  </div>
+                ) : sliderItems.length === 0 ? (
+                  <div style={{
+                    width: "100%",
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#6b7280",
+                    gap: "10px",
+                    textAlign: "center",
+                    padding: "16px"
+                  }}>
+                    <div style={{ fontSize: "36px" }}>📋</div>
+                    <div style={{ fontWeight: "700", color: "#1f2937" }}>Henüz satılık ilan yok</div>
+                    <div style={{ fontSize: "14px" }}>Admin panelinden ilan eklendiğinde burada otomatik görünecek.</div>
+                  </div>
+                ) : sliderItems.map((item, idx) => {
                   const isActive = idx === current;
                   const isNext = idx === (current + 1) % sliderItems.length;
                   const isPrev = idx === (current - 1 + sliderItems.length) % sliderItems.length;
@@ -823,7 +880,7 @@ export default function HomePage() {
 
                   return (
                     <div
-                      key={item.title}
+                      key={item.id}
                       style={{
                         position: "absolute",
                         top: 0,
@@ -842,32 +899,48 @@ export default function HomePage() {
                         padding: isMobile ? "16px" : "20px",
                       }}
                     >
-                    <img
-                      src={item.img}
-                      alt={item.title}
-                      style={{ 
-                        width: isMobile ? "100px" : "120px", 
-                        height: isMobile ? "100px" : "120px", 
-                        objectFit: "contain", 
-                        marginBottom: isMobile ? "8px" : "12px", 
-                        borderRadius: "12px",
-                      }} 
-                    />
-                    <div style={{ 
-                      fontSize: isMobile ? "14px" : "16px", 
-                      fontWeight: "700", 
-                      marginBottom: isMobile ? "4px" : "6px",
-                      textAlign: "center",
-                    }}>
-                      {item.title}
-                    </div>
-                    <div style={{ 
-                      fontSize: isMobile ? "14px" : "16px", 
-                      color: "#2563eb", 
-                      fontWeight: "600",
-                    }}>
-                      {item.price}
-                    </div>
+                      <Link
+                        href={`/satilik-ilanlar/${item.id}`}
+                        style={{ textDecoration: "none", color: "inherit", width: "100%" }}
+                      >
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            width: "100%",
+                            cursor: "pointer",
+                          }}
+                        >
+                          <img
+                            src={item.img}
+                            alt={item.title}
+                            style={{ 
+                              width: isMobile ? "100px" : "120px", 
+                              height: isMobile ? "100px" : "120px", 
+                              objectFit: "contain", 
+                              marginBottom: isMobile ? "8px" : "12px", 
+                              borderRadius: "12px",
+                            }} 
+                          />
+                          <div style={{ 
+                            fontSize: isMobile ? "14px" : "16px", 
+                            fontWeight: "700", 
+                            marginBottom: isMobile ? "4px" : "6px",
+                            textAlign: "center",
+                          }}>
+                            {item.title}
+                          </div>
+                          <div style={{ 
+                            fontSize: isMobile ? "14px" : "16px", 
+                            color: "#2563eb", 
+                            fontWeight: "600",
+                          }}>
+                            {item.price}
+                          </div>
+                        </div>
+                      </Link>
                   </div>
                 );
               })}
@@ -893,6 +966,7 @@ export default function HomePage() {
                     display: "inline-block",
                     transition: "background 0.2s",
                     cursor: "pointer",
+                    opacity: sliderItems.length > 0 ? 1 : 0.4
                   }}
                   onClick={() => setCurrent(idx)}
                 />
