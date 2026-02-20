@@ -1,5 +1,25 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Projeyi ayağa kaldırma
+
+**Gereksinim:** Node.js 18+ ([nodejs.org](https://nodejs.org) veya `brew install node`). nvm kullanıyorsanız proje kökündeki `.nvmrc` ile `nvm use` yapabilirsiniz.
+
+**Tek komut (kurulum + sunucu):**
+```bash
+./scripts/setup-and-run.sh
+# veya
+npm run run:dev
+```
+
+**Sadece sunucu (bağımlılıklar zaten kuruluysa):**
+```bash
+npm run dev
+```
+
+**Cursor / VS Code:** `Cmd+Shift+P` → "Tasks: Run Task" → **Projeyi başlat (setup + dev)**.
+
+Uygulama varsayılan olarak [http://localhost:3000](http://localhost:3000) adresinde açılır.
+
 ## Getting Started
 
 First, run the development server:

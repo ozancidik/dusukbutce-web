@@ -79,6 +79,13 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  kvkkApproved: {
+    type: Boolean,
+    default: false
+  },
+  kvkkApprovedAt: {
+    type: Date
+  },
   emailChangeVerificationCode: {
     type: String
   },
