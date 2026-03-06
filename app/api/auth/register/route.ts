@@ -19,7 +19,8 @@ export async function POST(request: NextRequest) {
       lastName,
       cep_telefonu,
       birth_date,
-      acceptNewsletter
+      acceptNewsletter,
+      kvkkApproved
     } = body;
 
     const rawBirthDate =
@@ -35,6 +36,14 @@ export async function POST(request: NextRequest) {
     if (!email || !password || !firstName || !lastName || !cep_telefonu) {
       return NextResponse.json(
         { error: 'Tüm alanlar gerekli' },
+        { status: 400 }
+      );
+    }
+
+    // KVKK onayı zorunlu
+    if (kvkkApproved !== true) {
+      return NextResponse.json(
+        { error: 'KVKK aydınlatma metnini ve gizlilik politikasını onaylamanız gerekmektedir.' },
         { status: 400 }
       );
     }
@@ -110,6 +119,7 @@ export async function POST(request: NextRequest) {
     const verificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 saat
 
     // Yeni kullanıcı oluştur
+    const now = new Date();
     const user = new User({
       email: sanitizedEmail,
       password: hashedPassword,
@@ -118,6 +128,8 @@ export async function POST(request: NextRequest) {
       dogum_tarihi: rawBirthDate ? new Date(rawBirthDate) : null,
       birthDate: rawBirthDate,
       acceptNewsletter: acceptNewsletter || false,
+      kvkkApproved: true,
+      kvkkApprovedAt: now,
       emailVerified: false,
       emailVerificationToken: verificationToken,
       emailVerificationExpires: verificationExpires,
