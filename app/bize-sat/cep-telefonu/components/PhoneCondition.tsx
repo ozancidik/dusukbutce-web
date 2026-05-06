@@ -94,6 +94,46 @@ export default function PhoneCondition({ isMobile, formData, onInputChange }: Ph
         gap: '16px',
         marginTop: '16px'
       }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <input
+            type="checkbox"
+            checked={formData.powersOn}
+            onChange={(e) => onInputChange('powersOn', e.target.checked)}
+            style={{ width: '24px', height: '24px' }}
+          />
+          <label style={{ fontSize: '16px', color: '#374151' }}>
+            Cihaz açılıyor
+          </label>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <input
+            type="checkbox"
+            checked={formData.cameraWorks}
+            onChange={(e) => onInputChange('cameraWorks', e.target.checked)}
+            style={{ width: '24px', height: '24px' }}
+          />
+          <label style={{ fontSize: '16px', color: '#374151' }}>
+            Kamera çalışıyor
+          </label>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <input
+            type="checkbox"
+            checked={formData.faceIdWorks}
+            onChange={(e) => onInputChange('faceIdWorks', e.target.checked)}
+            style={{ width: '24px', height: '24px' }}
+          />
+          <label style={{ fontSize: '16px', color: '#374151' }}>
+            Face ID / Parmak izi çalışıyor
+          </label>
+        </div>
+      </div>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
+        gap: '16px',
+        marginTop: '16px'
+      }}>
         <div style={{
           display: 'flex',
           alignItems: 'center',

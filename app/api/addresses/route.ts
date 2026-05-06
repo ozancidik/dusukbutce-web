@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
+import mongoose from 'mongoose';
 
 export async function GET(request: NextRequest) {
   try {
@@ -12,6 +13,13 @@ export async function GET(request: NextRequest) {
     if (!userId) {
       return NextResponse.json(
         { message: 'Kullanıcı ID gereklidir.' },
+        { status: 400 }
+      );
+    }
+
+    if (!mongoose.isValidObjectId(userId)) {
+      return NextResponse.json(
+        { message: 'Geçersiz kullanıcı ID formatı.' },
         { status: 400 }
       );
     }
@@ -47,6 +55,13 @@ export async function POST(request: NextRequest) {
     if (!title || !fullName || !phone || !address || !city || !district || !userId) {
       return NextResponse.json(
         { message: 'Tüm zorunlu alanları doldurun.' },
+        { status: 400 }
+      );
+    }
+
+    if (!mongoose.isValidObjectId(userId)) {
+      return NextResponse.json(
+        { message: 'Geçersiz kullanıcı ID formatı.' },
         { status: 400 }
       );
     }
@@ -105,6 +120,13 @@ export async function PUT(request: NextRequest) {
     if (!addressId || !title || !fullName || !phone || !address || !city || !district || !userId) {
       return NextResponse.json(
         { message: 'Tüm zorunlu alanları doldurun.' },
+        { status: 400 }
+      );
+    }
+
+    if (!mongoose.isValidObjectId(userId)) {
+      return NextResponse.json(
+        { message: 'Geçersiz kullanıcı ID formatı.' },
         { status: 400 }
       );
     }
@@ -174,6 +196,13 @@ export async function DELETE(request: NextRequest) {
     if (!addressId || !userId) {
       return NextResponse.json(
         { message: 'Adres ID ve kullanıcı ID gereklidir.' },
+        { status: 400 }
+      );
+    }
+
+    if (!mongoose.isValidObjectId(userId)) {
+      return NextResponse.json(
+        { message: 'Geçersiz kullanıcı ID formatı.' },
         { status: 400 }
       );
     }

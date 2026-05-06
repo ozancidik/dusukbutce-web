@@ -49,6 +49,12 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('❌ Teknik servis talebi oluşturulurken hata:', error);
+    if (error instanceof Error && error.name === 'ValidationError') {
+      return NextResponse.json({
+        success: false,
+        message: 'Geçersiz veri: ' + error.message
+      }, { status: 400 });
+    }
     const errorMessage = error instanceof Error ? error.message : 'Sunucu hatası';
     return NextResponse.json({ 
       success: false, 

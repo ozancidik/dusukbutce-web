@@ -37,7 +37,10 @@ export default function CepTelefonuPage() {
     warrantyDuration: '',
     invoiceDate: '',
     quantity: 1,
-    images: [] as string[]
+    images: [] as string[],
+    powersOn: true,
+    cameraWorks: true,
+    faceIdWorks: true
   });
 
   useEffect(() => {
@@ -249,7 +252,10 @@ export default function CepTelefonuPage() {
           warrantyDuration: '',
           invoiceDate: '',
           quantity: 1,
-          images: []
+          images: [],
+          powersOn: true,
+          cameraWorks: true,
+          faceIdWorks: true
         });
       } else {
         const errorData = await response.json().catch(() => ({ message: 'Bilinmeyen hata' }));

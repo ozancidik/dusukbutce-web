@@ -11,7 +11,15 @@ export async function POST(request: NextRequest) {
     await connectDB();
     
     const { email, password, csrfToken } = await request.json();
-    
+
+    // Alan validasyonu (CSRF'den önce — istemciye anlamlı hata dönmek için)
+    if (!email || !password) {
+      return NextResponse.json(
+        { success: false, message: 'Email ve şifre zorunludur.' },
+        { status: 400 }
+      );
+    }
+
     // CSRF token doğrulama
     const cookieToken = request.cookies.get('csrf-token')?.value;
     if (!csrfToken || !cookieToken || !validateCSRFToken(csrfToken, cookieToken)) {

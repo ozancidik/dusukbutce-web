@@ -118,6 +118,12 @@ export async function POST(request: NextRequest) {
       message: error?.message,
       stack: error?.stack
     });
+    if (error instanceof Error && error.name === 'ValidationError') {
+      return NextResponse.json(
+        { success: false, message: 'Geçersiz veri: ' + error.message, error: error.message },
+        { status: 400 }
+      );
+    }
     return NextResponse.json(
       { success: false, message: 'Failed to save submission', error: error?.message },
       { status: 500 }

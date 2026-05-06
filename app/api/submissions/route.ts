@@ -110,6 +110,14 @@ export async function POST(request: NextRequest) {
     const errorMessage = error instanceof Error ? error.message : 'Bilinmeyen hata';
     const errorStack = error instanceof Error ? error.stack : '';
     console.error('❌ Error details:', { errorMessage, errorStack });
+
+    // Mongoose ValidationError → 400
+    if (error instanceof Error && error.name === 'ValidationError') {
+      return NextResponse.json(
+        { success: false, message: 'Geçersiz veri: ' + errorMessage, error: errorMessage },
+        { status: 400 }
+      );
+    }
     
     // DNS timeout hatası için özel mesaj
     let userMessage = errorMessage || 'Teklif talebiniz gönderilemedi. Lütfen tekrar deneyin.';
