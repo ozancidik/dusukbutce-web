@@ -104,6 +104,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: "Success" }, { status: 200 });
   } catch (error) {
     console.error("Error in processor-submissions:", error);
+    if (error instanceof Error && error.name === 'ValidationError') {
+      return NextResponse.json(
+        { error: "Geçersiz veri: " + error.message },
+        { status: 400 }
+      );
+    }
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }

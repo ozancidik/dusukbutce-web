@@ -1,3 +1,9 @@
 app/admin-users/page.tsx
 node_modules
 .next
+
+# Ortam değişkenleri (gizli bilgiler - repoya girmemeli)
+.env
+.env.local
+.env*.local
+.env.local.backup

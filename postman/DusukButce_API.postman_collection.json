@@ -1859,7 +1859,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"brand\": \"Intel\",\n  \"model\": \"i7-13700K\",\n  \"socket\": \"LGA1700\",\n  \"coreCount\": \"16\",\n  \"threadCount\": \"24\",\n  \"baseClock\": \"3.4 GHz\",\n  \"boostClock\": \"5.4 GHz\",\n  \"hasStockCooler\": false,\n  \"overclocked\": \"Hayır\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"36\",\n  \"invoiceDate\": \"2024-01-10\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda işlemci, hiç overclock yapılmadı.\",\n  \"images\": []\n}"
+									"raw": "{\n  \"category\": \"processor\",\n  \"brand\": \"Intel\",\n  \"model\": \"i7-13700K\",\n  \"socket\": \"LGA1700\",\n  \"coreCount\": \"16\",\n  \"threadCount\": \"24\",\n  \"baseClock\": \"3.4 GHz\",\n  \"boostClock\": \"5.4 GHz\",\n  \"hasStockCooler\": false,\n  \"overclocked\": \"Hayır\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"36\",\n  \"invoiceDate\": \"2024-01-10\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda işlemci, hiç overclock yapılmadı.\",\n  \"images\": []\n}"
 								},
 								"url": {
 									"raw": "{{base_url}}/api/processor-submissions",
@@ -1886,7 +1886,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"brand\": \"ASUS\",\n  \"chipSet\": \"NVIDIA\",\n  \"model\": \"RTX 4070 Ti\",\n  \"memory\": \"12GB\",\n  \"memoryType\": \"256-bit\",\n  \"ports\": \"3x DisplayPort, 1x HDMI\",\n  \"dviOutput\": \"Yok\",\n  \"furmarkResult\": \"Test edildi, stabil çalışıyor\",\n  \"opened\": \"Hayır\",\n  \"thermalPadChanged\": \"Hayır\",\n  \"miningUsed\": \"Hayır\",\n  \"miningDuration\": \"\",\n  \"warrantySticker\": \"Sağlam\",\n  \"coilWhine\": \"Yok\",\n  \"oxidation\": \"Yok\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"36\",\n  \"invoiceDate\": \"2024-02-01\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda ekran kartı, hiç mining yapılmadı, garanti sticker sağlam.\",\n  \"images\": []\n}"
+									"raw": "{\n  \"category\": \"graphics-card\",\n  \"brand\": \"ASUS\",\n  \"chipSet\": \"NVIDIA\",\n  \"model\": \"RTX 4070 Ti\",\n  \"memory\": \"12GB\",\n  \"memoryType\": \"256-bit\",\n  \"ports\": \"3x DisplayPort, 1x HDMI\",\n  \"dviOutput\": \"Yok\",\n  \"furmarkResult\": \"Test edildi, stabil çalışıyor\",\n  \"opened\": \"Hayır\",\n  \"thermalPadChanged\": \"Hayır\",\n  \"miningUsed\": \"Hayır\",\n  \"miningDuration\": \"\",\n  \"warrantySticker\": \"Sağlam\",\n  \"coilWhine\": \"Yok\",\n  \"oxidation\": \"Yok\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"36\",\n  \"invoiceDate\": \"2024-02-01\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda ekran kartı, hiç mining yapılmadı, garanti sticker sağlam.\",\n  \"images\": []\n}"
 								},
 								"url": {
 									"raw": "{{base_url}}/api/graphics-card-submissions",
@@ -1913,7 +1913,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"brand\": \"Corsair\",\n  \"model\": \"Vengeance LPX\",\n  \"capacity\": \"32GB\",\n  \"type\": \"DDR4\",\n  \"speed\": \"3600MHz\",\n  \"latency\": \"CL18\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"Lifetime\",\n  \"invoiceDate\": \"2023-12-01\",\n  \"quantity\": 2,\n  \"description\": \"2x16GB kit, XMP profili ile test edildi.\",\n  \"images\": []\n}"
+									"raw": "{\n  \"category\": \"ram\",\n  \"brand\": \"Corsair\",\n  \"model\": \"Vengeance LPX\",\n  \"capacity\": \"32GB\",\n  \"type\": \"DDR4\",\n  \"speed\": \"3600MHz\",\n  \"latency\": \"CL18\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"Lifetime\",\n  \"invoiceDate\": \"2023-12-01\",\n  \"quantity\": 2,\n  \"description\": \"2x16GB kit, XMP profili ile test edildi.\",\n  \"images\": []\n}"
 								},
 								"url": {
 									"raw": "{{base_url}}/api/ram-submissions",
@@ -1940,7 +1940,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"brand\": \"Samsung\",\n  \"model\": \"970 EVO Plus\",\n  \"capacity\": \"1TB\",\n  \"interface\": \"NVMe\",\n  \"formFactor\": \"M.2 2280\",\n  \"readSpeed\": \"3500 MB/s\",\n  \"writeSpeed\": \"3300 MB/s\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"60\",\n  \"invoiceDate\": \"2024-01-05\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda NVMe SSD, hız testleri yapıldı.\",\n  \"images\": []\n}"
+									"raw": "{\n  \"category\": \"ssd\",\n  \"brand\": \"Samsung\",\n  \"model\": \"970 EVO Plus\",\n  \"capacity\": \"1TB\",\n  \"interface\": \"NVMe\",\n  \"formFactor\": \"M.2 2280\",\n  \"readSpeed\": \"3500 MB/s\",\n  \"writeSpeed\": \"3300 MB/s\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"60\",\n  \"invoiceDate\": \"2024-01-05\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda NVMe SSD, hız testleri yapıldı.\",\n  \"images\": []\n}"
 								},
 								"url": {
 									"raw": "{{base_url}}/api/ssd-submissions",
@@ -1967,7 +1967,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"brand\": \"Noctua\",\n  \"model\": \"NH-D15\",\n  \"coolerType\": \"Hava Soğutma\",\n  \"radiatorSize\": \"\",\n  \"socketCompatibility\": \"LGA1700, AM5, AM4\",\n  \"hasRGB\": false,\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"72\",\n  \"invoiceDate\": \"2023-11-20\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda hava soğutucu, tüm montaj parçaları mevcut.\",\n  \"images\": []\n}"
+									"raw": "{\n  \"category\": \"cooler\",\n  \"brand\": \"Noctua\",\n  \"model\": \"NH-D15\",\n  \"coolerType\": \"Hava Soğutma\",\n  \"radiatorSize\": \"\",\n  \"socketCompatibility\": \"LGA1700, AM5, AM4\",\n  \"hasRGB\": false,\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"72\",\n  \"invoiceDate\": \"2023-11-20\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda hava soğutucu, tüm montaj parçaları mevcut.\",\n  \"images\": []\n}"
 								},
 								"url": {
 									"raw": "{{base_url}}/api/cooler-submissions",
@@ -1994,7 +1994,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"brand\": \"Corsair\",\n  \"model\": \"4000D Airflow\",\n  \"formFactor\": \"Mid Tower\",\n  \"color\": \"Siyah\",\n  \"sidePanelType\": \"Tempered Glass\",\n  \"hasRGB\": false,\n  \"fanCount\": \"2x 120mm\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"24\",\n  \"invoiceDate\": \"2024-01-20\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda kasa, tüm vidalar ve montaj parçaları mevcut.\",\n  \"images\": []\n}"
+									"raw": "{\n  \"category\": \"case\",\n  \"brand\": \"Corsair\",\n  \"model\": \"4000D Airflow\",\n  \"formFactor\": \"Mid Tower\",\n  \"color\": \"Siyah\",\n  \"sidePanelType\": \"Tempered Glass\",\n  \"hasRGB\": false,\n  \"fanCount\": \"2x 120mm\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"24\",\n  \"invoiceDate\": \"2024-01-20\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda kasa, tüm vidalar ve montaj parçaları mevcut.\",\n  \"images\": []\n}"
 								},
 								"url": {
 									"raw": "{{base_url}}/api/case-submissions",
@@ -2021,7 +2021,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"brand\": \"LG\",\n  \"model\": \"27GL850-B\",\n  \"screenSize\": \"27\\\"\",\n  \"resolution\": \"2560x1440 (2K)\",\n  \"refreshRate\": \"144Hz\",\n  \"panelType\": \"IPS\",\n  \"responseTime\": \"1ms\",\n  \"curvature\": \"Düz\",\n  \"hdr\": \"HDR10\",\n  \"adaptiveSync\": \"G-Sync Compatible\",\n  \"ports\": \"2x HDMI, 1x DisplayPort, USB-C\",\n  \"deadPixels\": \"Yok\",\n  \"backlight\": \"Minimal\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"36\",\n  \"invoiceDate\": \"2023-10-15\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda gaming monitör, dead pixel yok.\",\n  \"images\": []\n}"
+									"raw": "{\n  \"category\": \"monitor\",\n  \"brand\": \"LG\",\n  \"model\": \"27GL850-B\",\n  \"screenSize\": \"27\\\"\",\n  \"resolution\": \"2560x1440 (2K)\",\n  \"refreshRate\": \"144Hz\",\n  \"panelType\": \"IPS\",\n  \"responseTime\": \"1ms\",\n  \"curvature\": \"Düz\",\n  \"hdr\": \"HDR10\",\n  \"adaptiveSync\": \"G-Sync Compatible\",\n  \"ports\": \"2x HDMI, 1x DisplayPort, USB-C\",\n  \"deadPixels\": \"Yok\",\n  \"backlight\": \"Minimal\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"36\",\n  \"invoiceDate\": \"2023-10-15\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda gaming monitör, dead pixel yok.\",\n  \"images\": []\n}"
 								},
 								"url": {
 									"raw": "{{base_url}}/api/monitor-submissions",
@@ -2048,7 +2048,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"brand\": \"Corsair\",\n  \"model\": \"K70 RGB TKL\",\n  \"switchType\": \"Cherry MX Red\",\n  \"layout\": \"US\",\n  \"size\": \"TKL (80%)\",\n  \"connectivity\": \"Kablolu\",\n  \"backlight\": \"RGB\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"24\",\n  \"invoiceDate\": \"2024-02-10\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda mekanik klavye, RGB aydınlatma çalışıyor.\",\n  \"images\": []\n}"
+									"raw": "{\n  \"category\": \"keyboard\",\n  \"brand\": \"Corsair\",\n  \"model\": \"K70 RGB TKL\",\n  \"switchType\": \"Cherry MX Red\",\n  \"layout\": \"US\",\n  \"size\": \"TKL (80%)\",\n  \"connectivity\": \"Kablolu\",\n  \"backlight\": \"RGB\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"24\",\n  \"invoiceDate\": \"2024-02-10\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda mekanik klavye, RGB aydınlatma çalışıyor.\",\n  \"images\": []\n}"
 								},
 								"url": {
 									"raw": "{{base_url}}/api/keyboard-submissions",
@@ -2075,7 +2075,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"brand\": \"Logitech\",\n  \"model\": \"G Pro X Superlight\",\n  \"connectivity\": \"Kablosuz\",\n  \"interface\": \"USB\",\n  \"color\": \"Siyah\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"24\",\n  \"invoiceDate\": \"2024-01-25\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda kablosuz gaming mouse.\",\n  \"images\": []\n}"
+									"raw": "{\n  \"category\": \"mouse\",\n  \"brand\": \"Logitech\",\n  \"model\": \"G Pro X Superlight\",\n  \"connectivity\": \"Kablosuz\",\n  \"interface\": \"USB\",\n  \"color\": \"Siyah\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"24\",\n  \"invoiceDate\": \"2024-01-25\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda kablosuz gaming mouse.\",\n  \"images\": []\n}"
 								},
 								"url": {
 									"raw": "{{base_url}}/api/mouse-submissions",
@@ -2102,7 +2102,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"brand\": \"Sony\",\n  \"model\": \"WH-1000XM5\",\n  \"headphoneType\": \"Over-Ear\",\n  \"connectivity\": \"Çoklu\",\n  \"hasNoiseCancellation\": true,\n  \"hasMicrophone\": true,\n  \"color\": \"Siyah\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"24\",\n  \"invoiceDate\": \"2024-03-01\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda kulaklık, ANC aktif, tüm aksesuarları mevcut.\",\n  \"images\": []\n}"
+									"raw": "{\n  \"category\": \"headphones\",\n  \"brand\": \"Sony\",\n  \"model\": \"WH-1000XM5\",\n  \"headphoneType\": \"Over-Ear\",\n  \"connectivity\": \"Çoklu\",\n  \"hasNoiseCancellation\": true,\n  \"hasMicrophone\": true,\n  \"color\": \"Siyah\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"24\",\n  \"invoiceDate\": \"2024-03-01\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda kulaklık, ANC aktif, tüm aksesuarları mevcut.\",\n  \"images\": []\n}"
 								},
 								"url": {
 									"raw": "{{base_url}}/api/headphones-submissions",
@@ -2129,7 +2129,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"brand\": \"Bose\",\n  \"model\": \"SoundLink Revolve+\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"12\",\n  \"invoiceDate\": \"2024-02-20\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda Bluetooth hoparlör.\",\n  \"images\": []\n}"
+									"raw": "{\n  \"category\": \"audio-system\",\n  \"brand\": \"Bose\",\n  \"model\": \"SoundLink Revolve+\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"12\",\n  \"invoiceDate\": \"2024-02-20\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda Bluetooth hoparlör.\",\n  \"images\": []\n}"
 								},
 								"url": {
 									"raw": "{{base_url}}/api/audio-system-submissions",
@@ -2156,7 +2156,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"brand\": \"JBL\",\n  \"model\": \"PartyBox 310\",\n  \"systemType\": \"2.1\",\n  \"power\": \"240W\",\n  \"connectivity\": \"Bluetooth, AUX, USB\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"24\",\n  \"invoiceDate\": \"2024-01-30\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda ses sistemi, tüm aksesuarları mevcut.\",\n  \"images\": []\n}"
+									"raw": "{\n  \"category\": \"sound-system\",\n  \"brand\": \"JBL\",\n  \"model\": \"PartyBox 310\",\n  \"systemType\": \"2.1\",\n  \"power\": \"240W\",\n  \"connectivity\": \"Bluetooth, AUX, USB\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"24\",\n  \"invoiceDate\": \"2024-01-30\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda ses sistemi, tüm aksesuarları mevcut.\",\n  \"images\": []\n}"
 								},
 								"url": {
 									"raw": "{{base_url}}/api/sound-system-submissions",
@@ -2183,7 +2183,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"brand\": \"Apple\",\n  \"model\": \"iPad Pro 12.9\\\"\",\n  \"storage\": \"512GB\",\n  \"screenSize\": \"12.9\\\"\",\n  \"connectivity\": \"Wi-Fi + Cellular\",\n  \"batteryHealth\": \"95\",\n  \"hasPen\": true,\n  \"hasKeyboard\": true,\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"12\",\n  \"invoiceDate\": \"2024-01-10\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda iPad Pro, Apple Pencil ve Magic Keyboard dahil.\",\n  \"images\": []\n}"
+									"raw": "{\n  \"category\": \"tablet\",\n  \"brand\": \"Apple\",\n  \"model\": \"iPad Pro 12.9\\\"\",\n  \"storage\": \"512GB\",\n  \"screenSize\": \"12.9\\\"\",\n  \"connectivity\": \"Wi-Fi + Cellular\",\n  \"batteryHealth\": \"95\",\n  \"hasPen\": true,\n  \"hasKeyboard\": true,\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"12\",\n  \"invoiceDate\": \"2024-01-10\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda iPad Pro, Apple Pencil ve Magic Keyboard dahil.\",\n  \"images\": []\n}"
 								},
 								"url": {
 									"raw": "{{base_url}}/api/tablet-submissions",
@@ -2210,7 +2210,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"brand\": \"Logitech\",\n  \"model\": \"G29\",\n  \"forceFeedback\": \"Var\",\n  \"hasPedals\": true,\n  \"hasShifter\": true,\n  \"compatibility\": \"PC, PS4, PS5\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"24\",\n  \"invoiceDate\": \"2023-12-15\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda gaming direksiyon, pedal ve vites kolu dahil.\",\n  \"images\": []\n}"
+									"raw": "{\n  \"category\": \"gaming-wheel\",\n  \"brand\": \"Logitech\",\n  \"model\": \"G29\",\n  \"forceFeedback\": \"Var\",\n  \"hasPedals\": true,\n  \"hasShifter\": true,\n  \"compatibility\": \"PC, PS4, PS5\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"24\",\n  \"invoiceDate\": \"2023-12-15\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda gaming direksiyon, pedal ve vites kolu dahil.\",\n  \"images\": []\n}"
 								},
 								"url": {
 									"raw": "{{base_url}}/api/gaming-wheel-submissions",
@@ -2237,8 +2237,31 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"phone\": \"05551234567\",\n  \"deviceType\": \"laptop\",\n  \"brand\": \"Apple\",\n  \"model\": \"MacBook Pro\",\n  \"problem\": \"Screen not working\",\n  \"description\": \"Detailed description of the problem\"\n}"
+									"raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"phone\": \"05551234567\",\n  \"serviceType\": \"Laptop Tamiri\",\n  \"deliveryMethod\": \"kargo-ile-gonder\",\n  \"address\": \"Örnek Sokak No:1 Daire:3\",\n  \"city\": \"İstanbul\",\n  \"district\": \"Kadıköy\",\n  \"deviceType\": \"laptop\",\n  \"brand\": \"Apple\",\n  \"model\": \"MacBook Pro\",\n  \"deviceInfo\": \"Apple MacBook Pro 16\\\" M3 Pro 2023\",\n  \"problemDescription\": \"Ekran çalışmıyor, açılışta siyah kalıyor\",\n  \"shippingMethod\": \"\",\n  \"preferredDate\": \"\",\n  \"preferredTime\": \"\",\n  \"notes\": \"Kargo ile gönderilecek\"\n}"
 								},
+								"description": "Teknik servis talebi oluşturma.\n\n**Zorunlu Alanlar:**\n- name: Ad Soyad\n- phone: Telefon\n- serviceType: Servis türü (PC Onarım, Laptop Tamiri, vb.)\n- deliveryMethod: `kargo-ile-gonder` veya `evimden-al`\n- address: Adres\n- city: Şehir\n- district: İlçe\n- deviceInfo: Cihaz açıklaması\n- problemDescription: Problem açıklaması\n\n**Opsiyonel:**\n- email, shippingMethod, notes\n- preferredDate / preferredTime (sadece `evimden-al` için)",
+								"url": {
+									"raw": "{{base_url}}/api/technical-service-submissions",
+									"host": ["{{base_url}}"],
+									"path": ["api", "technical-service-submissions"]
+								}
+							}
+						},
+						{
+							"name": "Create Technical Service Submission (Evimden Al)",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Jane Doe\",\n  \"email\": \"jane@example.com\",\n  \"phone\": \"05559876543\",\n  \"serviceType\": \"PC Onarım\",\n  \"deliveryMethod\": \"evimden-al\",\n  \"address\": \"Başka Cadde No:10\",\n  \"city\": \"Ankara\",\n  \"district\": \"Çankaya\",\n  \"deviceType\": \"desktop\",\n  \"brand\": \"Dell\",\n  \"model\": \"OptiPlex 7090\",\n  \"deviceInfo\": \"Dell OptiPlex 7090 i7 32GB\",\n  \"problemDescription\": \"Bilgisayar açılmıyor, güç ışığı yanmıyor\",\n  \"preferredDate\": \"2026-04-15\",\n  \"preferredTime\": \"14:00\",\n  \"notes\": \"\"\n}"
+								},
+								"description": "Evimden alınarak servis için teslim senaryosu. `deliveryMethod: evimden-al` kullanılırken `preferredDate` ve `preferredTime` belirtilmesi önerilir.",
 								"url": {
 									"raw": "{{base_url}}/api/technical-service-submissions",
 									"host": ["{{base_url}}"],
