@@ -1,0 +1,105 @@
+import { NextResponse } from "next/server";
+import mongoose from "mongoose";
+import connectDB from "@/lib/mongodb";
+import ProductSubmission from "@/models/ProductSubmission";
+import User from "@/models/User";
+import { sendNewSubmissionNotificationToAdmin } from "@/lib/email";
+
+/**
+ * Tüm "bize-sat" kategorileri için ortak teklif (submission) oluşturma mantığı.
+ * Her kategoriye ait route.ts dosyası yalnızca bu fonksiyonu çağırır.
+ *
+ * Not: Yalnızca aşağıdaki ürün alanları client'tan kabul edilir. status, offer,
+ * listing, adminNotes gibi iş akışı/admin alanları client body'sinden ALINMAZ.
+ */
+const ALLOWED_FIELDS = [
+  // Genel
+  "category", "brand", "model", "type", "manufacturingYear", "size",
+  "processor", "processorBrand", "graphicsCard", "graphicsCardWatt", "wattValue",
+  "storage", "storageType", "ram", "ramType", "refreshRate", "screenSize",
+  "batteryHealth", "condition", "cosmeticCondition", "accessories",
+  "storageCapacity", "hasWarranty", "warrantyDuration", "description",
+  "screenStatus", "deadPixelCount", "hasBox", "hasInvoice", "invoiceDate",
+  "images", "quantity",
+  // İşlemci özel
+  "stokFan", "cache", "socket",
+  // Ekran kartı özel
+  "memory", "memoryType", "coreClock", "boostClock", "powerConsumption",
+  "ports", "interface", "chipSet", "dviOutput", "furmarkResult", "opened",
+  "thermalPadChanged", "miningUsed", "miningDuration", "warrantySticker",
+  "coilWhine", "oxidation",
+] as const;
+
+// JWT token'dan userId çıkarır (token yoksa/geçersizse anonim gönderim).
+function extractUserId(request: Request): string | null {
+  try {
+    const token = request.headers.get("authorization")?.replace("Bearer ", "");
+    if (token) {
+      const decoded = JSON.parse(
+        Buffer.from(token.split(".")[1], "base64").toString()
+      );
+      return decoded.userId ?? null;
+    }
+  } catch {
+    // Geçersiz token — anonim gönderim olarak devam edilir.
+  }
+  return null;
+}
+
+export async function handleProductSubmission(request: Request, source: string) {
+  try {
+    const body = await request.json();
+    const userId = extractUserId(request);
+
+    await connectDB();
+
+    // Sadece izin verilen ürün alanlarını al.
+    const data: Record<string, unknown> = {};
+    for (const key of ALLOWED_FIELDS) {
+      if (body[key] !== undefined) data[key] = body[key];
+    }
+
+    const submission = new ProductSubmission({
+      ...data,
+      userId: userId || new mongoose.Types.ObjectId(),
+      status: "pending",
+      createdAt: new Date(),
+    });
+
+    await submission.save();
+
+    // Müşteri iletişim bilgilerini admin bildirim e-postasına ekle.
+    let customerInfo = null;
+    if (userId) {
+      try {
+        const user = await User.findById(userId);
+        if (user) {
+          customerInfo = {
+            name: user.name || "",
+            email: user.email || "",
+            phone: user.phone || "",
+          };
+        }
+      } catch (error) {
+        console.error("Müşteri bilgileri alınamadı:", error);
+      }
+    }
+
+    try {
+      await sendNewSubmissionNotificationToAdmin({
+        ...submission.toObject(),
+        customerInfo,
+      });
+    } catch (error) {
+      console.error("Mail gönderme hatası:", error);
+    }
+
+    return NextResponse.json({ message: "Success" }, { status: 200 });
+  } catch (error) {
+    console.error(`Error in ${source}:`, error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+}
