@@ -4,6 +4,7 @@ import connectDB from "@/lib/mongodb";
 import ProductSubmission from "@/models/ProductSubmission";
 import User from "@/models/User";
 import { sendNewSubmissionNotificationToAdmin } from "@/lib/email";
+import { getVerifiedUserId } from "@/lib/auth";
 
 /**
  * Tüm "bize-sat" kategorileri için ortak teklif (submission) oluşturma mantığı.
@@ -28,28 +29,15 @@ const ALLOWED_FIELDS = [
   "ports", "interface", "chipSet", "dviOutput", "furmarkResult", "opened",
   "thermalPadChanged", "miningUsed", "miningDuration", "warrantySticker",
   "coilWhine", "oxidation",
+  // Kategoriye özel ek alanlar (RAM/SSD, mouse, klavye, monitör, ses sistemi)
+  "capacity", "speed", "dpi", "connectivity", "switchType", "layout",
+  "resolution", "panelType", "responseTime", "power",
 ] as const;
-
-// JWT token'dan userId çıkarır (token yoksa/geçersizse anonim gönderim).
-function extractUserId(request: Request): string | null {
-  try {
-    const token = request.headers.get("authorization")?.replace("Bearer ", "");
-    if (token) {
-      const decoded = JSON.parse(
-        Buffer.from(token.split(".")[1], "base64").toString()
-      );
-      return decoded.userId ?? null;
-    }
-  } catch {
-    // Geçersiz token — anonim gönderim olarak devam edilir.
-  }
-  return null;
-}
 
 export async function handleProductSubmission(request: Request, source: string) {
   try {
     const body = await request.json();
-    const userId = extractUserId(request);
+    const userId = getVerifiedUserId(request);
 
     await connectDB();
 

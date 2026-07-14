@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import connectDB from "@/lib/mongodb";
 import User from "@/models/User";
 import { sendNewSubmissionNotificationToAdmin } from '@/lib/email';
+import { getVerifiedUserId } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,14 +13,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     console.log('📝 Gelen veri:', JSON.stringify(body, null, 2));
 
-    // JWT token'dan userId al
-    let userId = null;
-    try {
-      const token = request.headers.get('authorization')?.replace('Bearer ', '');
-      if (token) {
-        const decoded = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
-        userId = decoded.userId;
-        console.log('📝 Found userId from token:', userId);
+    // JWT token'dan userId al (imza doğrulanır — sahte userId engellenir)
+    const userId = getVerifiedUserId(request);
     console.log('🔍 Received form data:', body);
     console.log('🔍 Dropdown values in API:', {
       processorBrand: body.processorBrand,
@@ -27,10 +22,6 @@ export async function POST(request: NextRequest) {
       storageType: body.storageType,
       graphicsCardWatt: body.graphicsCardWatt
     });
-      }
-    } catch (error) {
-      console.log('📝 No valid token found, creating temporary userId');
-    }
     
     // MongoDB bağlantısı kontrolü
     if (!process.env.MONGODB_URI) {
