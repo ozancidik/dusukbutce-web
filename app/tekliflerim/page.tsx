@@ -49,22 +49,13 @@ export default function TekliflerimPage() {
 
   const fetchSubmissions = async () => {
     try {
-      // Get userId from localStorage token
-      let userId = null;
-      try {
-        const token = localStorage.getItem('token');
-        if (token) {
-          const decoded = decodeJWT(token);
-          userId = decoded?.userId;
-          console.log('🔍 Token decoded userId:', userId);
-        }
-      } catch (error) {
-        console.log('No valid token found');
-      }
-
-      const url = userId ? `/api/submissions?userId=${userId}` : '/api/submissions';
-      console.log('🔍 Fetching submissions from:', url);
-      const response = await fetch(url);
+      // Sunucu, kullanıcıyı doğrulanmış token'dan tespit eder; ?userId= artık gönderilmez.
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/submissions', {
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      });
       const data = await response.json();
       
       console.log('🔍 API response:', data);

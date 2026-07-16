@@ -8,11 +8,13 @@ import Footer from "./components/Footer";
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
+  display: "optional",
 });
 
 const robotoMono = Roboto_Mono({
   variable: "--font-roboto-mono",
   subsets: ["latin"],
+  display: "optional",
 });
 
 export const metadata: Metadata = {

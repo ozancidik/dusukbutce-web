@@ -40,5 +40,8 @@ yarn-error.log*
 .idea/
 .vscode/
 
+# Claude Code (yerel ayarlar — commit'lenmez)
+.claude/settings.local.json
+
 # proje-özel (geçmişte yanlışlıkla eklenmişti)
 app/admin-users/page.tsx

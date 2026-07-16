@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import connectDB from "@/lib/mongodb";
 import User from "@/models/User";
 import { sendNewSubmissionNotificationToAdmin } from '@/lib/email';
+import { getVerifiedUser, getVerifiedUserId } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,19 +13,9 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     console.log('📝 Gelen veri:', JSON.stringify(body, null, 2));
 
-    // JWT token'dan userId al
-    let userId = null;
-    try {
-      const token = request.headers.get('authorization')?.replace('Bearer ', '');
-      if (token) {
-        const decoded = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
-        userId = decoded.userId;
-        console.log('📝 Found userId from token:', userId);
-      }
-    } catch (error) {
-      console.log('📝 No valid token found, creating temporary userId');
-    }
-    
+    // JWT token'dan userId al (imza doğrulanır; token yoksa misafir gönderimi)
+    const userId = getVerifiedUserId(request);
+
     // MongoDB bağlantısı kontrolü
     if (!process.env.MONGODB_URI) {
       console.log('⚠️ MongoDB URI tanımlı değil, veri console\'a yazdırılıyor:');
@@ -137,20 +128,34 @@ export async function GET(request: NextRequest) {
     
     await connectDB();
     
+    // Kimlik doğrulama zorunlu — kullanıcı yalnızca KENDİ tekliflerini görebilir.
+    const verified = getVerifiedUser(request);
+    if (!verified) {
+      return NextResponse.json(
+        { success: false, message: 'Yetkisiz erişim' },
+        { status: 401 }
+      );
+    }
+
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category');
-    const userId = searchParams.get('userId');
-    
-    let query = {};
+    const requestedUserId = searchParams.get('userId');
+
+    const query: Record<string, unknown> = {};
     if (category) {
-      query = { category };
+      query.category = category;
     }
-    
-    // If userId is provided, filter by userId
-    if (userId) {
-      query = { ...query, userId: new mongoose.Types.ObjectId(userId) };
+
+    if (verified.isAdmin) {
+      // Admin: belirli bir kullanıcıyı sorgulayabilir; belirtmezse tümü.
+      if (requestedUserId) {
+        query.userId = new mongoose.Types.ObjectId(requestedUserId);
+      }
+    } else {
+      // Normal kullanıcı: yalnızca kendi tekliflerini görür (?userId= yok sayılır).
+      query.userId = new mongoose.Types.ObjectId(verified.userId);
     }
-    
+
     const submissions = await ProductSubmission.find(query).sort({ createdAt: -1 });
     
     return NextResponse.json({ 
@@ -173,16 +178,25 @@ export async function PUT(request: NextRequest) {
     
     await connectDB();
     
+    // Kimlik doğrulama zorunlu.
+    const verified = getVerifiedUser(request);
+    if (!verified) {
+      return NextResponse.json(
+        { success: false, message: 'Yetkisiz erişim' },
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
     const { id, status, deliveryMethod, customerInfo } = body;
-    
+
     if (!id) {
       return NextResponse.json(
         { success: false, message: 'Submission ID is required' },
         { status: 400 }
       );
     }
-    
+
     // Find and update the submission
     const submission = await ProductSubmission.findById(id);
     if (!submission) {
@@ -191,7 +205,15 @@ export async function PUT(request: NextRequest) {
         { status: 404 }
       );
     }
-    
+
+    // Sahiplik kontrolü: admin değilse yalnızca kendi teklifini güncelleyebilir.
+    if (!verified.isAdmin && submission.userId?.toString() !== verified.userId) {
+      return NextResponse.json(
+        { success: false, message: 'Bu teklifi güncelleme yetkiniz yok' },
+        { status: 403 }
+      );
+    }
+
     // Update submission fields
     if (status) {
       submission.status = status;
@@ -255,26 +277,23 @@ export async function DELETE(request: NextRequest) {
       );
     }
     
-    // Get userId from JWT token to verify ownership
-    let userId = null;
-    try {
-      const token = request.headers.get('authorization')?.replace('Bearer ', '');
-      if (token) {
-        const decoded = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
-        userId = decoded.userId;
-      }
-    } catch (error) {
-      console.log('No valid token found for deletion');
-    }
-    
-    // Check if user owns this submission (optional security check)
-    if (userId && submission.userId && submission.userId.toString() !== userId) {
+    // Kimlik doğrulama zorunlu (eski kod token yoksa kontrolü atlıyordu).
+    const verified = getVerifiedUser(request);
+    if (!verified) {
       return NextResponse.json(
-        { success: false, message: 'Unauthorized to delete this submission' },
+        { success: false, message: 'Yetkisiz erişim' },
+        { status: 401 }
+      );
+    }
+
+    // Sahiplik kontrolü: admin değilse yalnızca kendi teklifini silebilir.
+    if (!verified.isAdmin && submission.userId?.toString() !== verified.userId) {
+      return NextResponse.json(
+        { success: false, message: 'Bu teklifi silme yetkiniz yok' },
         { status: 403 }
       );
     }
-    
+
     // Delete the submission
     await ProductSubmission.findByIdAndDelete(submissionId);
     
