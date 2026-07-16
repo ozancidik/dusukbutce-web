@@ -36,6 +36,8 @@ const productSubmissionSchema = new mongoose.Schema({
   quantity: { type: Number, default: 1 },
   createdAt: { type: Date, default: Date.now },
   status: { type: String, enum: ['pending', 'offered', 'listed', 'rejected', 'approved', 'accepted', 'customer_accepted', 'customer_rejected', 'delivery_confirmed'], default: 'pending' },
+  offerNumber: { type: String }, // Teklif numarası (OFFER-2024-001234)
+  orderNumber: { type: String }, // Sipariş numarası (ORDER-2024-001234)
   adminNotes: { type: String },
   offer: {
     amount: { type: Number },
@@ -88,7 +90,23 @@ const productSubmissionSchema = new mongoose.Schema({
   miningDuration: { type: String },
   warrantySticker: { type: String },
   coilWhine: { type: String },
-  oxidation: { type: String }
+  oxidation: { type: String },
+  // RAM / SSD
+  capacity: { type: String },
+  speed: { type: String },
+  // Mouse
+  dpi: { type: String },
+  // Genel bağlantı türü (mouse, klavye, tablet, kulaklık, ses sistemi)
+  connectivity: { type: String },
+  // Klavye
+  switchType: { type: String },
+  layout: { type: String },
+  // Monitör
+  resolution: { type: String },
+  panelType: { type: String },
+  responseTime: { type: String },
+  // Ses sistemi
+  power: { type: String }
 });
 
 export default mongoose.models.ProductSubmission || mongoose.model('ProductSubmission', productSubmissionSchema); 

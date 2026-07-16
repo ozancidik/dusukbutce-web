@@ -68,6 +68,13 @@ export async function POST(request: NextRequest) {
     
     // Teklif verildiğinde offer bilgilerini de güncelle
     if (action === 'offer') {
+      // Eğer daha önce teklif numarası yoksa oluştur
+      if (!submission.offerNumber) {
+        const { generateOfferNumber } = await import('@/lib/numberGenerator');
+        updateData.offerNumber = await generateOfferNumber();
+        console.log('📝 Yeni teklif numarası oluşturuldu:', updateData.offerNumber);
+      }
+      
       updateData.offerAmount = amount;
       updateData.offer = {
         amount: amount,

@@ -120,16 +120,42 @@ export default function SubmissionCard({
           }}>
             {submission.brand} {submission.model}
           </h3>
-          <span style={{
-            fontSize: isMobile ? '12px' : '14px',
-            color: '#6b7280',
-            background: '#f1f5f9',
-            padding: '4px 8px',
-            borderRadius: '6px',
-            textTransform: 'capitalize'
-          }}>
-            {getCategoryDisplayName(submission.category)}
-          </span>
+          <div style={{ marginBottom: '4px', display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center' }}>
+            {submission.offerNumber && (
+              <span style={{
+                fontSize: isMobile ? '11px' : '12px',
+                color: '#3b82f6',
+                background: '#dbeafe',
+                padding: '4px 8px',
+                borderRadius: '6px',
+                fontWeight: '500'
+              }}>
+                📋 {submission.offerNumber}
+              </span>
+            )}
+            {submission.orderNumber && (
+              <span style={{
+                fontSize: isMobile ? '11px' : '12px',
+                color: '#10b981',
+                background: '#d1fae5',
+                padding: '4px 8px',
+                borderRadius: '6px',
+                fontWeight: '500'
+              }}>
+                🛒 {submission.orderNumber}
+              </span>
+            )}
+            <span style={{
+              fontSize: isMobile ? '12px' : '14px',
+              color: '#6b7280',
+              background: '#f1f5f9',
+              padding: '4px 8px',
+              borderRadius: '6px',
+              textTransform: 'capitalize'
+            }}>
+              {getCategoryDisplayName(submission.category)}
+            </span>
+          </div>
         </div>
         <span style={{
           fontSize: isMobile ? '12px' : '14px',

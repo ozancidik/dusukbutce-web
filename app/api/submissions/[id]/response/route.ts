@@ -51,20 +51,30 @@ export async function PUT(
     const newStatus = action === 'accepted' ? 'customer_accepted' : 'customer_rejected';
     console.log('📝 Yeni status:', newStatus);
 
+    // Sipariş kabul edildiğinde sipariş numarası oluştur
+    const updateFields: any = {
+      status: newStatus,
+      'customerResponse.action': action as 'accepted' | 'rejected',
+      'customerResponse.note': note || '',
+      'customerResponse.reason': reason || '',
+      'customerResponse.date': new Date(),
+      updatedAt: new Date()
+    };
+
+    // Eğer teklif kabul edildiyse ve sipariş numarası yoksa oluştur
+    if (action === 'accepted' && !submission.orderNumber) {
+      const { generateOrderNumber } = await import('@/lib/numberGenerator');
+      updateFields.orderNumber = await generateOrderNumber();
+      console.log('📦 Yeni sipariş numarası oluşturuldu:', updateFields.orderNumber);
+    }
+
     // Update submission with customer response using findByIdAndUpdate (daha güvenli)
     let updatedSubmission;
     try {
       updatedSubmission = await ProductSubmission.findByIdAndUpdate(
         id,
         {
-          $set: {
-            status: newStatus,
-            'customerResponse.action': action as 'accepted' | 'rejected',
-            'customerResponse.note': note || '',
-            'customerResponse.reason': reason || '',
-            'customerResponse.date': new Date(),
-            updatedAt: new Date()
-          }
+          $set: updateFields
         },
         { new: true, runValidators: false }
       );

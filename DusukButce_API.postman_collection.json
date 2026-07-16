@@ -1,0 +1,2551 @@
+{
+	"info": {
+		"_postman_id": "dusukbutce-api-collection",
+		"name": "DusukButce API Collection",
+		"description": "DusukButce web uygulaması için tüm API endpoint'leri",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const jsonData = pm.response.json();",
+									"    if (jsonData.token) {",
+									"        pm.environment.set('auth_token', jsonData.token);",
+									"        console.log('✅ Token kaydedildi:', jsonData.token.substring(0, 20) + '...');",
+									"    }",
+									"    if (jsonData.user && jsonData.user.id) {",
+									"        pm.environment.set('user_id', jsonData.user.id);",
+									"        console.log('✅ User ID kaydedildi:', jsonData.user.id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\",\n  \"csrfToken\": \"{{csrf_token}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"newuser@example.com\",\n  \"password\": \"password123\",\n  \"firstName\": \"Test\",\n  \"lastName\": \"User\",\n  \"cep_telefonu\": \"05551234567\",\n  \"birth_date\": \"1990-01-01\",\n  \"acceptNewsletter\": false\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/register",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "register"]
+						}
+					}
+				},
+				{
+					"name": "Verify Email",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"token\": \"verification_token_here\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/verify-email",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "verify-email"]
+						}
+					}
+				},
+				{
+					"name": "Resend Verification",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"test@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/resend-verification",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "resend-verification"]
+						}
+					}
+				},
+				{
+					"name": "Forgot Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"test@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/forgot-password",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "forgot-password"]
+						}
+					}
+				},
+				{
+					"name": "Verify Reset Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"token\": \"reset_token_here\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/verify-reset-token",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "verify-reset-token"]
+						}
+					}
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"token\": \"reset_token_here\",\n  \"password\": \"newpassword123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/reset-password",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "reset-password"]
+						}
+					}
+				},
+				{
+					"name": "Change Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"currentPassword\": \"oldpassword123\",\n  \"newPassword\": \"newpassword123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/change-password",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "change-password"]
+						}
+					}
+				},
+				{
+					"name": "Get User Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/auth/update-profile?userId={{user_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "update-profile"],
+							"query": [
+								{
+									"key": "userId",
+									"value": "{{user_id}}"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": \"{{user_id}}\",\n  \"firstName\": \"Updated\",\n  \"lastName\": \"Name\",\n  \"phone\": \"05551234567\",\n  \"birthDate\": \"1990-01-01\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/update-profile",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "update-profile"]
+						}
+					}
+				},
+				{
+					"name": "Verify Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"token\": \"{{auth_token}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/verify-token",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "verify-token"]
+						}
+					}
+				},
+				{
+					"name": "Refresh Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"token\": \"{{auth_token}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/refresh",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "refresh"]
+						}
+					}
+				},
+				{
+					"name": "Get CSRF Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const jsonData = pm.response.json();",
+									"    if (jsonData.csrfToken) {",
+									"        pm.environment.set('csrf_token', jsonData.csrfToken);",
+									"        console.log('✅ CSRF Token kaydedildi');",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/api/auth/csrf-token",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "csrf-token"]
+						}
+					}
+				},
+				{
+					"name": "Check Email",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"test@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/check-email",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "check-email"]
+						}
+					}
+				},
+				{
+					"name": "Check Phone",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"phone\": \"05551234567\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/check-phone",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "check-phone"]
+						}
+					}
+				},
+				{
+					"name": "Get User Email",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": \"{{user_id}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/get-user-email",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "get-user-email"]
+						}
+					}
+				},
+				{
+					"name": "Send Email Change Verification",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"newEmail\": \"newemail@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/send-email-change-verification",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "send-email-change-verification"]
+						}
+					}
+				},
+				{
+					"name": "Google Auth",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/api/auth/google",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "google"]
+						}
+					}
+				},
+				{
+					"name": "Google Callback",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/api/auth/google/callback",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "google", "callback"]
+						}
+					}
+				},
+				{
+					"name": "Facebook Auth",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/api/auth/facebook",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "facebook"]
+						}
+					}
+				},
+				{
+					"name": "Facebook Callback",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/api/auth/facebook/callback",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "facebook", "callback"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "Auth",
+					"item": [
+						{
+							"name": "Admin Login",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"adminpassword123\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/admin/auth",
+									"host": ["{{base_url}}"],
+									"path": ["api", "admin", "auth"]
+								}
+							}
+						},
+						{
+							"name": "Check Admin Auth",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/admin/auth",
+									"host": ["{{base_url}}"],
+									"path": ["api", "admin", "auth"]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Products",
+					"item": [
+						{
+							"name": "Get All Products",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/admin/products",
+									"host": ["{{base_url}}"],
+									"path": ["api", "admin", "products"]
+								}
+							}
+						},
+						{
+							"name": "Create Product",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Test Product\",\n  \"category\": \"laptop\",\n  \"brand\": \"Test Brand\",\n  \"productModel\": \"Model X\",\n  \"price\": 1000,\n  \"stock\": 10,\n  \"description\": \"Test product description\",\n  \"images\": [],\n  \"specifications\": {},\n  \"status\": \"draft\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/admin/products",
+									"host": ["{{base_url}}"],
+									"path": ["api", "admin", "products"]
+								}
+							}
+						},
+						{
+							"name": "Update Product",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"productId\": \"{{product_id}}\",\n  \"name\": \"Updated Product Name\",\n  \"price\": 1200,\n  \"stock\": 15\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/admin/products",
+									"host": ["{{base_url}}"],
+									"path": ["api", "admin", "products"]
+								}
+							}
+						},
+						{
+							"name": "Delete Product",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"productId\": \"{{product_id}}\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/admin/products",
+									"host": ["{{base_url}}"],
+									"path": ["api", "admin", "products"]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Categories",
+					"item": [
+						{
+							"name": "Get All Categories",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/admin/categories?parentId=null&activeOnly=true",
+									"host": ["{{base_url}}"],
+									"path": ["api", "admin", "categories"],
+									"query": [
+										{
+											"key": "parentId",
+											"value": "null"
+										},
+										{
+											"key": "activeOnly",
+											"value": "true"
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Create Category",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"New Category\",\n  \"description\": \"Category description\",\n  \"parentCategory\": null,\n  \"sortOrder\": 0\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/admin/categories",
+									"host": ["{{base_url}}"],
+									"path": ["api", "admin", "categories"]
+								}
+							}
+						},
+						{
+							"name": "Get Category by ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/admin/categories/{{category_id}}",
+									"host": ["{{base_url}}"],
+									"path": ["api", "admin", "categories", "{{category_id}}"]
+								}
+							}
+						},
+						{
+							"name": "Update Category",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Updated Category Name\",\n  \"description\": \"Updated description\",\n  \"isActive\": true\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/admin/categories/{{category_id}}",
+									"host": ["{{base_url}}"],
+									"path": ["api", "admin", "categories", "{{category_id}}"]
+								}
+							}
+						},
+						{
+							"name": "Delete Category",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/admin/categories/{{category_id}}",
+									"host": ["{{base_url}}"],
+									"path": ["api", "admin", "categories", "{{category_id}}"]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Users",
+					"item": [
+						{
+							"name": "Get All Users",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/admin/users",
+									"host": ["{{base_url}}"],
+									"path": ["api", "admin", "users"]
+								}
+							}
+						},
+						{
+							"name": "Delete User",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/admin/users/{{user_id}}",
+									"host": ["{{base_url}}"],
+									"path": ["api", "admin", "users", "{{user_id}}"]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Submissions",
+					"item": [
+						{
+							"name": "Get All Submissions",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/admin/submissions",
+									"host": ["{{base_url}}"],
+									"path": ["api", "admin", "submissions"]
+								}
+							}
+						},
+						{
+							"name": "Update Submission",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"submissionId\": \"{{submission_id}}\",\n  \"status\": \"approved\",\n  \"adminNotes\": \"Approved by admin\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/admin/submissions",
+									"host": ["{{base_url}}"],
+									"path": ["api", "admin", "submissions"]
+								}
+							}
+						},
+						{
+							"name": "Delete Submission",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"submissionId\": \"{{submission_id}}\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/admin/submissions",
+									"host": ["{{base_url}}"],
+									"path": ["api", "admin", "submissions"]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Prices",
+					"item": [
+						{
+							"name": "Get All Prices",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/admin/prices",
+									"host": ["{{base_url}}"],
+									"path": ["api", "admin", "prices"]
+								}
+							}
+						},
+						{
+							"name": "Create Price",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"productId\": \"{{product_id}}\",\n  \"price\": 1000,\n  \"date\": \"2026-01-26\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/admin/prices",
+									"host": ["{{base_url}}"],
+									"path": ["api", "admin", "prices"]
+								}
+							}
+						},
+						{
+							"name": "Get Price by ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/admin/prices/{{price_id}}",
+									"host": ["{{base_url}}"],
+									"path": ["api", "admin", "prices", "{{price_id}}"]
+								}
+							}
+						},
+						{
+							"name": "Update Price",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"price\": 1200\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/admin/prices/{{price_id}}",
+									"host": ["{{base_url}}"],
+									"path": ["api", "admin", "prices", "{{price_id}}"]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Stock",
+					"item": [
+						{
+							"name": "Update Stock",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"productId\": \"{{product_id}}\",\n  \"stock\": 50\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/admin/stock/update",
+									"host": ["{{base_url}}"],
+									"path": ["api", "admin", "stock", "update"]
+								}
+							}
+						},
+						{
+							"name": "Bulk Update Stock",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"updates\": [\n    {\n      \"productId\": \"{{product_id}}\",\n      \"stock\": 50\n    }\n  ]\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/admin/stock/bulk-update",
+									"host": ["{{base_url}}"],
+									"path": ["api", "admin", "stock", "bulk-update"]
+								}
+							}
+						},
+						{
+							"name": "Get Stock History",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/admin/stock/history?productId={{product_id}}",
+									"host": ["{{base_url}}"],
+									"path": ["api", "admin", "stock", "history"],
+									"query": [
+										{
+											"key": "productId",
+											"value": "{{product_id}}"
+										}
+									]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Images",
+					"item": [
+						{
+							"name": "Get All Images",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/admin/images",
+									"host": ["{{base_url}}"],
+									"path": ["api", "admin", "images"]
+								}
+							}
+						},
+						{
+							"name": "Upload Image",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "image",
+											"type": "file",
+											"src": []
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/api/admin/images",
+									"host": ["{{base_url}}"],
+									"path": ["api", "admin", "images"]
+								}
+							}
+						},
+						{
+							"name": "Get Image by ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/admin/images/{{image_id}}",
+									"host": ["{{base_url}}"],
+									"path": ["api", "admin", "images", "{{image_id}}"]
+								}
+							}
+						},
+						{
+							"name": "Update Image",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"url\": \"https://example.com/image.jpg\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/admin/images/{{image_id}}",
+									"host": ["{{base_url}}"],
+									"path": ["api", "admin", "images", "{{image_id}}"]
+								}
+							}
+						},
+						{
+							"name": "Delete Image",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/admin/images/{{image_id}}",
+									"host": ["{{base_url}}"],
+									"path": ["api", "admin", "images", "{{image_id}}"]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Delete",
+					"item": [
+						{
+							"name": "Delete Item",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/admin/delete/{{item_id}}",
+									"host": ["{{base_url}}"],
+									"path": ["api", "admin", "delete", "{{item_id}}"]
+								}
+							}
+						},
+						{
+							"name": "Restore Item",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"itemId\": \"{{item_id}}\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/admin/delete/{{item_id}}",
+									"host": ["{{base_url}}"],
+									"path": ["api", "admin", "delete", "{{item_id}}"]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Action",
+					"item": [
+						{
+							"name": "Admin Action",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 200) {",
+											"    const jsonData = pm.response.json();",
+											"    if (jsonData.submission) {",
+											"        if (jsonData.submission.offerNumber) {",
+											"            pm.environment.set('offer_number', jsonData.submission.offerNumber);",
+											"            console.log('✅ Teklif No kaydedildi:', jsonData.submission.offerNumber);",
+											"        }",
+											"        if (jsonData.submission.orderNumber) {",
+											"            pm.environment.set('order_number', jsonData.submission.orderNumber);",
+											"            console.log('✅ Sipariş No kaydedildi:', jsonData.submission.orderNumber);",
+											"        }",
+											"    }",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"action\": \"offer\",\n  \"submissionId\": \"{{submission_id}}\",\n  \"amount\": 5000,\n  \"notes\": \"Mükemmel durumda ürün\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/admin/action",
+									"host": ["{{base_url}}"],
+									"path": ["api", "admin", "action"]
+								},
+								"description": "Admin işlemleri endpoint'i.\n\n**Actions:**\n- \"offer\": Teklif ver (amount ve notes gerekli)\n- \"list\": İlan oluştur\n- \"reject\": Reddet\n- \"delivery_completed\": Teslimat tamamlandı\n\n**Request Body (Teklif için):**\n- action: \"offer\"\n- submissionId: string\n- amount: number (TL)\n- notes: string (opsiyonel)\n\n**Response:**\n- success: boolean\n- message: string\n- submission: object\n  - offerNumber: string (OFFER-2024-001234 formatında, teklif verildiğinde otomatik oluşturulur)\n  - orderNumber: string (ORDER-2024-001234 formatında, varsa)"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Newsletter",
+					"item": [
+						{
+							"name": "Get Newsletter Subscribers",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/admin/newsletter-subscribers",
+									"host": ["{{base_url}}"],
+									"path": ["api", "admin", "newsletter-subscribers"]
+								}
+							}
+						},
+						{
+							"name": "Send Newsletter",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"subject\": \"Newsletter Subject\",\n  \"content\": \"Newsletter content here\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/admin/send-newsletter",
+									"host": ["{{base_url}}"],
+									"path": ["api", "admin", "send-newsletter"]
+								}
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Submissions",
+			"item": [
+				{
+					"name": "General Submissions",
+					"item": [
+						{
+							"name": "Create Submission (Generic)",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"category\": \"playstation\",\n  \"brand\": \"Sony\",\n  \"model\": \"PS5\",\n  \"condition\": \"used\",\n  \"price\": 5000\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/submissions",
+									"host": ["{{base_url}}"],
+									"path": ["api", "submissions"]
+								}
+							}
+						},
+						{
+							"name": "PlayStation Submission",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 200) {",
+											"    const jsonData = pm.response.json();",
+											"    if (jsonData.id) {",
+											"        pm.environment.set('submission_id', jsonData.id);",
+											"        console.log('✅ Submission ID kaydedildi:', jsonData.id);",
+											"    }",
+											"    if (jsonData.offerNumber) {",
+											"        pm.environment.set('offer_number', jsonData.offerNumber);",
+											"        console.log('✅ Teklif No kaydedildi:', jsonData.offerNumber);",
+											"    }",
+											"    if (jsonData.orderNumber) {",
+											"        pm.environment.set('order_number', jsonData.orderNumber);",
+											"        console.log('✅ Sipariş No kaydedildi:', jsonData.orderNumber);",
+											"    }",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"category\": \"playstation\",\n  \"brand\": \"Sony\",\n  \"model\": \"PS5\",\n  \"storage\": \"825GB\",\n  \"color\": \"Beyaz\",\n  \"controllers\": 2,\n  \"games\": \"Spider-Man 2, God of War Ragnarök\",\n  \"accessories\": \"Kamera, şarj istasyonu\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"24\",\n  \"invoiceDate\": \"2024-01-15\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda PS5, 2 adet DualSense kontrolcü ve oyunlar dahil.\",\n  \"images\": []\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/submissions",
+									"host": ["{{base_url}}"],
+									"path": ["api", "submissions"]
+								},
+								"description": "PlayStation submission için tüm alanlar:\n- Temel: brand (Sony), model, storage, color\n- Aksesuarlar: controllers, games, accessories\n- Durum: cosmeticCondition, hasBox, hasInvoice, hasWarranty, warrantyDuration, invoiceDate, quantity\n- Açıklama: description\n- Fotoğraflar: images\n\n**Response:**\n- success: boolean\n- message: string\n- id: string (MongoDB ObjectId - unique)\n- offerNumber: string (OFFER-2024-001234 formatında, teklif verildiğinde otomatik oluşturulur)\n- orderNumber: string (ORDER-2024-001234 formatında, sipariş kabul edildiğinde otomatik oluşturulur)"
+							},
+							"response": []
+						},
+						{
+							"name": "Xbox Submission",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"category\": \"xbox\",\n  \"brand\": \"Microsoft\",\n  \"model\": \"Xbox Series X\",\n  \"storage\": \"1TB\",\n  \"color\": \"Siyah\",\n  \"controllers\": 1,\n  \"games\": \"Forza Horizon 5, Halo Infinite\",\n  \"accessories\": \"Şarj istasyonu\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"24\",\n  \"invoiceDate\": \"2024-02-01\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda Xbox Series X, kontrolcü ve oyunlar dahil.\",\n  \"images\": []\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/submissions",
+									"host": ["{{base_url}}"],
+									"path": ["api", "submissions"]
+								},
+								"description": "Xbox submission için tüm alanlar:\n- Temel: brand (Microsoft), model, storage, color\n- Aksesuarlar: controllers, games, accessories\n- Durum: cosmeticCondition, hasBox, hasInvoice, hasWarranty, warrantyDuration, invoiceDate, quantity\n- Açıklama: description\n- Fotoğraflar: images\n\n**Response:**\n- success: boolean\n- message: string\n- id: string (MongoDB ObjectId - unique)\n- offerNumber: string (OFFER-2024-001234 formatında, teklif verildiğinde otomatik oluşturulur)\n- orderNumber: string (ORDER-2024-001234 formatında, sipariş kabul edildiğinde otomatik oluşturulur)"
+							}
+						},
+						{
+							"name": "Cep Telefonu Submission",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"category\": \"cep-telefonu\",\n  \"brand\": \"Apple\",\n  \"model\": \"iPhone 15 Pro\",\n  \"storage\": \"256GB\",\n  \"ram\": \"8GB\",\n  \"batteryHealth\": \"98\",\n  \"screenSize\": \"6.1\\\"\",\n  \"color\": \"Titanium\",\n  \"registrationType\": \"Kayıtlı\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"12\",\n  \"invoiceDate\": \"2024-01-20\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda iPhone, tüm aksesuarları mevcut.\",\n  \"images\": []\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/submissions",
+									"host": ["{{base_url}}"],
+									"path": ["api", "submissions"]
+								},
+								"description": "Cep telefonu submission için tüm alanlar:\n- Temel: brand, model, storage, ram\n- Özellikler: batteryHealth, screenSize, color, registrationType\n- Durum: cosmeticCondition, hasBox, hasInvoice, hasWarranty, warrantyDuration, invoiceDate, quantity\n- Açıklama: description\n- Fotoğraflar: images"
+							}
+						},
+						{
+							"name": "Yazıcı Submission",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"category\": \"yazici\",\n  \"brand\": \"HP\",\n  \"model\": \"LaserJet Pro M404dn\",\n  \"type\": \"Lazer\",\n  \"color\": \"Beyaz\",\n  \"connectionType\": \"USB, Wi-Fi, Ethernet\",\n  \"printSpeed\": \"38 sayfa/dakika\",\n  \"resolution\": \"1200x1200 dpi\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"12\",\n  \"invoiceDate\": \"2024-02-15\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda lazer yazıcı, test edildi.\",\n  \"images\": []\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/submissions",
+									"host": ["{{base_url}}"],
+									"path": ["api", "submissions"]
+								},
+								"description": "Yazıcı submission için tüm alanlar:\n- Temel: brand, model, type, color\n- Teknik: connectionType, printSpeed, resolution\n- Durum: cosmeticCondition, hasBox, hasInvoice, hasWarranty, warrantyDuration, invoiceDate, quantity\n- Açıklama: description\n- Fotoğraflar: images"
+							}
+						},
+						{
+							"name": "Tarayıcı Submission",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"category\": \"tarayici\",\n  \"brand\": \"Canon\",\n  \"model\": \"CanoScan LiDE 400\",\n  \"type\": \"Flatbed\",\n  \"connectionType\": \"USB\",\n  \"resolution\": \"4800x4800 dpi\",\n  \"scanSpeed\": \"10 saniye/A4\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"12\",\n  \"invoiceDate\": \"2024-01-25\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda tarayıcı, test edildi.\",\n  \"images\": []\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/submissions",
+									"host": ["{{base_url}}"],
+									"path": ["api", "submissions"]
+								},
+								"description": "Tarayıcı submission için tüm alanlar:\n- Temel: brand, model, type\n- Teknik: connectionType, resolution, scanSpeed\n- Durum: cosmeticCondition, hasBox, hasInvoice, hasWarranty, warrantyDuration, invoiceDate, quantity\n- Açıklama: description\n- Fotoğraflar: images"
+							}
+						},
+						{
+							"name": "Fotokopi Makinesi Submission",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"category\": \"fotokopi-makinesi\",\n  \"brand\": \"Canon\",\n  \"model\": \"imageRUNNER ADVANCE C5535i\",\n  \"type\": \"Renkli\",\n  \"color\": \"Beyaz\",\n  \"connectionType\": \"Ethernet, USB\",\n  \"copySpeed\": \"45 sayfa/dakika\",\n  \"resolution\": \"1200x1200 dpi\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"12\",\n  \"invoiceDate\": \"2024-02-10\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda fotokopi makinesi, test edildi.\",\n  \"images\": []\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/submissions",
+									"host": ["{{base_url}}"],
+									"path": ["api", "submissions"]
+								},
+								"description": "Fotokopi makinesi submission için tüm alanlar:\n- Temel: brand, model, type, color\n- Teknik: connectionType, copySpeed, resolution\n- Durum: cosmeticCondition, hasBox, hasInvoice, hasWarranty, warrantyDuration, invoiceDate, quantity\n- Açıklama: description\n- Fotoğraflar: images"
+							}
+						},
+						{
+							"name": "Gamepad Submission",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"category\": \"gamepad\",\n  \"brand\": \"Microsoft\",\n  \"model\": \"Xbox Wireless Controller\",\n  \"condition\": \"Mükemmel\",\n  \"color\": \"Siyah\",\n  \"accessories\": \"Şarj kablosu, dongle\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"12\",\n  \"invoiceDate\": \"2024-03-10\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda Xbox kontrolcü, şarj kablosu dahil.\",\n  \"images\": []\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/submissions",
+									"host": ["{{base_url}}"],
+									"path": ["api", "submissions"]
+								},
+								"description": "Gamepad submission için tüm alanlar:\n- Temel: brand (Microsoft/Sony/Logitech vb.), model, condition, color, accessories\n- Durum: cosmeticCondition, hasBox, hasInvoice, hasWarranty, warrantyDuration, invoiceDate, quantity\n- Açıklama: description\n- Fotoğraflar: images"
+							}
+						},
+						{
+							"name": "Get Submissions",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 200) {",
+											"    const jsonData = pm.response.json();",
+											"    if (jsonData.success && jsonData.submissions && jsonData.submissions.length > 0) {",
+											"        const firstSubmission = jsonData.submissions[0];",
+											"        if (firstSubmission._id) {",
+											"            pm.environment.set('submission_id', firstSubmission._id);",
+											"            console.log('✅ Submission ID kaydedildi:', firstSubmission._id);",
+											"        }",
+											"        if (firstSubmission.offerNumber) {",
+											"            pm.environment.set('offer_number', firstSubmission.offerNumber);",
+											"            console.log('✅ Teklif No kaydedildi:', firstSubmission.offerNumber);",
+											"        }",
+											"        if (firstSubmission.orderNumber) {",
+											"            pm.environment.set('order_number', firstSubmission.orderNumber);",
+											"            console.log('✅ Sipariş No kaydedildi:', firstSubmission.orderNumber);",
+											"        }",
+											"    }",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}",
+										"disabled": true
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/submissions",
+									"host": ["{{base_url}}"],
+									"path": ["api", "submissions"],
+									"query": [
+										{
+											"key": "category",
+											"value": "playstation",
+											"disabled": true,
+											"description": "Opsiyonel: Kategori filtresi"
+										},
+										{
+											"key": "userId",
+											"value": "{{user_id}}",
+											"disabled": true,
+											"description": "Opsiyonel: JWT token'dan otomatik alınır, manuel göndermeye gerek yok"
+										}
+									]
+								},
+								"description": "Kullanıcının submission'larını getirir.\n\n**Query Parameters (Opsiyonel):**\n- category: Kategori filtresi (playstation, xbox, vb.)\n- userId: Kullanıcı ID (opsiyonel - JWT token'dan otomatik alınır)\n\n**Authorization:**\n- Bearer token ile gönderilirse, token'dan userId otomatik çıkarılır\n- Token yoksa veya userId query parametresi varsa, query parametresi kullanılır\n- Hiçbiri yoksa, tüm submission'lar döndürülür (admin için)\n\n**Response:**\n- success: boolean\n- submissions: array\n  - Her submission'da offerNumber ve orderNumber alanları bulunur (varsa)"
+							},
+							"response": []
+						},
+						{
+							"name": "Update Submission",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"id\": \"{{submission_id}}\",\n  \"status\": \"approved\",\n  \"deliveryMethod\": \"pickup\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/submissions",
+									"host": ["{{base_url}}"],
+									"path": ["api", "submissions"]
+								}
+							}
+						},
+						{
+							"name": "Delete Submission",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}",
+										"disabled": true
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/submissions?id={{submission_id}}",
+									"host": ["{{base_url}}"],
+									"path": ["api", "submissions"],
+									"query": [
+										{
+											"key": "id",
+											"value": "{{submission_id}}"
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Submit Response",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 200) {",
+											"    const jsonData = pm.response.json();",
+											"    if (jsonData.submission) {",
+											"        if (jsonData.submission.orderNumber) {",
+											"            pm.environment.set('order_number', jsonData.submission.orderNumber);",
+											"            console.log('✅ Sipariş No kaydedildi:', jsonData.submission.orderNumber);",
+											"        }",
+											"        if (jsonData.submission.offerNumber) {",
+											"            pm.environment.set('offer_number', jsonData.submission.offerNumber);",
+											"            console.log('✅ Teklif No kaydedildi:', jsonData.submission.offerNumber);",
+											"        }",
+											"    }",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"action\": \"accepted\",\n  \"note\": \"Teklifi kabul ediyorum\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/submissions/{{submission_id}}/response",
+									"host": ["{{base_url}}"],
+									"path": ["api", "submissions", "{{submission_id}}", "response"]
+								},
+								"description": "Teklif yanıtı gönderme endpoint'i.\n\n**Request Body:**\n- action: \"accepted\" veya \"rejected\"\n- note: (opsiyonel) Not\n- reason: (opsiyonel) Red nedeni\n\n**Response:**\n- success: boolean\n- message: string\n- submission: object\n  - orderNumber: string (ORDER-2024-001234 formatında, teklif kabul edildiğinde otomatik oluşturulur)\n  - offerNumber: string (OFFER-2024-001234 formatında, varsa)"
+							},
+							"response": []
+						},
+						{
+							"name": "Reoffer Submission",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"newPrice\": 4500\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/submissions/{{submission_id}}/reoffer",
+									"host": ["{{base_url}}"],
+									"path": ["api", "submissions", "{{submission_id}}", "reoffer"]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Notebook Submissions",
+					"item": [
+						{
+							"name": "Create Notebook Submission",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 200) {",
+											"    const jsonData = pm.response.json();",
+											"    if (jsonData.id) {",
+											"        pm.environment.set('submission_id', jsonData.id);",
+											"        console.log('✅ Submission ID kaydedildi:', jsonData.id);",
+											"    }",
+											"    if (jsonData.offerNumber) {",
+											"        pm.environment.set('offer_number', jsonData.offerNumber);",
+											"        console.log('✅ Teklif No kaydedildi:', jsonData.offerNumber);",
+											"    }",
+											"    if (jsonData.orderNumber) {",
+											"        pm.environment.set('order_number', jsonData.orderNumber);",
+											"        console.log('✅ Sipariş No kaydedildi:', jsonData.orderNumber);",
+											"    }",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"category\": \"notebook\",\n  \"brand\": \"Apple\",\n  \"model\": \"MacBook Pro 16\",\n  \"processorBrand\": \"Apple\",\n  \"processor\": \"M1 Pro\",\n  \"graphicsCard\": \"M1 Pro GPU\",\n  \"graphicsCardWatt\": \"\",\n  \"ram\": \"32GB\",\n  \"ramType\": \"LPDDR5\",\n  \"storage\": \"1TB\",\n  \"storageType\": \"NVMe\",\n  \"screenSize\": \"16 inch\",\n  \"refreshRate\": \"120Hz\",\n  \"batteryHealth\": \"95\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"24\",\n  \"invoiceDate\": \"2024-01-15\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda MacBook Pro. Tüm orijinal aksesuarları ve kutuları mevcut.\",\n  \"images\": []\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/notebook-submissions",
+									"host": ["{{base_url}}"],
+									"path": ["api", "notebook-submissions"]
+								},
+								"description": "Notebook submission için tüm alanlar:\n- Temel: brand, model\n- İşlemci: processorBrand, processor\n- Ekran Kartı: graphicsCard, graphicsCardWatt\n- Bellek: ram, ramType, storage, storageType\n- Ekran: screenSize, refreshRate\n- Pil: batteryHealth\n- Durum: cosmeticCondition, hasBox, hasInvoice, hasWarranty, warrantyDuration, invoiceDate, quantity\n- Açıklama: description\n- Fotoğraflar: images (base64 array)\n\n**Response:**\n- success: boolean\n- message: string\n- id: string (MongoDB ObjectId - unique)\n- offerNumber: string (OFFER-2024-001234 formatında, teklif verildiğinde otomatik oluşturulur)\n- orderNumber: string (ORDER-2024-001234 formatında, sipariş kabul edildiğinde otomatik oluşturulur)"
+							},
+							"response": []
+						},
+						{
+							"name": "Create Desktop Submission (Masaüstü Bilgisayar)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 200) {",
+											"    const jsonData = pm.response.json();",
+											"    if (jsonData.id) {",
+											"        pm.environment.set('submission_id', jsonData.id);",
+											"        console.log('✅ Submission ID kaydedildi:', jsonData.id);",
+											"    }",
+											"    if (jsonData.offerNumber) {",
+											"        pm.environment.set('offer_number', jsonData.offerNumber);",
+											"        console.log('✅ Teklif No kaydedildi:', jsonData.offerNumber);",
+											"    }",
+											"    if (jsonData.orderNumber) {",
+											"        pm.environment.set('order_number', jsonData.orderNumber);",
+											"        console.log('✅ Sipariş No kaydedildi:', jsonData.orderNumber);",
+											"    }",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"category\": \"desktop\",\n  \"brand\": \"Dell\",\n  \"model\": \"OptiPlex 7090\",\n  \"processorBrand\": \"Intel\",\n  \"processor\": \"i7-11700\",\n  \"graphicsCard\": \"RTX 4060\",\n  \"graphicsCardWatt\": \"140W\",\n  \"ram\": \"32GB\",\n  \"ramType\": \"DDR4\",\n  \"storage\": \"1TB SSD\",\n  \"storageType\": \"NVMe\",\n  \"powerSupply\": \"750W 80+ Gold\",\n  \"motherboard\": \"ASUS Prime B660M\",\n  \"case\": \"NZXT H510\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"24\",\n  \"invoiceDate\": \"2024-01-15\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda, az kullanılmış masaüstü bilgisayar. Tüm orijinal kutuları ve faturaları mevcut.\",\n  \"images\": []\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/notebook-submissions",
+									"host": ["{{base_url}}"],
+									"path": ["api", "notebook-submissions"]
+								},
+								"description": "Masaüstü bilgisayar submission için tüm alanları içerir:\n- Temel Bilgiler: brand, model\n- İşlemci: processorBrand, processor\n- Ekran Kartı: graphicsCard, graphicsCardWatt\n- Bellek ve Depolama: ram, ramType, storage, storageType\n- Diğer Donanım: powerSupply, motherboard, case\n- Ürün Durumu: cosmeticCondition, hasBox, hasInvoice, hasWarranty, warrantyDuration, invoiceDate, quantity\n- Açıklama: description\n- Fotoğraflar: images (base64 array)\n\n**Response:**\n- success: boolean\n- message: string\n- id: string (MongoDB ObjectId - unique)\n- offerNumber: string (OFFER-2024-001234 formatında, teklif verildiğinde otomatik oluşturulur)\n- orderNumber: string (ORDER-2024-001234 formatında, sipariş kabul edildiğinde otomatik oluşturulur)"
+							},
+							"response": []
+						},
+						{
+							"name": "Get Notebook Submissions",
+							"request": {
+								"method": "GET",
+								"url": {
+									"raw": "{{base_url}}/api/notebook-submissions",
+									"host": ["{{base_url}}"],
+									"path": ["api", "notebook-submissions"]
+								}
+							}
+						},
+						{
+							"name": "Update Notebook Submission",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"id\": \"{{submission_id}}\",\n  \"status\": \"approved\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/notebook-submissions",
+									"host": ["{{base_url}}"],
+									"path": ["api", "notebook-submissions"]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Product Submissions",
+					"item": [
+						{
+							"name": "Processor Submission",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"brand\": \"Intel\",\n  \"model\": \"i7-13700K\",\n  \"socket\": \"LGA1700\",\n  \"coreCount\": \"16\",\n  \"threadCount\": \"24\",\n  \"baseClock\": \"3.4 GHz\",\n  \"boostClock\": \"5.4 GHz\",\n  \"hasStockCooler\": false,\n  \"overclocked\": \"Hayır\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"36\",\n  \"invoiceDate\": \"2024-01-10\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda işlemci, hiç overclock yapılmadı.\",\n  \"images\": []\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/processor-submissions",
+									"host": ["{{base_url}}"],
+									"path": ["api", "processor-submissions"]
+								},
+								"description": "İşlemci submission için tüm alanlar:\n- Temel: brand, model, socket\n- Özellikler: coreCount, threadCount, baseClock, boostClock\n- Kullanım: hasStockCooler, overclocked\n- Durum: cosmeticCondition, hasBox, hasInvoice, hasWarranty, warrantyDuration, invoiceDate, quantity\n- Açıklama: description\n- Fotoğraflar: images"
+							}
+						},
+						{
+							"name": "Graphics Card Submission",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"brand\": \"ASUS\",\n  \"chipSet\": \"NVIDIA\",\n  \"model\": \"RTX 4070 Ti\",\n  \"memory\": \"12GB\",\n  \"memoryType\": \"256-bit\",\n  \"ports\": \"3x DisplayPort, 1x HDMI\",\n  \"dviOutput\": \"Yok\",\n  \"furmarkResult\": \"Test edildi, stabil çalışıyor\",\n  \"opened\": \"Hayır\",\n  \"thermalPadChanged\": \"Hayır\",\n  \"miningUsed\": \"Hayır\",\n  \"miningDuration\": \"\",\n  \"warrantySticker\": \"Sağlam\",\n  \"coilWhine\": \"Yok\",\n  \"oxidation\": \"Yok\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"36\",\n  \"invoiceDate\": \"2024-02-01\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda ekran kartı, hiç mining yapılmadı, garanti sticker sağlam.\",\n  \"images\": []\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/graphics-card-submissions",
+									"host": ["{{base_url}}"],
+									"path": ["api", "graphics-card-submissions"]
+								},
+								"description": "Ekran kartı submission için tüm alanlar:\n- Temel: brand, chipSet, model\n- Teknik: memory, memoryType, ports, dviOutput\n- Test/Kullanım: furmarkResult, opened, thermalPadChanged, miningUsed, miningDuration, warrantySticker, coilWhine, oxidation\n- Durum: cosmeticCondition, hasBox, hasInvoice, hasWarranty, warrantyDuration, invoiceDate, quantity\n- Açıklama: description\n- Fotoğraflar: images"
+							}
+						},
+						{
+							"name": "RAM Submission",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"brand\": \"Corsair\",\n  \"model\": \"Vengeance LPX\",\n  \"capacity\": \"32GB\",\n  \"type\": \"DDR4\",\n  \"speed\": \"3600MHz\",\n  \"latency\": \"CL18\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"Lifetime\",\n  \"invoiceDate\": \"2023-12-01\",\n  \"quantity\": 2,\n  \"description\": \"2x16GB kit, XMP profili ile test edildi.\",\n  \"images\": []\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ram-submissions",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ram-submissions"]
+								},
+								"description": "RAM submission için tüm alanlar:\n- Temel: brand, model, capacity, type\n- Özellikler: speed, latency\n- Durum: cosmeticCondition, hasBox, hasInvoice, hasWarranty, warrantyDuration, invoiceDate, quantity\n- Açıklama: description\n- Fotoğraflar: images"
+							}
+						},
+						{
+							"name": "SSD Submission",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"brand\": \"Samsung\",\n  \"model\": \"970 EVO Plus\",\n  \"capacity\": \"1TB\",\n  \"interface\": \"NVMe\",\n  \"formFactor\": \"M.2 2280\",\n  \"readSpeed\": \"3500 MB/s\",\n  \"writeSpeed\": \"3300 MB/s\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"60\",\n  \"invoiceDate\": \"2024-01-05\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda NVMe SSD, hız testleri yapıldı.\",\n  \"images\": []\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ssd-submissions",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ssd-submissions"]
+								},
+								"description": "SSD submission için tüm alanlar:\n- Temel: brand, model, capacity\n- Teknik: interface, formFactor, readSpeed, writeSpeed\n- Durum: cosmeticCondition, hasBox, hasInvoice, hasWarranty, warrantyDuration, invoiceDate, quantity\n- Açıklama: description\n- Fotoğraflar: images"
+							}
+						},
+						{
+							"name": "Cooler Submission",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"brand\": \"Noctua\",\n  \"model\": \"NH-D15\",\n  \"coolerType\": \"Hava Soğutma\",\n  \"radiatorSize\": \"\",\n  \"socketCompatibility\": \"LGA1700, AM5, AM4\",\n  \"hasRGB\": false,\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"72\",\n  \"invoiceDate\": \"2023-11-20\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda hava soğutucu, tüm montaj parçaları mevcut.\",\n  \"images\": []\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/cooler-submissions",
+									"host": ["{{base_url}}"],
+									"path": ["api", "cooler-submissions"]
+								},
+								"description": "Soğutucu submission için tüm alanlar:\n- Temel: brand, model, coolerType\n- Özellikler: radiatorSize (AIO için), socketCompatibility, hasRGB\n- Durum: cosmeticCondition, hasBox, hasInvoice, hasWarranty, warrantyDuration, invoiceDate, quantity\n- Açıklama: description\n- Fotoğraflar: images"
+							}
+						},
+						{
+							"name": "Case Submission",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"brand\": \"Corsair\",\n  \"model\": \"4000D Airflow\",\n  \"formFactor\": \"Mid Tower\",\n  \"color\": \"Siyah\",\n  \"sidePanelType\": \"Tempered Glass\",\n  \"hasRGB\": false,\n  \"fanCount\": \"2x 120mm\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"24\",\n  \"invoiceDate\": \"2024-01-20\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda kasa, tüm vidalar ve montaj parçaları mevcut.\",\n  \"images\": []\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/case-submissions",
+									"host": ["{{base_url}}"],
+									"path": ["api", "case-submissions"]
+								},
+								"description": "Kasa submission için tüm alanlar:\n- Temel: brand, model, formFactor\n- Özellikler: color, sidePanelType, hasRGB, fanCount\n- Durum: cosmeticCondition, hasBox, hasInvoice, hasWarranty, warrantyDuration, invoiceDate, quantity\n- Açıklama: description\n- Fotoğraflar: images"
+							}
+						},
+						{
+							"name": "Monitor Submission",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"brand\": \"LG\",\n  \"model\": \"27GL850-B\",\n  \"screenSize\": \"27\\\"\",\n  \"resolution\": \"2560x1440 (2K)\",\n  \"refreshRate\": \"144Hz\",\n  \"panelType\": \"IPS\",\n  \"responseTime\": \"1ms\",\n  \"curvature\": \"Düz\",\n  \"hdr\": \"HDR10\",\n  \"adaptiveSync\": \"G-Sync Compatible\",\n  \"ports\": \"2x HDMI, 1x DisplayPort, USB-C\",\n  \"deadPixels\": \"Yok\",\n  \"backlight\": \"Minimal\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"36\",\n  \"invoiceDate\": \"2023-10-15\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda gaming monitör, dead pixel yok.\",\n  \"images\": []\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/monitor-submissions",
+									"host": ["{{base_url}}"],
+									"path": ["api", "monitor-submissions"]
+								},
+								"description": "Monitör submission için tüm alanlar:\n- Temel: brand, model, screenSize, resolution, refreshRate, panelType\n- Özellikler: responseTime, curvature, hdr, adaptiveSync, ports\n- Durum Bilgileri: deadPixels, backlight\n- Ürün Durumu: cosmeticCondition, hasBox, hasInvoice, hasWarranty, warrantyDuration, invoiceDate, quantity\n- Açıklama: description\n- Fotoğraflar: images"
+							}
+						},
+						{
+							"name": "Keyboard Submission",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"brand\": \"Corsair\",\n  \"model\": \"K70 RGB TKL\",\n  \"switchType\": \"Cherry MX Red\",\n  \"layout\": \"US\",\n  \"size\": \"TKL (80%)\",\n  \"connectivity\": \"Kablolu\",\n  \"backlight\": \"RGB\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"24\",\n  \"invoiceDate\": \"2024-02-10\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda mekanik klavye, RGB aydınlatma çalışıyor.\",\n  \"images\": []\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/keyboard-submissions",
+									"host": ["{{base_url}}"],
+									"path": ["api", "keyboard-submissions"]
+								},
+								"description": "Klavye submission için tüm alanlar:\n- Temel: brand, model, switchType\n- Özellikler: layout, size, connectivity, backlight\n- Durum: cosmeticCondition, hasBox, hasInvoice, hasWarranty, warrantyDuration, invoiceDate, quantity\n- Açıklama: description\n- Fotoğraflar: images"
+							}
+						},
+						{
+							"name": "Mouse Submission",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"brand\": \"Logitech\",\n  \"model\": \"G Pro X Superlight\",\n  \"connectivity\": \"Kablosuz\",\n  \"interface\": \"USB\",\n  \"color\": \"Siyah\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"24\",\n  \"invoiceDate\": \"2024-01-25\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda kablosuz gaming mouse.\",\n  \"images\": []\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/mouse-submissions",
+									"host": ["{{base_url}}"],
+									"path": ["api", "mouse-submissions"]
+								},
+								"description": "Mouse submission için tüm alanlar:\n- Temel: brand, model, connectivity, interface, color\n- Durum: cosmeticCondition, hasBox, hasInvoice, hasWarranty, warrantyDuration, invoiceDate, quantity\n- Açıklama: description\n- Fotoğraflar: images"
+							}
+						},
+						{
+							"name": "Headphones Submission",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"brand\": \"Sony\",\n  \"model\": \"WH-1000XM5\",\n  \"headphoneType\": \"Over-Ear\",\n  \"connectivity\": \"Çoklu\",\n  \"hasNoiseCancellation\": true,\n  \"hasMicrophone\": true,\n  \"color\": \"Siyah\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"24\",\n  \"invoiceDate\": \"2024-03-01\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda kulaklık, ANC aktif, tüm aksesuarları mevcut.\",\n  \"images\": []\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/headphones-submissions",
+									"host": ["{{base_url}}"],
+									"path": ["api", "headphones-submissions"]
+								},
+								"description": "Kulaklık submission için tüm alanlar:\n- Temel: brand, model, headphoneType, connectivity\n- Özellikler: hasNoiseCancellation, hasMicrophone, color\n- Durum: cosmeticCondition, hasBox, hasInvoice, hasWarranty, warrantyDuration, invoiceDate, quantity\n- Açıklama: description\n- Fotoğraflar: images"
+							}
+						},
+						{
+							"name": "Audio System Submission",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"brand\": \"Bose\",\n  \"model\": \"SoundLink Revolve+\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"12\",\n  \"invoiceDate\": \"2024-02-20\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda Bluetooth hoparlör.\",\n  \"images\": []\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/audio-system-submissions",
+									"host": ["{{base_url}}"],
+									"path": ["api", "audio-system-submissions"]
+								},
+								"description": "Audio System submission için alanlar:\n- Temel: brand, model\n- Durum: cosmeticCondition, hasBox, hasInvoice, hasWarranty, warrantyDuration, invoiceDate, quantity\n- Açıklama: description\n- Fotoğraflar: images"
+							}
+						},
+						{
+							"name": "Sound System Submission",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"brand\": \"JBL\",\n  \"model\": \"PartyBox 310\",\n  \"systemType\": \"2.1\",\n  \"power\": \"240W\",\n  \"connectivity\": \"Bluetooth, AUX, USB\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"24\",\n  \"invoiceDate\": \"2024-01-30\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda ses sistemi, tüm aksesuarları mevcut.\",\n  \"images\": []\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/sound-system-submissions",
+									"host": ["{{base_url}}"],
+									"path": ["api", "sound-system-submissions"]
+								},
+								"description": "Ses sistemi submission için tüm alanlar:\n- Temel: brand, model, systemType\n- Özellikler: power, connectivity\n- Durum: cosmeticCondition, hasBox, hasInvoice, hasWarranty, warrantyDuration, invoiceDate, quantity\n- Açıklama: description\n- Fotoğraflar: images"
+							}
+						},
+						{
+							"name": "Tablet Submission",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"brand\": \"Apple\",\n  \"model\": \"iPad Pro 12.9\\\"\",\n  \"storage\": \"512GB\",\n  \"screenSize\": \"12.9\\\"\",\n  \"connectivity\": \"Wi-Fi + Cellular\",\n  \"batteryHealth\": \"95\",\n  \"hasPen\": true,\n  \"hasKeyboard\": true,\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"12\",\n  \"invoiceDate\": \"2024-01-10\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda iPad Pro, Apple Pencil ve Magic Keyboard dahil.\",\n  \"images\": []\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/tablet-submissions",
+									"host": ["{{base_url}}"],
+									"path": ["api", "tablet-submissions"]
+								},
+								"description": "Tablet submission için tüm alanlar:\n- Temel: brand, model, storage, screenSize, connectivity\n- Durum/Aksesuarlar: batteryHealth, hasPen, hasKeyboard\n- Ürün Durumu: cosmeticCondition, hasBox, hasInvoice, hasWarranty, warrantyDuration, invoiceDate, quantity\n- Açıklama: description\n- Fotoğraflar: images"
+							}
+						},
+						{
+							"name": "Gaming Wheel Submission",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"brand\": \"Logitech\",\n  \"model\": \"G29\",\n  \"forceFeedback\": \"Var\",\n  \"hasPedals\": true,\n  \"hasShifter\": true,\n  \"compatibility\": \"PC, PS4, PS5\",\n  \"cosmeticCondition\": \"Mükemmel\",\n  \"hasBox\": true,\n  \"hasInvoice\": true,\n  \"hasWarranty\": true,\n  \"warrantyDuration\": \"24\",\n  \"invoiceDate\": \"2023-12-15\",\n  \"quantity\": 1,\n  \"description\": \"Mükemmel durumda gaming direksiyon, pedal ve vites kolu dahil.\",\n  \"images\": []\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/gaming-wheel-submissions",
+									"host": ["{{base_url}}"],
+									"path": ["api", "gaming-wheel-submissions"]
+								},
+								"description": "Gaming direksiyon submission için tüm alanlar:\n- Temel: brand, model, forceFeedback\n- Aksesuarlar: hasPedals, hasShifter, compatibility\n- Durum: cosmeticCondition, hasBox, hasInvoice, hasWarranty, warrantyDuration, invoiceDate, quantity\n- Açıklama: description\n- Fotoğraflar: images"
+							}
+						}
+					]
+				},
+				{
+					"name": "Technical Service Submission",
+					"item": [
+						{
+							"name": "Create Technical Service Submission",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"phone\": \"05551234567\",\n  \"deviceType\": \"laptop\",\n  \"brand\": \"Apple\",\n  \"model\": \"MacBook Pro\",\n  \"problem\": \"Screen not working\",\n  \"description\": \"Detailed description of the problem\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/technical-service-submissions",
+									"host": ["{{base_url}}"],
+									"path": ["api", "technical-service-submissions"]
+								}
+							}
+						},
+						{
+							"name": "Get Technical Service Submissions",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}",
+										"disabled": true
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/technical-service-submissions",
+									"host": ["{{base_url}}"],
+									"path": ["api", "technical-service-submissions"]
+								}
+							}
+						},
+						{
+							"name": "Update Technical Service Submission",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"id\": \"{{submission_id}}\",\n  \"status\": \"in_progress\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/technical-service-submissions",
+									"host": ["{{base_url}}"],
+									"path": ["api", "technical-service-submissions"]
+								}
+							}
+						},
+						{
+							"name": "Delete Technical Service Submission",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"id\": \"{{submission_id}}\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/technical-service-submissions",
+									"host": ["{{base_url}}"],
+									"path": ["api", "technical-service-submissions"]
+								}
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Listings",
+			"item": [
+				{
+					"name": "Get All Listings",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/api/listings",
+							"host": ["{{base_url}}"],
+							"path": ["api", "listings"]
+						}
+					}
+				},
+				{
+					"name": "Get Listing by ID",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/api/listings/{{listing_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "listings", "{{listing_id}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Contact",
+			"item": [
+				{
+					"name": "Send Contact Message",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"subject\": \"Question\",\n  \"message\": \"I have a question about your services.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/contact",
+							"host": ["{{base_url}}"],
+							"path": ["api", "contact"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Addresses",
+			"item": [
+				{
+					"name": "Get Addresses",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/addresses?userId={{user_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "addresses"],
+							"query": [
+								{
+									"key": "userId",
+									"value": "{{user_id}}"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Address",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": \"{{user_id}}\",\n  \"title\": \"Home\",\n  \"address\": \"123 Main St\",\n  \"city\": \"Istanbul\",\n  \"district\": \"Kadikoy\",\n  \"postalCode\": \"34000\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/addresses",
+							"host": ["{{base_url}}"],
+							"path": ["api", "addresses"]
+						}
+					}
+				},
+				{
+					"name": "Update Address",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": \"{{user_id}}\",\n  \"addressId\": \"{{address_id}}\",\n  \"title\": \"Work\",\n  \"address\": \"456 Business Ave\",\n  \"city\": \"Istanbul\",\n  \"district\": \"Besiktas\",\n  \"postalCode\": \"34353\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/addresses",
+							"host": ["{{base_url}}"],
+							"path": ["api", "addresses"]
+						}
+					}
+				},
+				{
+					"name": "Delete Address",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": \"{{user_id}}\",\n  \"addressId\": \"{{address_id}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/addresses",
+							"host": ["{{base_url}}"],
+							"path": ["api", "addresses"]
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "auth_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "admin_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "user_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "submission_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "product_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "category_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "listing_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "address_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "price_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "image_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "item_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "csrf_token",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

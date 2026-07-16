@@ -27,6 +27,8 @@ export interface Submission {
   quantity: number;
   createdAt: string;
   status: string;
+  offerNumber?: string;
+  orderNumber?: string;
   adminNotes?: string;
   images: string[];
   offer?: Offer;

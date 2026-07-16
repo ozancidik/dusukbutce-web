@@ -118,10 +118,12 @@ function TeklifTeslimatPageContent() {
           formData
         });
         
+        const token = localStorage.getItem('token');
         const response = await fetch('/api/submissions', {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
           body: JSON.stringify({
             id: submissionId,

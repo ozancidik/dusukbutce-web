@@ -75,10 +75,21 @@ export default function HomePage() {
 
   useEffect(() => {
     let isMounted = true;
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+    let controller: AbortController | null = null;
+
     const loadSliderListings = async () => {
       try {
         setSliderLoading(true);
-        const res = await fetch('/api/listings', { cache: 'no-store' });
+        controller = new AbortController();
+        timeoutId = setTimeout(() => controller!.abort(), 10000);
+
+        const res = await fetch('/api/listings', { 
+          cache: 'no-store',
+          signal: controller.signal
+        });
+        if (timeoutId) { clearTimeout(timeoutId); timeoutId = null; }
+
         if (!res.ok) throw new Error('İlanlar getirilemedi');
         const data = (await res.json()) as ListingSubmission[];
         const items: SliderItem[] = (Array.isArray(data) ? data : [])
@@ -96,17 +107,25 @@ export default function HomePage() {
           setSliderItems(items);
           setCurrent(0);
         }
-      } catch {
-        if (isMounted) {
-          setSliderItems([]);
+      } catch (error) {
+        if (timeoutId) { clearTimeout(timeoutId); timeoutId = null; }
+        // AbortError: 10s timeout veya unmount - konsola yazma, sessizce boş kullan
+        if ((error as Error)?.name === 'AbortError') {
+          if (isMounted) setSliderItems([]);
+          return;
         }
+        console.error('Error loading listings:', error);
+        if (isMounted) setSliderItems([]);
       } finally {
         if (isMounted) setSliderLoading(false);
       }
     };
     loadSliderListings();
+
     return () => {
       isMounted = false;
+      if (timeoutId) clearTimeout(timeoutId);
+      if (controller) controller.abort();
     };
   }, []);
 
