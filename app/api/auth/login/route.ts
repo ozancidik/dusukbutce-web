@@ -5,9 +5,14 @@ import User from '../../../../models/User';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { validateCSRFToken } from '@/lib/security';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 export async function POST(request: NextRequest) {
   try {
+    // Brute-force koruması: IP başına 5 dakikada en fazla 10 giriş denemesi.
+    const limited = checkRateLimit(request, { name: 'login', limit: 10, windowMs: 5 * 60_000 });
+    if (limited) return limited;
+
     await connectDB();
     
     const { email, password, csrfToken } = await request.json();

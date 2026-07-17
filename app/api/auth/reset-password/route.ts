@@ -2,10 +2,13 @@ import { NextResponse, NextRequest } from "next/server";
 import connectDB from "@/lib/mongodb";
 import User from "../../../../models/User";
 import bcrypt from "bcryptjs";
+import { checkRateLimit } from "@/lib/rateLimit";
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('🔐 Şifre sıfırlama API çağrıldı');
+    // Token brute-force koruması: IP başına 15 dakikada en fazla 10 deneme.
+    const limited = checkRateLimit(request, { name: 'reset-password', limit: 10, windowMs: 15 * 60_000 });
+    if (limited) return limited;
     
     const { token, password } = await request.json();
     

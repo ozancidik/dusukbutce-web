@@ -6,9 +6,14 @@ import bcrypt from 'bcryptjs';
 import { sanitizeInput, checkSQLInjection } from '@/lib/security';
 import { sendEmailVerificationEmail } from '@/lib/email';
 import crypto from 'crypto';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 export async function POST(request: NextRequest) {
   try {
+    // Spam koruması: IP başına 15 dakikada en fazla 5 kayıt denemesi.
+    const limited = checkRateLimit(request, { name: 'register', limit: 5, windowMs: 15 * 60_000 });
+    if (limited) return limited;
+
     await connectDB();
 
     const body = await request.json();

@@ -3,10 +3,13 @@ import connectDB from "@/lib/mongodb";
 import User from "../../../../models/User";
 import crypto from "crypto";
 import { sendEmailVerificationEmail } from "@/lib/email";
+import { checkRateLimit } from "@/lib/rateLimit";
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('📧 Email doğrulama tekrar gönderme API çağrıldı');
+    // E-posta spam koruması: IP başına 15 dakikada en fazla 5 istek.
+    const limited = checkRateLimit(request, { name: 'resend-verification', limit: 5, windowMs: 15 * 60_000 });
+    if (limited) return limited;
     
     const { email } = await request.json();
     
