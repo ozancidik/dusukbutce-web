@@ -44,6 +44,13 @@ const nextConfig = {
       }
     ];
   },
+  compiler: {
+    // Production build'inde tüm console.* çağrılarını söker (console.error hariç).
+    // Geliştirmede (dev) loglar korunur. 637 elle console.log silmeye gerek kalmaz;
+    // ayrıca token/kullanıcı gibi bilgilerin prod loglarına sızmasını önler.
+    removeConsole:
+      process.env.NODE_ENV === 'production' ? { exclude: ['error'] } : false,
+  },
   images: {
     unoptimized: true
   }
