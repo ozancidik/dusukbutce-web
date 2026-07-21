@@ -7,6 +7,7 @@ import { sanitizeInput, checkSQLInjection } from '@/lib/security';
 import { sendEmailVerificationEmail } from '@/lib/email';
 import crypto from 'crypto';
 import { checkRateLimit } from '@/lib/rateLimit';
+import { validateBody, registerSchema } from '@/lib/validate';
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,6 +18,8 @@ export async function POST(request: NextRequest) {
     await connectDB();
 
     const body = await request.json();
+    const v = validateBody(registerSchema, body);
+    if (v.error) return v.error;
     const {
       email,
       password,

@@ -6,6 +6,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { validateCSRFToken } from '@/lib/security';
 import { checkRateLimit } from '@/lib/rateLimit';
+import { validateBody, loginSchema } from '@/lib/validate';
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,8 +16,11 @@ export async function POST(request: NextRequest) {
 
     await connectDB();
     
-    const { email, password, csrfToken } = await request.json();
-    
+    const body = await request.json();
+    const v = validateBody(loginSchema, body);
+    if (v.error) return v.error;
+    const { email, password, csrfToken } = body;
+
     // CSRF token doğrulama
     const cookieToken = request.cookies.get('csrf-token')?.value;
     if (!csrfToken || !cookieToken || !validateCSRFToken(csrfToken, cookieToken)) {
