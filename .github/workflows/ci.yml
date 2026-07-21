@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Build
+        run: npm run build
+        env:
+          # Derleme sırasında DB'ye gerçek bağlantı yapılmaz; bu değerler yalnızca
+          # modül yükleme anındaki "tanımlı mı?" kontrollerini geçmek için dummy.
+          MONGODB_URI: mongodb+srv://ci:ci@ci.example.com/ci
+          JWT_SECRET: ci-dummy-jwt-secret-not-used-at-runtime
+          NEXT_TELEMETRY_DISABLED: '1'
