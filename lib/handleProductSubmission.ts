@@ -5,6 +5,7 @@ import ProductSubmission from "@/models/ProductSubmission";
 import User from "@/models/User";
 import { sendNewSubmissionNotificationToAdmin } from "@/lib/email";
 import { getVerifiedUserId } from "@/lib/auth";
+import { validateBody, submissionSchema } from "@/lib/validate";
 
 /**
  * Tüm "bize-sat" kategorileri için ortak teklif (submission) oluşturma mantığı.
@@ -37,6 +38,10 @@ const ALLOWED_FIELDS = [
 export async function handleProductSubmission(request: Request, source: string) {
   try {
     const body = await request.json();
+
+    const v = validateBody(submissionSchema, body);
+    if (v.error) return v.error;
+
     const userId = getVerifiedUserId(request);
 
     await connectDB();
