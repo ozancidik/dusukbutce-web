@@ -3,6 +3,7 @@ import connectDB from "@/lib/mongodb";
 import { NextResponse } from "next/server";
 import User from '@/models/User';
 import jwt from 'jsonwebtoken';
+import { authCookieString } from '@/lib/cookies';
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -420,10 +421,11 @@ export async function GET(request: NextRequest) {
         </body>
       </html>
     `, {
-      headers: { 
+      headers: {
         'Content-Type': 'text/html; charset=utf-8',
         'Cross-Origin-Opener-Policy': 'unsafe-none',
-        'Cross-Origin-Embedder-Policy': 'unsafe-none'
+        'Cross-Origin-Embedder-Policy': 'unsafe-none',
+        'Set-Cookie': authCookieString(String(token))
       }
     });
   } catch (error: any) {
