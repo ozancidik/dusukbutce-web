@@ -2,19 +2,20 @@ import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
+import { getTokenFromRequest } from '@/lib/auth';
+import { setAuthCookie } from '@/lib/cookies';
 
 export async function POST(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization');
-    
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    // Token önce httpOnly cookie'den, yoksa Authorization header'dan okunur.
+    const token = getTokenFromRequest(request);
+
+    if (!token) {
       return NextResponse.json(
         { success: false, error: 'Token bulunamadı' },
         { status: 401 }
       );
     }
-
-    const token = authHeader.substring(7);
     
     if (!process.env.JWT_SECRET) {
       return NextResponse.json(
@@ -71,11 +72,13 @@ export async function POST(request: NextRequest) {
         { expiresIn: '7d' }
       );
 
-      return NextResponse.json({
+      const refreshResponse = NextResponse.json({
         success: true,
         token: newToken,
         refreshed: true
       });
+      setAuthCookie(refreshResponse, newToken);
+      return refreshResponse;
 
     } catch (jwtError) {
       return NextResponse.json(

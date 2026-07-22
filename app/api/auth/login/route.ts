@@ -6,6 +6,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { validateCSRFToken } from '@/lib/security';
 import { checkRateLimit } from '@/lib/rateLimit';
+import { setAuthCookie } from '@/lib/cookies';
 import { validateBody, loginSchema } from '@/lib/validate';
 
 export async function POST(request: NextRequest) {
@@ -128,8 +129,8 @@ export async function POST(request: NextRequest) {
     user.lastLogin = new Date();
     await user.save();
     
-    return NextResponse.json({ 
-      success: true, 
+    const response = NextResponse.json({
+      success: true,
       message: 'Giriş başarılı',
       token: token,
       user: {
@@ -141,6 +142,10 @@ export async function POST(request: NextRequest) {
         isAdmin: user.isAdmin
       }
     });
+    // JWT'yi httpOnly cookie olarak da yaz (client Authorization header'ı olmadan
+    // kimlik doğrulayabilsin; XSS token'a erişemesin).
+    setAuthCookie(response, token);
+    return response;
   } catch (error) {
     console.error('Error logging in user:', error);
     return NextResponse.json(
