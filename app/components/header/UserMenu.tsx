@@ -15,7 +15,7 @@ interface UserMenuProps {
 }
 
 export default function UserMenu({ userInfo, showDropdown, setShowDropdown, safeDecodeName }: UserMenuProps) {
-  const handleLogout = () => {
+  const handleLogout = async () => {
     console.log('🚪 Çıkış yap butonuna tıklandı!');
     // Clear all auth-related storage
     localStorage.removeItem('token');
@@ -32,7 +32,10 @@ export default function UserMenu({ userInfo, showDropdown, setShowDropdown, safe
     sessionStorage.removeItem('adminLoggedIn');
     sessionStorage.removeItem('adminEmail');
     sessionStorage.removeItem('adminToken');
-    
+
+    // httpOnly auth cookie'sini sunucudan temizle (JS silemez)
+    try { await fetch('/api/auth/logout', { method: 'POST' }); } catch {}
+
     // Reload page to reset state
     window.location.href = '/';
   };
