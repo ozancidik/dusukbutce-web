@@ -440,7 +440,7 @@ function HeaderComponent() {
                       
                       {/* Çıkış Yap Butonu */}
                       <div 
-                        onClick={() => {
+                        onClick={async () => {
                           console.log('🚪 Çıkış yap butonuna tıklandı!');
                           // Clear all auth-related storage
                           localStorage.removeItem('token');
@@ -457,7 +457,10 @@ function HeaderComponent() {
                           sessionStorage.removeItem('adminLoggedIn');
                           sessionStorage.removeItem('adminEmail');
                           sessionStorage.removeItem('adminToken');
-                          
+
+                          // httpOnly auth cookie'sini sunucudan temizle (JS silemez)
+                          try { await fetch('/api/auth/logout', { method: 'POST' }); } catch {}
+
                           // Reload page to reset state
                           window.location.href = '/';
                         }}

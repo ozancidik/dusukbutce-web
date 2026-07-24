@@ -10,29 +10,13 @@ export const useAuth = () => {
   // Token refresh fonksiyonu
   const refreshToken = async () => {
     try {
-      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-      if (!token) return;
-
-      const response = await fetch('/api/auth/refresh', {
+      // JWT httpOnly cookie'de tutulur; sunucu cookie'yi okuyup gerekiyorsa yeni
+      // bir cookie yazar. Client'ın token'ı görmesine/saklamasına gerek yoktur.
+      await fetch('/api/auth/refresh', {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+        headers: { 'Content-Type': 'application/json' },
       });
-
-      const data = await response.json();
-      
-      if (data.success && data.refreshed && data.token) {
-        // Yeni token'ı kaydet
-        const storage = localStorage.getItem('token') ? localStorage : sessionStorage;
-        storage.setItem('token', data.token);
-        
-        // Event tetikle
-        window.dispatchEvent(new Event('localStorageChange'));
-      }
     } catch (error) {
-      // Refresh hatası - sessizce devam et
       console.error('Token refresh error:', error);
     }
   };
@@ -143,22 +127,11 @@ export const useAuth = () => {
       }
     };
 
-    // Token süresi kontrolü (otomatik logout yok, sadece token süresi dolduğunda kontrol)
-    const checkTokenAndLogout = () => {
-      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-      if (!token) {
-        handleLogout();
-        return;
-      }
-      
-      // Token süresini kontrol et
-      const remainingTime = checkTokenExpiry(token);
-      
-      if (!remainingTime) {
-        // Token süresi dolmuş, logout yap
-        handleLogout();
-      }
-    };
+    // Token artık httpOnly cookie'de olduğu için client'tan okunup süresi kontrol
+    // edilemez; süre sunucuda (jwt.verify) denetlenir ve dolmuşsa istekler 401
+    // döner. Bu yüzden burada localStorage token yok diye otomatik logout YAPILMAZ
+    // (eski davranış tüm kullanıcıları anında logout ederdi).
+    const checkTokenAndLogout = () => {};
 
     // Token refresh timer fonksiyonları
     const startRefreshTimer = () => {

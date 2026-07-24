@@ -354,7 +354,7 @@ export default function DesktopUserMenu({
           )}
           
           <div 
-            onClick={() => {
+            onClick={async () => {
               console.log('🚪 Çıkış yap butonuna tıklandı!');
               
               // Tüm login ile ilgili storage değerlerini temizle
@@ -371,9 +371,12 @@ export default function DesktopUserMenu({
               
               // Cookie'yi de temizle
               document.cookie = 'adminToken=; path=/; max-age=0';
-              
+
+              // httpOnly auth cookie'sini sunucudan temizle (JS silemez)
+              try { await fetch('/api/auth/logout', { method: 'POST' }); } catch {}
+
               console.log('✅ Tüm storage temizlendi, anasayfaya yönlendiriliyor...');
-              
+
               // Reload page to reset state
               window.location.href = '/';
             }}

@@ -19,7 +19,6 @@ export interface UserDataToStore {
   userBirthDate: string;
   userIsAdmin: string;
   loginTime: string;
-  token: string;
   user: string;
   rememberMe?: string;
 }
@@ -38,7 +37,8 @@ export const saveUserData = (userData: UserData, token: string, rememberMe: bool
     userBirthDate: userData.birthDate || '',
     userIsAdmin: userData.isAdmin.toString(),
     loginTime: loginTime.toString(),
-    token: token,
+    // NOT: JWT artık localStorage'a YAZILMIYOR — httpOnly cookie'de tutuluyor
+    // (XSS koruması). Aşağıdaki admin bloğu ayrı `adminToken` sistemini korur.
     user: JSON.stringify(userData),
     rememberMe: rememberMe.toString()
   };
