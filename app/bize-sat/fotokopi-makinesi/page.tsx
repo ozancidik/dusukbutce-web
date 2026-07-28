@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import { uploadImage } from '@/lib/uploadImage';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../hooks/useAuth';
 import SubmissionPopup from '../../../components/SubmissionPopup';
@@ -97,74 +98,16 @@ export default function FotokopiMakinesiPage() {
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (files) {
-      const maxImages = 10;
-      const remainingSlots = maxImages - (formData.images?.length || 0);
-      
-      if (remainingSlots <= 0) {
-        return; // Maksimum görsel sayısına ulaşıldı
+    if (!files) return;
+    Array.from(files).forEach(async (file) => {
+      try {
+        const url = await uploadImage(file);
+        setFormData((prev: any) => ({ ...prev, images: [...prev.images, url] }));
+      } catch (err) {
+        console.error('Görsel yüklenemedi:', err);
+        alert(err instanceof Error ? err.message : 'Görsel yüklenirken bir hata oluştu.');
       }
-      
-      const filesToProcess = Array.from(files).slice(0, remainingSlots);
-      const newImages: string[] = [];
-      
-      filesToProcess.forEach(async (file) => {
-        // Resim boyutunu kontrol et (max 2MB)
-        if (file.size > 2 * 1024 * 1024) {
-          setShowImageSizeWarning(true);
-          setTimeout(() => setShowImageSizeWarning(false), 3000);
-          return;
-        }
-        
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-          if (e.target?.result) {
-            try {
-              const base64String = e.target.result as string;
-              const compressedImage = await compressImage(base64String);
-              
-              newImages.push(compressedImage);
-              if (newImages.length === filesToProcess.length) {
-                setFormData(prev => {
-                  const newData = {
-                    ...prev,
-                    images: [...(prev.images || []), ...newImages]
-                  };
-                  
-                  try {
-                    localStorage.setItem('copierFormData', JSON.stringify(newData));
-                  } catch (error) {
-                    console.warn('localStorage quota hatası:', error);
-                  }
-                  
-                  return newData;
-                });
-              }
-            } catch (error) {
-              console.error('Resim işleme hatası:', error);
-              newImages.push(e.target.result as string);
-              if (newImages.length === filesToProcess.length) {
-                setFormData(prev => {
-                  const newData = {
-                    ...prev,
-                    images: [...(prev.images || []), ...newImages]
-                  };
-                  
-                  try {
-                    localStorage.setItem('copierFormData', JSON.stringify(newData));
-                  } catch (error) {
-                    console.warn('localStorage quota hatası:', error);
-                  }
-                  
-                  return newData;
-                });
-              }
-            }
-          }
-        };
-        reader.readAsDataURL(file);
-      });
-    }
+    });
   };
 
   const compressImage = (base64String: string): Promise<string> => {
