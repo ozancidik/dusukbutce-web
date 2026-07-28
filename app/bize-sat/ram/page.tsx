@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '../../hooks/useAuth';
 import SubmissionPopup from '../../../components/SubmissionPopup';
 import LoginRequiredCard from '../components/LoginRequiredCard';
+import { uploadImage } from '@/lib/uploadImage';
 
 export default function RamPage() {
   const router = useRouter();
@@ -134,26 +135,21 @@ export default function RamPage() {
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (files) {
-      const newImages: string[] = [];
-      
-      Array.from(files).forEach(file => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          if (e.target?.result) {
-            const compressedImage = compressImageSync(e.target.result as string);
-            newImages.push(compressedImage);
-            if (newImages.length === files.length) {
-              setFormData(prev => ({
-                ...prev,
-                images: [...prev.images, ...newImages]
-              }));
-            }
-          }
-        };
-        reader.readAsDataURL(file);
-      });
-    }
+    if (!files) return;
+
+    // Her dosyayı (helper'da) sıkıştır + Vercel Blob'a yükle → dönen URL'i sakla.
+    Array.from(files).forEach(async (file) => {
+      try {
+        const url = await uploadImage(file);
+        setFormData(prev => ({ ...prev, images: [...prev.images, url] }));
+      } catch (err) {
+        console.error('Görsel yüklenemedi:', err);
+        setPopupType('error');
+        setPopupTitle('Görsel Yüklenemedi');
+        setPopupMessage(err instanceof Error ? err.message : 'Görsel yüklenirken bir hata oluştu. Lütfen tekrar deneyin.');
+        setShowPopup(true);
+      }
+    });
   };
 
   const removeImage = (index: number) => {

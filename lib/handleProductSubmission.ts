@@ -31,7 +31,7 @@ const ALLOWED_FIELDS = [
   "thermalPadChanged", "miningUsed", "miningDuration", "warrantySticker",
   "coilWhine", "oxidation",
   // Kategoriye özel ek alanlar (RAM/SSD, mouse, klavye, monitör, ses sistemi)
-  "capacity", "speed", "dpi", "connectivity", "switchType", "layout",
+  "capacity", "speed", "latency", "dpi", "connectivity", "switchType", "layout",
   "resolution", "panelType", "responseTime", "power",
 ] as const;
 

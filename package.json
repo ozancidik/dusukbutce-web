@@ -20,6 +20,7 @@
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/nodemailer": "^7.0.0",
+    "@vercel/blob": "^2.6.1",
     "bcryptjs": "^3.0.2",
     "bson": "^6.10.4",
     "joi": "^18.0.0",
