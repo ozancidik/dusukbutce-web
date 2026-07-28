@@ -1,7 +1,54 @@
 'use client';
-import React from 'react';
+import React, { useState } from 'react';
 import { Submission } from '../utils/types';
 import { formatDate, formatPrice, getStatusInfo, getStatusText } from '../utils/helpers';
+
+// "Ürün Özellikleri" bölümünde gösterilecek EK alanlar. Marka/model, işlemci,
+// ekran kartı, ram, depolama ve durum zaten ayrıca gösteriliyor; burada geri kalan
+// (kategoriye özel) alanlardan dolu olanlar otomatik listelenir.
+const EXTRA_SPEC_FIELDS: [string, string][] = [
+  ['capacity', 'KAPASİTE'],
+  ['speed', 'HIZ'],
+  ['type', 'TİP'],
+  ['latency', 'GECİKME'],
+  ['size', 'BOYUT'],
+  ['screenSize', 'EKRAN BOYUTU'],
+  ['resolution', 'ÇÖZÜNÜRLÜK'],
+  ['refreshRate', 'YENİLEME HIZI'],
+  ['panelType', 'PANEL'],
+  ['responseTime', 'TEPKİ SÜRESİ'],
+  ['processorBrand', 'İŞLEMCİ MARKASI'],
+  ['graphicsCardWatt', 'EKRAN KARTI WATT'],
+  ['ramType', 'RAM TİPİ'],
+  ['storageType', 'DEPOLAMA TİPİ'],
+  ['storageCapacity', 'DEPOLAMA KAPASİTESİ'],
+  ['batteryHealth', 'PİL SAĞLIĞI'],
+  ['socket', 'SOKET'],
+  ['cache', 'ÖNBELLEK'],
+  ['stokFan', 'STOK FAN'],
+  ['memory', 'BELLEK'],
+  ['memoryType', 'BELLEK TİPİ'],
+  ['coreClock', 'ÇEKİRDEK HIZI'],
+  ['boostClock', 'BOOST HIZI'],
+  ['powerConsumption', 'GÜÇ TÜKETİMİ'],
+  ['ports', 'PORTLAR'],
+  ['interface', 'ARAYÜZ'],
+  ['chipSet', 'CHIPSET'],
+  ['connectivity', 'BAĞLANTI'],
+  ['switchType', 'SWITCH TİPİ'],
+  ['layout', 'DÜZEN'],
+  ['dpi', 'DPI'],
+  ['power', 'GÜÇ'],
+  ['wattValue', 'WATT'],
+  ['manufacturingYear', 'ÜRETİM YILI'],
+  ['accessories', 'AKSESUARLAR'],
+  ['condition', 'KONDİSYON'],
+  ['screenStatus', 'EKRAN DURUMU'],
+  ['deadPixelCount', 'ÖLÜ PİKSEL'],
+  ['quantity', 'ADET'],
+  ['warrantyDuration', 'GARANTİ SÜRESİ (AY)'],
+  ['invoiceDate', 'FATURA TARİHİ'],
+];
 
 interface SubmissionCardFullProps {
   submission: Submission;
@@ -20,6 +67,7 @@ export default function SubmissionCardFull({
   onDelete,
   onReoffer 
 }: SubmissionCardFullProps) {
+  const [showDetails, setShowDetails] = useState(false);
   return (
     <div key={submission._id} style={{
       background: 'white',
@@ -128,8 +176,24 @@ export default function SubmissionCardFull({
           }}>
             Ürün Özellikleri
           </h4>
+          <button
+            onClick={() => setShowDetails(v => !v)}
+            style={{
+              marginLeft: 'auto',
+              padding: isMobile ? '6px 12px' : '6px 14px',
+              fontSize: isMobile ? '12px' : '13px',
+              fontWeight: 600,
+              color: '#2563eb',
+              background: '#eff6ff',
+              border: '1px solid #bfdbfe',
+              borderRadius: '6px',
+              cursor: 'pointer'
+            }}
+          >
+            {showDetails ? 'Detayı Gizle ▲' : 'Detay ▼'}
+          </button>
         </div>
-        
+
         <div style={{
           display: 'grid',
           gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(180px, 1fr))',
@@ -153,6 +217,8 @@ export default function SubmissionCardFull({
             </div>
           </div>
 
+          {showDetails && (
+          <>
           {/* İşlemci - Kritik */}
           {submission.processor && (
             <div style={{
@@ -233,6 +299,36 @@ export default function SubmissionCardFull({
             </div>
           )}
 
+          {/* Diğer dolu alanlar (kategoriye göre otomatik) */}
+          {EXTRA_SPEC_FIELDS.map(([key, label]) => {
+            const value = (submission as any)[key];
+            if (value === undefined || value === null || value === '') return null;
+            return (
+              <div key={key} style={{ background: 'white', padding: '12px', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
+                <span style={{ fontSize: isMobile ? '11px' : '12px', color: '#64748b', fontWeight: '500' }}>{label}</span>
+                <div style={{ fontSize: isMobile ? '14px' : '15px', fontWeight: '500', color: '#1e293b', marginTop: '4px' }}>
+                  {String(value)}
+                </div>
+              </div>
+            );
+          })}
+
+          {/* Kutu / Fatura / Garanti */}
+          {([['hasBox', 'KUTU'], ['hasInvoice', 'FATURA'], ['hasWarranty', 'GARANTİ']] as [string, string][]).map(([key, label]) => {
+            const val = (submission as any)[key];
+            if (val === undefined || val === null) return null;
+            return (
+              <div key={key} style={{ background: 'white', padding: '12px', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
+                <span style={{ fontSize: isMobile ? '11px' : '12px', color: '#64748b', fontWeight: '500' }}>{label}</span>
+                <div style={{ fontSize: isMobile ? '14px' : '15px', fontWeight: '500', color: val ? '#16a34a' : '#94a3b8', marginTop: '4px' }}>
+                  {val ? 'Var' : 'Yok'}
+                </div>
+              </div>
+            );
+          })}
+          </>
+          )}
+
           {/* Durum - Kritik */}
           <div style={{
             background: 'white',
@@ -251,6 +347,36 @@ export default function SubmissionCardFull({
             </div>
           </div>
         </div>
+
+        {/* Açıklama */}
+        {showDetails && (submission as any).description && (
+          <div style={{ marginTop: isMobile ? '12px' : '16px', background: 'white', padding: '12px', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
+            <span style={{ fontSize: isMobile ? '11px' : '12px', color: '#64748b', fontWeight: '500' }}>AÇIKLAMA</span>
+            <div style={{ fontSize: isMobile ? '14px' : '15px', color: '#1e293b', marginTop: '4px', whiteSpace: 'pre-wrap' }}>
+              {(submission as any).description}
+            </div>
+          </div>
+        )}
+
+        {/* Fotoğraflar */}
+        {showDetails && Array.isArray((submission as any).images) && (submission as any).images.length > 0 && (
+          <div style={{ marginTop: isMobile ? '12px' : '16px' }}>
+            <span style={{ fontSize: isMobile ? '11px' : '12px', color: '#64748b', fontWeight: '500' }}>
+              FOTOĞRAFLAR ({(submission as any).images.length})
+            </span>
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '8px' }}>
+              {(submission as any).images.map((img: string, i: number) => (
+                <a key={i} href={img} target="_blank" rel="noopener noreferrer">
+                  <img
+                    src={img}
+                    alt={`Fotoğraf ${i + 1}`}
+                    style={{ width: isMobile ? '64px' : '80px', height: isMobile ? '64px' : '80px', objectFit: 'cover', borderRadius: '6px', border: '1px solid #e2e8f0' }}
+                  />
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Offer Section */}
