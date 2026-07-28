@@ -94,6 +94,7 @@ const productSubmissionSchema = new mongoose.Schema({
   // RAM / SSD
   capacity: { type: String },
   speed: { type: String },
+  latency: { type: String },
   // Mouse
   dpi: { type: String },
   // Genel bağlantı türü (mouse, klavye, tablet, kulaklık, ses sistemi)
