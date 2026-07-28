@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import { uploadImage } from '@/lib/uploadImage';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../hooks/useAuth';
 import SubmissionPopup from '../../../components/SubmissionPopup';
@@ -222,47 +223,16 @@ export default function PlayStationPage() {
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    if (files.length === 0) return;
-
-    const newImages: string[] = [];
-    
-    files.forEach((file) => {
-      // Dosya tipini kontrol et
-      if (!file.type.startsWith('image/')) {
-        alert('Lütfen sadece resim dosyası seçin.');
-        return;
+    const files = e.target.files;
+    if (!files) return;
+    Array.from(files).forEach(async (file) => {
+      try {
+        const url = await uploadImage(file);
+        setFormData((prev: any) => ({ ...prev, images: [...prev.images, url] }));
+      } catch (err) {
+        console.error('Görsel yüklenemedi:', err);
+        alert(err instanceof Error ? err.message : 'Görsel yüklenirken bir hata oluştu.');
       }
-
-      // Resim boyutunu kontrol et (max 2MB)
-      if (file.size > 2 * 1024 * 1024) {
-        alert('Resim boyutu 2MB\'dan küçük olmalıdır.');
-        return;
-      }
-      
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        if (e.target?.result) {
-          try {
-            // Base64 string'i sıkıştır
-            const base64String = e.target.result as string;
-            const compressedImage = await compressImage(base64String);
-            
-            newImages.push(compressedImage);
-            if (newImages.length === files.length) {
-              setFormData(prev => ({
-                ...prev,
-                images: [...prev.images, ...newImages]
-              }));
-            }
-          } catch (error) {
-            console.error('Resim işleme hatası:', error);
-            // Hata durumunda orijinal resmi kullan
-            newImages.push(e.target.result as string);
-          }
-        }
-      };
-      reader.readAsDataURL(file);
     });
   };
 

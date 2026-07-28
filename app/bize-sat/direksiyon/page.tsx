@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import { uploadImage } from '@/lib/uploadImage';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../hooks/useAuth';
 import SubmissionPopup from '../../../components/SubmissionPopup';
@@ -117,45 +118,16 @@ export default function SteeringWheelPage() {
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (files) {
-      const newImages: string[] = [];
-      
-      Array.from(files).forEach(async (file) => {
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-          if (e.target?.result) {
-            try {
-              const base64String = e.target.result as string;
-              const compressedImage = await compressImage(base64String);
-              
-              newImages.push(compressedImage);
-              if (newImages.length === files.length) {
-                const newData = {
-                  ...formData,
-                  images: [...formData.images, ...newImages]
-                };
-                setFormData(newData);
-                
-                // Form verilerini localStorage'a kaydet
-                try {
-                  localStorage.setItem('steeringWheelFormData', JSON.stringify(newData));
-                } catch (error) {
-                  console.warn('localStorage quota hatası, veriler kaydedilemedi:', error);
-                }
-              }
-            } catch (error) {
-              console.error('Resim işleme hatası:', error);
-              const newData = {
-                ...formData,
-                images: [...formData.images, e.target.result as string]
-              };
-              setFormData(newData);
-            }
-          }
-        };
-        reader.readAsDataURL(file);
-      });
-    }
+    if (!files) return;
+    Array.from(files).forEach(async (file) => {
+      try {
+        const url = await uploadImage(file);
+        setFormData((prev: any) => ({ ...prev, images: [...prev.images, url] }));
+      } catch (err) {
+        console.error('Görsel yüklenemedi:', err);
+        alert(err instanceof Error ? err.message : 'Görsel yüklenirken bir hata oluştu.');
+      }
+    });
   };
 
   const removeImage = (index: number) => {
