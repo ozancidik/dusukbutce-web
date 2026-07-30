@@ -1,5 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // @vercel/blob -> @vercel/oidc -> @vercel/cli-config -> xdg-app-paths zincirindeki
+  // paket, import edilir edilmez require.main.filename'den ad tahmin etmeye çalışıyor.
+  // Next'in webpack bundle'ında require.main uygun şekilde set edilmediği için bu,
+  // "TypeError: The path argument must be of type string" ile build'i kırıyor.
+  // Bu paketi bundle etmeyip gerçek Node ortamında native require ile yükletmek
+  // sorunu çözüyor (runtime'da require.main normal davranıyor).
+  serverExternalPackages: ['@vercel/blob'],
   async headers() {
     return [
       {

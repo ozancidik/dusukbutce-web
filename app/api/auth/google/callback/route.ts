@@ -116,10 +116,6 @@ export async function GET(request: NextRequest) {
     });
 
     const tokenData = await tokenResponse.json();
-    
-    console.log('Token Response:', JSON.stringify(tokenData, null, 2));
-    console.log('Response Status:', tokenResponse.status);
-    console.log('Response Headers:', Object.fromEntries(tokenResponse.headers.entries()));
 
     if (!tokenData.access_token) {
       console.error('Token Error Details:', JSON.stringify(tokenData, null, 2));
