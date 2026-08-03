@@ -24,6 +24,10 @@ interface Submission {
   };
 }
 
+function getAdminToken(): string | null {
+  return localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken');
+}
+
 export default function AdminSubmissions() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -56,7 +60,9 @@ export default function AdminSubmissions() {
     const fetchSubmissions = async () => {
       setLoading(true);
       try {
-        const response = await fetch('/api/notebook-submissions');
+        const response = await fetch('/api/notebook-submissions', {
+          headers: { Authorization: `Bearer ${getAdminToken()}` }
+        });
         const data = await response.json();
         if (data.success) {
           setSubmissions(data.submissions);
@@ -97,11 +103,12 @@ export default function AdminSubmissions() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${getAdminToken()}`,
         },
         body: JSON.stringify({
           submissionId: selectedSubmission._id,
-          action: modalType === 'offer' ? 'addOffer' : 
-                  modalType === 'listing' ? 'createListing' : 
+          action: modalType === 'offer' ? 'addOffer' :
+                  modalType === 'listing' ? 'createListing' :
                   modalType === 'reject' ? 'reject' : modalType,
           data: formData
         })
@@ -111,7 +118,9 @@ export default function AdminSubmissions() {
 
       if (result.success) {
         // Submission listesini yenile
-        const submissionsResponse = await fetch('/api/notebook-submissions');
+        const submissionsResponse = await fetch('/api/notebook-submissions', {
+          headers: { Authorization: `Bearer ${getAdminToken()}` }
+        });
         const submissionsData = await submissionsResponse.json();
         if (submissionsData.success) {
           setSubmissions(submissionsData.submissions);

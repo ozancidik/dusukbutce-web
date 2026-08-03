@@ -1,12 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import ProductSubmission from '@/models/ProductSubmission';
+import { getVerifiedUserId } from '@/lib/auth';
 
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const verifiedUserId = getVerifiedUserId(request);
+    if (!verifiedUserId) {
+      return NextResponse.json(
+        { success: false, message: 'Yetkisiz erişim' },
+        { status: 401 }
+      );
+    }
+
     const { id } = await params;
     const { reofferNote } = await request.json();
 
@@ -25,6 +34,13 @@ export async function PUT(
       return NextResponse.json(
         { success: false, message: 'Teklif bulunamadı!' },
         { status: 404 }
+      );
+    }
+
+    if (submission.userId?.toString() !== verifiedUserId) {
+      return NextResponse.json(
+        { success: false, message: 'Bu teklif üzerinde işlem yapma yetkiniz yok' },
+        { status: 403 }
       );
     }
 

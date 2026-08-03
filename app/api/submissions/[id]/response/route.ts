@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import ProductSubmission from '@/models/ProductSubmission';
 import User from '@/models/User';
-import { 
-  sendCustomerAcceptEmailToAdmin, 
-  sendCustomerRejectEmailToAdmin 
+import { getVerifiedUserId } from '@/lib/auth';
+import {
+  sendCustomerAcceptEmailToAdmin,
+  sendCustomerRejectEmailToAdmin
 } from '@/lib/email';
 
 export async function PUT(
@@ -13,13 +14,21 @@ export async function PUT(
 ) {
   try {
     console.log('🔄 PUT /api/submissions/[id]/response başladı');
-    
+
+    const verifiedUserId = getVerifiedUserId(request);
+    if (!verifiedUserId) {
+      return NextResponse.json(
+        { success: false, message: 'Yetkisiz erişim' },
+        { status: 401 }
+      );
+    }
+
     await connectDB();
     console.log('✅ Database bağlantısı başarılı');
-    
+
     const { id } = await params;
     console.log('📋 Submission ID:', id);
-    
+
     const body = await request.json();
     console.log('📦 Request body:', body);
     const { action, note, reason } = body;
@@ -43,6 +52,13 @@ export async function PUT(
     console.log('✅ Submission bulundu:', submission._id, 'Mevcut status:', submission.status);
     console.log('👤 Submission userId:', submission.userId);
     console.log('👤 Submission userId type:', typeof submission.userId);
+
+    if (submission.userId?.toString() !== verifiedUserId) {
+      return NextResponse.json(
+        { success: false, message: 'Bu teklif üzerinde işlem yapma yetkiniz yok' },
+        { status: 403 }
+      );
+    }
 
     // Müşteri bilgilerini önce al (güncellemeden önce)
     const originalUserId = submission.userId;

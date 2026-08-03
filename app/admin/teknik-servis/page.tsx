@@ -25,6 +25,10 @@ interface TechnicalServiceSubmission {
   updatedAt: string;
 }
 
+function getAdminToken(): string | null {
+  return localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken');
+}
+
 export default function AdminTeknikServis() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -70,7 +74,9 @@ export default function AdminTeknikServis() {
   const fetchSubmissions = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/technical-service-submissions');
+      const response = await fetch('/api/technical-service-submissions', {
+        headers: { Authorization: `Bearer ${getAdminToken()}` }
+      });
       const data = await response.json();
       if (data.success) {
         setSubmissions(data.submissions);
@@ -96,6 +102,7 @@ export default function AdminTeknikServis() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${getAdminToken()}`,
         },
         body: JSON.stringify({
           submissionId,
@@ -130,6 +137,7 @@ export default function AdminTeknikServis() {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${getAdminToken()}`,
         },
         body: JSON.stringify({ submissionId })
       });

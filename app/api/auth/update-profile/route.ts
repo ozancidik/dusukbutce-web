@@ -2,22 +2,23 @@ import { NextRequest } from "next/server";
 import connectDB from "@/lib/mongodb";
 import { NextResponse } from "next/server";
 import User from '@/models/User';
+import { getVerifiedUserId } from '@/lib/auth';
 
 export async function PUT(request: NextRequest) {
   try {
-    const body = await request.json();
-    console.log('📝 Profile update request body:', body);
-    
-    const { userId, firstName, lastName, email, phone, birthDate, emailVerificationCode } = body;
-
+    const userId = getVerifiedUserId(request);
     if (!userId) {
-      console.error('❌ User ID missing in request');
       return NextResponse.json(
-        { success: false, message: 'Kullanıcı ID gerekli' },
-        { status: 400 }
+        { success: false, message: 'Yetkisiz erişim' },
+        { status: 401 }
       );
     }
-    
+
+    const body = await request.json();
+    console.log('📝 Profile update request body:', body);
+
+    const { firstName, lastName, email, phone, birthDate, emailVerificationCode } = body;
+
     console.log('🔍 Updating user with ID:', userId);
 
     // MongoDB'ye bağlan
@@ -217,13 +218,11 @@ export async function PUT(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const searchParams = request.nextUrl.searchParams;
-    const userId = searchParams.get('userId');
-
+    const userId = getVerifiedUserId(request);
     if (!userId) {
       return NextResponse.json(
-        { success: false, message: 'Kullanıcı ID gerekli' },
-        { status: 400 }
+        { success: false, message: 'Yetkisiz erişim' },
+        { status: 401 }
       );
     }
 

@@ -36,14 +36,9 @@ export const ensureAdminRequest = (request: NextRequest): AdminTokenPayload => {
     throw new AdminAuthError("Sunucu yapılandırma hatası", 500);
   }
 
+  let decoded: AdminTokenPayload;
   try {
-    const decoded = jwt.verify(token, secret) as AdminTokenPayload;
-
-    if (!decoded || (!decoded.isAdmin && decoded.role !== "admin")) {
-      throw new AdminAuthError("Yetkisiz erişim: admin yetkisi yok", 403);
-    }
-
-    return decoded;
+    decoded = jwt.verify(token, secret) as AdminTokenPayload;
   } catch (error) {
     if (error instanceof TokenExpiredError) {
       throw new AdminAuthError("Token süresi dolmuş", 401);
@@ -51,6 +46,12 @@ export const ensureAdminRequest = (request: NextRequest): AdminTokenPayload => {
 
     throw new AdminAuthError("Geçersiz token", 401);
   }
+
+  if (!decoded || (!decoded.isAdmin && decoded.role !== "admin")) {
+    throw new AdminAuthError("Yetkisiz erişim: admin yetkisi yok", 403);
+  }
+
+  return decoded;
 };
 
 export const handleAdminAuthError = (error: unknown) => {

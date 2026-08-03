@@ -5,6 +5,7 @@ import connectDB from "@/lib/mongodb";
 import User from "@/models/User";
 import { sendNewSubmissionNotificationToAdmin } from '@/lib/email';
 import { getVerifiedUserId } from '@/lib/auth';
+import { AdminAuthError, ensureAdminRequest, handleAdminAuthError } from '@/app/api/admin/utils/requireAdmin';
 
 export async function POST(request: NextRequest) {
   try {
@@ -116,8 +117,10 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    ensureAdminRequest(request);
+
     if (!process.env.MONGODB_URI) {
       return NextResponse.json({ 
         success: true, 
@@ -163,11 +166,12 @@ export async function GET() {
     
     console.log('📊 Notebook submissions fetched:', submissionsWithUser.length);
     
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       submissions: submissionsWithUser
     });
   } catch (error) {
+    if (error instanceof AdminAuthError) return handleAdminAuthError(error);
     console.error('Error fetching notebook submissions:', error);
     return NextResponse.json(
       { success: false, message: 'Failed to fetch submissions' },
@@ -178,6 +182,8 @@ export async function GET() {
 
 export async function PUT(request: NextRequest) {
   try {
+    ensureAdminRequest(request);
+
     const { submissionId, action, data } = await request.json();
 
     if (!process.env.MONGODB_URI) {
@@ -231,7 +237,8 @@ export async function PUT(request: NextRequest) {
     });
 
   } catch (error) {
+    if (error instanceof AdminAuthError) return handleAdminAuthError(error);
     console.error('Error updating submission:', error);
     return NextResponse.json({ success: false, message: 'Internal server error' }, { status: 500 });
   }
-} 
+}
