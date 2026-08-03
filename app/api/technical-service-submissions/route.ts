@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import connectDB from "@/lib/mongodb";
 import TechnicalServiceSubmission from '@/models/TechnicalServiceSubmission';
+import { AdminAuthError, ensureAdminRequest, handleAdminAuthError } from '@/app/api/admin/utils/requireAdmin';
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
@@ -60,6 +61,8 @@ export async function POST(request: NextRequest) {
 // GET - Tüm teknik servis taleplerini getir (Admin için)
 export async function GET(request: NextRequest) {
   try {
+    ensureAdminRequest(request);
+
     if (!MONGODB_URI) {
       return NextResponse.json({ 
         success: false, 
@@ -89,10 +92,11 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
+    if (error instanceof AdminAuthError) return handleAdminAuthError(error);
     console.error('❌ Teknik servis talepleri getirilirken hata:', error);
     const errorMessage = error instanceof Error ? error.message : 'Sunucu hatası';
-    return NextResponse.json({ 
-      success: false, 
+    return NextResponse.json({
+      success: false,
       message: errorMessage
     }, { status: 500 });
   }
@@ -101,6 +105,8 @@ export async function GET(request: NextRequest) {
 // PUT - Teknik servis talebini güncelle (Admin için)
 export async function PUT(request: NextRequest) {
   try {
+    ensureAdminRequest(request);
+
     const { submissionId, status, adminNotes } = await request.json();
 
     if (!MONGODB_URI) {
@@ -139,10 +145,11 @@ export async function PUT(request: NextRequest) {
     });
 
   } catch (error) {
+    if (error instanceof AdminAuthError) return handleAdminAuthError(error);
     console.error('❌ Teknik servis talebi güncellenirken hata:', error);
     const errorMessage = error instanceof Error ? error.message : 'Sunucu hatası';
-    return NextResponse.json({ 
-      success: false, 
+    return NextResponse.json({
+      success: false,
       message: errorMessage
     }, { status: 500 });
   }
@@ -151,6 +158,8 @@ export async function PUT(request: NextRequest) {
 // DELETE - Teknik servis talebini sil (Admin için)
 export async function DELETE(request: NextRequest) {
   try {
+    ensureAdminRequest(request);
+
     const { submissionId } = await request.json();
 
     if (!MONGODB_URI) {
@@ -179,9 +188,10 @@ export async function DELETE(request: NextRequest) {
     });
 
   } catch (error) {
+    if (error instanceof AdminAuthError) return handleAdminAuthError(error);
     console.error('❌ Teknik servis talebi silinirken hata:', error);
     const errorMessage = error instanceof Error ? error.message : 'Sunucu hatası';
-    return NextResponse.json({ 
+    return NextResponse.json({
       success: false, 
       message: errorMessage
     }, { status: 500 });

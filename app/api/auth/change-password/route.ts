@@ -2,18 +2,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import bcrypt from 'bcryptjs';
+import { getVerifiedUserId } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId, currentPassword, newPassword } = await request.json();
-
-    // Validation
+    const userId = getVerifiedUserId(request);
     if (!userId) {
       return NextResponse.json(
-        { message: 'Kullanıcı kimliği gerekli.' },
-        { status: 400 }
+        { message: 'Yetkisiz erişim.' },
+        { status: 401 }
       );
     }
+
+    const { currentPassword, newPassword } = await request.json();
 
     if (!currentPassword || !newPassword) {
       return NextResponse.json(

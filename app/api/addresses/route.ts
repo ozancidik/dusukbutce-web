@@ -1,18 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
+import { getVerifiedUserId } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
   try {
-    console.log('🔍 MONGODB_URI:', process.env.MONGODB_URI);
-    
-    const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('userId');
-
+    const userId = getVerifiedUserId(request);
     if (!userId) {
       return NextResponse.json(
-        { message: 'Kullanıcı ID gereklidir.' },
-        { status: 400 }
+        { message: 'Yetkisiz erişim.' },
+        { status: 401 }
       );
     }
 
@@ -41,10 +38,18 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { title, fullName, phone, address, city, district, postalCode, isDefault, userId } = await request.json();
+    const userId = getVerifiedUserId(request);
+    if (!userId) {
+      return NextResponse.json(
+        { message: 'Yetkisiz erişim.' },
+        { status: 401 }
+      );
+    }
+
+    const { title, fullName, phone, address, city, district, postalCode, isDefault } = await request.json();
 
     // Validation
-    if (!title || !fullName || !phone || !address || !city || !district || !userId) {
+    if (!title || !fullName || !phone || !address || !city || !district) {
       return NextResponse.json(
         { message: 'Tüm zorunlu alanları doldurun.' },
         { status: 400 }
@@ -99,10 +104,18 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const { addressId, title, fullName, phone, address, city, district, postalCode, isDefault, userId } = await request.json();
+    const userId = getVerifiedUserId(request);
+    if (!userId) {
+      return NextResponse.json(
+        { message: 'Yetkisiz erişim.' },
+        { status: 401 }
+      );
+    }
+
+    const { addressId, title, fullName, phone, address, city, district, postalCode, isDefault } = await request.json();
 
     // Validation
-    if (!addressId || !title || !fullName || !phone || !address || !city || !district || !userId) {
+    if (!addressId || !title || !fullName || !phone || !address || !city || !district) {
       return NextResponse.json(
         { message: 'Tüm zorunlu alanları doldurun.' },
         { status: 400 }
@@ -167,13 +180,20 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
+    const userId = getVerifiedUserId(request);
+    if (!userId) {
+      return NextResponse.json(
+        { message: 'Yetkisiz erişim.' },
+        { status: 401 }
+      );
+    }
+
     const { searchParams } = new URL(request.url);
     const addressId = searchParams.get('addressId');
-    const userId = searchParams.get('userId');
 
-    if (!addressId || !userId) {
+    if (!addressId) {
       return NextResponse.json(
-        { message: 'Adres ID ve kullanıcı ID gereklidir.' },
+        { message: 'Adres ID gereklidir.' },
         { status: 400 }
       );
     }

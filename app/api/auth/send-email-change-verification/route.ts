@@ -3,16 +3,25 @@ import connectDB from "@/lib/mongodb";
 import User from "../../../../models/User";
 import crypto from "crypto";
 import { sendEmailChangeVerificationEmail } from "@/lib/email";
+import { getVerifiedUserId } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
   try {
     console.log('📧 Email değişikliği doğrulama kodu gönderme API çağrıldı');
-    
-    const { userId, newEmail } = await request.json();
-    
-    if (!userId || !newEmail) {
+
+    const userId = getVerifiedUserId(request);
+    if (!userId) {
       return NextResponse.json(
-        { success: false, error: 'Kullanıcı ID ve yeni email adresi gerekli' },
+        { success: false, error: 'Yetkisiz erişim' },
+        { status: 401 }
+      );
+    }
+
+    const { newEmail } = await request.json();
+
+    if (!newEmail) {
+      return NextResponse.json(
+        { success: false, error: 'Yeni email adresi gerekli' },
         { status: 400 }
       );
     }
