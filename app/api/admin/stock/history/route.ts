@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import StockHistory from '@/models/StockHistory';
 import { AdminAuthError, ensureAdminRequest, handleAdminAuthError } from '../../utils/requireAdmin';
+import { parsePagination } from '@/lib/pagination';
 
 // GET - Stok geçmişi
 export async function GET(request: NextRequest) {
@@ -12,8 +13,7 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const productId = searchParams.get('productId');
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '20');
+    const { page, limit } = parsePagination(searchParams);
 
     const query: any = {};
     if (productId) {
