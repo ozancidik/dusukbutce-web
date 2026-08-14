@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import mongoose from 'mongoose';
 import connectDB from '@/lib/mongodb';
 import Category from '@/models/Category';
 import { AdminAuthError, ensureAdminRequest, handleAdminAuthError } from '../utils/requireAdmin';
@@ -17,6 +18,12 @@ export async function GET(request: NextRequest) {
     let query: any = {};
     
     if (parentId) {
+      if (parentId !== 'null' && !mongoose.Types.ObjectId.isValid(parentId)) {
+        return NextResponse.json(
+          { success: false, message: 'Geçersiz parentId' },
+          { status: 400 }
+        );
+      }
       query.parentCategory = parentId === 'null' ? null : parentId;
     }
     

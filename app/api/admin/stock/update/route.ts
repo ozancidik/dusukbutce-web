@@ -30,37 +30,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Ürünü bul
-    const product = await Product.findById(productId);
-    if (!product) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Ürün bulunamadı',
-          message: 'Belirtilen ID\'ye sahip ürün bulunamadı'
-        },
-        { status: 404 }
-      );
-    }
+    const delta = parseInt(changeAmount);
 
-    const previousStock = product.stock;
-    let newStock = previousStock;
-
-    // Stok değişimini hesapla
+    // Aggregation-pipeline update: MongoDB'de tek atomik adımda uygulanır.
+    // Önceki kod findById + save() ile okuyup yazıyordu — eşzamanlı istekler
+    // aynı "eski" değeri okuyup üstüne yazınca artışların çoğu kayboluyordu
+    // (canlı testte 10 eşzamanlı "+1" isteği sonunda stock sadece 2 arttı).
+    let pipelineStage: Record<string, unknown>;
     switch (changeType) {
       case 'add':
-        newStock = previousStock + parseInt(changeAmount);
+        pipelineStage = { stock: { $add: ['$stock', delta] } };
         break;
       case 'remove':
-        newStock = Math.max(0, previousStock - parseInt(changeAmount));
+        pipelineStage = { stock: { $max: [0, { $subtract: ['$stock', delta] }] } };
         break;
       case 'set':
-        newStock = Math.max(0, parseInt(changeAmount));
+        pipelineStage = { stock: Math.max(0, delta) };
         break;
       default:
         return NextResponse.json(
-          { 
-            success: false, 
+          {
+            success: false,
             error: 'Geçersiz değişim türü',
             message: 'Değişim türü add, remove veya set olmalı'
           },
@@ -68,9 +58,33 @@ export async function POST(request: NextRequest) {
         );
     }
 
-    // Ürün stokunu güncelle
-    product.stock = newStock;
-    await product.save();
+    // Sadece varlık kontrolü + "önceki" değeri raporlamak için okunuyor;
+    // gerçek güncelleme aşağıdaki atomik pipeline ile yapılıyor.
+    const existing = await Product.findById(productId).select('name stock');
+    if (!existing) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Ürün bulunamadı',
+          message: 'Belirtilen ID\'ye sahip ürün bulunamadı'
+        },
+        { status: 404 }
+      );
+    }
+    const previousStock = existing.stock;
+
+    const product = await Product.findByIdAndUpdate(
+      productId,
+      [{ $set: pipelineStage }],
+      { new: true }
+    );
+    if (!product) {
+      return NextResponse.json(
+        { success: false, error: 'Ürün bulunamadı', message: 'Belirtilen ID\'ye sahip ürün bulunamadı' },
+        { status: 404 }
+      );
+    }
+    const newStock = product.stock;
 
     // Stok geçmişini kaydet
     const stockUpdate = await StockHistory.create({
