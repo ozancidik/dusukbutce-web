@@ -166,7 +166,7 @@ export const deleteAllSubmissions = async (): Promise<{ success: boolean; messag
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${adminToken}`
       },
-      body: JSON.stringify({ action: 'deleteAll' }),
+      body: JSON.stringify({ action: 'deleteAll', confirm: 'DELETE_ALL_SUBMISSIONS' }),
     });
 
     const data = await response.json();
