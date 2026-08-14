@@ -3,6 +3,7 @@ import connectDB from '@/lib/mongodb';
 import { Product } from '@/models/Product';
 import PriceHistory from '@/models/PriceHistory';
 import { AdminAuthError, ensureAdminRequest, handleAdminAuthError } from '../utils/requireAdmin';
+import { parsePagination } from '@/lib/pagination';
 
 // GET - Fiyat geçmişi ve istatistikleri getir
 export async function GET(request: NextRequest) {
@@ -16,9 +17,8 @@ export async function GET(request: NextRequest) {
     const changeType = searchParams.get('changeType');
     const startDate = searchParams.get('startDate');
     const endDate = searchParams.get('endDate');
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '20');
-    
+    const { page, limit } = parsePagination(searchParams);
+
     let query: any = {};
     
     if (productId) {

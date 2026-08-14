@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { phone } = body;
 
-    if (!phone) {
+    if (!phone || typeof phone !== 'string') {
       return NextResponse.json(
         { exists: false },
         { status: 200 }
