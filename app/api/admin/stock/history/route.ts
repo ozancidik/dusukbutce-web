@@ -1,21 +1,44 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
+import StockHistory from '@/models/StockHistory';
 import { AdminAuthError, ensureAdminRequest, handleAdminAuthError } from '../../utils/requireAdmin';
 
-// GET - Stok geçmişi (şimdilik boş array döndürüyor, gerçek uygulamada ayrı collection'da tutulur)
+// GET - Stok geçmişi
 export async function GET(request: NextRequest) {
   try {
     ensureAdminRequest(request);
 
     await connectDB();
-    
-    // Gerçek uygulamada StockHistory collection'ından veri çekilir
-    // Şimdilik boş array döndürüyoruz
-    const history: any[] = [];
-    
+
+    const { searchParams } = new URL(request.url);
+    const productId = searchParams.get('productId');
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '20');
+
+    const query: any = {};
+    if (productId) {
+      query.productId = productId;
+    }
+
+    const skip = (page - 1) * limit;
+
+    const [history, totalCount] = await Promise.all([
+      StockHistory.find(query)
+        .sort({ updatedAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      StockHistory.countDocuments(query)
+    ]);
+
     return NextResponse.json({
       success: true,
       history,
+      pagination: {
+        page,
+        limit,
+        totalCount,
+        totalPages: Math.ceil(totalCount / limit)
+      },
       message: 'Stok geçmişi başarıyla getirildi'
     });
   } catch (error) {

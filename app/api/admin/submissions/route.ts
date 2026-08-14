@@ -110,20 +110,28 @@ export async function DELETE(request: NextRequest) {
     ensureAdminRequest(request);
 
     const body = await request.json();
-    const { action, submissionId } = body;
-    
+    const { action, submissionId, confirm } = body;
+
     try {
       await connectDB();
     } catch (dbError) {
       console.error('❌ MongoDB connection error:', dbError);
-      return NextResponse.json({ 
-        success: false, 
+      return NextResponse.json({
+        success: false,
         message: 'Veritabanı bağlantı hatası. Lütfen daha sonra tekrar deneyin.',
         error: 'Database connection failed'
       }, { status: 503 });
     }
-    
+
     if (action === 'deleteAll') {
+      // Onaysız/filtresiz toplu silme geri dönüşsüz — istemcinin bilerek
+      // gönderdiğini doğrulayan ek bir alan zorunlu tutulur.
+      if (confirm !== 'DELETE_ALL_SUBMISSIONS') {
+        return NextResponse.json({
+          success: false,
+          message: 'Onay gerekli: confirm alanı "DELETE_ALL_SUBMISSIONS" olmalı'
+        }, { status: 400 });
+      }
       console.log('🗑️ Tüm submissions siliniyor...');
       const result = await ProductSubmission.deleteMany({});
       console.log(`✅ ${result.deletedCount} submission silindi`);

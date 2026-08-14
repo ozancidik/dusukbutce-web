@@ -67,7 +67,10 @@ CategorySchema.virtual('hasChildren', {
 });
 
 // Pre-save middleware
-CategorySchema.pre('save', function(this: ICategory, next) {
+// pre('validate') olarak kayıtlı — required-alan doğrulaması pre('save')'den ÖNCE
+// çalışır, o hook'ta set edilen slug validasyona yetişmeden "slug required" hatası
+// verirdi (kategori oluşturma bu yüzden hep 500 dönüyordu).
+CategorySchema.pre('validate', function(this: ICategory, next) {
   // Slug oluştur
   if (this.isModified('name') && !this.slug) {
     this.slug = this.name

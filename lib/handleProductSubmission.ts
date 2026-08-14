@@ -14,7 +14,7 @@ import { validateBody, submissionSchema } from "@/lib/validate";
  * Not: Yalnızca aşağıdaki ürün alanları client'tan kabul edilir. status, offer,
  * listing, adminNotes gibi iş akışı/admin alanları client body'sinden ALINMAZ.
  */
-const ALLOWED_FIELDS = [
+export const ALLOWED_FIELDS = [
   // Genel
   "category", "brand", "model", "type", "manufacturingYear", "size",
   "processor", "processorBrand", "graphicsCard", "graphicsCardWatt", "wattValue",

@@ -94,6 +94,7 @@ export async function POST(request: NextRequest) {
     
     const category = new Category({
       name: name.trim(),
+      slug,
       description: description?.trim(),
       parentCategory: parentCategory === 'null' ? null : parentCategory,
       sortOrder: sortOrder || 0

@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import { Product } from '@/models/Product';
+import StockHistory from '@/models/StockHistory';
 import { AdminAuthError, ensureAdminRequest, handleAdminAuthError } from '../../utils/requireAdmin';
 
 // POST - Toplu stok güncelleme
 export async function POST(request: NextRequest) {
   try {
-    ensureAdminRequest(request);
+    const decoded = ensureAdminRequest(request);
 
     await connectDB();
     
@@ -90,6 +91,17 @@ export async function POST(request: NextRequest) {
         // Ürün stokunu güncelle
         product.stock = newStock;
         await product.save();
+
+        await StockHistory.create({
+          productId: product._id,
+          productName: product.name,
+          changeType: update.changeType,
+          previousStock,
+          newStock,
+          changeAmount: newStock - previousStock,
+          reason: update.reason || 'Toplu stok güncelleme',
+          updatedBy: decoded.email || 'admin',
+        });
 
         results.push({
           productId: product._id,
