@@ -66,18 +66,20 @@ export async function POST(request: NextRequest) {
     for (const { product, update } of productsToUpdate) {
       try {
         const previousStock = product.stock;
-        let newStock = previousStock;
+        const delta = parseInt(update.changeAmount);
 
-        // Stok değişimini hesapla
+        // Aggregation-pipeline update: atomik, aynı üründe eşzamanlı
+        // istekler olsa da kayıp güncelleme olmaz (bkz. admin/stock/update).
+        let pipelineStage: Record<string, unknown>;
         switch (update.changeType) {
           case 'add':
-            newStock = previousStock + parseInt(update.changeAmount);
+            pipelineStage = { stock: { $add: ['$stock', delta] } };
             break;
           case 'remove':
-            newStock = Math.max(0, previousStock - parseInt(update.changeAmount));
+            pipelineStage = { stock: { $max: [0, { $subtract: ['$stock', delta] }] } };
             break;
           case 'set':
-            newStock = Math.max(0, parseInt(update.changeAmount));
+            pipelineStage = { stock: Math.max(0, delta) };
             break;
           default:
             errors.push({
@@ -88,9 +90,20 @@ export async function POST(request: NextRequest) {
             continue;
         }
 
-        // Ürün stokunu güncelle
-        product.stock = newStock;
-        await product.save();
+        const updated = await Product.findByIdAndUpdate(
+          product._id,
+          [{ $set: pipelineStage }],
+          { new: true }
+        );
+        if (!updated) {
+          errors.push({
+            productId: product._id,
+            productName: product.name,
+            error: 'Ürün güncellenemedi'
+          });
+          continue;
+        }
+        const newStock = updated.stock;
 
         await StockHistory.create({
           productId: product._id,

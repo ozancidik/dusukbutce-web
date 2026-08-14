@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import mongoose from 'mongoose';
 import connectDB from '@/lib/mongodb';
 import { Product } from '@/models/Product';
 import PriceHistory from '@/models/PriceHistory';
@@ -20,20 +21,31 @@ export async function GET(request: NextRequest) {
     const { page, limit } = parsePagination(searchParams);
 
     let query: any = {};
-    
+
     if (productId) {
+      if (!mongoose.Types.ObjectId.isValid(productId)) {
+        return NextResponse.json(
+          { success: false, message: 'Geçersiz productId' },
+          { status: 400 }
+        );
+      }
       query.productId = productId;
     }
-    
+
     if (changeType) {
       query.changeType = changeType;
     }
-    
+
     if (startDate && endDate) {
-      query.changedAt = {
-        $gte: new Date(startDate),
-        $lte: new Date(endDate)
-      };
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+        return NextResponse.json(
+          { success: false, message: 'Geçersiz tarih formatı' },
+          { status: 400 }
+        );
+      }
+      query.changedAt = { $gte: start, $lte: end };
     }
     
     const skip = (page - 1) * limit;
