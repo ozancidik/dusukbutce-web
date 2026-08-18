@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { safeDecodeName, formatPhoneNumber, isBirthDateEditable } from "./utils/helpers";
@@ -23,6 +23,13 @@ export default function ProfilePage() {
   const [isSendingCode, setIsSendingCode] = useState(false);
   const [isCodeSent, setIsCodeSent] = useState(false);
   const [originalEmail, setOriginalEmail] = useState('');
+  // Doğum tarihi input'unu bilerek "uncontrolled" tutuyoruz (bkz. aşağıdaki
+  // yorum) — bu key değiştikçe input remount olup editForm.birthDate'teki
+  // güncel değeri defaultValue olarak alır.
+  const [birthDateKey, setBirthDateKey] = useState(0);
+  // Kaydet'e tıklama ile onBlur'un sıralamasına güvenmemek için: kaydetme
+  // anında inputun DOM'daki canlı değerini doğrudan bu ref'ten okuyoruz.
+  const birthDateInputRef = useRef<HTMLInputElement>(null);
   const [editForm, setEditForm] = useState({
     firstName: '',
     lastName: '',
@@ -36,6 +43,27 @@ export default function ProfilePage() {
   const [showErrorPopup, setShowErrorPopup] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const router = useRouter();
+
+  // Doğum tarihi state'i (editForm.birthDate) sadece onBlur'da güncelleniyor.
+  // Kaydetme sırasında blur'un click'ten önce işlenmiş olduğuna güvenmek yerine,
+  // inputun o anki DOM değerini doğrudan okuyup kullanıyoruz — böylece
+  // kaydetme, blur/click sıralamasından tamamen bağımsız hale geliyor.
+  const getEffectiveBirthDate = () => {
+    const liveValue = birthDateInputRef.current?.value;
+    const dateFormatRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (canEditBirthDate && liveValue && dateFormatRegex.test(liveValue)) {
+      return liveValue;
+    }
+    return editForm.birthDate;
+  };
+
+  // Doğum tarihi seçilebilir aralığı: en az 13 yaş (handleSave'deki kontrolle
+  // aynı kural), en fazla 1930. Native date input'un min/max'ına veriliyor.
+  const maxBirthDateForInput = (() => {
+    const d = new Date();
+    d.setFullYear(d.getFullYear() - 13);
+    return d.toISOString().split('T')[0];
+  })();
 
   // Mobil responsive kontrol
   useEffect(() => {
@@ -249,46 +277,27 @@ export default function ProfilePage() {
   const handleEdit = async () => {
     setIsEditing(true);
     setMessage('');
+    // Doğum tarihi input'u uncontrolled — düzenleme her başladığında güncel
+    // değeri defaultValue olarak alsın diye remount ettiriyoruz.
+    setBirthDateKey(k => k + 1);
     const currentEmail = userInfo?.email || '';
     setOriginalEmail(currentEmail);
     setIsEmailChanged(false);
     setEmailVerificationCode('');
     
-    // Önce localStorage'dan birthDateEdited bilgisini kontrol et (hızlı kontrol)
-    const birthDateEditedFromStorage = localStorage.getItem('birthDateEdited') === 'true' || 
-                                        sessionStorage.getItem('birthDateEdited') === 'true';
-    
     // userInfo'dan authProviders kontrolü
     const authProviders = (userInfo as any)?.authProviders || [];
-    const hasSocialProvider = authProviders.some((provider: any) => 
+    const hasSocialProvider = authProviders.some((provider: any) =>
       provider.provider === 'google' || provider.provider === 'facebook'
     );
-    const hasLocalProvider = authProviders.some((provider: any) => 
-      provider.provider === 'local'
-    );
-    
-    // Eğer localStorage'da birthDateEdited true ise, hemen state'i güncelle (API çağrısı yapmadan önce)
-    if (birthDateEditedFromStorage) {
-      console.log('🔒 handleEdit: localStorage birthDateEdited=true, input disabled olacak');
-      setCanEditBirthDate(false);
-      setIsSocialLogin(hasSocialProvider);
-      // userInfo'yu güncelle
-      setUserInfo((prev: any) => ({
-        ...prev,
-        birthDateEdited: true,
-        authProviders: authProviders
-      }));
-    } else if (hasSocialProvider && !hasLocalProvider) {
-      // OAuth kullanıcısı ve daha önce düzenlenmemişse, düzenlenebilir
-      console.log('🔓 handleEdit: OAuth kullanıcısı, düzenlenebilir');
-      setCanEditBirthDate(true);
-      setIsSocialLogin(true);
-    } else {
-      // Local authentication kullanıcısı veya bilinmeyen durum
-      console.log('🔒 handleEdit: Local kullanıcı veya bilinmeyen durum, düzenlenemez');
-      setCanEditBirthDate(false);
-      setIsSocialLogin(hasSocialProvider);
-    }
+
+    // İlk (API yanıtı gelmeden önceki) tahmin: elimizdeki mevcut userInfo ile
+    // TEK doğru kaynak olan isBirthDateEditable() kullanılıyor — burada ayrı
+    // ve eksik bir "hasSocialProvider && !birthDateEdited" mantığı YOK, çünkü
+    // böyle bir kopya "doğum tarihi zaten dolu mu" kontrolünü unutup, aslında
+    // kilitli olması gereken bir hesapta alanı yanlışlıkla açık gösterebilir.
+    setCanEditBirthDate(isBirthDateEditable(userInfo));
+    setIsSocialLogin(hasSocialProvider);
     
     // Güncel kullanıcı bilgilerini API'den çek (birthDateEdited durumunu kontrol etmek için)
     if (userInfo?.id) {
@@ -300,15 +309,20 @@ export default function ProfilePage() {
           const apiUserData = data.user;
           const authProviders = apiUserData.authProviders || [];
           const birthDateEdited = apiUserData.birthDateEdited || false;
-          
+
           console.log('🔍 API response: birthDateEdited=', birthDateEdited);
-          
-          const hasSocialProvider = authProviders.some((provider: any) => 
+
+          const hasSocialProvider = authProviders.some((provider: any) =>
             provider.provider === 'google' || provider.provider === 'facebook'
           );
-          
-          // canEditBirthDate state'ini güncelle (API'den gelen bilgi kesin)
-          const canEdit = hasSocialProvider && !birthDateEdited;
+
+          // canEditBirthDate state'ini güncelle (API'den gelen bilgi kesin) —
+          // tek doğru kaynak isBirthDateEditable(), taze API verisiyle çağrılıyor.
+          const canEdit = isBirthDateEditable({
+            birthDate: apiUserData.birthDate,
+            birthDateEdited,
+            authProviders
+          });
           console.log('🔍 canEditBirthDate=', canEdit, '(hasSocialProvider:', hasSocialProvider, ', birthDateEdited:', birthDateEdited, ')');
           setCanEditBirthDate(canEdit);
           setIsSocialLogin(hasSocialProvider);
@@ -339,18 +353,13 @@ export default function ProfilePage() {
             birthDate: apiUserData.birthDate || prev.birthDate
           }));
         } else {
-          // API'den bilgi alınamazsa, localStorage'dan kontrol et
-          console.warn('⚠️ API\'den bilgi alınamadı, localStorage\'dan kontrol ediliyor');
-          const hasSocialProvider = (userInfo as any)?.authProviders?.some((provider: any) => 
+          // API'den bilgi alınamazsa, elimizdeki userInfo ile en iyi tahmini yap
+          console.warn('⚠️ API\'den bilgi alınamadı, mevcut userInfo ile kontrol ediliyor');
+          setCanEditBirthDate(isBirthDateEditable(userInfo));
+          setIsSocialLogin((userInfo as any)?.authProviders?.some((provider: any) =>
             provider.provider === 'google' || provider.provider === 'facebook'
-          ) || false;
-          
-          if (hasSocialProvider) {
-            const canEdit = !birthDateEditedFromStorage;
-            setCanEditBirthDate(canEdit);
-            setIsSocialLogin(true);
-          }
-          
+          ) || false);
+
           // EditForm'u güncelle
           setEditForm((prev: any) => ({
             ...prev,
@@ -359,17 +368,12 @@ export default function ProfilePage() {
         }
       } catch (error) {
         console.error('❌ Kullanıcı bilgileri yüklenirken hata:', error);
-        // Hata durumunda localStorage'dan kontrol et
-        const hasSocialProvider = (userInfo as any)?.authProviders?.some((provider: any) => 
+        // Hata durumunda elimizdeki userInfo ile en iyi tahmini yap
+        setCanEditBirthDate(isBirthDateEditable(userInfo));
+        setIsSocialLogin((userInfo as any)?.authProviders?.some((provider: any) =>
           provider.provider === 'google' || provider.provider === 'facebook'
-        ) || false;
-        
-        if (hasSocialProvider) {
-          const canEdit = !birthDateEditedFromStorage;
-          setCanEditBirthDate(canEdit);
-          setIsSocialLogin(true);
-        }
-        
+        ) || false);
+
         // EditForm'u güncelle
         setEditForm((prev: any) => ({
           ...prev,
@@ -420,16 +424,29 @@ export default function ProfilePage() {
       const formatted = formatPhoneNumber(value);
       setEditForm({ ...editForm, [name]: formatted });
     } else if (name === 'birthDate') {
-      // Doğum tarihi düzenlenebilir mi kontrol et
-      if (!isBirthDateEditable(userInfo)) {
-        return; // Düzenlenemezse, değişiklik yapma
-      }
-      // Doğum tarihi için sadece geçerli tarih formatına izin ver
-      if (value === '' || /^\d{4}-\d{2}-\d{2}$/.test(value)) {
-        setEditForm({ ...editForm, [name]: value });
-      }
+      // Doğum tarihi kasıtlı olarak burada YOK SAYILIYOR — bkz. handleBirthDateBlur.
+      // Native <input type="date">, yazma sırasında (özellikle yıl hanesi
+      // tamamlanmadan) tarayıcıya göre değişen, güvenilmez ara değerler
+      // bildirebiliyor: bazı tarayıcılarda "" , bazılarında ise TAM
+      // formatlı ama YANLIŞ bir tarih (ör. "2222-02-02" — canlı testte
+      // gözlemlendi, kullanıcı 17.12 girmişken). İkisi de state'e yazılırsa
+      // controlled input her yeniden render'da DOM'u ezip kullanıcının o ana
+      // kadar yazdığı gün/ay'ı görsel olarak siler. Bu yüzden bu alan
+      // "uncontrolled" tutuluyor (bkz. ProfileForm: defaultValue + key) ve
+      // state sadece kullanıcı alandan çıktığında (onBlur) güncellenir.
+      return;
     } else {
       setEditForm({ ...editForm, [name]: value });
+    }
+  };
+
+  const handleBirthDateBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    if (!isBirthDateEditable(userInfo)) return;
+    const { value } = e.target;
+    // Kullanıcı alandan çıktı — artık ara-adım tuhaflıkları söz konusu değil,
+    // tarayıcının o an raporladığı değer input'un gerçek nihai durumudur.
+    if (value === '' || /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+      setEditForm(prev => ({ ...prev, birthDate: value }));
     }
   };
 
@@ -483,6 +500,8 @@ export default function ProfilePage() {
     setIsVerifyingEmail(true);
     setMessage('');
 
+    const currentBirthDate = getEffectiveBirthDate();
+
     try {
       const response = await fetch('/api/auth/update-profile', {
         method: 'PUT',
@@ -493,7 +512,7 @@ export default function ProfilePage() {
           lastName: editForm.lastName,
           email: editForm.email,
           phone: editForm.phone,
-          birthDate: isSocialLogin ? editForm.birthDate : undefined,
+          birthDate: isSocialLogin ? currentBirthDate : undefined,
           emailVerificationCode: emailVerificationCode
         })
       });
@@ -510,7 +529,7 @@ export default function ProfilePage() {
         
         // Sadece sosyal medya girişi için doğum tarihini güncelle
         if (isSocialLogin) {
-          localStorage.setItem('userBirthDate', editForm.birthDate);
+          localStorage.setItem('userBirthDate', currentBirthDate);
           localStorage.setItem('birthDateEdited', 'true');
         }
         
@@ -525,30 +544,30 @@ export default function ProfilePage() {
         sessionStorage.setItem('userEmail', editForm.email);
         sessionStorage.setItem('userPhone', formattedPhone || editForm.phone);
         if (canEditBirthDate) {
-          sessionStorage.setItem('userBirthDate', editForm.birthDate);
+          sessionStorage.setItem('userBirthDate', currentBirthDate);
         }
-        
+
         // JSON user objesini güncelle
         const updatedUser = {
           id: userInfo.id,
           email: editForm.email,
           name: newName,
           phone: formattedPhone || editForm.phone,
-          birthDate: canEditBirthDate ? editForm.birthDate : userInfo.birthDate
+          birthDate: canEditBirthDate ? currentBirthDate : userInfo.birthDate
         };
         localStorage.setItem('user', JSON.stringify(updatedUser));
         sessionStorage.setItem('user', JSON.stringify(updatedUser));
-        
+
         setUserInfo({
           ...userInfo,
           name: newName,
           email: editForm.email,
           phone: editForm.phone,
-          birthDate: canEditBirthDate ? editForm.birthDate : userInfo.birthDate
+          birthDate: canEditBirthDate ? currentBirthDate : userInfo.birthDate
         });
         
         // Doğum tarihi düzenlendiyse sosyal medya girişi flag'ini güncelle
-        if (isSocialLogin && editForm.birthDate) {
+        if (isSocialLogin && currentBirthDate) {
           setIsSocialLogin(false);
         }
         
@@ -608,6 +627,7 @@ export default function ProfilePage() {
     setIsCodeSent(false);
     setEmailVerificationCode('');
     setIsCodeInvalid(false);
+    setBirthDateKey(k => k + 1);
     if (!userInfo) return;
     
     const nameParts = userInfo.name ? safeDecodeName(userInfo.name).split(' ') : ['', ''];
@@ -632,6 +652,10 @@ export default function ProfilePage() {
       setMessageType('error');
       return;
     }
+
+    // onBlur'un Kaydet tıklamasından önce işlenmiş olduğuna güvenmek yerine,
+    // inputun DOM'daki güncel değerini burada tek seferde okuyup sabitliyoruz.
+    const currentBirthDate = getEffectiveBirthDate();
 
     // Ad validasyonu
     const nameRegex = /^[a-zA-ZğüşıöçĞÜŞİÖÇ\s-]+$/;
@@ -703,55 +727,55 @@ export default function ProfilePage() {
     }
 
     // Doğum tarihi validasyonu - sadece düzenlenebilirse
-    if (editForm.birthDate.trim() && canEditBirthDate) {
+    if (currentBirthDate.trim() && canEditBirthDate) {
       const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-      if (!dateRegex.test(editForm.birthDate)) {
+      if (!dateRegex.test(currentBirthDate)) {
         setMessage('Geçerli bir doğum tarihi giriniz. Örn: 1990-01-15');
         return;
       }
-      
+
       // Tarih geçerli mi kontrol et
-      const birthDate = new Date(editForm.birthDate + 'T00:00:00');
+      const birthDate = new Date(currentBirthDate + 'T00:00:00');
       const today = new Date();
       today.setHours(0, 0, 0, 0); // Bugünün başlangıcı
-      
+
       // Debug logları
       console.log('🔍 Doğum tarihi validasyonu:');
-      console.log('🔍 editForm.birthDate:', editForm.birthDate);
+      console.log('🔍 currentBirthDate:', currentBirthDate);
       console.log('🔍 birthDate:', birthDate);
       console.log('🔍 today:', today);
       console.log('🔍 birthDate > today:', birthDate > today);
-      
+
       if (isNaN(birthDate.getTime())) {
         setMessage('Geçerli bir doğum tarihi giriniz.');
         return;
       }
-      
+
       if (birthDate > today) {
         console.log('❌ Gelecek tarih tespit edildi!');
         setMessage('Doğum tarihi bugünden sonra olamaz.');
         return;
       }
-      
+
       // Minimum 13 yaş kontrolü
       const thirteenYearsAgo = new Date();
       thirteenYearsAgo.setFullYear(today.getFullYear() - 13);
       thirteenYearsAgo.setHours(0, 0, 0, 0);
-      
+
       console.log('🔍 Yaş kontrolü:');
       console.log('🔍 thirteenYearsAgo:', thirteenYearsAgo);
       console.log('🔍 birthDate > thirteenYearsAgo:', birthDate > thirteenYearsAgo);
-      
+
       if (birthDate > thirteenYearsAgo) {
         console.log('❌ 13 yaşından küçük tespit edildi!');
         setMessage('En az 13 yaşında olmalısınız.');
         return;
       }
-      
-      // Çok eski tarih kontrolü (1900'den önce)
-      const minDate = new Date('1900-01-01');
+
+      // Çok eski / saçma tarih kontrolü (1930'dan önce olamaz)
+      const minDate = new Date('1930-01-01');
       if (birthDate < minDate) {
-        setMessage('Doğum tarihi 1900\'den önce olamaz.');
+        setMessage('Doğum tarihi 1930\'dan önce olamaz.');
         return;
       }
     }
@@ -784,7 +808,7 @@ export default function ProfilePage() {
       console.log('🔍 birthDateEditedFromStorage:', birthDateEditedFromStorage);
       console.log('🔍 birthDateEditedFromUserInfo:', birthDateEditedFromUserInfo);
       console.log('🔍 isBirthDateEditable():', canEdit);
-      console.log('🔍 editForm.birthDate:', editForm.birthDate);
+      console.log('🔍 currentBirthDate:', currentBirthDate);
       console.log('🔍 userInfo.birthDate:', userInfo.birthDate);
       
       // API'ye güncelleme gönder
@@ -803,43 +827,45 @@ export default function ProfilePage() {
       
       if (canEdit) {
         // Düzenlenebilirse, değer değiştiyse yeni değeri gönder
-        if (editForm.birthDate && editForm.birthDate !== userInfo.birthDate) {
-          updateData.birthDate = editForm.birthDate;
-          console.log('✅ handleSave: Yeni doğum tarihi gönderiliyor (düzenlenebilir):', editForm.birthDate);
-        } else if (editForm.birthDate) {
+        if (currentBirthDate && currentBirthDate !== userInfo.birthDate) {
+          updateData.birthDate = currentBirthDate;
+          console.log('✅ handleSave: Yeni doğum tarihi gönderiliyor (düzenlenebilir):', currentBirthDate);
+        } else if (currentBirthDate) {
           // Aynı değer, normal güncelleme
-          updateData.birthDate = editForm.birthDate;
-          console.log('✅ handleSave: Doğum tarihi aynı (düzenlenebilir):', editForm.birthDate);
+          updateData.birthDate = currentBirthDate;
+          console.log('✅ handleSave: Doğum tarihi aynı (düzenlenebilir):', currentBirthDate);
         }
       } else {
         // DÜZENLENEMEZSE - Kesin kontrol
-        if (editForm.birthDate && editForm.birthDate !== userInfo.birthDate) {
-          // Değer değişmiş ama düzenlenemez → HATA
-          console.error('❌ handleSave: Doğum tarihi düzenlenemez ama değer değişmiş!');
-          console.error('❌ editForm.birthDate:', editForm.birthDate);
-          console.error('❌ userInfo.birthDate:', userInfo.birthDate);
-          console.error('❌ birthDateEditedFromStorage:', birthDateEditedFromStorage);
-          console.error('❌ birthDateEditedFromUserInfo:', birthDateEditedFromUserInfo);
-          
+        if (currentBirthDate && currentBirthDate !== userInfo.birthDate) {
+          // Değer değişmiş ama düzenlenemez → beklenen bir engelleme (kullanıcıya
+          // mesaj gösterilip return ediliyor), gerçek bir hata değil — bu yüzden
+          // Next.js dev overlay'i tetiklememesi için console.warn kullanılıyor.
+          console.warn('⚠️ handleSave: Doğum tarihi düzenlenemez ama değer değişmiş!');
+          console.warn('⚠️ currentBirthDate:', currentBirthDate);
+          console.warn('⚠️ userInfo.birthDate:', userInfo.birthDate);
+          console.warn('⚠️ birthDateEditedFromStorage:', birthDateEditedFromStorage);
+          console.warn('⚠️ birthDateEditedFromUserInfo:', birthDateEditedFromUserInfo);
+
           // Frontend'de hata göster ve API çağrısı yapma
           setMessage('Doğum tarihi daha önce belirlenmiş. Artık değiştirilemez.');
           setMessageType('error');
           setErrorMessage('Doğum tarihi daha önce belirlenmiş. Artık değiştirilemez.');
           setShowErrorPopup(true);
-          
+
           // EditForm'daki birthDate'i mevcut değere geri al
           setEditForm((prev: any) => ({
             ...prev,
             birthDate: userInfo.birthDate || prev.birthDate
           }));
-          
+
           return; // API çağrısı yapma
-        } else if (editForm.birthDate) {
+        } else if (currentBirthDate) {
           // Aynı değer, mevcut değeri gönder (normal güncelleme, diğer alanlar için)
-          updateData.birthDate = userInfo.birthDate || editForm.birthDate;
+          updateData.birthDate = userInfo.birthDate || currentBirthDate;
           console.log('✅ handleSave: Doğum tarihi aynı (düzenlenemez, mevcut değer gönderiliyor):', updateData.birthDate);
         }
-        // Eğer editForm.birthDate yoksa, birthDate gönderme (API mevcut değeri koruyacak)
+        // Eğer currentBirthDate yoksa, birthDate gönderme (API mevcut değeri koruyacak)
       }
 
       // Email değişikliği için doğrulama kodu gönder
@@ -871,9 +897,9 @@ export default function ProfilePage() {
         if (updatedUserData.birthDate) {
           localStorage.setItem('userBirthDate', updatedUserData.birthDate);
           sessionStorage.setItem('userBirthDate', updatedUserData.birthDate);
-        } else if (canEditBirthDate && editForm.birthDate) {
-          localStorage.setItem('userBirthDate', editForm.birthDate);
-          sessionStorage.setItem('userBirthDate', editForm.birthDate);
+        } else if (canEditBirthDate && currentBirthDate) {
+          localStorage.setItem('userBirthDate', currentBirthDate);
+          sessionStorage.setItem('userBirthDate', currentBirthDate);
         }
         
         // birthDateEdited flag'ini güncelle (API'den gelen bilgi kesin)
@@ -906,7 +932,7 @@ export default function ProfilePage() {
           email: editForm.email,
           name: newName,
           phone: formattedPhone || editForm.phone,
-          birthDate: updatedUserData.birthDate || (canEditBirthDate ? editForm.birthDate : userInfo.birthDate),
+          birthDate: updatedUserData.birthDate || (canEditBirthDate ? currentBirthDate : userInfo.birthDate),
           birthDateEdited: birthDateEdited,
           authProviders: authProviders,
           isAdmin: updatedUserData.isAdmin || userInfo.isAdmin
@@ -930,7 +956,7 @@ export default function ProfilePage() {
         
         // userInfo'yu güncelle (birthDateEdited dahil)
         // Doğum tarihini belirle: API'den gelen değer varsa onu kullan, yoksa mevcut değeri koru
-        const finalBirthDate = updatedUserData.birthDate || userInfo.birthDate || editForm.birthDate || '';
+        const finalBirthDate = updatedUserData.birthDate || userInfo.birthDate || currentBirthDate || '';
         setUserInfo({
           ...userInfo,
           name: newName,
@@ -1177,7 +1203,11 @@ export default function ProfilePage() {
                   isCodeSent={isCodeSent}
                   canEditBirthDate={canEditBirthDate}
                   isSocialLogin={isSocialLogin}
+                  birthDateKey={birthDateKey}
+                  birthDateInputRef={birthDateInputRef}
+                  maxBirthDate={maxBirthDateForInput}
                   handleChange={handleChange}
+                  handleBirthDateBlur={handleBirthDateBlur}
                   handleSendEmailVerification={handleSendEmailVerification}
                   handleVerifyEmailCode={handleVerifyEmailCode}
                   message={message}

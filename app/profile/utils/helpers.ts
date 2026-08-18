@@ -80,28 +80,32 @@ export const isBirthDateEditable = (userInfo: any): boolean => {
   const hasSocialProvider = authProviders.some((provider: any) => 
     provider.provider === 'google' || provider.provider === 'facebook'
   );
-  const hasLocalProvider = authProviders.some((provider: any) => 
+  const hasLocalProvider = authProviders.some((provider: any) =>
     provider.provider === 'local'
   );
-  
-  // Local authentication kullanıcıları için doğum tarihi düzenlenemez
-  if (hasLocalProvider) {
+
+  // Sadece local (şifreli) girişi olan, hiç sosyal medya bağlantısı olmayan
+  // kullanıcılar için doğum tarihi düzenlenemez (register'da set edilir).
+  // Hem sosyal medya hem local girişi olan (dual-provider) hesaplar, saf OAuth
+  // kullanıcıları gibi, doğum tarihi boşsa bir kereliğine girebilir.
+  if (!hasSocialProvider) {
     return false;
   }
-  
-  // Eğer OAuth kullanıcısı ise ve zaten bir doğum tarihi varsa, düzenlenemez (migration için)
-  // Bu, eski kayıtlar için geçerli - zaten bir doğum tarihi varsa, artık düzenlenemez
+
+  // Eğer OAuth kullanıcısı ise (local girişi yoksa) ve zaten bir doğum tarihi
+  // varsa, düzenlenemez (migration için) - eski kayıtlar için geçerli.
   if (hasSocialProvider && birthDate && !hasLocalProvider) {
     console.log('🔒 isBirthDateEditable: OAuth kullanıcısı ve zaten doğum tarihi var, düzenlenemez');
     return false;
   }
-  
+
   // Eğer herhangi biri true ise, düzenlenemez
   if (birthDateEditedFromUserInfo || birthDateEditedFromStorage) {
     return false;
   }
-  
-  // Sadece OAuth kullanıcıları, daha önce düzenlenmemişse ve doğum tarihi yoksa düzenlenebilir
+
+  // Sosyal medya bağlantısı olan (local girişi olsun ya da olmasın) kullanıcılar,
+  // daha önce düzenlenmemişse ve doğum tarihi yoksa düzenlenebilir
   return hasSocialProvider && !birthDateEditedFromUserInfo && !birthDateEditedFromStorage && !birthDate;
 };
 
