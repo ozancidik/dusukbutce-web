@@ -848,9 +848,15 @@ export default function ProfilePage() {
           console.warn('⚠️ birthDateEditedFromUserInfo:', birthDateEditedFromUserInfo);
 
           // Frontend'de hata göster ve API çağrısı yapma
-          setMessage('Doğum tarihi daha önce belirlenmiş. Artık değiştirilemez.');
+          // isSocialLogin=false ise (saf local hesap) bu özellik hesap için hiç
+          // kullanılamıyor demektir — "daha önce belirlenmiş" mesajı bu durumda
+          // yanıltıcı olur, gerçek sebebi söyleyen ayrı bir mesaj gösteriyoruz.
+          const birthDateBlockedMessage = isSocialLogin
+            ? 'Doğum tarihi daha önce belirlenmiş. Artık değiştirilemez.'
+            : 'Doğum tarihi bu hesap için düzenlenemez.';
+          setMessage(birthDateBlockedMessage);
           setMessageType('error');
-          setErrorMessage('Doğum tarihi daha önce belirlenmiş. Artık değiştirilemez.');
+          setErrorMessage(birthDateBlockedMessage);
           setShowErrorPopup(true);
 
           // EditForm'daki birthDate'i mevcut değere geri al
