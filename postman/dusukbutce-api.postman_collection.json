@@ -1,0 +1,3288 @@
+{
+  "info": {
+    "_postman_id": "dusukbutce-api-full-collection",
+    "name": "Düşük Bütçe API",
+    "description": "# Düşük Bütçe — Tüm Backend API Uç Noktaları\n\nBu koleksiyon `app/api/**/route.ts` altındaki 63 route dosyasının (90 istek) TAMAMINI kapsar. Kaynak koddan (Ağustos 2026 itibarıyla) çıkarılmıştır.\n\n## Kurulum\n1. Koleksiyon değişkeni `base_url` varsayılan olarak `http://localhost:3000` — prod için değiştirin.\n2. Postman'de **cookie jar açık olmalı** (Settings → General → \"Automatically follow redirects\" ve cookie desteği açık; Postman Desktop varsayılan olarak destekler).\n\n## Kimlik doğrulama akışı (normal kullanıcı)\n`lib/auth.ts::getVerifiedUser` isteğin JWT'sini ÖNCE httpOnly `auth-token` cookie'sinden okur (yoksa `Authorization: Bearer` header'ından — geriye dönük uyumluluk).\n1. **Auth → CSRF Token Al** (`GET /api/auth/csrf-token`) çalıştırın — test script yanıttaki `csrfToken`'ı `{{csrf_token}}` koleksiyon değişkenine kaydeder.\n2. **Auth → Login** (`POST /api/auth/login`) çalıştırın — body'de `csrfToken: \"{{csrf_token}}\"` otomatik gönderilir. Başarılıysa Postman cookie jar'ı `auth-token` httpOnly cookie'sini otomatik saklar ve SONRAKİ TÜM isteklerde otomatik gönderir.\n3. Artık `getVerifiedUser` gerektiren tüm istekler (addresses, update-profile, change-password, send-email-change-verification, submissions/[id]/reoffer+response, submissions GET/PUT/DELETE, upload, vb.) otomatik olarak doğrulanmış olur — bu endpoint'ler userId'yi artık cookie'den okur, body/query'deki userId yok sayılır.\n\n## Kimlik doğrulama akışı (admin)\nAdmin uç noktaları (**tamamı** `app/api/admin/**`) `ensureAdminRequest` kullanır — bu, cookie DEĞİL, `Authorization: Bearer <token>` header'ı okur ve decoded JWT'de `isAdmin: true` ya da `role: \"admin\"` arar.\n1. **Admin - Auth & Users → Admin Login** (`POST /api/admin/auth`) çalıştırın (önce CSRF Token Al gerekir, aynı `{{csrf_token}}`). Test hesabının MongoDB'de `isAdmin: true` VE `isActive: true` olması gerekir.\n2. Test script yanıttaki `token`'ı `{{admin_token}}` koleksiyon değişkenine kaydeder. Tüm admin/* istekleri `Authorization: Bearer {{admin_token}}` header'ını zaten kullanır.\n3. Not: `POST /api/admin/auth`, `ensureAdminRequest` DEĞİL kendi basit `jwt.verify` mantığını kullanır ve token 48 saat geçerlidir (normal kullanıcı token'ı 7 gün).\n\n## CSRF koruması\nSadece **Login** (`/api/auth/login`) ve **Admin Login** (`/api/admin/auth`) `csrfToken` alanı ve `csrf-token` cookie eşleşmesi ister (`lib/security.ts::validateCSRFToken`). Diğer hiçbir endpoint CSRF kontrolü yapmaz.\n\n## Görsel yükleme deseni\nSubmission/ürün endpoint'lerindeki `images` alanları önceden yüklenmiş Vercel Blob URL'leri BEKLER. Akış: önce `POST /api/upload` ile (auth gerekir) `data:image/...;base64,...` gönderip dönen `{ url }`'i alın, sonra bu URL'i ilgili submission/ürün isteğinin `images` dizisine koyun. (Bazı admin görsel endpoint'leri ham base64 data URL de kabul eder, ama önerilen yol budur.)\n\n## Güvenlik düzeltmeleri (2026-08-03)\n- `addresses`, `auth/update-profile`, `auth/change-password`, `auth/send-email-change-verification` daha önce JWT doğrulaması YAPMIYORDU (sadece body/query'deki `userId`'ye güveniyordu — bir hesap ele geçirme zincirine izin veriyordu). Artık `getVerifiedUserId` ile auth zorunlu, userId cookie'den alınır.\n- `submissions/[id]/reoffer` ve `submissions/[id]/response` artık auth + sahiplik kontrolü (submission.userId eşleşmeli) gerektiriyor.\n- `notebook-submissions` (GET/PUT) ve `technical-service-submissions` (tüm metodlar) artık `ensureAdminRequest` ile admin-only.\n\n## Önemli tutarsızlıklar (koddan tespit edilen, hâlâ geçerli, bilgilendirme amaçlı)\n- `admin/delete/[id]` (DELETE ve POST) şu an gerçek bir silme yapmıyor, sabit \"test modu\" yanıtı dönüyor.\n- `admin/stock/history` her zaman boş dizi döner (StockHistory koleksiyonu henüz yok).\n",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "csrf_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "admin_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "user_id",
+      "value": "",
+      "type": "string",
+      "description": "Login sonrası user.id ile elle doldurun"
+    },
+    {
+      "key": "product_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "category_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "submission_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "address_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "admin_user_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "CSRF Token Al",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/csrf-token",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "csrf-token"
+              ]
+            },
+            "description": "Herkese açık. `csrf-token` httpOnly cookie'si set eder ve aynı değeri JSON gövdesinde döner. Login ve Admin Login isteklerinden ÖNCE bu istek çalıştırılmalı — dönen `csrfToken`, test script ile `{{csrf_token}}` koleksiyon değişkenine kaydedilir."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.csrfToken) {",
+                  "    pm.collectionVariables.set('csrf_token', json.csrfToken);",
+                  "    console.log('csrf_token kaydedildi');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Herkese açık. **CSRF gerekli**: `csrfToken` alanı, önce `GET /api/auth/csrf-token` ile alınan `csrf-token` cookie'sinin değeriyle eşleşmelidir (bu koleksiyonda otomatik `{{csrf_token}}` olarak taşınır). Rate limit: IP başına 5dk'da 10 deneme. Başarılıysa httpOnly `auth-token` cookie'si set edilir (Postman cookie jar'ı bunu sonraki isteklerde otomatik gönderir) ve body'de `token` de döner. Hatalar: 400 (Joi), 401 (yanlış email/şifre, email doğrulanmamış, OAuth-only hesap), 403 (CSRF geçersiz), 500.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"ayse.yilmaz@example.com\",\n  \"password\": \"Sifre123!\",\n  \"csrfToken\": \"{{csrf_token}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register (Kayıt Ol)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ]
+            },
+            "description": "Herkese açık. Rate limit: IP başına 15dk'da 5 deneme. `kvkkApproved: true` zorunlu. `cep_telefonu` 11 haneli, 0 ile başlamalı. Başarılı: 201, doğrulama e-postası gönderilir (`emailVerified: false` ile oluşturulur — login için önce email doğrulanmalı). Hatalar: 400 (eksik alan/Joi/format/duplicate email-phone).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"ayse.yilmaz@example.com\",\n  \"password\": \"Sifre123!\",\n  \"firstName\": \"Ayşe\",\n  \"lastName\": \"Yılmaz\",\n  \"cep_telefonu\": \"05551234567\",\n  \"kvkkApproved\": true,\n  \"acceptNewsletter\": false,\n  \"birth_date\": \"1995-04-12\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/logout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "logout"
+              ]
+            },
+            "description": "Herkese açık (giriş şart değil). httpOnly `auth-token` cookie'sini sunucu tarafında temizler. Her zaman 200 döner."
+          },
+          "response": []
+        },
+        {
+          "name": "Token Refresh",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/refresh",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "refresh"
+              ]
+            },
+            "description": "Auth token gerektirir (cookie ya da `Authorization: Bearer`). Token ömrünün %80'i geçtiyse yeni token üretir ve cookie'yi günceller; aksi halde aynı token'ı döner. Hatalar: 401 (token yok/geçersiz/kullanıcı pasif), 500."
+          },
+          "response": []
+        },
+        {
+          "name": "Token Doğrula (verify-token)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/verify-token",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "verify-token"
+              ]
+            },
+            "description": "Herkese açık endpoint ama body'de geçerli bir JWT bekler (imza JWT_SECRET ile doğrulanır). Kullanım: client elinde token varsa kullanıcı bilgisini çekmek için. Hatalar: 400 (token yok), 401 (geçersiz token), 404 (kullanıcı yok), 500.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"{{auth_token_manual}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Değişiklik: Şifre Değiştir",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/change-password",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "change-password"
+              ]
+            },
+            "description": "Auth gerekir (httpOnly `auth-token` cookie — önce Login çalıştırın). userId artık body'den değil, cookie'den doğrulanır. Yeni şifre min 8 karakter, büyük/küçük harf ve özel karakter içermeli, mevcut şifreyle aynı olamaz. Hatalar: 401 (giriş yapılmamış), 400 (validasyon/mevcut şifre yanlış/OAuth-only hesap), 404 (kullanıcı yok), 500.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"EskiSifre123!\",\n  \"newPassword\": \"YeniSifre456!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Email Var mı? (check-email)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/check-email",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "check-email"
+              ]
+            },
+            "description": "Herkese açık. Kayıt formunda canlı email kontrolü için. Her zaman 200 döner: `{ exists: boolean }`.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"ayse.yilmaz@example.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Telefon Var mı? (check-phone)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/check-phone",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "check-phone"
+              ]
+            },
+            "description": "Herkese açık. Kayıt formunda canlı telefon kontrolü için. Her zaman 200 döner: `{ exists: boolean }`.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"05551234567\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Şifremi Unuttum (forgot-password)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/forgot-password",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "forgot-password"
+              ]
+            },
+            "description": "Herkese açık. Rate limit: IP başına 15dk'da 5 istek. Kullanıcı bulunamasa bile güvenlik gereği aynı başarı mesajı döner (email enumeration önleme). Reset token üretir, 1 saat geçerli, e-posta gönderir. Hatalar: 400 (format), 503 (DB), 500.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"ayse.yilmaz@example.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Şifre Sıfırlama Token Doğrula",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/verify-reset-token",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "verify-reset-token"
+              ]
+            },
+            "description": "Herkese açık. Şifre sıfırlama linkindeki token'ı doğrular (süresi dolmamış olmalı). Hatalar: 400 (geçersiz/süresi dolmuş token), 500.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"RESET_TOKEN_FROM_EMAIL\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Şifre Sıfırla (reset-password)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/reset-password",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "reset-password"
+              ]
+            },
+            "description": "Herkese açık. Rate limit: IP başına 15dk'da 10 deneme. Şifre kuralları change-password ile aynı (min 8, büyük/küçük harf, özel karakter). Hatalar: 400 (validasyon/geçersiz-süresi dolmuş token), 500.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"RESET_TOKEN_FROM_EMAIL\",\n  \"password\": \"YeniSifre456!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Email Doğrulama Bağlantısını Tekrar Gönder",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/resend-verification",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "resend-verification"
+              ]
+            },
+            "description": "Herkese açık. Rate limit: IP başına 15dk'da 5 istek. Kullanıcı zaten doğrulanmışsa 400 döner. Aksi halde yeni token üretip 24 saat geçerli doğrulama e-postası gönderir.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"ayse.yilmaz@example.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Email Doğrula (verify-email)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/verify-email",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "verify-email"
+              ]
+            },
+            "description": "Herkese açık. Doğrulama e-postasındaki linkteki token ile `emailVerified: true` yapar. Hatalar: 400 (geçersiz/süresi dolmuş token), 500.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"VERIFY_TOKEN_FROM_EMAIL\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Token ile Kullanıcı Emaili Getir",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/get-user-email",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "get-user-email"
+              ]
+            },
+            "description": "Herkese açık. Email doğrulama sayfasında hangi adrese gönderildiğini göstermek için `emailVerificationToken` üzerinden kullanıcının email'ini döner (süresi dolmuş olsa bile). Hatalar: 400 (token yok/geçersiz), 500.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"VERIFY_TOKEN_FROM_EMAIL\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Profil Getir (update-profile)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/update-profile",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "update-profile"
+              ]
+            },
+            "description": "Auth gerekir (httpOnly `auth-token` cookie — önce Login çalıştırın). userId artık query'den değil, cookie'den doğrulanır; query'deki userId yok sayılır. Doğum tarihi migration mantığı da burada çalışır (OAuth kullanıcıları için `birthDateEdited` flag'i). Hatalar: 401 (giriş yapılmamış), 404 (kullanıcı yok), 500."
+          },
+          "response": []
+        },
+        {
+          "name": "Profil Güncelle (update-profile)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/update-profile",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "update-profile"
+              ]
+            },
+            "description": "Auth gerekir (httpOnly `auth-token` cookie — önce Login çalıştırın). userId artık body'den değil, cookie'den doğrulanır. Email değişikliği varsa `emailVerificationCode` zorunlu (önce POST /api/auth/send-email-change-verification ile alınır). Doğum tarihi bir kez set edildikten sonra (local kullanıcılarda register'da, OAuth kullanıcılarda ilk profil güncellemesinde) bir daha değiştirilemez. Hatalar: 401 (giriş yapılmamış), 400 (doğrulama kodu hatalı/süresi dolmuş/email-telefon zaten kullanılıyor/doğum tarihi kilitli), 404, 500.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Ayşe\",\n  \"lastName\": \"Yılmaz\",\n  \"email\": \"ayse.yilmaz@example.com\",\n  \"phone\": \"05551234567\",\n  \"birthDate\": \"1995-04-12\",\n  \"emailVerificationCode\": \"123456\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Email Değişikliği Doğrulama Kodu Gönder",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/send-email-change-verification",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "send-email-change-verification"
+              ]
+            },
+            "description": "Auth gerekir (httpOnly `auth-token` cookie — önce Login çalıştırın). userId artık body'den değil, cookie'den doğrulanır. 6 haneli kod üretir (10dk geçerli) ve yeni email adresine gönderir; `PUT /api/auth/update-profile` ile birlikte kullanılır. Hatalar: 401 (giriş yapılmamış), 400 (eksik alan/email kullanımda), 404 (kullanıcı yok), 500.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"newEmail\": \"yeni.email@example.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Google OAuth Başlat",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/google?returnUrl=%2Fprofile",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "google"
+              ],
+              "query": [
+                {
+                  "key": "returnUrl",
+                  "value": "/profile"
+                }
+              ]
+            },
+            "description": "Herkese açık, tarayıcıda açılır (Postman'de doğrudan test edilemez — 302 redirect ile Google consent ekranına yönlendirir). GOOGLE_CLIENT_ID/SECRET env değişkenleri gerekir."
+          },
+          "response": []
+        },
+        {
+          "name": "Google OAuth Callback",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/google/callback?code=GOOGLE_AUTH_CODE&state=",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "google",
+                "callback"
+              ],
+              "query": [
+                {
+                  "key": "code",
+                  "value": "GOOGLE_AUTH_CODE"
+                },
+                {
+                  "key": "state",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Tarayıcı tarafından Google tarafından çağrılır — Postman ile manuel test edilemez (gerçek bir `code` gerekir). Başarılı olursa kullanıcı oluşturur/günceller, `auth-token` cookie'sini set eder ve popup'ı kapatan bir HTML sayfası döner."
+          },
+          "response": []
+        },
+        {
+          "name": "Facebook OAuth Başlat",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/facebook?returnUrl=%2Fprofile",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "facebook"
+              ],
+              "query": [
+                {
+                  "key": "returnUrl",
+                  "value": "/profile"
+                }
+              ]
+            },
+            "description": "Herkese açık, tarayıcıda açılır (Postman'de doğrudan test edilemez — 302 redirect ile Facebook consent ekranına yönlendirir). FACEBOOK_APP_ID/SECRET env değişkenleri gerekir."
+          },
+          "response": []
+        },
+        {
+          "name": "Facebook OAuth Callback",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/facebook/callback?code=FACEBOOK_AUTH_CODE&state=",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "facebook",
+                "callback"
+              ],
+              "query": [
+                {
+                  "key": "code",
+                  "value": "FACEBOOK_AUTH_CODE"
+                },
+                {
+                  "key": "state",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Tarayıcı tarafından Facebook tarafından çağrılır — Postman ile manuel test edilemez (gerçek bir `code` gerekir). Başarılı olursa kullanıcı oluşturur/günceller, `auth-token` cookie'sini set eder ve popup'ı kapatan bir HTML sayfası döner."
+          },
+          "response": []
+        }
+      ],
+      "description": "Kayıt, giriş, çıkış, şifre işlemleri, email doğrulama, OAuth (Google/Facebook), profil. Çoğu endpoint herkese açık; bazıları (change-password, update-profile, addresses ile aynı desen) yalnızca body'deki userId'ye güvenir."
+    },
+    {
+      "name": "Admin - Auth & Users",
+      "item": [
+        {
+          "name": "Admin Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/auth",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "auth"
+              ]
+            },
+            "description": "**CSRF gerekli**: önce GET /api/auth/csrf-token çalıştırılmalı (bu koleksiyonda `{{csrf_token}}` otomatik taşınır). Kullanıcının MongoDB'de `isAdmin: true` VE `isActive: true` olması gerekir. Diğer tüm admin/* endpoint'leri bu isteğin döndürdüğü `token`'ı `Authorization: Bearer <token>` header'ında bekler (bu koleksiyonda test script ile `{{admin_token}}` koleksiyon değişkenine otomatik kaydedilir — cookie DEĞİL, admin auth httpOnly cookie kullanmaz). Token 48 saat geçerli. Hatalar: 401 (yanlış email/şifre/yetkisiz), 403 (CSRF), 500, 503 (DB).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@dusukbutce.com\",\n  \"password\": \"AdminSifre123!\",\n  \"csrfToken\": \"{{csrf_token}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.token) {",
+                  "    pm.collectionVariables.set('admin_token', json.token);",
+                  "    console.log('admin_token kaydedildi');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin Token Doğrula",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/auth",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "auth"
+              ]
+            },
+            "description": "`Authorization: Bearer <token>` header'ındaki admin token'ını doğrular. Not: bu route kendi basit jwt.verify'ını kullanır, `ensureAdminRequest` DEĞİL. Hatalar: 401 (token yok/geçersiz), 500."
+          },
+          "response": []
+        },
+        {
+          "name": "Tüm Kullanıcıları Listele",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/users",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "users"
+              ]
+            },
+            "description": "Admin yetkisi gerekir (`ensureAdminRequest` — `Authorization: Bearer {{admin_token}}`, decoded JWT'de `isAdmin: true` ya da `role: \"admin\"` olmalı). Şifre hariç tüm kullanıcıları döner. Test hesabında MongoDB'de `isAdmin: true` olmalı. Hatalar: 401/403 (yetkisiz), 500."
+          },
+          "response": []
+        },
+        {
+          "name": "Admin Kullanıcı Sil",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/users/:id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "users",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{admin_user_id}}"
+                }
+              ]
+            },
+            "description": "Admin yetkisi gerekir. DİKKAT: sadece `isAdmin: true` olan kullanıcılar bu endpoint ile silinebilir (normal kullanıcılar silinemez — 403 döner). `:id` yerine gerçek bir admin kullanıcı ObjectId'si girin. Hatalar: 401/403, 404 (kullanıcı yok), 500."
+          },
+          "response": []
+        }
+      ],
+      "description": "Admin girişi ve kullanıcı yönetimi. Tüm admin/* uç noktaları Authorization: Bearer {{admin_token}} header'ı gerektirir."
+    },
+    {
+      "name": "Admin - Products & Categories",
+      "item": [
+        {
+          "name": "Ürünleri Listele",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/products",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "products"
+              ]
+            },
+            "description": "Admin yetkisi gerekir. Tüm ürünleri (`Product` koleksiyonu) döner, filtre/sayfalama yok. Hatalar: 401/403, 500."
+          },
+          "response": []
+        },
+        {
+          "name": "Ürün Oluştur",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/products",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "products"
+              ]
+            },
+            "description": "Admin yetkisi gerekir. Zorunlu alanlar: name, category, brand, productModel, price, description. `status` verilmezse \"draft\" olur. Hatalar: 400 (eksik alan/negatif fiyat-stok), 401/403, 500.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"ASUS TUF Gaming F15 Notebook\",\n  \"category\": \"notebook\",\n  \"brand\": \"ASUS\",\n  \"productModel\": \"TUF Gaming F15 FX507\",\n  \"price\": 24999.9,\n  \"stock\": 5,\n  \"description\": \"i5 12. nesil, 16GB RAM, RTX 3050, 512GB SSD, 15.6\\\" 144Hz\",\n  \"images\": [\n    \"https://xxxxx.public.blob.vercel-storage.com/products/1234567890.jpg\"\n  ],\n  \"specifications\": {\n    \"islemci\": \"Intel Core i5-12500H\",\n    \"ram\": \"16GB DDR4\",\n    \"ekranKarti\": \"NVIDIA RTX 3050 4GB\",\n    \"depolama\": \"512GB NVMe SSD\"\n  },\n  \"status\": \"active\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ürün Güncelle",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/products",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "products"
+              ]
+            },
+            "description": "Admin yetkisi gerekir. Body'de `productId` zorunlu; diğer alanlar verilirse güncellenir (partial update, undefined alanlar dokunulmaz). Hatalar: 400 (productId yok/negatif fiyat-stok), 401/403, 404 (ürün yok — findByIdAndUpdate null dönerse update sonucu null olabilir), 500.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": \"{{product_id}}\",\n  \"name\": \"ASUS TUF Gaming F15 Notebook\",\n  \"category\": \"notebook\",\n  \"brand\": \"ASUS\",\n  \"productModel\": \"TUF Gaming F15 FX507\",\n  \"price\": 24999.9,\n  \"stock\": 5,\n  \"description\": \"i5 12. nesil, 16GB RAM, RTX 3050, 512GB SSD, 15.6\\\" 144Hz\",\n  \"images\": [\n    \"https://xxxxx.public.blob.vercel-storage.com/products/1234567890.jpg\"\n  ],\n  \"specifications\": {\n    \"islemci\": \"Intel Core i5-12500H\",\n    \"ram\": \"16GB DDR4\",\n    \"ekranKarti\": \"NVIDIA RTX 3050 4GB\",\n    \"depolama\": \"512GB NVMe SSD\"\n  },\n  \"status\": \"active\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ürün Sil",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/products",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "products"
+              ]
+            },
+            "description": "Admin yetkisi gerekir. Body'de `productId` zorunlu. Hatalar: 400 (productId yok), 401/403, 404 (ürün yok), 500.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": \"{{product_id}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Kategorileri Listele",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/categories?parentId=&activeOnly=true",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "categories"
+              ],
+              "query": [
+                {
+                  "key": "parentId",
+                  "value": "",
+                  "description": "\"null\" verilirse yalnızca kök kategoriler",
+                  "disabled": true
+                },
+                {
+                  "key": "activeOnly",
+                  "value": "true",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Admin yetkisi gerekir. `parentId` ve `activeOnly` opsiyonel filtreler. Hatalar: 401/403, 500."
+          },
+          "response": []
+        },
+        {
+          "name": "Kategori Oluştur",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/categories",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "categories"
+              ]
+            },
+            "description": "Admin yetkisi gerekir. `name` zorunlu; slug otomatik oluşturulur ve tekil olmalı. `parentCategory` bir kategori ObjectId'si ya da \"null\" olabilir. Hatalar: 400 (isim yok/slug çakışması/geçersiz parent), 401/403, 500.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ekran Kartları\",\n  \"description\": \"Masaüstü ve harici ekran kartları\",\n  \"parentCategory\": null,\n  \"sortOrder\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Kategori Getir",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/categories/:id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "categories",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{category_id}}"
+                }
+              ]
+            },
+            "description": "Admin yetkisi gerekir. Hatalar: 401/403, 404 (kategori yok), 500."
+          },
+          "response": []
+        },
+        {
+          "name": "Kategori Güncelle",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/categories/:id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "categories",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{category_id}}"
+                }
+              ]
+            },
+            "description": "Admin yetkisi gerekir. Tüm alanlar opsiyonel (partial update); isim değişirse slug yeniden üretilip tekillik kontrolü yapılır. Hatalar: 400 (boş isim/slug çakışması/kendi kendine parent), 401/403, 404, 500.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ekran Kartları (Güncel)\",\n  \"description\": \"Güncellenmiş açıklama\",\n  \"parentCategory\": null,\n  \"sortOrder\": 2,\n  \"isActive\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Kategori Sil",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/categories/:id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "categories",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{category_id}}"
+                }
+              ]
+            },
+            "description": "Admin yetkisi gerekir. Alt kategorisi olan ya da içinde ürün bulunan kategoriler silinemez. Hatalar: 400 (alt kategori/ürün var), 401/403, 404, 500."
+          },
+          "response": []
+        },
+        {
+          "name": "Fiyat Geçmişi ve İstatistikler (Tümü)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/prices?productId=&changeType=manual&startDate=&endDate=&page=1&limit=20",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "prices"
+              ],
+              "query": [
+                {
+                  "key": "productId",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "changeType",
+                  "value": "manual",
+                  "description": "manual | bulk",
+                  "disabled": true
+                },
+                {
+                  "key": "startDate",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "endDate",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "Admin yetkisi gerekir. Sayfalama + filtre destekli fiyat geçmişi (PriceHistory koleksiyonu) ve toplu istatistikler. Hatalar: 401/403, 500."
+          },
+          "response": []
+        },
+        {
+          "name": "Toplu Fiyat Güncelleme",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/prices",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "prices"
+              ]
+            },
+            "description": "Admin yetkisi gerekir. `updateType`: fixed | percentage | multiply. Her ürün için PriceHistory kaydı oluşturur, hatalı olanlar `errors` dizisinde raporlanır (kısmi başarı mümkün — yine de 200 döner). Hatalar: 400 (eksik alan/geçersiz updateType), 401/403, 500.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productIds\": [\n    \"{{product_id}}\"\n  ],\n  \"updateType\": \"percentage\",\n  \"updateValue\": 10,\n  \"changeReason\": \"Kur güncellemesi\",\n  \"changedBy\": \"admin@dusukbutce.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ürün Fiyat Geçmişi (Tekil)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/prices/:id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "prices",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{product_id}}"
+                }
+              ]
+            },
+            "description": "Admin yetkisi gerekir. `:id` bir ürün ObjectId'si. Hatalar: 401/403, 404 (ürün yok), 500."
+          },
+          "response": []
+        },
+        {
+          "name": "Ürün Fiyatı Güncelle (Tekil)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/prices/:id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "prices",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{product_id}}"
+                }
+              ]
+            },
+            "description": "Admin yetkisi gerekir. Fiyat aynıysa 400 döner (\"Fiyat değişmedi\"). Hatalar: 400 (newPrice yok/negatif/aynı fiyat/changedBy yok), 401/403, 404, 500.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"newPrice\": 27999.9,\n  \"changeReason\": \"Manuel fiyat düzeltmesi\",\n  \"changedBy\": \"admin@dusukbutce.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ürün Görsellerini Getir (İstatistiklerle)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/images?productId=&page=1&limit=20",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "images"
+              ],
+              "query": [
+                {
+                  "key": "productId",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "Admin yetkisi gerekir. Sayfalanmış ürün listesi + toplam görsel istatistikleri. Hatalar: 401/403, 500."
+          },
+          "response": []
+        },
+        {
+          "name": "Ürüne Toplu Görsel Yükle",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/images",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "images"
+              ]
+            },
+            "description": "Admin yetkisi gerekir. Görseller `data:image/...` ya da `http...` ile başlamalı. Mevcut görsellerle birleşir, toplam 20'yi geçemez. Hatalar: 400 (eksik alan/format/limit aşımı), 401/403, 404 (ürün yok), 500.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": \"{{product_id}}\",\n  \"images\": [\n    \"https://xxxxx.public.blob.vercel-storage.com/products/1.jpg\",\n    \"https://xxxxx.public.blob.vercel-storage.com/products/2.jpg\"\n  ],\n  \"uploadedBy\": \"admin@dusukbutce.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ürün Görsellerini Getir (Tekil)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/images/:id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "images",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{product_id}}"
+                }
+              ]
+            },
+            "description": "Admin yetkisi gerekir. `:id` bir ürün ObjectId'si. Hatalar: 401/403, 404, 500."
+          },
+          "response": []
+        },
+        {
+          "name": "Ürün Görsellerini Güncelle (replace/add/remove/reorder)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/images/:id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "images",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{product_id}}"
+                }
+              ]
+            },
+            "description": "Admin yetkisi gerekir. `action`: replace | add | remove | reorder. `remove` için `imageIndex` gerekir, `reorder` için `images` mevcut sayıyla eşleşmeli. `uploadedBy` her zaman zorunlu. Hatalar: 400 (validasyon türüne göre değişir), 401/403, 404, 500.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"replace\",\n  \"images\": [\n    \"https://xxxxx.public.blob.vercel-storage.com/products/1.jpg\"\n  ],\n  \"uploadedBy\": \"admin@dusukbutce.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ürünün Tüm Görsellerini Sil",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/images/:id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "images",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{product_id}}"
+                }
+              ]
+            },
+            "description": "Admin yetkisi gerekir. Ürünün `images` dizisini boşaltır. Hatalar: 401/403, 404, 500."
+          },
+          "response": []
+        }
+      ],
+      "description": "Ürün, kategori, fiyat ve görsel yönetimi (admin panel CRUD)."
+    },
+    {
+      "name": "Admin - Stock",
+      "item": [
+        {
+          "name": "Stok Güncelle (Tekil)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/stock/update",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "stock",
+                "update"
+              ]
+            },
+            "description": "Admin yetkisi gerekir. `changeType`: add | remove | set. `remove` sonucu 0'ın altına düşmez (Math.max). Hatalar: 400 (eksik alan/geçersiz changeType), 401/403, 404 (ürün yok), 500.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": \"{{product_id}}\",\n  \"changeType\": \"add\",\n  \"changeAmount\": 10,\n  \"reason\": \"Yeni parti geldi\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Stok Güncelle (Toplu)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/stock/bulk-update",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "stock",
+                "bulk-update"
+              ]
+            },
+            "description": "Admin yetkisi gerekir. İki mod: `updates` dizisi (ürün bazlı) VEYA `category` + `changeType` + `changeAmount` (kategori/tüm ürünler için tek tip değişim). Hatalar: 400 (ikisi de eksikse), 401/403, 500.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"updates\": [\n    {\n      \"productId\": \"{{product_id}}\",\n      \"changeType\": \"set\",\n      \"changeAmount\": 20,\n      \"reason\": \"Sayım düzeltmesi\"\n    }\n  ],\n  \"reason\": \"Toplu sayım\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Stok Geçmişi",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/stock/history",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "stock",
+                "history"
+              ]
+            },
+            "description": "Admin yetkisi gerekir. NOT: Şu an her zaman boş dizi döner — ayrı bir StockHistory koleksiyonu henüz uygulanmamış (kod içi yorum: \"gerçek uygulamada ayrı collection'da tutulur\"). Hatalar: 401/403, 500."
+          },
+          "response": []
+        }
+      ],
+      "description": "Stok güncelleme (tekil/toplu) ve stok geçmişi."
+    },
+    {
+      "name": "Admin - Submissions & Newsletter",
+      "item": [
+        {
+          "name": "Tüm Teklifleri Listele",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/submissions?limit=50",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "submissions"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ]
+            },
+            "description": "Admin yetkisi gerekir. Tüm kategorilerden ProductSubmission kayıtlarını (userId populate edilmiş) döner. Hatalar: 401/403, 500, 503 (DB)."
+          },
+          "response": []
+        },
+        {
+          "name": "Teklif Güncelle (updateStatus/addOffer/createListing/reject)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/submissions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "submissions"
+              ]
+            },
+            "description": "Admin yetkisi gerekir. `action`: updateStatus | addOffer | createListing | reject — her biri `data` içinde farklı alanlar bekler (bkz. updateStatus: {status, adminNotes?, userId?}; createListing: {price, title, description}; reject: {rejectReason|reason}). Hatalar: 400 (geçersiz action), 401/403, 404 (teklif yok), 500, 503.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"submissionId\": \"{{submission_id}}\",\n  \"action\": \"addOffer\",\n  \"data\": {\n    \"amount\": 5500,\n    \"notes\": \"Ekran kartı için teklifimiz\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Teklif(ler) Sil",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/submissions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "submissions"
+              ]
+            },
+            "description": "Admin yetkisi gerekir. `action`: \"deleteOne\" (submissionId ile) veya \"deleteAll\" (TÜM teklifleri siler — dikkatli kullanın). Hatalar: 400 (geçersiz action/eksik parametre), 401/403, 404, 500, 503.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"deleteOne\",\n  \"submissionId\": \"{{submission_id}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Teklif İşlemi (offer/list/reject/delivery_completed)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/action",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "action"
+              ]
+            },
+            "description": "Admin yetkisi gerekir. `action`: offer | list | reject | delivery_completed. `offer` verildiğinde `amount` zorunlu ve teklif numarası otomatik üretilir; ilgili müşteri e-postası (varsa) gönderilir. Hatalar: 400 (submissionId/action yok), 401/403, 404 (teklif yok), 500.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"submissionId\": \"{{submission_id}}\",\n  \"action\": \"offer\",\n  \"amount\": 5500,\n  \"notes\": \"İlk teklifimiz\",\n  \"customerEmail\": \"ayse.yilmaz@example.com\",\n  \"customerName\": \"Ayşe Yılmaz\",\n  \"productName\": \"NVIDIA RTX 3070\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Teklif Sil (Tekil, test modu)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/delete/:id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "delete",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{submission_id}}"
+                }
+              ]
+            },
+            "description": "Admin yetkisi gerekir. NOT: Kod şu an gerçek silme yapmıyor — sabit bir \"Test modu\" başarı mesajı döner (yorum satırında ProductSubmission importu kapalı). Hatalar: 400 (id yok), 401/403, 500."
+          },
+          "response": []
+        },
+        {
+          "name": "Tüm Teklifleri Sil (test modu)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/delete/:id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "delete",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{submission_id}}"
+                }
+              ]
+            },
+            "description": "Admin yetkisi gerekir. NOT: Kod şu an gerçek silme yapmıyor — sabit bir \"Test modu\" başarı mesajı döner (`deletedCount: 1` sabit). `:id` bu route'ta kullanılmıyor ama URL şeması gereği doldurulmalı."
+          },
+          "response": []
+        },
+        {
+          "name": "Newsletter Abonelerini Listele",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/newsletter-subscribers",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "newsletter-subscribers"
+              ]
+            },
+            "description": "Admin yetkisi gerekir. `acceptNewsletter: true` olan kullanıcıları döner. Hatalar: 401/403, 500."
+          },
+          "response": []
+        },
+        {
+          "name": "Newsletter Gönder",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/send-newsletter",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "send-newsletter"
+              ]
+            },
+            "description": "Admin yetkisi gerekir. `subscribers` dizisindeki her aboneye Gmail/nodemailer ile tek tek e-posta gönderir (senkron döngü — çok sayıda abone varsa yavaş olabilir). Hatalar: 400 (eksik alan), 401/403, 500.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subject\": \"Düşük Bütçe — Yeni Fırsatlar!\",\n  \"message\": \"Bu ay ekran kartlarında büyük indirim var, kaçırmayın!\",\n  \"subscribers\": [\n    {\n      \"email\": \"ayse.yilmaz@example.com\",\n      \"name\": \"Ayşe Yılmaz\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "Admin tarafından teklif (submission) yönetimi ve newsletter gönderimi."
+    },
+    {
+      "name": "Listings",
+      "item": [
+        {
+          "name": "İlanları Listele",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/listings",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "listings"
+              ]
+            },
+            "description": "Herkese açık. Yalnızca `status: \"listed\"` olan ProductSubmission kayıtlarını döner (en fazla 100). MongoDB bağlantı hatasında/timeout'ta (3sn) sessizce boş dizi `[]` döner (200) — sayfa MongoDB olmadan da yüklensin diye."
+          },
+          "response": []
+        },
+        {
+          "name": "İlan Detayı",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/listings/:id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "listings",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{submission_id}}"
+                }
+              ]
+            },
+            "description": "Herkese açık. `:id` geçerli bir ObjectId olmalı ve kaydın `status: \"listed\"` olması gerekir (aksi halde 404). Hatalar: 400 (geçersiz ObjectId formatı), 404 (bulunamadı/listed değil), 500."
+          },
+          "response": []
+        }
+      ],
+      "description": "Herkese açık, \"listed\" durumundaki ürün ilanları."
+    },
+    {
+      "name": "Product Submissions (Bize Sat)",
+      "item": [
+        {
+          "name": "Genel Teklifler (submissions)",
+          "item": [
+            {
+              "name": "Genel Teklif Gönder (submissions)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/submissions",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "submissions"
+                  ]
+                },
+                "description": "Kimlik doğrulama opsiyonel (getVerifiedUserId — cookie varsa teklif kullanıcıya bağlanır, yoksa misafir olarak kaydedilir). `category` verilmezse \"playstation\" varsayılır. app/api/submissions/route.ts kendi ALLOWED_FIELDS beyaz listesini KULLANMAZ — body'nin tamamı (userId/status/adminNotes hariç override edilenler dışında) doğrudan kaydedilir; bu yüzden diğer kategori route'larından (handleProductSubmission ortak fonksiyonu) DAVRANIŞ olarak farklıdır. Başarılı: 200 `{ success: true, id }`. Hata: 500.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"category\": \"playstation\",\n  \"brand\": \"Sony\",\n  \"model\": \"PlayStation 5 Slim\",\n  \"cosmeticCondition\": \"İyi - hafif kullanım izleri var\",\n  \"condition\": \"Çalışıyor\",\n  \"hasWarranty\": false,\n  \"warrantyDuration\": \"\",\n  \"hasBox\": true,\n  \"hasInvoice\": false,\n  \"accessories\": \"1 kol, orijinal kutu\",\n  \"description\": \"1 yıllık, sorunsuz\",\n  \"images\": [\n    \"https://xxxxx.public.blob.vercel-storage.com/submissions/USER_ID/1234567890.jpg\"\n  ],\n  \"quantity\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Kendi Tekliflerimi Listele",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/submissions?category=&userId=",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "submissions"
+                  ],
+                  "query": [
+                    {
+                      "key": "category",
+                      "value": "",
+                      "disabled": true
+                    },
+                    {
+                      "key": "userId",
+                      "value": "",
+                      "description": "Sadece admin bu parametreyi kullanabilir; normal kullanıcıda yok sayılır",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "Kimlik doğrulama ZORUNLU (`auth-token` cookie ya da Authorization Bearer). Normal kullanıcı yalnızca kendi tekliflerini görür; admin `userId` query'si ile belirli bir kullanıcıyı ya da tümünü sorgulayabilir. Hatalar: 401 (giriş yok), 500."
+              },
+              "response": []
+            },
+            {
+              "name": "Teklif Güncelle (status/deliveryMethod/customerInfo)",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/submissions",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "submissions"
+                  ]
+                },
+                "description": "Kimlik doğrulama ZORUNLU. Sahiplik kontrolü: admin değilse yalnızca kendi teklifini güncelleyebilir. Hatalar: 400 (id yok), 401 (giriş yok), 403 (başkasının teklifi), 404 (teklif yok), 500.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": \"{{submission_id}}\",\n  \"status\": \"accepted\",\n  \"deliveryMethod\": \"kargo\",\n  \"customerInfo\": {\n    \"name\": \"Ayşe Yılmaz\",\n    \"email\": \"ayse.yilmaz@example.com\",\n    \"phone\": \"05551234567\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Teklif Sil",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/submissions?id=%7B%7Bsubmission_id%7D%7D",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "submissions"
+                  ],
+                  "query": [
+                    {
+                      "key": "id",
+                      "value": "{{submission_id}}"
+                    }
+                  ]
+                },
+                "description": "Kimlik doğrulama ZORUNLU. Sahiplik kontrolü: admin değilse yalnızca kendi teklifini silebilir. Hatalar: 400 (id yok), 401, 403, 404, 500."
+              },
+              "response": []
+            }
+          ],
+          "description": "app/api/submissions/route.ts — playstation vb. genel kategori, kendi ALLOWED_FIELDS filtresi YOK."
+        },
+        {
+          "name": "Kategori Teklifleri (ortak şema — 14 route)",
+          "item": [
+            {
+              "name": "Teklif Gönder — graphics-card-submissions",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/graphics-card-submissions",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "graphics-card-submissions"
+                  ]
+                },
+                "description": "Kimlik doğrulama: opsiyonel — `auth-token` cookie'si varsa teklif kullanıcıya bağlanır (getVerifiedUserId), yoksa misafir teklifi olarak kaydedilir. Body, lib/handleProductSubmission.ts içindeki ALLOWED_FIELDS beyaz listesinden geçirilir; listede olmayan alanlar sessizce yok sayılır. lib/validate.ts submissionSchema zorunlu kılar: category, brand, model, cosmeticCondition (max uzunluklar var). images alanı önceden POST /api/upload ile yüklenmiş Vercel Blob URL'leri olmalı (base64 de kabul edilir ama önerilmez, 8MB/öğe ve 20 öğe sınırı var). Başarılı: 200 { \"message\": \"Success\" }. Hata: 400 (Joi doğrulama hatası), 500 (sunucu/DB hatası).",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"category\": \"ekran-karti\",\n  \"brand\": \"NVIDIA\",\n  \"model\": \"GeForce RTX 3070\",\n  \"cosmeticCondition\": \"İyi - hafif kullanım izleri var\",\n  \"condition\": \"Çalışıyor\",\n  \"hasWarranty\": false,\n  \"warrantyDuration\": \"\",\n  \"hasBox\": true,\n  \"hasInvoice\": false,\n  \"accessories\": \"Orijinal kutu, adaptör\",\n  \"description\": \"Sorunsuz çalışır durumda, temiz kullanılmış.\",\n  \"images\": [\n    \"https://xxxxx.public.blob.vercel-storage.com/submissions/USER_ID/1234567890.jpg\"\n  ],\n  \"quantity\": 1,\n  \"memory\": \"8GB\",\n  \"memoryType\": \"GDDR6\",\n  \"coreClock\": \"1500MHz\",\n  \"boostClock\": \"1725MHz\",\n  \"powerConsumption\": \"220W\",\n  \"ports\": \"HDMI, 3x DisplayPort\",\n  \"interface\": \"PCIe 4.0 x16\",\n  \"chipSet\": \"GA104\",\n  \"dviOutput\": false,\n  \"furmarkResult\": \"Stabil, 70°C altı\",\n  \"opened\": false,\n  \"thermalPadChanged\": false,\n  \"miningUsed\": false,\n  \"warrantySticker\": true,\n  \"coilWhine\": false,\n  \"oxidation\": false\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Teklif Gönder — audio-system-submissions",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/audio-system-submissions",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "audio-system-submissions"
+                  ]
+                },
+                "description": "Kimlik doğrulama: opsiyonel — `auth-token` cookie'si varsa teklif kullanıcıya bağlanır (getVerifiedUserId), yoksa misafir teklifi olarak kaydedilir. Body, lib/handleProductSubmission.ts içindeki ALLOWED_FIELDS beyaz listesinden geçirilir; listede olmayan alanlar sessizce yok sayılır. lib/validate.ts submissionSchema zorunlu kılar: category, brand, model, cosmeticCondition (max uzunluklar var). images alanı önceden POST /api/upload ile yüklenmiş Vercel Blob URL'leri olmalı (base64 de kabul edilir ama önerilmez, 8MB/öğe ve 20 öğe sınırı var). Başarılı: 200 { \"message\": \"Success\" }. Hata: 400 (Joi doğrulama hatası), 500 (sunucu/DB hatası).",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"category\": \"ses-sistemi\",\n  \"brand\": \"Logitech\",\n  \"model\": \"Z623\",\n  \"cosmeticCondition\": \"İyi - hafif kullanım izleri var\",\n  \"condition\": \"Çalışıyor\",\n  \"hasWarranty\": false,\n  \"warrantyDuration\": \"\",\n  \"hasBox\": true,\n  \"hasInvoice\": false,\n  \"accessories\": \"Orijinal kutu, adaptör\",\n  \"description\": \"Sorunsuz çalışır durumda, temiz kullanılmış.\",\n  \"images\": [\n    \"https://xxxxx.public.blob.vercel-storage.com/submissions/USER_ID/1234567890.jpg\"\n  ],\n  \"quantity\": 1,\n  \"power\": \"400W\",\n  \"connectivity\": \"AUX, RCA\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Teklif Gönder — case-submissions",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/case-submissions",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "case-submissions"
+                  ]
+                },
+                "description": "Kimlik doğrulama: opsiyonel — `auth-token` cookie'si varsa teklif kullanıcıya bağlanır (getVerifiedUserId), yoksa misafir teklifi olarak kaydedilir. Body, lib/handleProductSubmission.ts içindeki ALLOWED_FIELDS beyaz listesinden geçirilir; listede olmayan alanlar sessizce yok sayılır. lib/validate.ts submissionSchema zorunlu kılar: category, brand, model, cosmeticCondition (max uzunluklar var). images alanı önceden POST /api/upload ile yüklenmiş Vercel Blob URL'leri olmalı (base64 de kabul edilir ama önerilmez, 8MB/öğe ve 20 öğe sınırı var). Başarılı: 200 { \"message\": \"Success\" }. Hata: 400 (Joi doğrulama hatası), 500 (sunucu/DB hatası).",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"category\": \"kasa\",\n  \"brand\": \"NZXT\",\n  \"model\": \"H510\",\n  \"cosmeticCondition\": \"İyi - hafif kullanım izleri var\",\n  \"condition\": \"Çalışıyor\",\n  \"hasWarranty\": false,\n  \"warrantyDuration\": \"\",\n  \"hasBox\": true,\n  \"hasInvoice\": false,\n  \"accessories\": \"Orijinal kutu, adaptör\",\n  \"description\": \"Sorunsuz çalışır durumda, temiz kullanılmış.\",\n  \"images\": [\n    \"https://xxxxx.public.blob.vercel-storage.com/submissions/USER_ID/1234567890.jpg\"\n  ],\n  \"quantity\": 1,\n  \"type\": \"Mid Tower\",\n  \"ports\": \"2x USB 3.0, Ses\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Teklif Gönder — cooler-submissions",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/cooler-submissions",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "cooler-submissions"
+                  ]
+                },
+                "description": "Kimlik doğrulama: opsiyonel — `auth-token` cookie'si varsa teklif kullanıcıya bağlanır (getVerifiedUserId), yoksa misafir teklifi olarak kaydedilir. Body, lib/handleProductSubmission.ts içindeki ALLOWED_FIELDS beyaz listesinden geçirilir; listede olmayan alanlar sessizce yok sayılır. lib/validate.ts submissionSchema zorunlu kılar: category, brand, model, cosmeticCondition (max uzunluklar var). images alanı önceden POST /api/upload ile yüklenmiş Vercel Blob URL'leri olmalı (base64 de kabul edilir ama önerilmez, 8MB/öğe ve 20 öğe sınırı var). Başarılı: 200 { \"message\": \"Success\" }. Hata: 400 (Joi doğrulama hatası), 500 (sunucu/DB hatası).",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"category\": \"sogutucu\",\n  \"brand\": \"Cooler Master\",\n  \"model\": \"Hyper 212\",\n  \"cosmeticCondition\": \"İyi - hafif kullanım izleri var\",\n  \"condition\": \"Çalışıyor\",\n  \"hasWarranty\": false,\n  \"warrantyDuration\": \"\",\n  \"hasBox\": true,\n  \"hasInvoice\": false,\n  \"accessories\": \"Orijinal kutu, adaptör\",\n  \"description\": \"Sorunsuz çalışır durumda, temiz kullanılmış.\",\n  \"images\": [\n    \"https://xxxxx.public.blob.vercel-storage.com/submissions/USER_ID/1234567890.jpg\"\n  ],\n  \"quantity\": 1,\n  \"type\": \"Hava Soğutmalı\",\n  \"socket\": \"AM4/LGA1700\",\n  \"stokFan\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Teklif Gönder — gaming-wheel-submissions",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/gaming-wheel-submissions",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "gaming-wheel-submissions"
+                  ]
+                },
+                "description": "Kimlik doğrulama: opsiyonel — `auth-token` cookie'si varsa teklif kullanıcıya bağlanır (getVerifiedUserId), yoksa misafir teklifi olarak kaydedilir. Body, lib/handleProductSubmission.ts içindeki ALLOWED_FIELDS beyaz listesinden geçirilir; listede olmayan alanlar sessizce yok sayılır. lib/validate.ts submissionSchema zorunlu kılar: category, brand, model, cosmeticCondition (max uzunluklar var). images alanı önceden POST /api/upload ile yüklenmiş Vercel Blob URL'leri olmalı (base64 de kabul edilir ama önerilmez, 8MB/öğe ve 20 öğe sınırı var). Başarılı: 200 { \"message\": \"Success\" }. Hata: 400 (Joi doğrulama hatası), 500 (sunucu/DB hatası).",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"category\": \"oyun-direksiyonu\",\n  \"brand\": \"Logitech\",\n  \"model\": \"G29\",\n  \"cosmeticCondition\": \"İyi - hafif kullanım izleri var\",\n  \"condition\": \"Çalışıyor\",\n  \"hasWarranty\": false,\n  \"warrantyDuration\": \"\",\n  \"hasBox\": true,\n  \"hasInvoice\": false,\n  \"accessories\": \"Orijinal kutu, adaptör\",\n  \"description\": \"Sorunsuz çalışır durumda, temiz kullanılmış.\",\n  \"images\": [\n    \"https://xxxxx.public.blob.vercel-storage.com/submissions/USER_ID/1234567890.jpg\"\n  ],\n  \"quantity\": 1,\n  \"connectivity\": \"USB\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Teklif Gönder — headphones-submissions",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/headphones-submissions",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "headphones-submissions"
+                  ]
+                },
+                "description": "Kimlik doğrulama: opsiyonel — `auth-token` cookie'si varsa teklif kullanıcıya bağlanır (getVerifiedUserId), yoksa misafir teklifi olarak kaydedilir. Body, lib/handleProductSubmission.ts içindeki ALLOWED_FIELDS beyaz listesinden geçirilir; listede olmayan alanlar sessizce yok sayılır. lib/validate.ts submissionSchema zorunlu kılar: category, brand, model, cosmeticCondition (max uzunluklar var). images alanı önceden POST /api/upload ile yüklenmiş Vercel Blob URL'leri olmalı (base64 de kabul edilir ama önerilmez, 8MB/öğe ve 20 öğe sınırı var). Başarılı: 200 { \"message\": \"Success\" }. Hata: 400 (Joi doğrulama hatası), 500 (sunucu/DB hatası).",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"category\": \"kulaklik\",\n  \"brand\": \"HyperX\",\n  \"model\": \"Cloud II\",\n  \"cosmeticCondition\": \"İyi - hafif kullanım izleri var\",\n  \"condition\": \"Çalışıyor\",\n  \"hasWarranty\": false,\n  \"warrantyDuration\": \"\",\n  \"hasBox\": true,\n  \"hasInvoice\": false,\n  \"accessories\": \"Orijinal kutu, adaptör\",\n  \"description\": \"Sorunsuz çalışır durumda, temiz kullanılmış.\",\n  \"images\": [\n    \"https://xxxxx.public.blob.vercel-storage.com/submissions/USER_ID/1234567890.jpg\"\n  ],\n  \"quantity\": 1,\n  \"connectivity\": \"Kablolu, 3.5mm\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Teklif Gönder — keyboard-submissions",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/keyboard-submissions",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "keyboard-submissions"
+                  ]
+                },
+                "description": "Kimlik doğrulama: opsiyonel — `auth-token` cookie'si varsa teklif kullanıcıya bağlanır (getVerifiedUserId), yoksa misafir teklifi olarak kaydedilir. Body, lib/handleProductSubmission.ts içindeki ALLOWED_FIELDS beyaz listesinden geçirilir; listede olmayan alanlar sessizce yok sayılır. lib/validate.ts submissionSchema zorunlu kılar: category, brand, model, cosmeticCondition (max uzunluklar var). images alanı önceden POST /api/upload ile yüklenmiş Vercel Blob URL'leri olmalı (base64 de kabul edilir ama önerilmez, 8MB/öğe ve 20 öğe sınırı var). Başarılı: 200 { \"message\": \"Success\" }. Hata: 400 (Joi doğrulama hatası), 500 (sunucu/DB hatası).",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"category\": \"klavye\",\n  \"brand\": \"Logitech\",\n  \"model\": \"G413\",\n  \"cosmeticCondition\": \"İyi - hafif kullanım izleri var\",\n  \"condition\": \"Çalışıyor\",\n  \"hasWarranty\": false,\n  \"warrantyDuration\": \"\",\n  \"hasBox\": true,\n  \"hasInvoice\": false,\n  \"accessories\": \"Orijinal kutu, adaptör\",\n  \"description\": \"Sorunsuz çalışır durumda, temiz kullanılmış.\",\n  \"images\": [\n    \"https://xxxxx.public.blob.vercel-storage.com/submissions/USER_ID/1234567890.jpg\"\n  ],\n  \"quantity\": 1,\n  \"switchType\": \"Mekanik - Kailh Brown\",\n  \"layout\": \"TR-Q\",\n  \"connectivity\": \"Kablolu USB\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Teklif Gönder — monitor-submissions",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/monitor-submissions",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "monitor-submissions"
+                  ]
+                },
+                "description": "Kimlik doğrulama: opsiyonel — `auth-token` cookie'si varsa teklif kullanıcıya bağlanır (getVerifiedUserId), yoksa misafir teklifi olarak kaydedilir. Body, lib/handleProductSubmission.ts içindeki ALLOWED_FIELDS beyaz listesinden geçirilir; listede olmayan alanlar sessizce yok sayılır. lib/validate.ts submissionSchema zorunlu kılar: category, brand, model, cosmeticCondition (max uzunluklar var). images alanı önceden POST /api/upload ile yüklenmiş Vercel Blob URL'leri olmalı (base64 de kabul edilir ama önerilmez, 8MB/öğe ve 20 öğe sınırı var). Başarılı: 200 { \"message\": \"Success\" }. Hata: 400 (Joi doğrulama hatası), 500 (sunucu/DB hatası).",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"category\": \"monitor\",\n  \"brand\": \"LG\",\n  \"model\": \"27GL650F\",\n  \"cosmeticCondition\": \"İyi - hafif kullanım izleri var\",\n  \"condition\": \"Çalışıyor\",\n  \"hasWarranty\": false,\n  \"warrantyDuration\": \"\",\n  \"hasBox\": true,\n  \"hasInvoice\": false,\n  \"accessories\": \"Orijinal kutu, adaptör\",\n  \"description\": \"Sorunsuz çalışır durumda, temiz kullanılmış.\",\n  \"images\": [\n    \"https://xxxxx.public.blob.vercel-storage.com/submissions/USER_ID/1234567890.jpg\"\n  ],\n  \"quantity\": 1,\n  \"screenSize\": \"27\\\"\",\n  \"resolution\": \"1920x1080\",\n  \"refreshRate\": \"144Hz\",\n  \"panelType\": \"IPS\",\n  \"responseTime\": \"1ms\",\n  \"deadPixelCount\": 0,\n  \"screenStatus\": \"Sorunsuz\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Teklif Gönder — mouse-submissions",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/mouse-submissions",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "mouse-submissions"
+                  ]
+                },
+                "description": "Kimlik doğrulama: opsiyonel — `auth-token` cookie'si varsa teklif kullanıcıya bağlanır (getVerifiedUserId), yoksa misafir teklifi olarak kaydedilir. Body, lib/handleProductSubmission.ts içindeki ALLOWED_FIELDS beyaz listesinden geçirilir; listede olmayan alanlar sessizce yok sayılır. lib/validate.ts submissionSchema zorunlu kılar: category, brand, model, cosmeticCondition (max uzunluklar var). images alanı önceden POST /api/upload ile yüklenmiş Vercel Blob URL'leri olmalı (base64 de kabul edilir ama önerilmez, 8MB/öğe ve 20 öğe sınırı var). Başarılı: 200 { \"message\": \"Success\" }. Hata: 400 (Joi doğrulama hatası), 500 (sunucu/DB hatası).",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"category\": \"mouse\",\n  \"brand\": \"Logitech\",\n  \"model\": \"G502 Hero\",\n  \"cosmeticCondition\": \"İyi - hafif kullanım izleri var\",\n  \"condition\": \"Çalışıyor\",\n  \"hasWarranty\": false,\n  \"warrantyDuration\": \"\",\n  \"hasBox\": true,\n  \"hasInvoice\": false,\n  \"accessories\": \"Orijinal kutu, adaptör\",\n  \"description\": \"Sorunsuz çalışır durumda, temiz kullanılmış.\",\n  \"images\": [\n    \"https://xxxxx.public.blob.vercel-storage.com/submissions/USER_ID/1234567890.jpg\"\n  ],\n  \"quantity\": 1,\n  \"dpi\": \"16000\",\n  \"connectivity\": \"Kablolu USB\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Teklif Gönder — processor-submissions",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/processor-submissions",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "processor-submissions"
+                  ]
+                },
+                "description": "Kimlik doğrulama: opsiyonel — `auth-token` cookie'si varsa teklif kullanıcıya bağlanır (getVerifiedUserId), yoksa misafir teklifi olarak kaydedilir. Body, lib/handleProductSubmission.ts içindeki ALLOWED_FIELDS beyaz listesinden geçirilir; listede olmayan alanlar sessizce yok sayılır. lib/validate.ts submissionSchema zorunlu kılar: category, brand, model, cosmeticCondition (max uzunluklar var). images alanı önceden POST /api/upload ile yüklenmiş Vercel Blob URL'leri olmalı (base64 de kabul edilir ama önerilmez, 8MB/öğe ve 20 öğe sınırı var). Başarılı: 200 { \"message\": \"Success\" }. Hata: 400 (Joi doğrulama hatası), 500 (sunucu/DB hatası).",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"category\": \"islemci\",\n  \"brand\": \"Intel\",\n  \"model\": \"Core i5-12400F\",\n  \"cosmeticCondition\": \"İyi - hafif kullanım izleri var\",\n  \"condition\": \"Çalışıyor\",\n  \"hasWarranty\": false,\n  \"warrantyDuration\": \"\",\n  \"hasBox\": true,\n  \"hasInvoice\": false,\n  \"accessories\": \"Orijinal kutu, adaptör\",\n  \"description\": \"Sorunsuz çalışır durumda, temiz kullanılmış.\",\n  \"images\": [\n    \"https://xxxxx.public.blob.vercel-storage.com/submissions/USER_ID/1234567890.jpg\"\n  ],\n  \"quantity\": 1,\n  \"socket\": \"LGA1700\",\n  \"cache\": \"18MB\",\n  \"stokFan\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Teklif Gönder — ram-submissions",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/ram-submissions",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "ram-submissions"
+                  ]
+                },
+                "description": "Kimlik doğrulama: opsiyonel — `auth-token` cookie'si varsa teklif kullanıcıya bağlanır (getVerifiedUserId), yoksa misafir teklifi olarak kaydedilir. Body, lib/handleProductSubmission.ts içindeki ALLOWED_FIELDS beyaz listesinden geçirilir; listede olmayan alanlar sessizce yok sayılır. lib/validate.ts submissionSchema zorunlu kılar: category, brand, model, cosmeticCondition (max uzunluklar var). images alanı önceden POST /api/upload ile yüklenmiş Vercel Blob URL'leri olmalı (base64 de kabul edilir ama önerilmez, 8MB/öğe ve 20 öğe sınırı var). Başarılı: 200 { \"message\": \"Success\" }. Hata: 400 (Joi doğrulama hatası), 500 (sunucu/DB hatası).",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"category\": \"ram\",\n  \"brand\": \"Corsair\",\n  \"model\": \"Vengeance LPX 16GB (2x8GB)\",\n  \"cosmeticCondition\": \"İyi - hafif kullanım izleri var\",\n  \"condition\": \"Çalışıyor\",\n  \"hasWarranty\": false,\n  \"warrantyDuration\": \"\",\n  \"hasBox\": true,\n  \"hasInvoice\": false,\n  \"accessories\": \"Orijinal kutu, adaptör\",\n  \"description\": \"Sorunsuz çalışır durumda, temiz kullanılmış.\",\n  \"images\": [\n    \"https://xxxxx.public.blob.vercel-storage.com/submissions/USER_ID/1234567890.jpg\"\n  ],\n  \"quantity\": 1,\n  \"capacity\": \"16GB\",\n  \"ramType\": \"DDR4\",\n  \"speed\": \"3200MHz\",\n  \"latency\": \"CL16\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Teklif Gönder — sound-system-submissions",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/sound-system-submissions",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "sound-system-submissions"
+                  ]
+                },
+                "description": "Kimlik doğrulama: opsiyonel — `auth-token` cookie'si varsa teklif kullanıcıya bağlanır (getVerifiedUserId), yoksa misafir teklifi olarak kaydedilir. Body, lib/handleProductSubmission.ts içindeki ALLOWED_FIELDS beyaz listesinden geçirilir; listede olmayan alanlar sessizce yok sayılır. lib/validate.ts submissionSchema zorunlu kılar: category, brand, model, cosmeticCondition (max uzunluklar var). images alanı önceden POST /api/upload ile yüklenmiş Vercel Blob URL'leri olmalı (base64 de kabul edilir ama önerilmez, 8MB/öğe ve 20 öğe sınırı var). Başarılı: 200 { \"message\": \"Success\" }. Hata: 400 (Joi doğrulama hatası), 500 (sunucu/DB hatası).",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"category\": \"hoparlor-sistemi\",\n  \"brand\": \"Edifier\",\n  \"model\": \"R1280T\",\n  \"cosmeticCondition\": \"İyi - hafif kullanım izleri var\",\n  \"condition\": \"Çalışıyor\",\n  \"hasWarranty\": false,\n  \"warrantyDuration\": \"\",\n  \"hasBox\": true,\n  \"hasInvoice\": false,\n  \"accessories\": \"Orijinal kutu, adaptör\",\n  \"description\": \"Sorunsuz çalışır durumda, temiz kullanılmış.\",\n  \"images\": [\n    \"https://xxxxx.public.blob.vercel-storage.com/submissions/USER_ID/1234567890.jpg\"\n  ],\n  \"quantity\": 1,\n  \"power\": \"42W\",\n  \"connectivity\": \"AUX, RCA\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Teklif Gönder — ssd-submissions",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/ssd-submissions",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "ssd-submissions"
+                  ]
+                },
+                "description": "Kimlik doğrulama: opsiyonel — `auth-token` cookie'si varsa teklif kullanıcıya bağlanır (getVerifiedUserId), yoksa misafir teklifi olarak kaydedilir. Body, lib/handleProductSubmission.ts içindeki ALLOWED_FIELDS beyaz listesinden geçirilir; listede olmayan alanlar sessizce yok sayılır. lib/validate.ts submissionSchema zorunlu kılar: category, brand, model, cosmeticCondition (max uzunluklar var). images alanı önceden POST /api/upload ile yüklenmiş Vercel Blob URL'leri olmalı (base64 de kabul edilir ama önerilmez, 8MB/öğe ve 20 öğe sınırı var). Başarılı: 200 { \"message\": \"Success\" }. Hata: 400 (Joi doğrulama hatası), 500 (sunucu/DB hatası).",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"category\": \"ssd\",\n  \"brand\": \"Samsung\",\n  \"model\": \"970 EVO Plus 500GB\",\n  \"cosmeticCondition\": \"İyi - hafif kullanım izleri var\",\n  \"condition\": \"Çalışıyor\",\n  \"hasWarranty\": false,\n  \"warrantyDuration\": \"\",\n  \"hasBox\": true,\n  \"hasInvoice\": false,\n  \"accessories\": \"Orijinal kutu, adaptör\",\n  \"description\": \"Sorunsuz çalışır durumda, temiz kullanılmış.\",\n  \"images\": [\n    \"https://xxxxx.public.blob.vercel-storage.com/submissions/USER_ID/1234567890.jpg\"\n  ],\n  \"quantity\": 1,\n  \"storageCapacity\": \"500GB\",\n  \"storageType\": \"NVMe M.2\",\n  \"speed\": \"3500MB/s okuma\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Teklif Gönder — tablet-submissions",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/tablet-submissions",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "tablet-submissions"
+                  ]
+                },
+                "description": "Kimlik doğrulama: opsiyonel — `auth-token` cookie'si varsa teklif kullanıcıya bağlanır (getVerifiedUserId), yoksa misafir teklifi olarak kaydedilir. Body, lib/handleProductSubmission.ts içindeki ALLOWED_FIELDS beyaz listesinden geçirilir; listede olmayan alanlar sessizce yok sayılır. lib/validate.ts submissionSchema zorunlu kılar: category, brand, model, cosmeticCondition (max uzunluklar var). images alanı önceden POST /api/upload ile yüklenmiş Vercel Blob URL'leri olmalı (base64 de kabul edilir ama önerilmez, 8MB/öğe ve 20 öğe sınırı var). Başarılı: 200 { \"message\": \"Success\" }. Hata: 400 (Joi doğrulama hatası), 500 (sunucu/DB hatası).",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"category\": \"tablet\",\n  \"brand\": \"Samsung\",\n  \"model\": \"Galaxy Tab S6 Lite\",\n  \"cosmeticCondition\": \"İyi - hafif kullanım izleri var\",\n  \"condition\": \"Çalışıyor\",\n  \"hasWarranty\": false,\n  \"warrantyDuration\": \"\",\n  \"hasBox\": true,\n  \"hasInvoice\": false,\n  \"accessories\": \"Orijinal kutu, adaptör\",\n  \"description\": \"Sorunsuz çalışır durumda, temiz kullanılmış.\",\n  \"images\": [\n    \"https://xxxxx.public.blob.vercel-storage.com/submissions/USER_ID/1234567890.jpg\"\n  ],\n  \"quantity\": 1,\n  \"screenSize\": \"10.4\\\"\",\n  \"storageCapacity\": \"64GB\",\n  \"batteryHealth\": \"%90+\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            }
+          ],
+          "description": "Bu 14 route (graphics-card, audio-system, case, cooler, gaming-wheel, headphones, keyboard, monitor, mouse, processor, ram, sound-system, ssd, tablet) hepsi lib/handleProductSubmission.ts ortak fonksiyonunu çağırır: aynı ALLOWED_FIELDS beyaz listesi, aynı submissionSchema (Joi) doğrulaması, aynı davranış — sadece \"category\" değeri route adına göre farklı. Örnek gövdeler kategoriye göre uyarlanmış ama şema ortaktır."
+        },
+        {
+          "name": "Notebook Teklifleri (özel implementasyon)",
+          "item": [
+            {
+              "name": "Notebook Teklifi Gönder",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/notebook-submissions",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "notebook-submissions"
+                  ]
+                },
+                "description": "Kimlik doğrulama opsiyonel (getVerifiedUserId, misafir gönderim desteklenir). Bu route AYRI bir custom implementasyon — lib/handleProductSubmission.ts'i KULLANMAZ, submissionSchema/ALLOWED_FIELDS ile sınırlı DEĞİLDİR; body'nin tamamı category=\"notebook\" ile kaydedilir. Hatalar: 500 (sunucu/DB hatası). Not: images için data: base64 de kabul edilir ama URL önerilir.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"brand\": \"ASUS\",\n  \"model\": \"TUF Gaming F15 FX507\",\n  \"manufacturingYear\": \"2022\",\n  \"screenSize\": \"15.6\\\"\",\n  \"processorBrand\": \"Intel\",\n  \"processor\": \"Core i5-12500H\",\n  \"ramType\": \"DDR4\",\n  \"ram\": \"16GB\",\n  \"storageType\": \"NVMe SSD\",\n  \"storage\": \"512GB\",\n  \"graphicsCard\": \"NVIDIA RTX 3050\",\n  \"graphicsCardWatt\": \"4GB\",\n  \"batteryHealth\": \"%85+\",\n  \"cosmeticCondition\": \"İyi - hafif kullanım izleri var\",\n  \"accessories\": \"Orijinal şarj adaptörü\",\n  \"hasWarranty\": false,\n  \"description\": \"Sorunsuz çalışır durumda, temiz kullanılmış.\",\n  \"images\": [\n    \"https://xxxxx.public.blob.vercel-storage.com/submissions/USER_ID/1234567890.jpg\"\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Notebook Tekliflerini Listele",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/notebook-submissions",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "notebook-submissions"
+                  ]
+                },
+                "description": "Admin gerekir (ensureAdminRequest — Authorization: Bearer {{admin_token}}, önce Admin Login çalıştırın). Tüm notebook tekliflerini (kullanıcı bilgileriyle zenginleştirilmiş) döner. Hatalar: 401 (token yok/geçersiz), 403 (admin değil)."
+              },
+              "response": []
+            },
+            {
+              "name": "Notebook Teklif Müşteri Yanıtı (customerAccept/customerReject)",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/notebook-submissions",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "notebook-submissions"
+                  ]
+                },
+                "description": "Admin gerekir (ensureAdminRequest — Authorization: Bearer {{admin_token}}). `action`: customerAccept | customerReject. Hatalar: 401 (token yok/geçersiz), 403 (admin değil), 400 (geçersiz action), 404 (teklif yok), 500.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"submissionId\": \"{{submission_id}}\",\n  \"action\": \"customerAccept\",\n  \"data\": {\n    \"note\": \"Teklifi kabul ediyorum\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            }
+          ],
+          "description": "app/api/notebook-submissions/route.ts — diğer 14 route gibi ortak handleProductSubmission'ı KULLANMAZ, kendi custom POST/GET/PUT mantığına sahiptir ve ALLOWED_FIELDS ile sınırlı değildir."
+        },
+        {
+          "name": "Teknik Servis Talepleri (ayrı model)",
+          "item": [
+            {
+              "name": "Teknik Servis Talebi Oluştur",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/technical-service-submissions",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "technical-service-submissions"
+                  ]
+                },
+                "description": "DİKKAT: Kimlik doğrulama YOK — herkese açık. Farklı bir model kullanır (TechnicalServiceSubmission), diğer *-submissions route'larıyla ALAKASIZ bir şema. Hatalar: 500 (DB yapılandırılmamışsa/sunucu hatası).",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Mehmet Demir\",\n  \"phone\": \"05559876543\",\n  \"email\": \"mehmet.demir@example.com\",\n  \"address\": \"Örnek Mah. Örnek Sk. No:12 D:3\",\n  \"city\": \"İstanbul\",\n  \"district\": \"Kadıköy\",\n  \"serviceType\": \"Notebook Tamiri\",\n  \"deliveryMethod\": \"kargo\",\n  \"deviceInfo\": \"ASUS TUF Gaming F15, açılmıyor\",\n  \"problemDescription\": \"Cihaz şarj olduğu halde açılmıyor, güç LED'i yanmıyor.\",\n  \"preferredDate\": \"2026-08-10\",\n  \"preferredTime\": \"14:00-16:00\",\n  \"shippingMethod\": \"Kargo ile gönderim\",\n  \"notes\": \"Lütfen aramadan önce SMS atın.\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Teknik Servis Taleplerini Listele",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/technical-service-submissions?limit=100&status=",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "technical-service-submissions"
+                  ],
+                  "query": [
+                    {
+                      "key": "limit",
+                      "value": "100"
+                    },
+                    {
+                      "key": "status",
+                      "value": "",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "Admin gerekir (ensureAdminRequest — Authorization: Bearer {{admin_token}}, önce Admin Login çalıştırın). Hatalar: 401 (token yok/geçersiz), 403 (admin değil)."
+              },
+              "response": []
+            },
+            {
+              "name": "Teknik Servis Talebi Güncelle",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/technical-service-submissions",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "technical-service-submissions"
+                  ]
+                },
+                "description": "Admin gerekir (ensureAdminRequest — Authorization: Bearer {{admin_token}}). Hatalar: 401 (token yok/geçersiz), 403 (admin değil), 404 (talep yok), 500.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"submissionId\": \"{{submission_id}}\",\n  \"status\": \"in_progress\",\n  \"adminNotes\": \"Parça bekleniyor\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Teknik Servis Talebi Sil",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/technical-service-submissions",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "technical-service-submissions"
+                  ]
+                },
+                "description": "Admin gerekir (ensureAdminRequest — Authorization: Bearer {{admin_token}}). Hatalar: 401 (token yok/geçersiz), 403 (admin değil), 404 (talep yok), 500.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"submissionId\": \"{{submission_id}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            }
+          ],
+          "description": "app/api/technical-service-submissions/route.ts — TechnicalServiceSubmission adlı tamamen ayrı bir Mongoose modeli kullanır, ürün teklifi DEĞİL, tamir/servis talebidir."
+        },
+        {
+          "name": "Müşteri Aksiyonları",
+          "item": [
+            {
+              "name": "Yeniden Teklif Talep Et (reoffer)",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/submissions/:id/reoffer",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "submissions",
+                    ":id",
+                    "reoffer"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{submission_id}}"
+                    }
+                  ]
+                },
+                "description": "Auth gerekir (httpOnly `auth-token` cookie — önce Login çalıştırın) VE teklif giriş yapan kullanıcıya ait olmalı (submission.userId ile eşleşmeli). Yalnızca `status: \"rejected\"` olan teklifler için çalışır; teklifi tekrar \"pending\" durumuna alır. Hatalar: 401 (giriş yapılmamış), 403 (teklif başka kullanıcıya ait), 400 (not boş/durum uygun değil), 404 (teklif yok), 500.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"reofferNote\": \"Fiyatı biraz daha yükseltebilir misiniz? Ürün çok temiz durumda.\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Teklife Müşteri Yanıtı (accept/reject)",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/submissions/:id/response",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "submissions",
+                    ":id",
+                    "response"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "{{submission_id}}"
+                    }
+                  ]
+                },
+                "description": "Auth gerekir (httpOnly `auth-token` cookie — önce Login çalıştırın) VE teklif giriş yapan kullanıcıya ait olmalı (submission.userId ile eşleşmeli). `action`: \"accepted\" | \"rejected\" (reddederken `reason` alanı da kullanılabilir). Kabul edilirse otomatik sipariş numarası üretilir. Hatalar: 401 (giriş yapılmamış), 403 (teklif başka kullanıcıya ait), 400 (geçersiz action), 404 (teklif yok), 500.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"action\": \"accepted\",\n  \"note\": \"Teklifi kabul ediyorum, kargoyu bekliyorum.\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            }
+          ],
+          "description": "Müşterinin kendisine sunulan bir teklife yanıt vermesi (kabul/red) ya da reddedilen teklif için yeniden teklif istemesi."
+        }
+      ],
+      "description": "\"Bize Sat\" akışıyla ilgili tüm uç noktalar: genel/kategori bazlı teklif oluşturma, notebook ve teknik servis özel akışları, ve müşterinin teklife yanıt vermesi."
+    },
+    {
+      "name": "Addresses",
+      "item": [
+        {
+          "name": "Adresleri Listele",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/addresses",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "addresses"
+              ]
+            },
+            "description": "Auth gerekir (httpOnly `auth-token` cookie — önce Login çalıştırın). userId artık query'den değil, cookie'den doğrulanır. Hatalar: 401 (giriş yapılmamış), 404 (kullanıcı yok), 500."
+          },
+          "response": []
+        },
+        {
+          "name": "Adres Ekle",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/addresses",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "addresses"
+              ]
+            },
+            "description": "Auth gerekir (httpOnly `auth-token` cookie — önce Login çalıştırın). userId artık body'den değil, cookie'den doğrulanır. Zorunlu: title, fullName, phone, address, city, district. `isDefault: true` verilirse diğer adresler varsayılan olmaktan çıkar. Hatalar: 401 (giriş yapılmamış), 400 (eksik alan), 404 (kullanıcı yok), 500.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Ev Adresim\",\n  \"fullName\": \"Ayşe Yılmaz\",\n  \"phone\": \"05551234567\",\n  \"address\": \"Örnek Mah. Örnek Sk. No:12 D:3\",\n  \"city\": \"İstanbul\",\n  \"district\": \"Kadıköy\",\n  \"postalCode\": \"34710\",\n  \"isDefault\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Adres Güncelle",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/addresses",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "addresses"
+              ]
+            },
+            "description": "Auth gerekir (httpOnly `auth-token` cookie — önce Login çalıştırın). userId artık body'den değil, cookie'den doğrulanır. Zorunlu: addressId, title, fullName, phone, address, city, district. Hatalar: 401 (giriş yapılmamış), 400 (eksik alan), 404 (kullanıcı/adres yok), 500.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"addressId\": \"{{address_id}}\",\n  \"title\": \"Ev Adresim (Güncel)\",\n  \"fullName\": \"Ayşe Yılmaz\",\n  \"phone\": \"05551234567\",\n  \"address\": \"Örnek Mah. Örnek Sk. No:12 D:5\",\n  \"city\": \"İstanbul\",\n  \"district\": \"Kadıköy\",\n  \"postalCode\": \"34710\",\n  \"isDefault\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Adres Sil",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/addresses?addressId=%7B%7Baddress_id%7D%7D",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "addresses"
+              ],
+              "query": [
+                {
+                  "key": "addressId",
+                  "value": "{{address_id}}"
+                }
+              ]
+            },
+            "description": "Auth gerekir (httpOnly `auth-token` cookie — önce Login çalıştırın). userId artık query'den değil, cookie'den doğrulanır. Hatalar: 401 (giriş yapılmamış), 400 (eksik parametre), 404 (kullanıcı/adres yok), 500."
+          },
+          "response": []
+        }
+      ],
+      "description": "Kullanıcı adres defteri (CRUD). Auth gerekir (httpOnly auth-token cookie); userId artık cookie'den doğrulanır."
+    },
+    {
+      "name": "Upload",
+      "item": [
+        {
+          "name": "Görsel Yükle (Vercel Blob)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/upload",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "upload"
+              ]
+            },
+            "description": "Kimlik doğrulama ZORUNLU (`auth-token` httpOnly cookie — Postman cookie jar'ı login sonrası bunu otomatik gönderir). `image` alanı `data:image/<tür>;base64,<veri>` formatında olmalı. Maksimum 8MB. Başarılıysa Vercel Blob'a `submissions/<userId>/<timestamp>.<ext>` yoluna yüklenir ve public URL döner — bu URL diğer submission endpoint'lerinin `images` dizisinde kullanılır. Başarılı: 200 `{ url }`. Hatalar: 400 (image yok/format geçersiz/8MB üstü), 401 (giriş yok), 500.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"image\": \"data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEA...KISALTILMIŞ_BASE64...\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "Vercel Blob görsel yükleme — giriş gerektirir."
+    },
+    {
+      "name": "Contact",
+      "item": [
+        {
+          "name": "İletişim Formu Gönder",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/contact",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "contact"
+              ]
+            },
+            "description": "Herkese açık. Tüm alanlar zorunlu (name, email, subject, message). Kayıt sonrası admin'e bildirim e-postası async gönderilir (e-posta hatası kaydı etkilemez). Başarılı: 201. Hatalar: 400 (eksik alan/geçersiz email formatı), 500.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ayşe Yılmaz\",\n  \"email\": \"ayse.yilmaz@example.com\",\n  \"subject\": \"Ürün hakkında soru\",\n  \"message\": \"Merhaba, ilanınızdaki notebook hâlâ satışta mı?\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "İletişim formu — herkese açık."
+    }
+  ]
+}
