@@ -18,7 +18,11 @@ interface ProfileFormProps {
   isCodeSent: boolean;
   canEditBirthDate: boolean;
   isSocialLogin: boolean;
+  birthDateKey: number;
+  birthDateInputRef: React.RefObject<HTMLInputElement>;
+  maxBirthDate: string;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleBirthDateBlur: (e: React.FocusEvent<HTMLInputElement>) => void;
   handleSendEmailVerification: () => void;
   handleVerifyEmailCode: () => void;
   message: string;
@@ -36,7 +40,11 @@ export default function ProfileForm({
   isCodeSent,
   canEditBirthDate,
   isSocialLogin,
+  birthDateKey,
+  birthDateInputRef,
+  maxBirthDate,
   handleChange,
+  handleBirthDateBlur,
   handleSendEmailVerification,
   handleVerifyEmailCode,
   message,
@@ -154,11 +162,14 @@ export default function ProfileForm({
             Doğum Tarihi
           </label>
           <input
+            key={birthDateKey}
+            ref={birthDateInputRef}
             type="date"
             name="birthDate"
-            value={editForm.birthDate}
-            onChange={handleChange}
-            max="9999-12-31"
+            defaultValue={editForm.birthDate}
+            onBlur={handleBirthDateBlur}
+            min="1930-01-01"
+            max={maxBirthDate}
             style={{
               width: '100%',
               padding: isMobile ? '10px' : '12px',

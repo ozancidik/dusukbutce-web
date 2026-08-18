@@ -119,8 +119,9 @@ export async function PUT(request: NextRequest) {
       console.log('🔍 API: mevcut user.birthDate:', user.birthDate);
       console.log('🔍 API: birthDate !== user.birthDate:', birthDate !== user.birthDate);
       
-      if (hasLocalProvider) {
-        // Local authentication kullanıcıları için doğum tarihi güncellenemez (register'da set edilir)
+      if (!hasSocialProvider) {
+        // Sadece local (şifreli) girişi olan, sosyal medya bağlantısı olmayan
+        // kullanıcılar için doğum tarihi güncellenemez (register'da set edilir)
         // Eğer mevcut değerden farklı bir değer gönderilirse, reddet
         if (birthDate !== user.birthDate) {
           console.log('❌ API: Local user için doğum tarihi güncellenemez');
@@ -131,8 +132,9 @@ export async function PUT(request: NextRequest) {
         }
         // Aynı değer gönderilirse, sorun yok (normal güncelleme, diğer alanlar için)
         console.log('✅ API: Local user, doğum tarihi aynı, güncelleme yapılmıyor');
-      } else if (hasSocialProvider) {
-        // OAuth kullanıcıları için kontrol
+      } else {
+        // Sosyal medya bağlantısı olan kullanıcılar (local girişi olsun ya da
+        // olmasın) için kontrol
         if (user.birthDateEdited) {
           // Daha önce düzenlenmişse, yeni değer gönderilirse KESINLIKLE reddet
           if (birthDate !== user.birthDate) {
