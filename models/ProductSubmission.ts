@@ -107,7 +107,11 @@ const productSubmissionSchema = new mongoose.Schema({
   panelType: { type: String },
   responseTime: { type: String },
   // Ses sistemi
-  power: { type: String }
+  power: { type: String },
+  // Masaüstü bilgisayar özel alanları
+  powerSupply: { type: String },
+  motherboard: { type: String },
+  case: { type: String }
 });
 
 export default mongoose.models.ProductSubmission || mongoose.model('ProductSubmission', productSubmissionSchema); 

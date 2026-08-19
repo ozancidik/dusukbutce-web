@@ -163,7 +163,7 @@ export default function DesktopPage() {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 120000); // 120 saniye timeout
       
-      const response = await fetch('/api/notebook-submissions', {
+      const response = await fetch('/api/submissions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
