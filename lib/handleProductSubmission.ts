@@ -33,6 +33,8 @@ export const ALLOWED_FIELDS = [
   // Kategoriye özel ek alanlar (RAM/SSD, mouse, klavye, monitör, ses sistemi)
   "capacity", "speed", "latency", "dpi", "connectivity", "switchType", "layout",
   "resolution", "panelType", "responseTime", "power",
+  // Masaüstü bilgisayar özel
+  "powerSupply", "motherboard", "case",
 ] as const;
 
 export async function handleProductSubmission(request: Request, source: string) {
