@@ -1,4 +1,6 @@
 import React from "react";
+import { cache } from "react";
+import type { Metadata } from "next";
 import connectDB from "@/lib/mongodb";
 import ProductSubmission from "@/models/ProductSubmission";
 import mongoose from "mongoose";
@@ -24,12 +26,73 @@ type ListingSubmission = {
   };
 };
 
+const BASE_URL = "https://dusukbutce.com";
+
+// generateMetadata ve sayfa bileşeni aynı ilanı ayrı ayrı isterdi — React'in
+// cache()'i aynı istek içinde tekrarlanan çağrıyı tek bir DB sorgusuna indirir.
+const getListing = cache(async (id: string): Promise<ListingSubmission | null> => {
+  if (!mongoose.Types.ObjectId.isValid(id)) return null;
+  await connectDB();
+  return (await ProductSubmission.findOne({
+    _id: id,
+    status: "listed",
+  }).lean()) as ListingSubmission | null;
+});
+
+function getListingTitle(listing: ListingSubmission): string {
+  return (
+    listing.listing?.title ||
+    `${listing.brand || ""} ${listing.model || ""}`.trim() ||
+    "Satılık İlan"
+  );
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const listing = await getListing(id);
+
+  if (!listing) {
+    return { title: "İlan bulunamadı - Düşük Bütçe" };
+  }
+
+  const title = getListingTitle(listing);
+  const description =
+    listing.listing?.description ||
+    `${title} - ${listing.cosmeticCondition || "ikinci el"} durumda, Düşük Bütçe'de satılık.`;
+  const image = listing.images?.[0];
+  const url = `${BASE_URL}/satilik-ilanlar/${id}`;
+
+  return {
+    title: `${title} - Düşük Bütçe`,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      title,
+      description,
+      url,
+      type: "website",
+      images: image ? [{ url: image }] : undefined,
+    },
+    twitter: {
+      card: image ? "summary_large_image" : "summary",
+      title,
+      description,
+      images: image ? [image] : undefined,
+    },
+  };
+}
+
 export default async function ListingDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const listing = await getListing(id);
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return (
@@ -39,13 +102,6 @@ export default async function ListingDetailPage({
     );
   }
 
-  await connectDB();
-
-  const listing = (await ProductSubmission.findOne({
-    _id: id,
-    status: "listed",
-  }).lean()) as ListingSubmission | null;
-
   if (!listing) {
     return (
       <div style={{ padding: "40px", textAlign: "center" }}>
@@ -54,14 +110,37 @@ export default async function ListingDetailPage({
     );
   }
 
-  const title =
-    listing.listing?.title ||
-    `${listing.brand || ""} ${listing.model || ""}`.trim() ||
-    "Satılık İlan";
+  const title = getListingTitle(listing);
   const price = listing.listing?.price;
   const images = listing.images || [];
 
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: title,
+    description: listing.listing?.description || title,
+    category: listing.category,
+    brand: listing.brand ? { "@type": "Brand", name: listing.brand } : undefined,
+    image: images.length > 0 ? images : undefined,
+    itemCondition: "https://schema.org/UsedCondition",
+    offers:
+      typeof price === "number"
+        ? {
+            "@type": "Offer",
+            url: `${BASE_URL}/satilik-ilanlar/${id}`,
+            priceCurrency: "TRY",
+            price,
+            availability: "https://schema.org/InStock",
+          }
+        : undefined,
+  };
+
   return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
     <div
       style={{
         background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
@@ -279,6 +358,7 @@ export default async function ListingDetailPage({
         </div>
       </div>
     </div>
+    </>
   );
 }
 
