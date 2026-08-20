@@ -33,6 +33,10 @@ interface StockUpdate {
   updatedAt: string;
 }
 
+function getAdminToken(): string | null {
+  return localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken');
+}
+
 export default function AdminStockPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [stockHistory, setStockHistory] = useState<StockUpdate[]>([]);
@@ -90,7 +94,9 @@ export default function AdminStockPage() {
   const fetchProducts = async () => {
     try {
       setError(null);
-      const response = await fetch('/api/admin/products');
+      const response = await fetch('/api/admin/products', {
+        headers: { 'Authorization': `Bearer ${getAdminToken()}` }
+      });
       const data = await response.json();
       
       if (response.ok && data.success) {
@@ -113,7 +119,9 @@ export default function AdminStockPage() {
 
   const fetchStockHistory = async () => {
     try {
-      const response = await fetch('/api/admin/stock/history');
+      const response = await fetch('/api/admin/stock/history', {
+        headers: { 'Authorization': `Bearer ${getAdminToken()}` }
+      });
       const data = await response.json();
       
       if (response.ok && data.success) {
@@ -149,7 +157,10 @@ export default function AdminStockPage() {
     try {
       const response = await fetch('/api/admin/stock/update', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getAdminToken()}`
+        },
         body: JSON.stringify(updateData),
       });
       
@@ -171,7 +182,10 @@ export default function AdminStockPage() {
     try {
       const response = await fetch('/api/admin/stock/bulk-update', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getAdminToken()}`
+        },
         body: JSON.stringify(updateData),
       });
       

@@ -20,6 +20,10 @@ interface ImageStats {
   averageImagesPerProduct: number;
 }
 
+function getAdminToken(): string | null {
+  return localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken');
+}
+
 export default function ImagesPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [stats, setStats] = useState<ImageStats | null>(null);
@@ -46,7 +50,9 @@ export default function ImagesPage() {
         limit: '20'
       });
       
-      const response = await fetch(`/api/admin/images?${params}`);
+      const response = await fetch(`/api/admin/images?${params}`, {
+        headers: { 'Authorization': `Bearer ${getAdminToken()}` }
+      });
       const data = await response.json();
       
       if (data.success) {
@@ -120,7 +126,10 @@ export default function ImagesPage() {
     try {
       const response = await fetch('/api/admin/images', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getAdminToken()}`
+        },
         body: JSON.stringify({
           productId: selectedProduct._id,
           images,
@@ -151,7 +160,10 @@ export default function ImagesPage() {
     try {
       const response = await fetch(`/api/admin/images/${productId}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getAdminToken()}`
+        },
         body: JSON.stringify({
           action: 'remove',
           imageIndex,
@@ -179,7 +191,8 @@ export default function ImagesPage() {
     
     try {
       const response = await fetch(`/api/admin/images/${productId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${getAdminToken()}` }
       });
       
       const data = await response.json();

@@ -12,6 +12,10 @@ interface Subscriber {
   createdAt: string;
 }
 
+function getAdminToken(): string | null {
+  return localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken');
+}
+
 export default function NewsletterPage() {
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [loading, setLoading] = useState(true);
@@ -49,7 +53,9 @@ export default function NewsletterPage() {
 
   const fetchSubscribers = async () => {
     try {
-      const response = await fetch('/api/admin/newsletter-subscribers');
+      const response = await fetch('/api/admin/newsletter-subscribers', {
+        headers: { 'Authorization': `Bearer ${getAdminToken()}` }
+      });
       const data = await response.json();
       
       if (data.success) {
@@ -79,7 +85,10 @@ export default function NewsletterPage() {
     try {
       const response = await fetch('/api/admin/send-newsletter', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getAdminToken()}`
+        },
         body: JSON.stringify({
           subject: emailSubject,
           message: emailMessage,
