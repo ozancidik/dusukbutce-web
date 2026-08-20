@@ -1,5 +1,6 @@
 "use client";
 import React from 'react';
+import { formatDate } from '../../utils/formatDate';
 
 interface Submission {
   _id: string;
@@ -12,6 +13,7 @@ interface Submission {
   status: string;
   adminNotes?: string;
   createdAt: string;
+  submissionNumber?: string;
 }
 
 interface SubmissionDetailModalProps {
@@ -60,6 +62,17 @@ export default function SubmissionDetailModal({ isMobile, submission, onClose }:
             margin: 0
           }}>
             📋 Başvuru Detayları
+            {submission.submissionNumber && (
+              <span style={{
+                display: 'block',
+                fontSize: '13px',
+                fontWeight: '500',
+                color: '#6b21a8',
+                marginTop: '4px'
+              }}>
+                🎫 {submission.submissionNumber}
+              </span>
+            )}
           </h2>
           <button
             onClick={onClose}
@@ -271,7 +284,7 @@ export default function SubmissionDetailModal({ isMobile, submission, onClose }:
               fontSize: '14px',
               color: '#1f2937'
             }}>
-              {new Date(submission.createdAt).toLocaleDateString('tr-TR')}
+              {formatDate(submission.createdAt)}
             </div>
           </div>
         </div>

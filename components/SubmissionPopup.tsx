@@ -9,16 +9,18 @@ interface SubmissionPopupProps {
   message: string;
   duration?: number;
   redirectPath?: string;
+  referenceNumber?: string;
 }
 
-export default function SubmissionPopup({ 
-  isOpen, 
-  onClose, 
-  type, 
-  title, 
-  message, 
+export default function SubmissionPopup({
+  isOpen,
+  onClose,
+  type,
+  title,
+  message,
   duration = 5000,
-  redirectPath
+  redirectPath,
+  referenceNumber
 }: SubmissionPopupProps) {
   // Timer kaldırıldı - kullanıcı manuel olarak kapatacak
   // useEffect(() => {
@@ -90,9 +92,16 @@ export default function SubmissionPopup({
           </h3>
 
           {/* Message */}
-          <p className={`text-center mb-6 ${messageColor}`}>
+          <p className={`text-center ${referenceNumber ? 'mb-3' : 'mb-6'} ${messageColor}`}>
             {message}
           </p>
+
+          {/* Reference Number */}
+          {referenceNumber && (
+            <p className="text-center mb-6 font-semibold text-gray-700">
+              Takip Numaranız: {referenceNumber}
+            </p>
+          )}
 
           {/* Action Buttons */}
           <div className="flex gap-3">

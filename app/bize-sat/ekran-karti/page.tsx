@@ -18,6 +18,7 @@ export default function GraphicsCardPage() {
   const [popupType, setPopupType] = useState<'success' | 'error'>('success');
   const [popupTitle, setPopupTitle] = useState('');
   const [popupMessage, setPopupMessage] = useState('');
+  const [submissionNumber, setSubmissionNumber] = useState('');
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showFurmarkHelp, setShowFurmarkHelp] = useState(false);
   const [showCoilWhineHelp, setShowCoilWhineHelp] = useState(false);
@@ -142,6 +143,7 @@ export default function GraphicsCardPage() {
         setPopupType('success');
         setPopupTitle('Teklif Başarıyla Gönderildi!');
         setPopupMessage(result.message || 'Ekran kartı ürününüz için teklif talebiniz alındı. En kısa sürede size dönüş yapacağız.');
+        setSubmissionNumber(result.data?.submissionNumber || '');
         setShowPopup(true);
         
         // Form başarıyla gönderildikten sonra formu sıfırla
@@ -1630,6 +1632,7 @@ export default function GraphicsCardPage() {
         type={popupType}
         title={popupTitle}
         message={popupMessage}
+        referenceNumber={submissionNumber}
         duration={0}
         redirectPath={popupType === 'success' ? '/tekliflerim' : undefined}
       />

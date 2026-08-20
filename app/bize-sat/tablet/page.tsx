@@ -15,6 +15,7 @@ export default function TabletPage() {
   const [popupType, setPopupType] = useState<'success' | 'error'>('success');
   const [popupTitle, setPopupTitle] = useState('');
   const [popupMessage, setPopupMessage] = useState('');
+  const [submissionNumber, setSubmissionNumber] = useState('');
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [formData, setFormData] = useState({
     brand: '',
@@ -170,6 +171,7 @@ export default function TabletPage() {
 
       if (response.ok) {
         const data = await response.json();
+        setSubmissionNumber(data.submissionNumber || '');
         console.log('📥 Response data:', data);
         
         setPopupType('success');
@@ -999,6 +1001,7 @@ export default function TabletPage() {
         type={popupType}
         title={popupTitle}
         message={popupMessage}
+        referenceNumber={submissionNumber}
         duration={0}
         redirectPath={popupType === 'success' ? '/tekliflerim' : undefined}
       />

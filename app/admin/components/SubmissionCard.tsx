@@ -121,6 +121,18 @@ export default function SubmissionCard({
             {submission.brand} {submission.model}
           </h3>
           <div style={{ marginBottom: '4px', display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center' }}>
+            {submission.submissionNumber && (
+              <span style={{
+                fontSize: isMobile ? '11px' : '12px',
+                color: '#6b21a8',
+                background: '#f3e8ff',
+                padding: '4px 8px',
+                borderRadius: '6px',
+                fontWeight: '500'
+              }}>
+                🎫 {submission.submissionNumber}
+              </span>
+            )}
             {submission.offerNumber && (
               <span style={{
                 fontSize: isMobile ? '11px' : '12px',

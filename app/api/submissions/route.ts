@@ -6,6 +6,7 @@ import User from "@/models/User";
 import { sendNewSubmissionNotificationToAdmin } from '@/lib/email';
 import { getVerifiedUser, getVerifiedUserId } from '@/lib/auth';
 import { ALLOWED_FIELDS } from '@/lib/handleProductSubmission';
+import { generateSubmissionNumber } from '@/lib/numberGenerator';
 
 export async function POST(request: NextRequest) {
   try {
@@ -50,9 +51,12 @@ export async function POST(request: NextRequest) {
       if (body[key] !== undefined) data[key] = body[key];
     }
 
+    const submissionNumber = await generateSubmissionNumber();
+
     // Create submission with category and additional fields
     const submission = new ProductSubmission({
       ...data,
+      submissionNumber,
       category: body.category || 'playstation',
       userId: userId || new mongoose.Types.ObjectId(),
       status: 'pending', // Yeni talep durumu
@@ -100,10 +104,11 @@ export async function POST(request: NextRequest) {
         console.error('Mail gönderme hatası:', error);
       });
     
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       message: 'Submission saved successfully',
-      id: submission._id 
+      id: submission._id,
+      submissionNumber
     });
   } catch (error: any) {
     console.error('❌ Error saving submission:', error);

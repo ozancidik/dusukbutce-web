@@ -27,6 +27,7 @@ export interface Submission {
   quantity: number;
   createdAt: string;
   status: string;
+  submissionNumber?: string;
   offerNumber?: string;
   orderNumber?: string;
   adminNotes?: string;
