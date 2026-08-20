@@ -15,7 +15,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "setup": "npm install",
-    "run:dev": "npm run setup && npm run dev"
+    "run:dev": "npm run setup && npm run dev",
+    "crawl-audit": "node scripts/crawl-audit.mjs"
   },
   "dependencies": {
     "@sentry/nextjs": "^10.1.0",
@@ -41,6 +42,7 @@
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
     "mongodb-memory-server": "^11.2.0",
+    "playwright": "^1.62.1",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.1.11"

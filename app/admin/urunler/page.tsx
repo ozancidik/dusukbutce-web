@@ -19,6 +19,10 @@ interface Product {
   updatedAt: string;
 }
 
+function getAdminToken(): string | null {
+  return localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken');
+}
+
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -67,7 +71,9 @@ export default function AdminProductsPage() {
   const fetchProducts = async () => {
     try {
       setError(null);
-      const response = await fetch('/api/admin/products');
+      const response = await fetch('/api/admin/products', {
+        headers: { 'Authorization': `Bearer ${getAdminToken()}` }
+      });
       const data = await response.json();
       
       if (response.ok && data.success) {
@@ -108,6 +114,7 @@ export default function AdminProductsPage() {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getAdminToken()}`,
         },
         body: JSON.stringify({ productId: deleteTargetId }),
       });
@@ -869,6 +876,7 @@ export default function AdminProductsPage() {
                     method: 'POST',
                     headers: {
                       'Content-Type': 'application/json',
+                      'Authorization': `Bearer ${getAdminToken()}`,
                     },
                     body: JSON.stringify(formData),
                   });
@@ -928,6 +936,7 @@ export default function AdminProductsPage() {
                     method: 'PUT',
                     headers: {
                       'Content-Type': 'application/json',
+                      'Authorization': `Bearer ${getAdminToken()}`,
                     },
                     body: JSON.stringify({
                       productId: selectedProduct._id,

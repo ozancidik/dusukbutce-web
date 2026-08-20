@@ -44,6 +44,10 @@ interface PriceStats {
   decreaseCount: number;
 }
 
+function getAdminToken(): string | null {
+  return localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken');
+}
+
 export default function PricesPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [priceHistory, setPriceHistory] = useState<PriceHistory[]>([]);
@@ -76,9 +80,11 @@ export default function PricesPage() {
   // Ürünleri yükle
   const loadProducts = async () => {
     try {
-      const response = await fetch('/api/admin/products');
+      const response = await fetch('/api/admin/products', {
+        headers: { 'Authorization': `Bearer ${getAdminToken()}` }
+      });
       const data = await response.json();
-      
+
       if (data.success) {
         setProducts(data.products);
       }
@@ -100,7 +106,9 @@ export default function PricesPage() {
         params.append('changeType', filterChangeType);
       }
       
-      const response = await fetch(`/api/admin/prices?${params}`);
+      const response = await fetch(`/api/admin/prices?${params}`, {
+        headers: { 'Authorization': `Bearer ${getAdminToken()}` }
+      });
       const data = await response.json();
       
       if (data.success) {
@@ -146,7 +154,10 @@ export default function PricesPage() {
     try {
       const response = await fetch('/api/admin/prices', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getAdminToken()}`
+        },
         body: JSON.stringify({
           ...bulkForm,
           updateValue: parseFloat(bulkForm.updateValue),
@@ -185,7 +196,10 @@ export default function PricesPage() {
     try {
       const response = await fetch(`/api/admin/prices/${selectedProduct._id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getAdminToken()}`
+        },
         body: JSON.stringify({
           ...singleForm,
           newPrice: parseFloat(singleForm.newPrice),

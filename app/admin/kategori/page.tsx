@@ -19,6 +19,10 @@ interface Category {
   updatedAt: string;
 }
 
+function getAdminToken(): string | null {
+  return localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken');
+}
+
 export default function CategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -41,13 +45,15 @@ export default function CategoriesPage() {
   const loadCategories = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/admin/categories');
+      const response = await fetch('/api/admin/categories', {
+        headers: { 'Authorization': `Bearer ${getAdminToken()}` }
+      });
       const data = await response.json();
-      
+
       if (data.success) {
         setCategories(data.categories);
       } else {
-        console.error('Kategoriler yüklenemedi:', data.message);
+        console.error('Kategoriler yüklenemedi:', data.error || data.message);
       }
     } catch (error) {
       console.error('Kategori yükleme hatası:', error);
@@ -96,19 +102,22 @@ export default function CategoriesPage() {
     try {
       const response = await fetch('/api/admin/categories', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getAdminToken()}`
+        },
         body: JSON.stringify(formData)
       });
-      
+
       const data = await response.json();
-      
+
       if (data.success) {
         setShowAddModal(false);
         resetForm();
         loadCategories();
         alert('Kategori başarıyla eklendi!');
       } else {
-        alert('Hata: ' + data.message);
+        alert('Hata: ' + (data.error || data.message));
       }
     } catch (error) {
       console.error('Kategori ekleme hatası:', error);
@@ -137,12 +146,15 @@ export default function CategoriesPage() {
     try {
       const response = await fetch(`/api/admin/categories/${editingCategory._id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getAdminToken()}`
+        },
         body: JSON.stringify(formData)
       });
-      
+
       const data = await response.json();
-      
+
       if (data.success) {
         setShowEditModal(false);
         setEditingCategory(null);
@@ -150,7 +162,7 @@ export default function CategoriesPage() {
         loadCategories();
         alert('Kategori başarıyla güncellendi!');
       } else {
-        alert('Hata: ' + data.message);
+        alert('Hata: ' + (data.error || data.message));
       }
     } catch (error) {
       console.error('Kategori güncelleme hatası:', error);
@@ -164,16 +176,17 @@ export default function CategoriesPage() {
     
     try {
       const response = await fetch(`/api/admin/categories/${id}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${getAdminToken()}` }
       });
-      
+
       const data = await response.json();
-      
+
       if (data.success) {
         loadCategories();
         alert('Kategori başarıyla silindi!');
       } else {
-        alert('Hata: ' + data.message);
+        alert('Hata: ' + (data.error || data.message));
       }
     } catch (error) {
       console.error('Kategori silme hatası:', error);
@@ -186,17 +199,20 @@ export default function CategoriesPage() {
     try {
       const response = await fetch(`/api/admin/categories/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getAdminToken()}`
+        },
         body: JSON.stringify({ isActive: !currentStatus })
       });
-      
+
       const data = await response.json();
-      
+
       if (data.success) {
         loadCategories();
         alert(`Kategori ${!currentStatus ? 'aktif' : 'pasif'} edildi!`);
       } else {
-        alert('Hata: ' + data.message);
+        alert('Hata: ' + (data.error || data.message));
       }
     } catch (error) {
       console.error('Durum değiştirme hatası:', error);
