@@ -36,7 +36,7 @@ const productSubmissionSchema = new mongoose.Schema({
   images: [{ type: String }], // Base64 encoded images
   quantity: { type: Number, default: 1 },
   createdAt: { type: Date, default: Date.now },
-  status: { type: String, enum: ['pending', 'offered', 'listed', 'rejected', 'approved', 'accepted', 'customer_accepted', 'customer_rejected', 'delivery_confirmed'], default: 'pending' },
+  status: { type: String, enum: ['pending', 'offered', 'listed', 'rejected', 'approved', 'accepted', 'customer_accepted', 'customer_rejected', 'delivery_confirmed', 'delivery_completed', 'cancel_requested', 'cancelled'], default: 'pending' },
   offerNumber: { type: String }, // Teklif numarası (OFFER-2024-001234)
   orderNumber: { type: String }, // Sipariş numarası (ORDER-2024-001234)
   adminNotes: { type: String },
@@ -55,6 +55,17 @@ const productSubmissionSchema = new mongoose.Schema({
     paidAt: { type: Date },
     paidBy: { type: String }, // İşlemi yapan admin e-postası
     note: { type: String }
+  },
+  // Müşterinin iptal talebi — status 'cancel_requested' iken bekleniyor,
+  // admin onaylarsa status 'cancelled' olur, reddederse previousStatus'a
+  // geri döner. offer/payment ile aynı desende ayrı bir alt-nesne.
+  cancellation: {
+    reason: { type: String },
+    requestedAt: { type: Date },
+    previousStatus: { type: String },
+    resolvedAt: { type: Date },
+    resolvedBy: { type: String }, // İşlemi yapan admin e-postası
+    adminNote: { type: String }
   },
   listing: {
     price: { type: Number },

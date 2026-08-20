@@ -181,7 +181,7 @@ export default function AdminPage() {
     : submissions.filter(submission => submission.category === selectedCategory);
 
 
-  const handleAction = (submission: Submission, action: 'offer' | 'listing' | 'reject' | 'delivery_completed' | 'confirm_payment') => {
+  const handleAction = (submission: Submission, action: 'offer' | 'listing' | 'reject' | 'delivery_completed' | 'confirm_payment' | 'approve_cancellation' | 'reject_cancellation') => {
     setSelectedSubmission(submission);
     setModalType(action);
     setShowModal(true);
@@ -217,6 +217,14 @@ export default function AdminPage() {
           setShowToast(true);
         } else if (modalType === 'confirm_payment') {
           setToastMessage('💸 Ödeme onaylandı ve müşteriye bildirim gönderildi.');
+          setToastType('success');
+          setShowToast(true);
+        } else if (modalType === 'approve_cancellation') {
+          setToastMessage('✅ İptal talebi onaylandı ve müşteriye bildirim gönderildi.');
+          setToastType('success');
+          setShowToast(true);
+        } else if (modalType === 'reject_cancellation') {
+          setToastMessage('❌ İptal talebi reddedildi, talep eski durumuna döndü.');
           setToastType('success');
           setShowToast(true);
         } else {

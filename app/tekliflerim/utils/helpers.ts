@@ -52,6 +52,12 @@ export const getStatusInfo = (status: string) => {
       return { color: '#dc2626', text: 'Sizin Tarafınızdan Reddedildi', icon: '❌' };
     case 'delivery_confirmed':
       return { color: '#7c3aed', text: 'Teslimat Onaylandı', icon: '🚚' };
+    case 'delivery_completed':
+      return { color: '#059669', text: 'Teslimat Tamamlandı', icon: '✅' };
+    case 'cancel_requested':
+      return { color: '#d97706', text: 'İptal Talebiniz Değerlendiriliyor', icon: '🔄' };
+    case 'cancelled':
+      return { color: '#6b7280', text: 'İptal Edildi', icon: '🚫' };
     default:
       return { color: '#6b7280', text: 'Bilinmeyen', icon: '❓' };
   }

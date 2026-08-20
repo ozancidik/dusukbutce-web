@@ -37,6 +37,14 @@ export interface Submission {
     paidBy?: string;
     note?: string;
   };
+  cancellation?: {
+    reason?: string;
+    requestedAt?: string;
+    previousStatus?: string;
+    resolvedAt?: string;
+    resolvedBy?: string;
+    adminNote?: string;
+  };
   adminNotes?: string;
   images: string[]; // Base64 encoded images
   // Kullanıcı bilgileri
@@ -177,6 +185,6 @@ export interface Submission {
   pedal?: string;
 }
 
-export type ModalType = 'offer' | 'listing' | 'reject' | 'delivery_completed' | 'confirm_payment' | null;
+export type ModalType = 'offer' | 'listing' | 'reject' | 'delivery_completed' | 'confirm_payment' | 'approve_cancellation' | 'reject_cancellation' | null;
 export type DeleteModalType = 'single' | 'all' | null;
 export type ToastType = 'success' | 'error';
