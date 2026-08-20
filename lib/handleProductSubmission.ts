@@ -40,6 +40,11 @@ export const ALLOWED_FIELDS = [
 
 export async function handleProductSubmission(request: Request, source: string) {
   try {
+    // Rate limit merkezi olarak middleware.ts'te uygulanıyor (bu fonksiyon
+    // 13 farklı route.ts tarafından paylaşıldığı için, her route kendi
+    // bağımsız modül bundle'ına derleniyor ve module-level bir Map burada
+    // paylaşılmıyor — middleware.ts ise tüm istekler için TEK bir
+    // instance'da çalıştığından gerçek çapraz-endpoint koruması sağlıyor).
     const body = await request.json();
 
     const v = validateBody(submissionSchema, body);

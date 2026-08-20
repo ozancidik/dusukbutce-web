@@ -33,6 +33,13 @@ export interface Submission {
   adminNotes?: string;
   images: string[];
   offer?: Offer;
+  payment?: {
+    status: 'pending' | 'paid';
+    amount?: number;
+    method?: string;
+    paidAt?: string;
+    note?: string;
+  };
   listing?: {
     price: number;
     title: string;

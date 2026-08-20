@@ -77,6 +77,17 @@ export default function OfferCard({
                 🛒 Sipariş No: {submission.orderNumber}
               </p>
             )}
+            {submission.payment?.status === 'paid' && (
+              <p style={{
+                fontSize: isMobile ? '11px' : '13px',
+                color: '#059669',
+                margin: '0 0 2px 0',
+                fontWeight: '500'
+              }}>
+                💸 Ödendi: {formatPrice(submission.payment.amount || 0)}
+                {submission.payment.paidAt && ` · ${formatDate(submission.payment.paidAt)}`}
+              </p>
+            )}
           </div>
           <p style={{
             fontSize: isMobile ? '12px' : '14px',

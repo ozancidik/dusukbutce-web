@@ -5,11 +5,13 @@ import {
   sendCustomerAcceptEmailToAdmin, 
   sendCustomerRejectEmailToAdmin,
   sendAdminAcceptEmailToCustomer,
-  sendAdminRejectEmailToCustomer
+  sendAdminRejectEmailToCustomer,
+  sendPaymentConfirmationEmail
 } from '@/lib/email';
 import ProductSubmission from '@/models/ProductSubmission';
 import User from '@/models/User';
 import { AdminAuthError, ensureAdminRequest, handleAdminAuthError } from '../utils/requireAdmin';
+import { logAdminAction } from '@/lib/auditLog';
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,7 +21,7 @@ export async function POST(request: NextRequest) {
     const decoded = ensureAdminRequest(request);
     console.log('✅ Token doğrulandı:', decoded);
 
-    const { submissionId, action, amount, notes, reason, customerEmail, customerName, productName } = await request.json();
+    const { submissionId, action, amount, notes, reason, customerEmail, customerName, productName, paymentMethod } = await request.json();
     console.log('📝 Request data:', { submissionId, action, amount, notes, customerEmail, customerName, productName });
 
     if (!submissionId || !action) {
@@ -48,13 +50,20 @@ export async function POST(request: NextRequest) {
     console.log('🔍 Submission userId:', submission.userId);
     console.log('🔍 Submission userId type:', typeof submission.userId);
 
+    // Ödeme onayı bir statü geçişi değil, status'tan bağımsız ayrı bir alan
+    // (payment) — bu yüzden status/adminNotes'a dokunmuyor, "confirm_payment"
+    // aşağıdaki ternary zincirlerinin dışında ayrıca ele alınıyor.
+    const isPaymentAction = action === 'confirm_payment';
+
     // Status'u güncelle
-    const newStatus = action === 'offer' ? 'offered' : 
-                      action === 'list' ? 'listed' : 
+    const newStatus = isPaymentAction ? submission.status :
+                      action === 'offer' ? 'offered' :
+                      action === 'list' ? 'listed' :
                       action === 'delivery_completed' ? 'delivery_completed' :
                       'rejected';
-    const adminNotes = action === 'offer' ? `TEKLİF: ${amount} TL${notes ? ' - ' + notes : ''}` : 
-                       action === 'list' ? `İLAN OLUŞTURULDU${notes ? ' - ' + notes : ''}` : 
+    const adminNotes = isPaymentAction ? submission.adminNotes :
+                       action === 'offer' ? `TEKLİF: ${amount} TL${notes ? ' - ' + notes : ''}` :
+                       action === 'list' ? `İLAN OLUŞTURULDU${notes ? ' - ' + notes : ''}` :
                        action === 'delivery_completed' ? `TESLİMAT TAMAMLANDI${notes ? ' - ' + notes : ''}` :
                        `REDDEDİLDİ${notes ? ' - ' + notes : ''}`;
 
@@ -65,7 +74,18 @@ export async function POST(request: NextRequest) {
       adminNotes: adminNotes,
       updatedAt: new Date()
     };
-    
+
+    if (isPaymentAction) {
+      updateData.payment = {
+        status: 'paid',
+        amount: amount || submission.offer?.amount,
+        method: paymentMethod || 'Banka Havalesi/EFT',
+        paidAt: new Date(),
+        paidBy: decoded.email,
+        note: notes
+      };
+    }
+
     // Teklif verildiğinde offer bilgilerini de güncelle
     if (action === 'offer') {
       // Eğer daha önce teklif numarası yoksa oluştur
@@ -97,6 +117,20 @@ export async function POST(request: NextRequest) {
       );
     }
     console.log('✅ Submission güncellendi:', updatedSubmission._id);
+
+    // Audit log: kim, ne zaman, hangi talebe, ne yaptı.
+    await logAdminAction({
+      adminEmail: decoded.email || 'bilinmiyor',
+      action: `submission_${action}`,
+      targetType: 'submission',
+      targetId: submissionId,
+      details: {
+        amount: isPaymentAction ? updateData.payment.amount : amount,
+        notes,
+        reason,
+        paymentMethod: isPaymentAction ? updateData.payment.method : undefined,
+      },
+    });
 
     // Müşteri bilgilerini al (request'ten gelen değerleri kullan, yoksa submission'dan al)
     let finalCustomerEmail = customerEmail || submission.customerInfo?.email;
@@ -145,6 +179,20 @@ export async function POST(request: NextRequest) {
           .catch((error) => {
             console.error('Red maili gönderme hatası:', error);
           });
+      } else if (isPaymentAction && finalCustomerEmail) {
+        // Admin ödemeyi onayladı - müşteriye mail gönder
+        const paidAmount = updateData.payment.amount || 0;
+        sendPaymentConfirmationEmail(finalCustomerEmail, finalCustomerName, finalProductName, paidAmount, updateData.payment.method)
+          .then((emailSent) => {
+            if (emailSent) {
+              console.log(`✅ Ödeme onay maili müşteriye gönderildi: ${finalCustomerEmail}`);
+            } else {
+              console.log(`❌ Ödeme onay maili gönderilemedi: ${finalCustomerEmail}`);
+            }
+          })
+          .catch((error) => {
+            console.error('Ödeme onay maili gönderme hatası:', error);
+          });
       } else if (action === 'list' && finalCustomerEmail) {
         // Admin ilan oluşturdu - müşteriye mail gönder
         sendAdminAcceptEmailToCustomer(finalCustomerEmail, finalCustomerName, finalProductName, amount || 0)
@@ -171,6 +219,7 @@ export async function POST(request: NextRequest) {
         status: updatedSubmission.status,
         adminNotes: updatedSubmission.adminNotes,
         offerAmount: updatedSubmission.offerAmount,
+        payment: updatedSubmission.payment,
         updatedAt: updatedSubmission.updatedAt
       }
     });

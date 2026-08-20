@@ -10,8 +10,9 @@ import { generateSubmissionNumber } from '@/lib/numberGenerator';
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limit merkezi olarak middleware.ts'te uygulanıyor.
     console.log('📝 Notebook submission başlatılıyor...');
-    
+
     const body = await request.json();
     console.log('📝 Gelen veri:', JSON.stringify(body, null, 2));
 

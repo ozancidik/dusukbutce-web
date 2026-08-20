@@ -552,6 +552,75 @@ export async function sendAdminAcceptEmailToCustomer(customerEmail: string, cust
   }
 }
 
+// Admin ödemeyi onayladığında müşteriye gönderilecek mail
+export async function sendPaymentConfirmationEmail(customerEmail: string, customerName: string, productName: string, amount: number | string, method?: string) {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_APP_PASSWORD
+      }
+    });
+
+    const formattedAmount = Number(amount).toLocaleString('tr-TR');
+
+    const mailOptions = {
+      from: 'info@dusukbutce.com',
+      replyTo: 'info@dusukbutce.com',
+      to: customerEmail,
+      subject: `💸 Ödemeniz Gönderildi - Düşük Bütçe`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #059669; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">
+            💸 Ödemeniz Gönderildi
+          </h2>
+
+          <div style="background: #ecfdf5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <p style="color: #374151; margin: 0; line-height: 1.6;">
+              Merhaba <strong>${customerName}</strong>,
+            </p>
+            <p style="color: #374151; margin: 10px 0; line-height: 1.6;">
+              <strong>${productName}</strong> ürününüz için ödemeniz gönderildi.
+            </p>
+          </div>
+
+          <div style="background: #f0f9ff; padding: 20px; border-radius: 8px; border-left: 4px solid #0ea5e9;">
+            <h3 style="color: #0369a1; margin-top: 0;">💰 Ödeme Detayları</h3>
+            <div style="text-align: center; margin: 20px 0;">
+              <div style="font-size: 32px; font-weight: bold; color: #059669; margin: 10px 0;">
+                ${formattedAmount} TL
+              </div>
+              <p style="color: #065f46; margin: 0; font-size: 14px;">${method || 'Banka Havalesi/EFT'}</p>
+            </div>
+          </div>
+
+          <div style="margin: 30px 0; text-align: center;">
+            <a href="${getBaseUrl()}/tekliflerim"
+               style="background: #059669; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600;">
+              📋 Tekliflerimi Görüntüle
+            </a>
+          </div>
+
+          <div style="background: #fef3c7; padding: 15px; border-radius: 8px; border-left: 4px solid #f59e0b;">
+            <p style="color: #92400e; margin: 0; font-size: 14px;">
+              <strong>📞 İletişim:</strong> Sorularınız için <a href="mailto:info@dusukbutce.com" style="color: #2563eb;">info@dusukbutce.com</a> adresinden bize ulaşabilirsiniz.
+            </p>
+          </div>
+        </div>
+      `
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Ödeme onay maili müşteriye gönderildi:', info.messageId);
+    return true;
+
+  } catch (error) {
+    console.error('Ödeme onay maili gönderim hatası:', error);
+    return false;
+  }
+}
+
 // Admin teklifi reddettiğinde müşteriye gönderilecek mail
 export async function sendAdminRejectEmailToCustomer(customerEmail: string, customerName: string, productName: string, reason?: string) {
   try {

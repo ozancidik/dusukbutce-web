@@ -181,7 +181,7 @@ export default function AdminPage() {
     : submissions.filter(submission => submission.category === selectedCategory);
 
 
-  const handleAction = (submission: Submission, action: 'offer' | 'listing' | 'reject' | 'delivery_completed') => {
+  const handleAction = (submission: Submission, action: 'offer' | 'listing' | 'reject' | 'delivery_completed' | 'confirm_payment') => {
     setSelectedSubmission(submission);
     setModalType(action);
     setShowModal(true);
@@ -215,9 +215,13 @@ export default function AdminPage() {
           setToastMessage('✅ Teklifiniz başarıyla müşteriye iletildi! Müşteri teklifinizi değerlendirecek.');
           setToastType('success');
           setShowToast(true);
+        } else if (modalType === 'confirm_payment') {
+          setToastMessage('💸 Ödeme onaylandı ve müşteriye bildirim gönderildi.');
+          setToastType('success');
+          setShowToast(true);
         } else {
           // Diğer işlemler için normal mesaj
-          const actionText = modalType === 'listing' ? 'İlan' : 
+          const actionText = modalType === 'listing' ? 'İlan' :
                             modalType === 'reject' ? 'Reddetme' : 'İşlem';
           showToastMessage(`${actionText} başarıyla tamamlandı!`, 'success');
         }
@@ -704,7 +708,38 @@ export default function AdminPage() {
                     👥 Admin Kullanıcılar
                   </button>
                 </Link>
-                
+
+                <Link href="/admin/audit-log" style={{ textDecoration: 'none' }}>
+                  <button style={{
+                    background: 'linear-gradient(135deg, #4b5563 0%, #6b7280 100%)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '12px',
+                    padding: isMobile ? '12px 16px' : '16px 20px',
+                    fontSize: isMobile ? '13px' : '14px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    boxShadow: '0 4px 12px rgba(75, 85, 99, 0.3)',
+                    width: '100%'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 6px 16px rgba(75, 85, 99, 0.4)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(75, 85, 99, 0.3)';
+                  }}
+                  >
+                    📜 İşlem Geçmişi
+                  </button>
+                </Link>
+
                 <button
                   onClick={handleDeleteAllSubmissions}
                   disabled={isDeletingAll}

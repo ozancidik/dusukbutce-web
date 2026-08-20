@@ -11,7 +11,7 @@ interface Submission {
 interface ActionModalProps {
   showModal: boolean;
   selectedSubmission: Submission | null;
-  modalType: 'offer' | 'listing' | 'reject' | 'delivery_completed' | null;
+  modalType: 'offer' | 'listing' | 'reject' | 'delivery_completed' | 'confirm_payment' | null;
   isMobile: boolean;
   loading?: boolean;
   onSubmit: (data: any) => void;
@@ -64,6 +64,7 @@ export default function ActionModal({
           {modalType === 'offer' && 'Teklif Ver'}
           {modalType === 'listing' && 'İlan Oluştur'}
           {modalType === 'reject' && 'Talebi Reddet'}
+          {modalType === 'confirm_payment' && '💸 Ödeme Onayla'}
         </h2>
 
         <div style={{ marginBottom: '20px' }}>
@@ -84,7 +85,7 @@ export default function ActionModal({
 
 // Action Form Component
 function ActionForm({ type, onSubmit, onCancel, isMobile, loading = false }: {
-  type: 'offer' | 'listing' | 'reject' | 'delivery_completed';
+  type: 'offer' | 'listing' | 'reject' | 'delivery_completed' | 'confirm_payment';
   onSubmit: (data: any) => void;
   onCancel: () => void;
   isMobile: boolean;
@@ -94,7 +95,8 @@ function ActionForm({ type, onSubmit, onCancel, isMobile, loading = false }: {
     amount: '',
     notes: '',
     price: '',
-    reason: ''
+    reason: '',
+    paymentMethod: 'Banka Havalesi/EFT'
   });
   const [errors, setErrors] = useState<{[key: string]: string}>({});
 
@@ -114,6 +116,10 @@ function ActionForm({ type, onSubmit, onCancel, isMobile, loading = false }: {
       if (!formData.reason || formData.reason.trim() === '') {
         newErrors.reason = 'Reddetme sebebi gerekli';
       }
+    } else if (type === 'confirm_payment') {
+      if (!formData.amount || formData.amount.trim() === '') {
+        newErrors.amount = 'Ödeme tutarı gerekli';
+      }
     }
     
     setErrors(newErrors);
@@ -132,7 +138,7 @@ function ActionForm({ type, onSubmit, onCancel, isMobile, loading = false }: {
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -283,6 +289,100 @@ function ActionForm({ type, onSubmit, onCancel, isMobile, loading = false }: {
         </div>
       )}
 
+      {type === 'confirm_payment' && (
+        <>
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{
+              display: 'block',
+              fontSize: isMobile ? '14px' : '16px',
+              fontWeight: '500',
+              color: '#374151',
+              marginBottom: '8px'
+            }}>
+              Ödenen Tutar (TL)
+            </label>
+            <input
+              type="number"
+              name="amount"
+              value={formData.amount}
+              onChange={handleInputChange}
+              style={{
+                width: '100%',
+                padding: isMobile ? '12px' : '16px',
+                border: `2px solid ${errors.amount ? '#dc2626' : '#e5e7eb'}`,
+                borderRadius: '8px',
+                fontSize: isMobile ? '14px' : '16px',
+                background: '#f9fafb',
+                transition: 'border-color 0.2s'
+              }}
+              placeholder="Örn: 15000"
+            />
+            {errors.amount && (
+              <p style={{ color: '#dc2626', fontSize: '12px', margin: '4px 0 0 0' }}>
+                {errors.amount}
+              </p>
+            )}
+          </div>
+
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{
+              display: 'block',
+              fontSize: isMobile ? '14px' : '16px',
+              fontWeight: '500',
+              color: '#374151',
+              marginBottom: '8px'
+            }}>
+              Ödeme Yöntemi
+            </label>
+            <select
+              name="paymentMethod"
+              value={formData.paymentMethod}
+              onChange={handleInputChange}
+              style={{
+                width: '100%',
+                padding: isMobile ? '12px' : '16px',
+                border: '2px solid #e5e7eb',
+                borderRadius: '8px',
+                fontSize: isMobile ? '14px' : '16px',
+                background: '#f9fafb'
+              }}
+            >
+              <option value="Banka Havalesi/EFT">Banka Havalesi/EFT</option>
+              <option value="Elden">Elden</option>
+              <option value="Diğer">Diğer</option>
+            </select>
+          </div>
+
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{
+              display: 'block',
+              fontSize: isMobile ? '14px' : '16px',
+              fontWeight: '500',
+              color: '#374151',
+              marginBottom: '8px'
+            }}>
+              Not (Opsiyonel)
+            </label>
+            <textarea
+              name="notes"
+              value={formData.notes}
+              onChange={handleInputChange}
+              rows={2}
+              style={{
+                width: '100%',
+                padding: isMobile ? '12px' : '16px',
+                border: '2px solid #e5e7eb',
+                borderRadius: '8px',
+                fontSize: isMobile ? '14px' : '16px',
+                background: '#f9fafb',
+                resize: 'vertical'
+              }}
+              placeholder="Örn: IBAN son 4 hane, dekont no vb."
+            />
+          </div>
+        </>
+      )}
+
       <div style={{
         display: 'flex',
         gap: '12px',
@@ -312,7 +412,7 @@ function ActionForm({ type, onSubmit, onCancel, isMobile, loading = false }: {
           type="submit"
           disabled={loading}
           style={{
-            background: type === 'reject' ? '#dc2626' : '#2563eb',
+            background: type === 'reject' ? '#dc2626' : type === 'confirm_payment' ? '#059669' : '#2563eb',
             color: 'white',
             border: 'none',
             borderRadius: '6px',
@@ -342,6 +442,7 @@ function ActionForm({ type, onSubmit, onCancel, isMobile, loading = false }: {
               {type === 'offer' && 'Teklif Ver'}
               {type === 'listing' && 'İlan Oluştur'}
               {type === 'reject' && 'Reddet'}
+              {type === 'confirm_payment' && 'Ödeme Onayla'}
             </>
           )}
         </button>

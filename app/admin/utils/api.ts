@@ -104,8 +104,12 @@ export const submitAction = async (
       notes: formData.notes
     };
 
-    // Teklif verildiğinde müşteri bilgilerini de ekle
-    if (modalType === 'offer' && submission) {
+    if (modalType === 'confirm_payment') {
+      requestBody.paymentMethod = formData.paymentMethod;
+    }
+
+    // Teklif verildiğinde / ödeme onaylandığında müşteri bilgilerini de ekle
+    if ((modalType === 'offer' || modalType === 'confirm_payment') && submission) {
       requestBody.customerEmail = submission.userId?.email || '';
       requestBody.customerName = submission.userId?.name || 'Müşteri';
       requestBody.productName = `${submission.brand || ''} ${submission.model || ''}`.trim();
