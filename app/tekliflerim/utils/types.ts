@@ -54,6 +54,14 @@ export interface Submission {
     reason?: string;
     date: string;
   };
+  cancellation?: {
+    reason?: string;
+    requestedAt?: string;
+    previousStatus?: string;
+    resolvedAt?: string;
+    resolvedBy?: string;
+    adminNote?: string;
+  };
 }
 
 

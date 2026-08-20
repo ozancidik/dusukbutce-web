@@ -5,7 +5,7 @@ import { Submission } from '../types';
 interface SubmissionCardProps {
   submission: Submission;
   isMobile: boolean;
-  onAction: (submission: Submission, action: 'offer' | 'listing' | 'reject' | 'delivery_completed' | 'confirm_payment') => void;
+  onAction: (submission: Submission, action: 'offer' | 'listing' | 'reject' | 'delivery_completed' | 'confirm_payment' | 'approve_cancellation' | 'reject_cancellation') => void;
   onDelete: (submissionId: string) => void;
   onDetail: (submission: Submission) => void;
   onDeliveryInfo: (submission: Submission) => void;
@@ -35,6 +35,8 @@ export default function SubmissionCard({
       case 'customer_rejected': return { text: '❌ Müşteri Reddetti', bgColor: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)' };
       case 'delivery_confirmed': return { text: '🚚 Teslimat Onaylandı', bgColor: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)' };
       case 'delivery_completed': return { text: '✅ Teslimat Tamamlandı', bgColor: 'linear-gradient(135deg, #059669 0%, #10b981 100%)' };
+      case 'cancel_requested': return { text: '🔄 İptal Talebi Bekliyor', bgColor: 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)' };
+      case 'cancelled': return { text: '🚫 İptal Edildi', bgColor: 'linear-gradient(135deg, #6b7280 0%, #9ca3af 100%)' };
       default: return { text: status, bgColor: 'linear-gradient(135deg, #6b7280 0%, #9ca3af 100%)' };
     }
   };
@@ -352,6 +354,44 @@ export default function SubmissionCard({
         </div>
       )}
 
+      {/* İptal Talebi Bilgisi */}
+      {submission.cancellation?.reason && (submission.status === 'cancel_requested' || submission.status === 'cancelled') && (
+        <div style={{
+          background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
+          padding: '16px',
+          borderRadius: '12px',
+          border: '2px solid #f59e0b',
+          marginTop: '16px',
+          marginBottom: '16px',
+          boxShadow: '0 4px 12px rgba(245, 158, 11, 0.15)'
+        }}>
+          <h5 style={{
+            fontSize: isMobile ? '14px' : '16px',
+            fontWeight: '700',
+            color: '#92400e',
+            margin: '0 0 8px 0'
+          }}>
+            🔄 Müşterinin İptal Sebebi
+          </h5>
+          <div style={{
+            background: 'rgba(255, 255, 255, 0.7)',
+            padding: '12px',
+            borderRadius: '8px',
+            border: '1px solid rgba(245, 158, 11, 0.3)'
+          }}>
+            <p style={{
+              fontSize: isMobile ? '13px' : '14px',
+              color: '#92400e',
+              margin: 0,
+              lineHeight: '1.5',
+              fontStyle: 'italic'
+            }}>
+              "{submission.cancellation.reason}"
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Aksiyon Butonları */}
       <div style={{
         display: 'grid',
@@ -539,6 +579,54 @@ export default function SubmissionCard({
           >
             💸 {submission.payment?.status === 'paid' ? 'Ödendi' : 'Ödeme Onayla'}
           </button>
+        )}
+
+        {/* 6.7 İptal Talebini Onayla/Reddet - Sadece cancel_requested durumunda */}
+        {submission.status === 'cancel_requested' && (
+          <>
+            <button
+              onClick={() => onAction(submission, 'approve_cancellation')}
+              style={{
+                background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '12px',
+                padding: isMobile ? '12px 16px' : '14px 20px',
+                fontSize: isMobile ? '13px' : '14px',
+                cursor: 'pointer',
+                fontWeight: '600',
+                transition: 'all 0.2s',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                boxShadow: '0 4px 12px rgba(5, 150, 105, 0.3)'
+              }}
+            >
+              ✅ İptali Onayla
+            </button>
+            <button
+              onClick={() => onAction(submission, 'reject_cancellation')}
+              style={{
+                background: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '12px',
+                padding: isMobile ? '12px 16px' : '14px 20px',
+                fontSize: isMobile ? '13px' : '14px',
+                cursor: 'pointer',
+                fontWeight: '600',
+                transition: 'all 0.2s',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                boxShadow: '0 4px 12px rgba(220, 38, 38, 0.3)'
+              }}
+            >
+              ❌ İptali Reddet
+            </button>
+          </>
         )}
 
         {/* 7. Yeniden Teklif Al - Sadece reddedilen teklifler için */}

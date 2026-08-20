@@ -621,6 +621,198 @@ export async function sendPaymentConfirmationEmail(customerEmail: string, custom
   }
 }
 
+// Müşteri talebinin iptalini istediğinde admin'e gönderilecek mail
+export async function sendCancellationRequestEmailToAdmin(customerEmail: string, customerName: string, productName: string, reason: string | undefined, adminEmail: string = 'ozancidik@gmail.com') {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_APP_PASSWORD
+      }
+    });
+
+    const mailOptions = {
+      from: 'info@dusukbutce.com',
+      replyTo: 'info@dusukbutce.com',
+      to: adminEmail,
+      subject: `🔄 İptal Talebi - ${productName}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #d97706; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">
+            🔄 Müşteri İptal Talebinde Bulundu
+          </h2>
+
+          <div style="background: #fffbeb; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <p style="color: #374151; margin: 0; line-height: 1.6;">
+              <strong>${customerName}</strong> müşterisi <strong>${productName}</strong> için gönderdiği talebin iptalini istiyor.
+            </p>
+          </div>
+
+          ${reason ? `
+          <div style="background: #fef3c7; padding: 15px; border-radius: 8px; margin-top: 15px;">
+            <p style="color: #92400e; margin: 0; font-size: 14px;">
+              <strong>📝 İptal Sebebi:</strong> ${reason}
+            </p>
+          </div>
+          ` : ''}
+
+          <div style="margin: 30px 0; text-align: center;">
+            <a href="${getBaseUrl()}/admin"
+               style="background: #d97706; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600;">
+              🔍 Admin Panelinde İncele
+            </a>
+          </div>
+
+          <div style="background: #fef3c7; padding: 15px; border-radius: 8px; border-left: 4px solid #f59e0b;">
+            <p style="color: #92400e; margin: 0; font-size: 14px;">
+              <strong>📞 Müşteri Bilgileri:</strong> ${customerName} - ${customerEmail}
+            </p>
+          </div>
+        </div>
+      `
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log('İptal talebi maili admin\'e gönderildi:', info.messageId);
+    return true;
+
+  } catch (error) {
+    console.error('İptal talebi maili gönderim hatası:', error);
+    return false;
+  }
+}
+
+// Admin iptal talebini onayladığında müşteriye gönderilecek mail
+export async function sendCancellationApprovedEmailToCustomer(customerEmail: string, customerName: string, productName: string, adminNote?: string) {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_APP_PASSWORD
+      }
+    });
+
+    const mailOptions = {
+      from: 'info@dusukbutce.com',
+      replyTo: 'info@dusukbutce.com',
+      to: customerEmail,
+      subject: `✅ İptal Talebiniz Onaylandı - Düşük Bütçe`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #059669; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">
+            ✅ İptal Talebiniz Onaylandı
+          </h2>
+
+          <div style="background: #ecfdf5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <p style="color: #374151; margin: 0; line-height: 1.6;">
+              Merhaba <strong>${customerName}</strong>,
+            </p>
+            <p style="color: #374151; margin: 10px 0; line-height: 1.6;">
+              <strong>${productName}</strong> için gönderdiğiniz talep, iptal isteğiniz üzerine iptal edildi.
+            </p>
+          </div>
+
+          ${adminNote ? `
+          <div style="background: #f0f9ff; padding: 15px; border-radius: 8px; border-left: 4px solid #0ea5e9;">
+            <p style="color: #0369a1; margin: 0; font-size: 14px;">
+              <strong>📝 Not:</strong> ${adminNote}
+            </p>
+          </div>
+          ` : ''}
+
+          <div style="margin: 30px 0; text-align: center;">
+            <a href="${getBaseUrl()}/tekliflerim"
+               style="background: #059669; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600;">
+              📋 Tekliflerimi Görüntüle
+            </a>
+          </div>
+
+          <div style="background: #fef3c7; padding: 15px; border-radius: 8px; border-left: 4px solid #f59e0b;">
+            <p style="color: #92400e; margin: 0; font-size: 14px;">
+              <strong>📞 İletişim:</strong> Sorularınız için <a href="mailto:info@dusukbutce.com" style="color: #2563eb;">info@dusukbutce.com</a> adresinden bize ulaşabilirsiniz.
+            </p>
+          </div>
+        </div>
+      `
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log('İptal onay maili müşteriye gönderildi:', info.messageId);
+    return true;
+
+  } catch (error) {
+    console.error('İptal onay maili gönderim hatası:', error);
+    return false;
+  }
+}
+
+// Admin iptal talebini reddettiğinde müşteriye gönderilecek mail
+export async function sendCancellationRejectedEmailToCustomer(customerEmail: string, customerName: string, productName: string, adminNote?: string) {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_APP_PASSWORD
+      }
+    });
+
+    const mailOptions = {
+      from: 'info@dusukbutce.com',
+      replyTo: 'info@dusukbutce.com',
+      to: customerEmail,
+      subject: `❌ İptal Talebiniz Reddedildi - Düşük Bütçe`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #dc2626; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">
+            ❌ İptal Talebiniz Reddedildi
+          </h2>
+
+          <div style="background: #fef2f2; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <p style="color: #374151; margin: 0; line-height: 1.6;">
+              Merhaba <strong>${customerName}</strong>,
+            </p>
+            <p style="color: #374151; margin: 10px 0; line-height: 1.6;">
+              <strong>${productName}</strong> için gönderdiğiniz iptal talebi değerlendirildi ve reddedildi. Talebiniz eski durumuna döndü.
+            </p>
+          </div>
+
+          ${adminNote ? `
+          <div style="background: #fef3c7; padding: 15px; border-radius: 8px; border-left: 4px solid #f59e0b;">
+            <p style="color: #92400e; margin: 0; font-size: 14px;">
+              <strong>📝 Sebep:</strong> ${adminNote}
+            </p>
+          </div>
+          ` : ''}
+
+          <div style="margin: 30px 0; text-align: center;">
+            <a href="${getBaseUrl()}/tekliflerim"
+               style="background: #2563eb; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600;">
+              📋 Tekliflerimi Görüntüle
+            </a>
+          </div>
+
+          <div style="background: #fef3c7; padding: 15px; border-radius: 8px; border-left: 4px solid #f59e0b;">
+            <p style="color: #92400e; margin: 0; font-size: 14px;">
+              <strong>📞 İletişim:</strong> Sorularınız için <a href="mailto:info@dusukbutce.com" style="color: #2563eb;">info@dusukbutce.com</a> adresinden bize ulaşabilirsiniz.
+            </p>
+          </div>
+        </div>
+      `
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log('İptal red maili müşteriye gönderildi:', info.messageId);
+    return true;
+
+  } catch (error) {
+    console.error('İptal red maili gönderim hatası:', error);
+    return false;
+  }
+}
+
 // Admin teklifi reddettiğinde müşteriye gönderilecek mail
 export async function sendAdminRejectEmailToCustomer(customerEmail: string, customerName: string, productName: string, reason?: string) {
   try {

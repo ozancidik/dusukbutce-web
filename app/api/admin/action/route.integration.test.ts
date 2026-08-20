@@ -135,3 +135,93 @@ describe('POST /api/admin/action — viewer role write protection (real DB)', ()
     expect(reloaded?.payment?.amount).toBe(3500);
   });
 });
+
+describe('POST /api/admin/action — cancellation approve/reject (real DB)', () => {
+  async function createCancelRequested(previousStatus: string) {
+    const { default: ProductSubmission } = await import('@/models/ProductSubmission');
+    return ProductSubmission.create({
+      userId: new mongoose.Types.ObjectId(),
+      category: 'desktop',
+      brand: 'Test Brand',
+      model: 'Test Model',
+      cosmeticCondition: 'İyi',
+      status: 'cancel_requested',
+      cancellation: {
+        reason: 'artık istemiyorum',
+        requestedAt: new Date(),
+        previousStatus,
+      },
+    });
+  }
+
+  it('approve_cancellation finalizes the submission as cancelled', async () => {
+    const { POST } = await import('./route');
+    const { default: ProductSubmission } = await import('@/models/ProductSubmission');
+
+    const submission = await createCancelRequested('pending');
+    const fullToken = signAdminToken('full');
+
+    const response = await POST(postAction(fullToken, {
+      submissionId: submission._id.toString(),
+      action: 'approve_cancellation',
+      notes: 'onaylandı',
+    }));
+
+    expect(response.status).toBe(200);
+    const reloaded = await ProductSubmission.findById(submission._id).lean() as any;
+    expect(reloaded.status).toBe('cancelled');
+    expect(reloaded.cancellation.adminNote).toBe('onaylandı');
+    expect(reloaded.cancellation.resolvedBy).toBe('qa@example.com');
+  });
+
+  it('reject_cancellation reverts the submission back to its previous status', async () => {
+    const { POST } = await import('./route');
+    const { default: ProductSubmission } = await import('@/models/ProductSubmission');
+
+    const submission = await createCancelRequested('offered');
+    const fullToken = signAdminToken('full');
+
+    const response = await POST(postAction(fullToken, {
+      submissionId: submission._id.toString(),
+      action: 'reject_cancellation',
+      notes: 'kargoya verildi',
+    }));
+
+    expect(response.status).toBe(200);
+    const reloaded = await ProductSubmission.findById(submission._id).lean() as any;
+    expect(reloaded.status).toBe('offered');
+    expect(reloaded.cancellation.adminNote).toBe('kargoya verildi');
+  });
+
+  it('a viewer token cannot approve or reject a cancellation request', async () => {
+    const { POST } = await import('./route');
+    const { default: ProductSubmission } = await import('@/models/ProductSubmission');
+
+    const submission = await createCancelRequested('pending');
+    const viewerToken = signAdminToken('viewer');
+
+    const response = await POST(postAction(viewerToken, {
+      submissionId: submission._id.toString(),
+      action: 'approve_cancellation',
+    }));
+
+    expect(response.status).toBe(403);
+    const reloaded = await ProductSubmission.findById(submission._id).lean() as any;
+    expect(reloaded.status).toBe('cancel_requested');
+  });
+
+  it('refuses to resolve a submission that is not currently cancel_requested', async () => {
+    const { POST } = await import('./route');
+    const { default: ProductSubmission } = await import('@/models/ProductSubmission');
+
+    const submission = await createSubmission(); // status: 'pending'
+    const fullToken = signAdminToken('full');
+
+    const response = await POST(postAction(fullToken, {
+      submissionId: submission._id.toString(),
+      action: 'approve_cancellation',
+    }));
+
+    expect(response.status).toBe(400);
+  });
+});

@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
-import { 
-  sendOfferEmail, 
-  sendCustomerAcceptEmailToAdmin, 
+import {
+  sendOfferEmail,
+  sendCustomerAcceptEmailToAdmin,
   sendCustomerRejectEmailToAdmin,
   sendAdminAcceptEmailToCustomer,
   sendAdminRejectEmailToCustomer,
-  sendPaymentConfirmationEmail
+  sendPaymentConfirmationEmail,
+  sendCancellationApprovedEmailToCustomer,
+  sendCancellationRejectedEmailToCustomer
 } from '@/lib/email';
 import ProductSubmission from '@/models/ProductSubmission';
 import User from '@/models/User';
@@ -49,6 +51,87 @@ export async function POST(request: NextRequest) {
     console.log('✅ Submission bulundu:', submission._id);
     console.log('🔍 Submission userId:', submission.userId);
     console.log('🔍 Submission userId type:', typeof submission.userId);
+
+    // İptal talebi onayı/reddi — offer/reject/list zincirinden ayrı ele
+    // alınıyor çünkü "reddet" burada status'u DEĞİŞTİRMİYOR, talebi
+    // cancellation.previousStatus'a GERİ DÖNDÜRÜYOR.
+    if (action === 'approve_cancellation' || action === 'reject_cancellation') {
+      if (submission.status !== 'cancel_requested') {
+        return NextResponse.json(
+          { success: false, error: 'Bu talep şu anda iptal onayı bekleyen bir durumda değil' },
+          { status: 400 }
+        );
+      }
+
+      const approved = action === 'approve_cancellation';
+      const revertStatus = submission.cancellation?.previousStatus || 'pending';
+
+      const cancellationUpdate = await ProductSubmission.findByIdAndUpdate(
+        submissionId,
+        {
+          $set: {
+            status: approved ? 'cancelled' : revertStatus,
+            'cancellation.resolvedAt': new Date(),
+            'cancellation.resolvedBy': decoded.email || 'bilinmiyor',
+            'cancellation.adminNote': notes || '',
+            updatedAt: new Date(),
+          },
+        },
+        { new: true }
+      );
+
+      if (!cancellationUpdate) {
+        return NextResponse.json(
+          { success: false, error: 'Talep güncellenemedi' },
+          { status: 500 }
+        );
+      }
+
+      await logAdminAction({
+        adminEmail: decoded.email || 'bilinmiyor',
+        action: `submission_${action}`,
+        targetType: 'submission',
+        targetId: submissionId,
+        details: { notes, revertStatus, resolvedStatus: cancellationUpdate.status },
+      });
+
+      let finalCustomerEmail = customerEmail || submission.customerInfo?.email;
+      let finalCustomerName = customerName || submission.customerInfo?.firstName || submission.customerInfo?.lastName || 'Müşteri';
+      if (!finalCustomerEmail && submission.userId) {
+        try {
+          const user = await User.findById(submission.userId);
+          if (user) {
+            finalCustomerEmail = user.email;
+            finalCustomerName = user.firstName || user.lastName || user.name || 'Müşteri';
+          }
+        } catch (error) {
+          console.error('User bilgisi alınamadı:', error);
+        }
+      }
+      const finalProductName = productName || `${submission.brand} ${submission.model}`.trim();
+
+      if (finalCustomerEmail) {
+        const emailFn = approved ? sendCancellationApprovedEmailToCustomer : sendCancellationRejectedEmailToCustomer;
+        emailFn(finalCustomerEmail, finalCustomerName, finalProductName, notes)
+          .then((emailSent) => {
+            console.log(emailSent ? '✅ İptal sonucu maili gönderildi' : '❌ İptal sonucu maili gönderilemedi');
+          })
+          .catch((error) => {
+            console.error('İptal sonucu maili gönderme hatası:', error);
+          });
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: approved ? 'İptal talebi onaylandı' : 'İptal talebi reddedildi',
+        submission: {
+          _id: cancellationUpdate._id,
+          status: cancellationUpdate.status,
+          cancellation: cancellationUpdate.cancellation,
+          updatedAt: cancellationUpdate.updatedAt,
+        },
+      });
+    }
 
     // Ödeme onayı bir statü geçişi değil, status'tan bağımsız ayrı bir alan
     // (payment) — bu yüzden status/adminNotes'a dokunmuyor, "confirm_payment"
