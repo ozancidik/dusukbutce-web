@@ -1,5 +1,6 @@
 "use client";
 import React from 'react';
+import { formatDate } from '../../utils/formatDate';
 
 interface Submission {
   _id: string;
@@ -12,6 +13,7 @@ interface Submission {
   status: string;
   adminNotes?: string;
   createdAt: string;
+  submissionNumber?: string;
 }
 
 interface SubmissionsListProps {
@@ -154,6 +156,15 @@ export default function SubmissionsList({ isMobile, submissions, loading, onView
                     }}>
                       {submission.model}
                     </div>
+                    {submission.submissionNumber && (
+                      <div style={{
+                        fontSize: '11px',
+                        color: '#6b21a8',
+                        fontWeight: '500'
+                      }}>
+                        🎫 {submission.submissionNumber}
+                      </div>
+                    )}
                   </div>
                 </td>
                 <td style={{
@@ -197,7 +208,7 @@ export default function SubmissionsList({ isMobile, submissions, loading, onView
                   fontSize: '14px',
                   color: '#6b7280'
                 }}>
-                  {new Date(submission.createdAt).toLocaleDateString('tr-TR')}
+                  {formatDate(submission.createdAt)}
                 </td>
                 <td style={{
                   padding: isMobile ? '8px' : '12px',

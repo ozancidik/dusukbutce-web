@@ -95,6 +95,16 @@ export default function SubmissionCardFull({
             {submission.brand} {submission.model}
           </h3>
           <div style={{ marginBottom: '4px' }}>
+            {submission.submissionNumber && (
+              <p style={{
+                fontSize: isMobile ? '11px' : '13px',
+                color: '#6b21a8',
+                margin: '0 0 2px 0',
+                fontWeight: '500'
+              }}>
+                🎫 Talep No: {submission.submissionNumber}
+              </p>
+            )}
             {submission.offerNumber && (
               <p style={{
                 fontSize: isMobile ? '11px' : '13px',

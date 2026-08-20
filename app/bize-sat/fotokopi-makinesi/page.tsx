@@ -22,6 +22,7 @@ export default function FotokopiMakinesiPage() {
   const [popupType, setPopupType] = useState<'success' | 'error'>('success');
   const [popupTitle, setPopupTitle] = useState('');
   const [popupMessage, setPopupMessage] = useState('');
+  const [submissionNumber, setSubmissionNumber] = useState('');
   const [formData, setFormData] = useState({
     brand: '',
     model: '',
@@ -204,6 +205,7 @@ export default function FotokopiMakinesiPage() {
 
       if (response.ok) {
         const data = await response.json();
+        setSubmissionNumber(data.submissionNumber || '');
         console.log('📥 Response data:', data);
         
         setPopupType('success');
@@ -333,6 +335,7 @@ export default function FotokopiMakinesiPage() {
         type={popupType}
         title={popupTitle}
         message={popupMessage}
+        referenceNumber={submissionNumber}
       />
 
       {/* Image Size Warning */}

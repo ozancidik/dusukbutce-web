@@ -20,6 +20,7 @@ export default function NotebookPage() {
   const [popupType, setPopupType] = useState<'success' | 'error'>('success');
   const [popupTitle, setPopupTitle] = useState('');
   const [popupMessage, setPopupMessage] = useState('');
+  const [submissionNumber, setSubmissionNumber] = useState('');
   const [showBatteryTooltip, setShowBatteryTooltip] = useState(false);
   const [formData, setFormData] = useState({
     brand: '',
@@ -155,6 +156,7 @@ export default function NotebookPage() {
         setPopupType('success');
         setPopupTitle('Teklif Başarıyla Gönderildi!');
         setPopupMessage(result.message || 'Notebook bilgisayarınız için teklif talebiniz alındı. En kısa sürede size dönüş yapacağız.');
+        setSubmissionNumber(result.data?.submissionNumber || '');
         setShowPopup(true);
         
         // Form başarıyla gönderildikten sonra formu sıfırla
@@ -1441,6 +1443,7 @@ export default function NotebookPage() {
         type={popupType}
         title={popupTitle}
         message={popupMessage}
+        referenceNumber={submissionNumber}
         duration={0}
         redirectPath={popupType === 'success' ? '/tekliflerim' : undefined}
       />

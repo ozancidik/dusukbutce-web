@@ -6,6 +6,7 @@ import User from "@/models/User";
 import { sendNewSubmissionNotificationToAdmin } from "@/lib/email";
 import { getVerifiedUserId } from "@/lib/auth";
 import { validateBody, submissionSchema } from "@/lib/validate";
+import { generateSubmissionNumber } from "@/lib/numberGenerator";
 
 /**
  * Tüm "bize-sat" kategorileri için ortak teklif (submission) oluşturma mantığı.
@@ -54,8 +55,11 @@ export async function handleProductSubmission(request: Request, source: string) 
       if (body[key] !== undefined) data[key] = body[key];
     }
 
+    const submissionNumber = await generateSubmissionNumber();
+
     const submission = new ProductSubmission({
       ...data,
+      submissionNumber,
       userId: userId || new mongoose.Types.ObjectId(),
       status: "pending",
       createdAt: new Date(),
@@ -89,7 +93,10 @@ export async function handleProductSubmission(request: Request, source: string) 
       console.error("Mail gönderme hatası:", error);
     }
 
-    return NextResponse.json({ message: "Success" }, { status: 200 });
+    return NextResponse.json(
+      { message: "Success", id: submission._id, submissionNumber },
+      { status: 200 }
+    );
   } catch (error) {
     console.error(`Error in ${source}:`, error);
     return NextResponse.json(

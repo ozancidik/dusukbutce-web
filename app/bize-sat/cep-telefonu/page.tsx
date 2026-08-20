@@ -21,6 +21,7 @@ export default function CepTelefonuPage() {
   const [popupType, setPopupType] = useState<'success' | 'error'>('success');
   const [popupTitle, setPopupTitle] = useState('');
   const [popupMessage, setPopupMessage] = useState('');
+  const [submissionNumber, setSubmissionNumber] = useState('');
   const [formData, setFormData] = useState({
     brand: '',
     model: '',
@@ -189,6 +190,7 @@ export default function CepTelefonuPage() {
 
       if (response.ok) {
         const data = await response.json();
+        setSubmissionNumber(data.submissionNumber || '');
         console.log('📥 Response data:', data);
         
         setPopupType('success');
@@ -310,6 +312,7 @@ export default function CepTelefonuPage() {
           type={popupType}
           title={popupTitle}
           message={popupMessage}
+        referenceNumber={submissionNumber}
           onClose={() => setShowPopup(false)}
         />
       )}

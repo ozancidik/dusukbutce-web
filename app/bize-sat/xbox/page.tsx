@@ -12,6 +12,7 @@ export default function XboxPage() {
   const [popupType, setPopupType] = useState<'success' | 'error'>('success');
   const [popupTitle, setPopupTitle] = useState('');
   const [popupMessage, setPopupMessage] = useState('');
+  const [submissionNumber, setSubmissionNumber] = useState('');
   const [formData, setFormData] = useState({
     model: '',
     condition: '',
@@ -146,6 +147,7 @@ export default function XboxPage() {
 
       if (response.ok) {
         const data = await response.json();
+        setSubmissionNumber(data.submissionNumber || '');
         console.log('📥 Response data:', data);
         
         setPopupType('success');
@@ -759,6 +761,7 @@ export default function XboxPage() {
         type={popupType}
         title={popupTitle}
         message={popupMessage}
+        referenceNumber={submissionNumber}
         duration={0}
         redirectPath={popupType === 'success' ? '/tekliflerim' : undefined}
       />

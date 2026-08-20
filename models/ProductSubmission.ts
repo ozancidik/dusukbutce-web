@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 const productSubmissionSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   category: { type: String, required: true }, // notebook, desktop, graphics-card, etc.
+  submissionNumber: { type: String }, // Talep numarası (TLP-2024-000123) - oluşturma anında atanır
   brand: { type: String, required: true },
   model: { type: String, required: true },
   type: { type: String }, // For specific categories

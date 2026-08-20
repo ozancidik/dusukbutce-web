@@ -14,6 +14,7 @@ interface Submission {
   status: string;
   adminNotes?: string;
   createdAt: string;
+  submissionNumber?: string;
   userId?: {
     _id: string;
     name: string;
@@ -314,6 +315,17 @@ export default function AdminSubmissions() {
                       }}>
                         {submission.brand} {submission.model}
                       </h3>
+                      <p style={{
+                        fontSize: '12px',
+                        color: '#6b7280',
+                        margin: '0 0 4px 0'
+                      }}>
+                        {submission.submissionNumber && `🎫 ${submission.submissionNumber} · `}
+                        {new Date(submission.createdAt).toLocaleString('tr-TR', {
+                          year: 'numeric', month: '2-digit', day: '2-digit',
+                          hour: '2-digit', minute: '2-digit'
+                        })}
+                      </p>
                       <p style={{
                         fontSize: '14px',
                         color: '#6b7280',
