@@ -29,6 +29,14 @@ export interface Submission {
   submissionNumber?: string;
   offerNumber?: string;
   orderNumber?: string;
+  payment?: {
+    status: 'pending' | 'paid';
+    amount?: number;
+    method?: string;
+    paidAt?: string;
+    paidBy?: string;
+    note?: string;
+  };
   adminNotes?: string;
   images: string[]; // Base64 encoded images
   // Kullanıcı bilgileri
@@ -169,6 +177,6 @@ export interface Submission {
   pedal?: string;
 }
 
-export type ModalType = 'offer' | 'listing' | 'reject' | 'delivery_completed' | null;
+export type ModalType = 'offer' | 'listing' | 'reject' | 'delivery_completed' | 'confirm_payment' | null;
 export type DeleteModalType = 'single' | 'all' | null;
 export type ToastType = 'success' | 'error';

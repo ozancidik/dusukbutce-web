@@ -9,7 +9,7 @@ interface SubmissionListProps {
   isMobile: boolean;
   loading: boolean;
   error: string | null;
-  onAction: (submission: Submission, action: 'offer' | 'listing' | 'reject' | 'delivery_completed') => void;
+  onAction: (submission: Submission, action: 'offer' | 'listing' | 'reject' | 'delivery_completed' | 'confirm_payment') => void;
   onDelete: (submissionId: string) => void;
   onDetail: (submission: Submission) => void;
   onDeliveryInfo: (submission: Submission) => void;

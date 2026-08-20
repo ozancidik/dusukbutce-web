@@ -45,6 +45,17 @@ const productSubmissionSchema = new mongoose.Schema({
     notes: { type: String },
     date: { type: Date }
   },
+  // Ödeme teyidi — müşteriye banka transferiyle para gönderildiğinde admin
+  // işaretler. status'tan bağımsız ayrı bir alan: "kabul edildi" ile
+  // "ödeme yapıldı" farklı olaylar, biri diğerini otomatik takip etmez.
+  payment: {
+    status: { type: String, enum: ['pending', 'paid'], default: 'pending' },
+    amount: { type: Number },
+    method: { type: String }, // Örn. "Banka Havalesi/EFT"
+    paidAt: { type: Date },
+    paidBy: { type: String }, // İşlemi yapan admin e-postası
+    note: { type: String }
+  },
   listing: {
     price: { type: Number },
     title: { type: String },

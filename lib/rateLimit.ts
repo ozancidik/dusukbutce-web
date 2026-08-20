@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
 /**
  * Basit bellek-içi sliding-window rate limiter.
@@ -33,7 +33,7 @@ function cleanup(now: number, maxWindowMs: number) {
 }
 
 /** İstemci IP'sini proxy başlıklarından çıkarır. */
-export function getClientIp(request: NextRequest): string {
+export function getClientIp(request: Request): string {
   const fwd = request.headers.get("x-forwarded-for");
   if (fwd) return fwd.split(",")[0].trim();
   return request.headers.get("x-real-ip") ?? "unknown";
@@ -55,7 +55,7 @@ export interface RateLimitOptions {
  *   if (limited) return limited;
  */
 export function checkRateLimit(
-  request: NextRequest,
+  request: Request,
   { name, limit, windowMs }: RateLimitOptions
 ): NextResponse | null {
   const now = Date.now();

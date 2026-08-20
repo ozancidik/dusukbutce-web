@@ -5,7 +5,7 @@ import { Submission } from '../types';
 interface SubmissionCardProps {
   submission: Submission;
   isMobile: boolean;
-  onAction: (submission: Submission, action: 'offer' | 'listing' | 'reject' | 'delivery_completed') => void;
+  onAction: (submission: Submission, action: 'offer' | 'listing' | 'reject' | 'delivery_completed' | 'confirm_payment') => void;
   onDelete: (submissionId: string) => void;
   onDetail: (submission: Submission) => void;
   onDeliveryInfo: (submission: Submission) => void;
@@ -509,6 +509,37 @@ export default function SubmissionCard({
         >
           ❌ {submission.status === 'rejected' ? 'Reddedildi' : 'Reddet'}
         </button>
+
+        {/* 6.5 Ödeme Onayla - müşteri kabul ettikten sonra, henüz ödenmediyse */}
+        {['accepted', 'customer_accepted', 'delivery_confirmed', 'delivery_completed', 'listed'].includes(submission.status) && (
+          <button
+            onClick={() => submission.payment?.status !== 'paid' && onAction(submission, 'confirm_payment')}
+            disabled={submission.payment?.status === 'paid'}
+            style={{
+              background: submission.payment?.status === 'paid'
+                ? 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)'
+                : 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '12px',
+              padding: isMobile ? '12px 16px' : '14px 20px',
+              fontSize: isMobile ? '13px' : '14px',
+              cursor: submission.payment?.status === 'paid' ? 'not-allowed' : 'pointer',
+              fontWeight: '600',
+              transition: 'all 0.2s',
+              opacity: submission.payment?.status === 'paid' ? 0.7 : 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              boxShadow: submission.payment?.status === 'paid'
+                ? '0 2px 4px rgba(0, 0, 0, 0.1)'
+                : '0 4px 12px rgba(5, 150, 105, 0.3)'
+            }}
+          >
+            💸 {submission.payment?.status === 'paid' ? 'Ödendi' : 'Ödeme Onayla'}
+          </button>
+        )}
 
         {/* 7. Yeniden Teklif Al - Sadece reddedilen teklifler için */}
         {submission.status === 'rejected' && (

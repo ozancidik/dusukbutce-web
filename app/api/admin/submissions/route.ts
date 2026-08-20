@@ -4,6 +4,7 @@ import ProductSubmission from '@/models/ProductSubmission';
 import User from '@/models/User';
 import mongoose from 'mongoose';
 import { AdminAuthError, ensureAdminRequest, handleAdminAuthError } from "../utils/requireAdmin";
+import { logAdminAction } from '@/lib/auditLog';
 
 // Ensure User model is registered
 if (mongoose.models.User === undefined) {
@@ -14,7 +15,7 @@ const MONGODB_URI = process.env.MONGODB_URI;
 
 export async function PUT(request: NextRequest) {
   try {
-    ensureAdminRequest(request);
+    const decoded = ensureAdminRequest(request);
 
     const { submissionId, action, data } = await request.json();
 
@@ -90,8 +91,16 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ success: false, message: 'Submission not found' }, { status: 404 });
     }
 
-    return NextResponse.json({ 
-      success: true, 
+    await logAdminAction({
+      adminEmail: decoded.email || 'bilinmiyor',
+      action: `submission_${action}`,
+      targetType: 'submission',
+      targetId: submissionId,
+      details: data,
+    });
+
+    return NextResponse.json({
+      success: true,
       message: 'Submission updated successfully',
       submission: updatedSubmission
     });
@@ -107,7 +116,7 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    ensureAdminRequest(request);
+    const decoded = ensureAdminRequest(request);
 
     const body = await request.json();
     const { action, submissionId, confirm } = body;
@@ -135,26 +144,43 @@ export async function DELETE(request: NextRequest) {
       console.log('🗑️ Tüm submissions siliniyor...');
       const result = await ProductSubmission.deleteMany({});
       console.log(`✅ ${result.deletedCount} submission silindi`);
-      
-      return NextResponse.json({ 
-        success: true, 
+
+      await logAdminAction({
+        adminEmail: decoded.email || 'bilinmiyor',
+        action: 'submission_delete_all',
+        targetType: 'submission',
+        targetId: 'all',
+        details: { deletedCount: result.deletedCount },
+      });
+
+      return NextResponse.json({
+        success: true,
         message: `${result.deletedCount} submission silindi`,
         deletedCount: result.deletedCount
       });
     } else if (action === 'deleteOne' && submissionId) {
       console.log(`🗑️ Tek submission siliniyor: ${submissionId}`);
       const result = await ProductSubmission.findByIdAndDelete(submissionId);
-      
+
       if (!result) {
-        return NextResponse.json({ 
-          success: false, 
-          message: 'İlan bulunamadı' 
+        return NextResponse.json({
+          success: false,
+          message: 'İlan bulunamadı'
         }, { status: 404 });
       }
-      
+
       console.log(`✅ Submission silindi: ${submissionId}`);
-      return NextResponse.json({ 
-        success: true, 
+
+      await logAdminAction({
+        adminEmail: decoded.email || 'bilinmiyor',
+        action: 'submission_delete',
+        targetType: 'submission',
+        targetId: submissionId,
+        details: { brand: result.brand, model: result.model, submissionNumber: result.submissionNumber },
+      });
+
+      return NextResponse.json({
+        success: true,
         message: 'İlan başarıyla silindi',
         deletedSubmission: result
       });

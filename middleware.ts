@@ -1,11 +1,32 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { checkRateLimit } from '@/lib/rateLimit';
+
+// Satış talebi (submission) oluşturan tüm uçlar — generic /api/submissions
+// ve kategoriye özel /api/{kategori}-submissions route'larının tamamı.
+// Rate limit burada, TEK bir middleware instance'ında uygulanıyor çünkü her
+// route.ts kendi bağımsız modül bundle'ına derleniyor; route içinde
+// checkRateLimit çağırmak her endpoint için AYRI bir sayaç oluşturur ve
+// gerçek bir çapraz-endpoint koruması sağlamaz (canlı testte doğrulandı:
+// bir endpoint'te limit dolsa bile diğer 14 endpoint hâlâ açık kalıyordu).
+function isSubmissionCreateRoute(pathname: string): boolean {
+  return pathname === '/api/submissions' || pathname.endsWith('-submissions');
+}
 
 export function middleware(request: NextRequest) {
   // Sadece API endpoint'leri için CORS headers ekle
   if (request.nextUrl.pathname.startsWith('/api/')) {
+    if (request.method === 'POST' && isSubmissionCreateRoute(request.nextUrl.pathname)) {
+      const limited = checkRateLimit(request, {
+        name: 'product-submission',
+        limit: 15,
+        windowMs: 10 * 60_000,
+      });
+      if (limited) return limited;
+    }
+
     const response = NextResponse.next();
-    
+
     // Origin kontrolü
     const origin = request.headers.get('origin');
     const isDevelopment = process.env.NODE_ENV === 'development';
