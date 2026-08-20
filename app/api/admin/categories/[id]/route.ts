@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Category from '@/models/Category';
-import { AdminAuthError, ensureAdminRequest, handleAdminAuthError } from '../../utils/requireAdmin';
+import { AdminAuthError, ensureAdminRequest, ensureFullAdminRequest, handleAdminAuthError } from '../../utils/requireAdmin';
 
 // GET - Tek kategori getir
 export async function GET(
@@ -48,10 +48,10 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    ensureAdminRequest(request);
+    ensureFullAdminRequest(request);
 
     await connectDB();
-    
+
     const { id } = await params;
     const body = await request.json();
     const { name, description, parentCategory, sortOrder, isActive } = body;
@@ -152,10 +152,10 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    ensureAdminRequest(request);
+    ensureFullAdminRequest(request);
 
     await connectDB();
-    
+
     const { id } = await params;
     const category = await Category.findById(id);
     if (!category) {

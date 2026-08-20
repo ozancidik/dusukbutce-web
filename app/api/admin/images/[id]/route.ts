@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import { Product } from '@/models/Product';
-import { AdminAuthError, ensureAdminRequest, handleAdminAuthError } from '../../utils/requireAdmin';
+import { AdminAuthError, ensureAdminRequest, ensureFullAdminRequest, handleAdminAuthError } from '../../utils/requireAdmin';
 
 // GET - Ürün görsellerini getir
 export async function GET(
@@ -56,10 +56,10 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    ensureAdminRequest(request);
+    ensureFullAdminRequest(request);
 
     await connectDB();
-    
+
     const { id } = await params;
     const body = await request.json();
     const { images, action, imageIndex, uploadedBy } = body;
@@ -221,12 +221,12 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    ensureAdminRequest(request);
+    ensureFullAdminRequest(request);
 
     await connectDB();
-    
+
     const { id } = await params;
-    
+
     const product = await Product.findById(id);
     if (!product) {
       return NextResponse.json(
@@ -234,7 +234,7 @@ export async function DELETE(
         { status: 404 }
       );
     }
-    
+
     const imageCount = product.images.length;
     product.images = [];
     await product.save();

@@ -3,7 +3,7 @@ import connectDB from "@/lib/mongodb";
 import ProductSubmission from '@/models/ProductSubmission';
 import User from '@/models/User';
 import mongoose from 'mongoose';
-import { AdminAuthError, ensureAdminRequest, handleAdminAuthError } from "../utils/requireAdmin";
+import { AdminAuthError, ensureAdminRequest, ensureFullAdminRequest, handleAdminAuthError } from "../utils/requireAdmin";
 import { logAdminAction } from '@/lib/auditLog';
 
 // Ensure User model is registered
@@ -15,7 +15,7 @@ const MONGODB_URI = process.env.MONGODB_URI;
 
 export async function PUT(request: NextRequest) {
   try {
-    const decoded = ensureAdminRequest(request);
+    const decoded = ensureFullAdminRequest(request);
 
     const { submissionId, action, data } = await request.json();
 
@@ -116,7 +116,7 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const decoded = ensureAdminRequest(request);
+    const decoded = ensureFullAdminRequest(request);
 
     const body = await request.json();
     const { action, submissionId, confirm } = body;

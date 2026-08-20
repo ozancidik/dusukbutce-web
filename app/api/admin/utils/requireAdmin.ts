@@ -6,6 +6,7 @@ interface AdminTokenPayload extends JwtPayload {
   role?: string;
   isAdmin?: boolean;
   email?: string;
+  adminRole?: string;
 }
 
 export class AdminAuthError extends Error {
@@ -49,6 +50,22 @@ export const ensureAdminRequest = (request: NextRequest): AdminTokenPayload => {
 
   if (!decoded || (!decoded.isAdmin && decoded.role !== "admin")) {
     throw new AdminAuthError("Yetkisiz erişim: admin yetkisi yok", 403);
+  }
+
+  return decoded;
+};
+
+/**
+ * ensureAdminRequest gibi geçerli bir admin token'ı zorunlu kılar, ayrıca
+ * token'ın "viewer" (salt okunur) rolünde OLMADIĞINI da doğrular. Yazma/
+ * silme etkisi olan uçlarda (teklif ver, sil, ödeme onayla vb.) kullanılır;
+ * salt-okunur listeleme uçları hâlâ ensureAdminRequest ile yetinir.
+ */
+export const ensureFullAdminRequest = (request: NextRequest): AdminTokenPayload => {
+  const decoded = ensureAdminRequest(request);
+
+  if (decoded.adminRole === "viewer") {
+    throw new AdminAuthError("Yetkisiz erişim: salt-okunur admin hesabı bu işlemi yapamaz", 403);
   }
 
   return decoded;

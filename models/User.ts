@@ -25,9 +25,17 @@ const userSchema = new mongoose.Schema({
   address: { 
     type: String 
   },
-  isAdmin: { 
-    type: Boolean, 
-    default: false 
+  isAdmin: {
+    type: Boolean,
+    default: false
+  },
+  // 'full': tüm admin işlemleri (teklif ver, sil, ödeme onayla vb.)
+  // 'viewer': sadece görüntüleme — yazma/silme uçları 403 döner.
+  // isAdmin=false kullanıcılarda anlamsız, sadece isAdmin=true iken geçerli.
+  adminRole: {
+    type: String,
+    enum: ['full', 'viewer'],
+    default: 'full'
   },
   createdAt: { 
     type: Date, 

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import { Product } from '@/models/Product';
-import { AdminAuthError, ensureAdminRequest, handleAdminAuthError } from '../utils/requireAdmin';
+import { AdminAuthError, ensureAdminRequest, ensureFullAdminRequest, handleAdminAuthError } from '../utils/requireAdmin';
 import { parsePagination } from '@/lib/pagination';
 
 // GET - Ürün görsellerini getir
@@ -91,7 +91,7 @@ export async function GET(request: NextRequest) {
 // POST - Toplu görsel yükleme
 export async function POST(request: NextRequest) {
   try {
-    ensureAdminRequest(request);
+    ensureFullAdminRequest(request);
 
     await connectDB();
     

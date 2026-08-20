@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import { Product } from '@/models/Product';
-import { AdminAuthError, ensureAdminRequest, handleAdminAuthError } from '../utils/requireAdmin';
+import { AdminAuthError, ensureAdminRequest, ensureFullAdminRequest, handleAdminAuthError } from '../utils/requireAdmin';
 
 // GET - Tüm ürünleri getir
 export async function GET(request: NextRequest) {
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
 // POST - Yeni ürün oluştur
 export async function POST(request: NextRequest) {
   try {
-    ensureAdminRequest(request);
+    ensureFullAdminRequest(request);
 
     await connectDB();
     
@@ -130,7 +130,7 @@ export async function POST(request: NextRequest) {
 // PUT - Ürün güncelle
 export async function PUT(request: NextRequest) {
   try {
-    ensureAdminRequest(request);
+    ensureFullAdminRequest(request);
 
     await connectDB();
     
@@ -241,7 +241,7 @@ export async function PUT(request: NextRequest) {
 // DELETE - Ürün sil
 export async function DELETE(request: NextRequest) {
   try {
-    ensureAdminRequest(request);
+    ensureFullAdminRequest(request);
 
     await connectDB();
     
