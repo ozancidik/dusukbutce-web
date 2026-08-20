@@ -1,3 +1,5 @@
+const { withSentryConfig } = require('@sentry/nextjs');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // @vercel/blob -> @vercel/oidc -> @vercel/cli-config -> xdg-app-paths zincirindeki
@@ -17,7 +19,9 @@ const nextConfig = {
             value: [
               "default-src 'self'",
               "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://static.cloudflareinsights.com https://vercel.live",
-              "connect-src 'self' https://www.googletagmanager.com https://www.google-analytics.com https://analytics.google.com https://oauth2.googleapis.com https://www.googleapis.com https://api.ipify.org https://ipapi.co",
+              // Sentry ingest: DSN'e göre tam alt domain değişir (ör. o123456.ingest.us.sentry.io),
+              // bu yüzden joker karakterle tüm bölgeler kapsanıyor.
+              "connect-src 'self' https://www.googletagmanager.com https://www.google-analytics.com https://analytics.google.com https://oauth2.googleapis.com https://www.googleapis.com https://api.ipify.org https://ipapi.co https://*.ingest.sentry.io https://*.ingest.us.sentry.io https://*.ingest.de.sentry.io",
               "img-src 'self' data: https: blob:",
               "style-src 'self' 'unsafe-inline'",
               "font-src 'self' data:",
@@ -75,4 +79,14 @@ const nextConfig = {
   }
 };
 
-module.exports = nextConfig;
+// org/project/authToken tanımlı değilse (henüz bir Sentry hesabı yoksa)
+// eklenti kaynak haritası yüklemeyi sessizce atlar — build'i kırmaz.
+module.exports = withSentryConfig(nextConfig, {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+  silent: true,
+  webpack: {
+    treeshake: { removeDebugLogging: true },
+  },
+});
