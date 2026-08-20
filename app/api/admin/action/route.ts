@@ -10,7 +10,7 @@ import {
 } from '@/lib/email';
 import ProductSubmission from '@/models/ProductSubmission';
 import User from '@/models/User';
-import { AdminAuthError, ensureAdminRequest, handleAdminAuthError } from '../utils/requireAdmin';
+import { AdminAuthError, ensureFullAdminRequest, handleAdminAuthError } from '../utils/requireAdmin';
 import { logAdminAction } from '@/lib/auditLog';
 
 export async function POST(request: NextRequest) {
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     console.log('🚀 Admin action API başladı');
     
     // Token doğrula
-    const decoded = ensureAdminRequest(request);
+    const decoded = ensureFullAdminRequest(request);
     console.log('✅ Token doğrulandı:', decoded);
 
     const { submissionId, action, amount, notes, reason, customerEmail, customerName, productName, paymentMethod } = await request.json();

@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import connectDB from '@/lib/mongodb';
 import { Product } from '@/models/Product';
 import PriceHistory from '@/models/PriceHistory';
-import { AdminAuthError, ensureAdminRequest, handleAdminAuthError } from '../utils/requireAdmin';
+import { AdminAuthError, ensureAdminRequest, ensureFullAdminRequest, handleAdminAuthError } from '../utils/requireAdmin';
 import { parsePagination } from '@/lib/pagination';
 
 // GET - Fiyat geçmişi ve istatistikleri getir
@@ -134,7 +134,7 @@ export async function GET(request: NextRequest) {
 // POST - Toplu fiyat güncelleme
 export async function POST(request: NextRequest) {
   try {
-    ensureAdminRequest(request);
+    ensureFullAdminRequest(request);
 
     await connectDB();
     

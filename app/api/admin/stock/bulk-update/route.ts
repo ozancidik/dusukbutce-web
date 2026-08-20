@@ -2,12 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import { Product } from '@/models/Product';
 import StockHistory from '@/models/StockHistory';
-import { AdminAuthError, ensureAdminRequest, handleAdminAuthError } from '../../utils/requireAdmin';
+import { AdminAuthError, ensureFullAdminRequest, handleAdminAuthError } from '../../utils/requireAdmin';
 
 // POST - Toplu stok güncelleme
 export async function POST(request: NextRequest) {
   try {
-    const decoded = ensureAdminRequest(request);
+    const decoded = ensureFullAdminRequest(request);
 
     await connectDB();
     

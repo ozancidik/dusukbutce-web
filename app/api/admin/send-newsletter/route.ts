@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from 'nodemailer';
-import { AdminAuthError, ensureAdminRequest, handleAdminAuthError } from "../utils/requireAdmin";
+import { AdminAuthError, ensureFullAdminRequest, handleAdminAuthError } from "../utils/requireAdmin";
 
 // Google Workspace transporter fonksiyonu (lib/email.ts'den aynı mantık)
 let cachedTransporter: nodemailer.Transporter | null = null;
@@ -27,7 +27,7 @@ function createTransporter(): nodemailer.Transporter {
 
 export async function POST(request: NextRequest) {
   try {
-    ensureAdminRequest(request);
+    ensureFullAdminRequest(request);
 
     const { subject, message, subscribers } = await request.json();
 

@@ -3,7 +3,7 @@ import connectDB from '@/lib/mongodb';
 import { Product } from '@/models/Product';
 import PriceHistory from '@/models/PriceHistory';
 import mongoose from 'mongoose';
-import { AdminAuthError, ensureAdminRequest, handleAdminAuthError } from '../../utils/requireAdmin';
+import { AdminAuthError, ensureAdminRequest, ensureFullAdminRequest, handleAdminAuthError } from '../../utils/requireAdmin';
 
 // GET - Ürün fiyat geçmişi
 export async function GET(
@@ -74,10 +74,10 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    ensureAdminRequest(request);
+    ensureFullAdminRequest(request);
 
     await connectDB();
-    
+
     const { id } = await params;
     const body = await request.json();
     const { newPrice, changeReason, changedBy } = body;

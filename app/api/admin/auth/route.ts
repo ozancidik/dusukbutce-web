@@ -75,11 +75,13 @@ export async function POST(request: NextRequest) {
     await adminUser.save();
 
     // JWT token oluştur
+    const adminRole = adminUser.adminRole === 'viewer' ? 'viewer' : 'full';
     const token = jwt.sign(
-      { 
+      {
         email: adminUser.email,
         userId: adminUser._id.toString(),
         role: 'admin',
+        adminRole,
         name: adminUser.name
       },
       JWT_SECRET,
@@ -92,7 +94,8 @@ export async function POST(request: NextRequest) {
       user: {
         email: adminUser.email,
         name: adminUser.name,
-        role: 'admin'
+        role: 'admin',
+        adminRole
       }
     });
 

@@ -8,6 +8,7 @@ interface User {
   phone?: string;
   address?: string;
   isAdmin: boolean;
+  adminRole?: 'full' | 'viewer';
   createdAt: string;
   lastLogin?: string;
   isActive: boolean;
@@ -23,6 +24,8 @@ interface AdminUsersTableProps {
   onDeleteConfirm: (userId: string) => void;
   onDeleteCancel: () => void;
   onDeleteUser: (userId: string) => void;
+  updatingRole: string | null;
+  onToggleAdminRole: (userId: string, currentRole: 'full' | 'viewer' | undefined) => void;
 }
 
 const AdminUsersTable: React.FC<AdminUsersTableProps> = ({
@@ -32,7 +35,9 @@ const AdminUsersTable: React.FC<AdminUsersTableProps> = ({
   deletingUser,
   onDeleteConfirm,
   onDeleteCancel,
-  onDeleteUser
+  onDeleteUser,
+  updatingRole,
+  onToggleAdminRole
 }) => {
   return (
     <div style={{ overflowX: "auto" }}>
@@ -47,6 +52,7 @@ const AdminUsersTable: React.FC<AdminUsersTableProps> = ({
             <th style={{ padding: "12px", textAlign: "left", borderBottom: "1px solid #e2e8f0" }}>Email</th>
             <th style={{ padding: "12px", textAlign: "left", borderBottom: "1px solid #e2e8f0" }}>Telefon</th>
             <th style={{ padding: "12px", textAlign: "left", borderBottom: "1px solid #e2e8f0" }}>Admin</th>
+            <th style={{ padding: "12px", textAlign: "left", borderBottom: "1px solid #e2e8f0" }}>Yetki Seviyesi</th>
             <th style={{ padding: "12px", textAlign: "left", borderBottom: "1px solid #e2e8f0" }}>Email Doğrulama</th>
             <th style={{ padding: "12px", textAlign: "left", borderBottom: "1px solid #e2e8f0" }}>Newsletter</th>
             <th style={{ padding: "12px", textAlign: "left", borderBottom: "1px solid #e2e8f0" }}>Kayıt Tarihi</th>
@@ -72,6 +78,41 @@ const AdminUsersTable: React.FC<AdminUsersTableProps> = ({
                 }}>
                   {user.isAdmin ? "Admin" : "Kullanıcı"}
                 </span>
+              </td>
+              <td style={{ padding: "12px" }}>
+                {user.isAdmin ? (
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span style={{
+                      background: user.adminRole === 'viewer' ? "#9ca3af" : "#2563eb",
+                      color: "white",
+                      padding: "4px 8px",
+                      borderRadius: "4px",
+                      fontSize: "12px"
+                    }}>
+                      {user.adminRole === 'viewer' ? "Salt Okunur" : "Tam Yetki"}
+                    </span>
+                    <button
+                      onClick={() => onToggleAdminRole(user._id, user.adminRole)}
+                      disabled={updatingRole === user._id}
+                      style={{
+                        background: "transparent",
+                        color: "#2563eb",
+                        border: "1px solid #2563eb",
+                        borderRadius: "4px",
+                        padding: "3px 8px",
+                        fontSize: "11px",
+                        cursor: updatingRole === user._id ? "not-allowed" : "pointer",
+                        opacity: updatingRole === user._id ? 0.6 : 1
+                      }}
+                    >
+                      {updatingRole === user._id
+                        ? "⏳"
+                        : user.adminRole === 'viewer' ? "Tam Yetki Yap" : "Salt Okunur Yap"}
+                    </button>
+                  </div>
+                ) : (
+                  <span style={{ color: "#9ca3af", fontSize: "12px" }}>-</span>
+                )}
               </td>
               <td style={{ padding: "12px" }}>
                 <span style={{

@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 // import { ProductSubmission } from '@/models/ProductSubmission';
-import { AdminAuthError, ensureAdminRequest, handleAdminAuthError } from '../../utils/requireAdmin';
+import { AdminAuthError, ensureFullAdminRequest, handleAdminAuthError } from '../../utils/requireAdmin';
 
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    ensureAdminRequest(request);
+    ensureFullAdminRequest(request);
 
     const { id } = await params;
 
@@ -42,7 +42,7 @@ export async function DELETE(
 // Tüm submission'ları sil
 export async function POST(request: NextRequest) {
   try {
-    ensureAdminRequest(request);
+    ensureFullAdminRequest(request);
 
     await connectDB();
 
