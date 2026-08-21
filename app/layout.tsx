@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "./components/Header";
 import Breadcrumb from "./components/Breadcrumb";
 import Footer from "./components/Footer";
+import SessionGuard from "./components/SessionGuard";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -147,6 +148,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <div style={{ display: "flex", flexDirection: "column" }}>
+          <SessionGuard />
           <Header />
           <Breadcrumb />
           <main style={{ flex: 1 }}>

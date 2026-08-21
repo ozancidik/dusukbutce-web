@@ -47,6 +47,15 @@ export default function LoginPage() {
     fetchCsrfToken();
   }, []);
 
+  // Oturum süresi dolduğu için SessionGuard tarafından buraya yönlendirildiyse
+  // kullanıcıya nedenini açıkla (bkz. app/components/SessionGuard.tsx).
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('sessionExpired') === '1') {
+      setError('Oturumunuzun süresi doldu. Lütfen tekrar giriş yapın.');
+    }
+  }, []);
+
   // OAuth fallback kontrolü (URL parametresinden)
   useEffect(() => {
     const checkOAuthFallback = async (provider: 'google' | 'facebook') => {
