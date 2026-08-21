@@ -66,6 +66,16 @@ async function realLogin(page, { csrfUrl, loginUrl, email, password, extraBody =
   );
 }
 
+function isBroken(attempt) {
+  return Boolean(
+    attempt.navError ||
+    (attempt.pageStatus !== null && attempt.pageStatus !== 200) ||
+    attempt.consoleErrors.length ||
+    attempt.pageErrors.length ||
+    attempt.badRequests.length
+  );
+}
+
 async function visitRoute(context, url, settleMs) {
   const routePage = await context.newPage();
   const consoleErrors = [];
@@ -87,15 +97,17 @@ async function visitRoute(context, url, settleMs) {
   // websocket never goes idle, which makes Playwright's wait flaky.
   // 'load' + a fixed settle delay is reliable here.
   let navError = null;
+  let pageStatus = null;
   try {
-    await routePage.goto(url, { waitUntil: 'load', timeout: 20000 });
+    const navResponse = await routePage.goto(url, { waitUntil: 'load', timeout: 20000 });
+    pageStatus = navResponse ? navResponse.status() : null;
     await routePage.waitForTimeout(settleMs);
   } catch (e) {
     navError = String(e).slice(0, 300);
   }
 
   await routePage.close();
-  return { navError, consoleErrors, pageErrors, badRequests };
+  return { navError, pageStatus, consoleErrors, pageErrors, badRequests };
 }
 
 async function main() {
@@ -186,24 +198,23 @@ async function main() {
     // confirmed the underlying cause by re-testing "failing" routes in
     // isolation immediately afterward, where they always passed once warm.
     let attempt = await visitRoute(context, url, 800);
-    if (attempt.navError || attempt.consoleErrors.length || attempt.pageErrors.length || attempt.badRequests.length) {
+    if (isBroken(attempt)) {
       attempt = await visitRoute(context, url, 2500);
     }
 
     results.push({ route, ...attempt });
-    const flag = attempt.navError || attempt.consoleErrors.length || attempt.pageErrors.length || attempt.badRequests.length ? '❌' : '✅';
-    console.log(`${flag} ${route}`);
+    const flag = isBroken(attempt) ? '❌' : '✅';
+    console.log(`${flag} ${route} [${attempt.pageStatus ?? '?'}]`);
   }
 
   await browser.close();
 
-  const broken = results.filter(
-    (r) => r.navError || r.consoleErrors.length || r.pageErrors.length || r.badRequests.length
-  );
+  const broken = results.filter(isBroken);
   console.log(`\n\n=== ${broken.length} / ${results.length} routes had issues ===\n`);
   for (const r of broken) {
     console.log(`\n--- ${r.route} ---`);
     if (r.navError) console.log('  nav error:', r.navError);
+    if (r.pageStatus !== null && r.pageStatus !== 200) console.log('  page status:', r.pageStatus);
     for (const e of r.consoleErrors) console.log('  console:', e);
     for (const e of r.pageErrors) console.log('  pageerror:', e);
     for (const e of r.badRequests) console.log('  bad request:', e);
