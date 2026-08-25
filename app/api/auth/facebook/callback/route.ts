@@ -1,9 +1,9 @@
 import { NextRequest } from "next/server";
 import connectDB from "@/lib/mongodb";
 import { NextResponse } from "next/server";
-import User from '@/models/User';
 import jwt from 'jsonwebtoken';
 import { authCookieString } from '@/lib/cookies';
+import { upsertOAuthUser } from '@/lib/oauthUser';
 
 export async function GET(request: NextRequest) {
   // Base URL belirleme - production ve localhost için ayrı
@@ -242,39 +242,9 @@ export async function GET(request: NextRequest) {
     // MongoDB'ye bağlan
     await connectDB();
 
-    // Kullanıcıyı email ile bul
-    let user = await User.findOne({ email: userEmail });
-
-    if (!user) {
-      console.log('Facebook OAuth: Creating new user...');
-      // Yeni kullanıcı oluştur (OAuth kullanıcıları için password gerekli değil)
-      user = new User({
-        email: userEmail,
-        name: userName,
-        // password alanı set edilmiyor - OAuth kullanıcıları için gerekli değil
-        authProviders: [{
-          provider: 'facebook',
-          providerId: userData.id,
-          connectedAt: new Date()
-        }],
-        emailVerified: true // Facebook OAuth ile gelen email'ler zaten doğrulanmış
-      });
-      await user.save();
-      console.log('Facebook OAuth: New user created successfully');
-    } else {
-      console.log('Facebook OAuth: Existing user found');
-      // Mevcut kullanıcıya Facebook provider'ı ekle (eğer yoksa)
-      const hasFacebookProvider = user.authProviders?.some((p: any) => p.provider === 'facebook');
-      if (!hasFacebookProvider) {
-        if (!user.authProviders) user.authProviders = [];
-        user.authProviders.push({
-          provider: 'facebook',
-          providerId: userData.id,
-          connectedAt: new Date()
-        });
-        await user.save();
-      }
-    }
+    // Kullanıcıyı email ile bul / yoksa oluştur (Google+Facebook+mobil social-login ortak mantığı)
+    const { user, isNew } = await upsertOAuthUser(userEmail, userName, userData.id, 'facebook');
+    console.log(isNew ? 'Facebook OAuth: New user created successfully' : 'Facebook OAuth: Existing user found');
 
     // JWT token oluştur
     if (!process.env.JWT_SECRET) {

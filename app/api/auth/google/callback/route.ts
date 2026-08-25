@@ -1,9 +1,9 @@
 import { NextRequest } from "next/server";
 import connectDB from "@/lib/mongodb";
 import { NextResponse } from "next/server";
-import User from '@/models/User';
 import jwt from 'jsonwebtoken';
 import { authCookieString } from '@/lib/cookies';
+import { upsertOAuthUser } from '@/lib/oauthUser';
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -147,40 +147,19 @@ export async function GET(request: NextRequest) {
       throw dbError;
     }
 
-    // Kullanıcıyı email ile bul
-    let user = await User.findOne({ email: userData.email });
+    // Kullanıcıyı email ile bul / yoksa oluştur (Google+Facebook+mobil social-login ortak mantığı)
+    const { user } = await upsertOAuthUser(
+      userData.email,
+      decodeURIComponent(escape(userData.name)), // Türkçe karakterleri düzelt
+      userData.id,
+      'google',
+      { phone: phoneNumber }
+    );
 
-    if (!user) {
-      // Yeni kullanıcı oluştur (OAuth kullanıcıları için password gerekli değil)
-      user = new User({
-        email: userData.email,
-        name: decodeURIComponent(escape(userData.name)), // Türkçe karakterleri düzelt
-        phone: phoneNumber, // Google'dan gelen telefon numarası
-        // password alanı set edilmiyor - OAuth kullanıcıları için gerekli değil
-        authProviders: [{
-          provider: 'google',
-          providerId: userData.id,
-          connectedAt: new Date()
-        }],
-        emailVerified: true // Google OAuth ile gelen email'ler zaten doğrulanmış
-      });
-    } else {
-      // Mevcut kullanıcıya Google provider'ı ekle (eğer yoksa)
-      const hasGoogleProvider = user.authProviders?.some((p: any) => p.provider === 'google');
-      if (!hasGoogleProvider) {
-        if (!user.authProviders) user.authProviders = [];
-        user.authProviders.push({
-          provider: 'google',
-          providerId: userData.id,
-          connectedAt: new Date()
-        });
-      }
-      
-      // Telefon numarasını güncelle (eğer Google'dan geldiyse)
-      if (phoneNumber && phoneNumber !== user.phone) {
-        user.phone = phoneNumber;
-        await user.save();
-      }
+    // Telefon numarasını güncelle (eğer Google'dan geldiyse — şu an phoneNumber her zaman boş)
+    if (phoneNumber && phoneNumber !== user.phone) {
+      user.phone = phoneNumber;
+      await user.save();
     }
 
     // JWT token oluştur
