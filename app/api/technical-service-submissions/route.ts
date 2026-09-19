@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import connectDB from "@/lib/mongodb";
 import TechnicalServiceSubmission from '@/models/TechnicalServiceSubmission';
-import { AdminAuthError, ensureAdminRequest, handleAdminAuthError } from '@/app/api/admin/utils/requireAdmin';
+import { AdminAuthError, ensureAdminRequest, ensureFullAdminRequest, handleAdminAuthError } from '@/app/api/admin/utils/requireAdmin';
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
@@ -105,7 +105,8 @@ export async function GET(request: NextRequest) {
 // PUT - Teknik servis talebini güncelle (Admin için)
 export async function PUT(request: NextRequest) {
   try {
-    ensureAdminRequest(request);
+    // Durum değiştiren yazma işlemi — salt-okunur (viewer) admin yapamaz.
+    ensureFullAdminRequest(request);
 
     const { submissionId, status, adminNotes } = await request.json();
 
@@ -158,7 +159,8 @@ export async function PUT(request: NextRequest) {
 // DELETE - Teknik servis talebini sil (Admin için)
 export async function DELETE(request: NextRequest) {
   try {
-    ensureAdminRequest(request);
+    // Kalıcı silme — salt-okunur (viewer) admin yapamaz.
+    ensureFullAdminRequest(request);
 
     const { submissionId } = await request.json();
 

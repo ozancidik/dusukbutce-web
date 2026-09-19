@@ -231,6 +231,18 @@ export async function PUT(request: NextRequest) {
 
     // Update submission fields
     if (status) {
+      // Admin olmayan kullanıcılar workflow durumlarını (listed/accepted/
+      // delivery_completed vb.) doğrudan ayarlayamaz — admin onayı olmadan
+      // kendi talebini herkese açık ilan listesine enjekte edebilirdi.
+      // Müşteri-aksiyonlu durumlar zaten ayrı, sahiplik kontrollü uçlardan
+      // yönetiliyor (/api/submissions/[id]/cancel, /api/submissions/[id]/response).
+      const userAllowedStatuses = ['cancel_requested'];
+      if (!verified.isAdmin && !userAllowedStatuses.includes(status)) {
+        return NextResponse.json(
+          { success: false, message: 'Bu durum değişikliğini yapma yetkiniz yok' },
+          { status: 403 }
+        );
+      }
       submission.status = status;
     }
     
