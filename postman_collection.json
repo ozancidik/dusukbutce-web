@@ -1,0 +1,269 @@
+{
+  "info": {
+    "name": "dusukbutce Backend API Tests",
+    "description": "Comprehensive backend API testing",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "url": {"raw": "http://localhost:3000/api/auth/register", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "auth", "register"]},
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"test-{{$timestamp}}@example.com\",\"password\":\"Test123!@\",\"passwordConfirm\":\"Test123!@\",\"name\":\"Test User\"}"
+            }
+          }
+        },
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": {"raw": "http://localhost:3000/api/auth/login", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "auth", "login"]},
+            "body": {"mode": "raw", "raw": "{\"email\":\"test@example.com\",\"password\":\"Test123!@\"}"}
+          }
+        },
+        {
+          "name": "Logout User",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {"raw": "http://localhost:3000/api/auth/logout", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "auth", "logout"]}
+          }
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "http://localhost:3000/api/auth/me", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "auth", "me"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Listings (İlanlar)",
+      "item": [
+        {
+          "name": "Create Listing",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": {"raw": "http://localhost:3000/api/listings", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "listings"]},
+            "body": {
+              "mode": "raw",
+              "raw": "{\"title\":\"Test RAM 16GB\",\"description\":\"DDR4 Gaming RAM\",\"price\":2500,\"category\":\"ram\",\"condition\":\"used\",\"images\":[],\"contactMethod\":\"whatsapp\",\"phone\":\"+905555555555\"}"
+            }
+          }
+        },
+        {
+          "name": "Get All Listings",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "http://localhost:3000/api/listings?category=ram&limit=10", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "listings"], "query": [{"key": "category", "value": "ram"}, {"key": "limit", "value": "10"}]}
+          }
+        },
+        {
+          "name": "Get Listing by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "http://localhost:3000/api/listings/:id", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "listings", ":id"]}
+          }
+        },
+        {
+          "name": "Update Listing",
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": {"raw": "http://localhost:3000/api/listings/:id", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "listings", ":id"]},
+            "body": {"mode": "raw", "raw": "{\"price\":2800,\"description\":\"Updated description\"}"}
+          }
+        },
+        {
+          "name": "Delete Listing",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {"raw": "http://localhost:3000/api/listings/:id", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "listings", ":id"]}
+          }
+        },
+        {
+          "name": "Search Listings",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "http://localhost:3000/api/listings/search?q=RAM&category=ram", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "listings", "search"], "query": [{"key": "q", "value": "RAM"}, {"key": "category", "value": "ram"}]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Offers (Teklifler)",
+      "item": [
+        {
+          "name": "Create Offer",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": {"raw": "http://localhost:3000/api/offers", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "offers"]},
+            "body": {
+              "mode": "raw",
+              "raw": "{\"listingId\":\":listingId\",\"offeredPrice\":2000,\"message\":\"Biraz daha ucuz olabilir mi?\"}"
+            }
+          }
+        },
+        {
+          "name": "Get My Offers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "http://localhost:3000/api/offers/my-offers", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "offers", "my-offers"]}
+          }
+        },
+        {
+          "name": "Get Offers for Listing",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "http://localhost:3000/api/offers/listing/:listingId", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "offers", "listing", ":listingId"]}
+          }
+        },
+        {
+          "name": "Accept Offer",
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": {"raw": "http://localhost:3000/api/offers/:offerId/accept", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "offers", ":offerId", "accept"]},
+            "body": {"mode": "raw", "raw": "{\"message\":\"Teklifi kabul ediyorum\"}"}
+          }
+        },
+        {
+          "name": "Reject Offer",
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": {"raw": "http://localhost:3000/api/offers/:offerId/reject", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "offers", ":offerId", "reject"]},
+            "body": {"mode": "raw", "raw": "{\"reason\":\"Daha yüksek beklentim var\"}"}
+          }
+        },
+        {
+          "name": "Counter Offer",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": {"raw": "http://localhost:3000/api/offers/:offerId/counter", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "offers", ":offerId", "counter"]},
+            "body": {"mode": "raw", "raw": "{\"counterPrice\":2300,\"message\":\"Bu fiyata anlaşalım\"}"}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get User Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "http://localhost:3000/api/users/:userId", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "users", ":userId"]}
+          }
+        },
+        {
+          "name": "Update User Profile",
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": {"raw": "http://localhost:3000/api/users/profile", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "users", "profile"]},
+            "body": {"mode": "raw", "raw": "{\"phone\":\"+905555555555\",\"bio\":\"İkinci el elektronik alıp satıyorum\"}"}
+          }
+        },
+        {
+          "name": "Get User Listings",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "http://localhost:3000/api/users/:userId/listings", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "users", ":userId", "listings"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Get All Users (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "http://localhost:3000/api/admin/users?limit=20&page=1", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "admin", "users"], "query": [{"key": "limit", "value": "20"}, {"key": "page", "value": "1"}]}
+          }
+        },
+        {
+          "name": "Get All Listings (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "http://localhost:3000/api/admin/listings?status=pending", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "admin", "listings"], "query": [{"key": "status", "value": "pending"}]}
+          }
+        },
+        {
+          "name": "Approve Listing (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": {"raw": "http://localhost:3000/api/admin/listings/:listingId/approve", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "admin", "listings", ":listingId", "approve"]},
+            "body": {"mode": "raw", "raw": "{}"}
+          }
+        },
+        {
+          "name": "Reject Listing (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": {"raw": "http://localhost:3000/api/admin/listings/:listingId/reject", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "admin", "listings", ":listingId", "reject"]},
+            "body": {"mode": "raw", "raw": "{\"reason\":\"İçerik kurallarına uymuyor\"}"}
+          }
+        },
+        {
+          "name": "Get Dashboard Stats (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "http://localhost:3000/api/admin/stats", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "admin", "stats"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Categories",
+      "item": [
+        {
+          "name": "Get All Categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "http://localhost:3000/api/categories", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "categories"]}
+          }
+        },
+        {
+          "name": "Get Category by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "http://localhost:3000/api/categories/:categoryId", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "categories", ":categoryId"]}
+          }
+        }
+      ]
+    }
+  ]
+}

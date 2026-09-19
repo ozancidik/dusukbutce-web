@@ -1,0 +1,28 @@
+<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Main body -->
+  <rect x="12" y="8" width="40" height="48" rx="3" stroke="#8B5CF6" stroke-width="2"/>
+
+  <!-- Top panel/display area -->
+  <rect x="16" y="12" width="32" height="12" rx="2" stroke="#8B5CF6" stroke-width="1.5" fill="#f3e8ff" opacity="0.5"/>
+
+  <!-- Display buttons (top right) -->
+  <circle cx="48" cy="18" r="1.5" fill="#8B5CF6" opacity="0.6"/>
+  <circle cx="52" cy="18" r="1.5" fill="#8B5CF6" opacity="0.6"/>
+
+  <!-- Glass/scanner bed -->
+  <rect x="14" y="26" width="36" height="18" rx="1" stroke="#8B5CF6" stroke-width="1.5" fill="#dbeafe" opacity="0.3"/>
+
+  <!-- Glass frame lines (grid) -->
+  <line x1="22" y1="26" x2="22" y2="44" stroke="#8B5CF6" stroke-width="0.8" opacity="0.4"/>
+  <line x1="30" y1="26" x2="30" y2="44" stroke="#8B5CF6" stroke-width="0.8" opacity="0.4"/>
+  <line x1="38" y1="26" x2="38" y2="44" stroke="#8B5CF6" stroke-width="0.8" opacity="0.4"/>
+  <line x1="46" y1="26" x2="46" y2="44" stroke="#8B5CF6" stroke-width="0.8" opacity="0.4"/>
+
+  <!-- Paper output tray (bottom) -->
+  <rect x="12" y="45" width="40" height="10" rx="1" stroke="#8B5CF6" stroke-width="2"/>
+
+  <!-- Paper stack indicator -->
+  <line x1="18" y1="47" x2="46" y2="47" stroke="#8B5CF6" stroke-width="1" opacity="0.5"/>
+  <line x1="18" y1="50" x2="46" y2="50" stroke="#8B5CF6" stroke-width="1" opacity="0.5"/>
+  <line x1="18" y1="53" x2="46" y2="53" stroke="#8B5CF6" stroke-width="1" opacity="0.5"/>
+</svg>
