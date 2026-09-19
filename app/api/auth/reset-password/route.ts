@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
     user.updatedAt = new Date();
     await user.save();
 
-    console.log('✅ Şifre başarıyla güncellendi:', user.email);
+    console.log('✅ Şifre başarıyla güncellendi, userId:', user._id);
     if (!hasLocalProvider) {
       console.log('✅ Local provider eklendi');
     }

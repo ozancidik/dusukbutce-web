@@ -106,7 +106,7 @@ export async function DELETE(
     }
     
     // Kullanıcıyı sil
-    console.log('🗑️ Admin kullanıcı siliniyor:', user.email);
+    console.log('🗑️ Admin kullanıcı siliniyor, userId:', user._id);
     await User.findByIdAndDelete(id);
     console.log('✅ Admin kullanıcı başarıyla silindi');
     

@@ -14,7 +14,6 @@ export async function POST(request: NextRequest) {
     console.log('📝 Submission başlatılıyor...');
 
     const body = await request.json();
-    console.log('📝 Gelen veri:', JSON.stringify(body, null, 2));
 
     // JWT token'dan userId al (imza doğrulanır; token yoksa misafir gönderimi)
     const userId = getVerifiedUserId(request);

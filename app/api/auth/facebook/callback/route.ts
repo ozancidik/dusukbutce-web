@@ -109,16 +109,50 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get('code');
   const error = searchParams.get('error');
   const state = searchParams.get('state');
-  
+
   // State'den returnUrl'i al
   let returnUrl = '/profile';
+  let stateNonce: string | undefined;
   if (state) {
     try {
       const stateData = JSON.parse(decodeURIComponent(state));
       returnUrl = stateData.returnUrl || '/profile';
+      stateNonce = stateData.nonce;
     } catch (e) {
       console.error('State parse error:', e);
     }
+  }
+
+  // CSRF/login-CSRF koruması: nonce, akışı biz başlattığımızda ayarladığımız
+  // httpOnly cookie ile eşleşmeli. Eşleşmezse istek reddedilir.
+  const cookieNonce = request.cookies.get('facebook_oauth_nonce')?.value;
+  if (!cookieNonce || !stateNonce || cookieNonce !== stateNonce) {
+    console.error('❌ Facebook OAuth state/nonce eşleşmedi — olası CSRF denemesi');
+    return new Response(`
+      <!DOCTYPE html>
+      <html lang="tr">
+        <head>
+          <meta charset="UTF-8">
+          <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
+        </head>
+        <body>
+          <script>
+            if (window.opener) {
+              window.opener.postMessage({
+                type: 'FACEBOOK_LOGIN_ERROR',
+                error: 'Güvenlik doğrulaması başarısız oldu. Lütfen tekrar deneyin.'
+              }, window.location.origin);
+            }
+            window.close();
+          </script>
+        </body>
+      </html>
+    `, {
+      headers: {
+        'Content-Type': 'text/html; charset=utf-8',
+        'Cross-Origin-Opener-Policy': 'same-origin-allow-popups'
+      }
+    });
   }
 
   if (error) {
@@ -297,19 +331,6 @@ export async function GET(request: NextRequest) {
       targetOrigin = targetOrigin.replace('www.', '');
     }
     
-    // State parametresinden returnUrl'i al
-    const searchParams = request.nextUrl.searchParams;
-    const stateParam = searchParams.get('state');
-    let returnUrl = '/';
-    if (stateParam) {
-      try {
-        const state = JSON.parse(decodeURIComponent(stateParam));
-        returnUrl = state.returnUrl || '/';
-      } catch (e) {
-        console.warn('⚠️ Could not parse state parameter:', e);
-      }
-    }
-
     // Popup için HTML response - postMessage ile ana pencereye mesaj gönder
     return new Response(`
       <!DOCTYPE html>

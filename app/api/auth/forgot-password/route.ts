@@ -92,8 +92,8 @@ export async function POST(request: NextRequest) {
     }
     
     if (!user) {
-      // Güvenlik için kullanıcı bulunamasa da aynı mesajı döndür
-      console.log('📧 E-posta bulunamadı:', email);
+      // Güvenlik için kullanıcı bulunamasa da aynı mesajı döndür; e-posta PII'si loglanmıyor.
+      console.log('📧 Şifre sıfırlama isteği: kayıtlı olmayan e-posta');
       return NextResponse.json(
         { 
           success: true, 

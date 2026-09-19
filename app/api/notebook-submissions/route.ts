@@ -16,7 +16,6 @@ export async function POST(request: NextRequest) {
     console.log('📝 Notebook submission başlatılıyor...');
 
     const body = await request.json();
-    console.log('📝 Gelen veri:', JSON.stringify(body, null, 2));
 
     const v = validateBody(submissionSchema, body);
     if (v.error) return v.error;

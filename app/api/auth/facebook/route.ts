@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import connectDB from "@/lib/mongodb";
 import { NextResponse } from "next/server";
+import crypto from "crypto";
 
 export async function GET(request: NextRequest) {
   // Base URL belirleme - production ve localhost için ayrı
@@ -62,13 +63,15 @@ export async function GET(request: NextRequest) {
 
   const searchParams = request.nextUrl.searchParams;
   const returnUrl = searchParams.get('returnUrl') || '/profile';
-  
-  // State'e returnUrl'i ekle
+
+  // State'e returnUrl'i ekle; nonce sunucu tarafında üretilir ve callback'te
+  // aynı isimli httpOnly cookie ile karşılaştırılır (login-CSRF koruması).
+  const oauthNonce = crypto.randomBytes(16).toString('hex');
   const state = JSON.stringify({
-    random: Math.random().toString(36).substr(2, 9),
+    nonce: oauthNonce,
     returnUrl: returnUrl
   });
-  
+
   // Facebook OAuth URL'ini oluştur (sadece public_profile - email için ayrı izin gerekiyor)
   const facebookAuthUrl = `https://www.facebook.com/v18.0/dialog/oauth?` +
     `client_id=${facebookAppId}&` +
@@ -78,6 +81,14 @@ export async function GET(request: NextRequest) {
     `state=${encodeURIComponent(state)}`;
 
   console.log('Facebook OAuth URL created:', facebookAuthUrl);
-  
-  return NextResponse.redirect(facebookAuthUrl);
+
+  const response = NextResponse.redirect(facebookAuthUrl);
+  response.cookies.set('facebook_oauth_nonce', oauthNonce, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 10 * 60,
+    path: '/',
+  });
+  return response;
 } 

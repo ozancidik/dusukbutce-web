@@ -2,15 +2,19 @@ import { NextRequest } from "next/server";
 import connectDB from "@/lib/mongodb";
 import { NextResponse } from "next/server";
 import User from '@/models/User';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 export async function POST(request: NextRequest) {
   try {
+    // Token sızması durumunda süresiz email ifşasını yavaşlatan koruma
+    // (token 32-byte kriptografik rastgele olduğu için asıl koruma budur).
+    const limited = checkRateLimit(request, { name: 'get-user-email', limit: 20, windowMs: 15 * 60_000 });
+    if (limited) return limited;
+
     await connectDB();
 
     const body = await request.json();
     const { token } = body;
-
-    console.log('Get user email request:', { token: token ? 'token exists' : 'no token', tokenLength: token?.length });
 
     if (!token) {
       console.log('No token provided');
@@ -24,8 +28,6 @@ export async function POST(request: NextRequest) {
     const user = await User.findOne({
       emailVerificationToken: token
     });
-
-    console.log('User found for token:', { userFound: !!user, userEmail: user?.email });
 
     if (!user) {
       console.log('No user found for token');
