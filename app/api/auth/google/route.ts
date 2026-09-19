@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import connectDB from "@/lib/mongodb";
 import { NextResponse } from "next/server";
+import crypto from "crypto";
 export async function GET(request: NextRequest) {
   // Base URL belirleme - production ve localhost için ayrı
   let baseUrl = process.env.NEXT_PUBLIC_SITE_URL;
@@ -53,12 +54,23 @@ export async function GET(request: NextRequest) {
     });
   }
 
-  // State parametresini al (returnUrl için)
+  // returnUrl'i client'ın gönderdiği state'ten al (varsa), ama nonce'u HER
+  // ZAMAN sunucu üretir — client-supplied state'e login-CSRF koruması için
+  // güvenilmez (bkz. callback route'undaki nonce doğrulaması).
   const searchParams = request.nextUrl.searchParams;
-  const state = searchParams.get('state') || encodeURIComponent(JSON.stringify({ 
-    random: Math.random().toString(36).substring(7),
-    returnUrl: '/'
-  }));
+  let returnUrl = '/';
+  const clientState = searchParams.get('state');
+  if (clientState) {
+    try {
+      const parsed = JSON.parse(decodeURIComponent(clientState));
+      if (typeof parsed?.returnUrl === 'string') returnUrl = parsed.returnUrl;
+    } catch {
+      // Geçersiz/ayrıştırılamayan state — varsayılan returnUrl kullanılır.
+    }
+  }
+
+  const oauthNonce = crypto.randomBytes(16).toString('hex');
+  const state = encodeURIComponent(JSON.stringify({ nonce: oauthNonce, returnUrl }));
 
   // Google OAuth URL'ini oluştur
   const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
@@ -72,5 +84,13 @@ export async function GET(request: NextRequest) {
 
   console.log('Google Auth URL:', googleAuthUrl);
 
-  return NextResponse.redirect(googleAuthUrl);
+  const response = NextResponse.redirect(googleAuthUrl);
+  response.cookies.set('google_oauth_nonce', oauthNonce, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 10 * 60,
+    path: '/',
+  });
+  return response;
 } 

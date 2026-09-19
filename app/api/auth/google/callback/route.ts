@@ -64,7 +64,55 @@ export async function GET(request: NextRequest) {
         </body>
       </html>
     `, {
-      headers: { 
+      headers: {
+        'Content-Type': 'text/html; charset=utf-8',
+        'Cross-Origin-Opener-Policy': 'unsafe-none',
+        'Cross-Origin-Embedder-Policy': 'unsafe-none'
+      }
+    });
+  }
+
+  // CSRF/login-CSRF koruması: state parametresindeki nonce, akışı biz
+  // başlattığımızda ayarladığımız httpOnly cookie ile eşleşmeli. Eşleşmezse
+  // (veya cookie yoksa) istek reddedilir — böylece bir saldırgan kendi
+  // başlattığı OAuth akışını kurbanın tarayıcısında tamamlatıp kendi
+  // hesabını kurbanın oturumuna bağlayamaz.
+  const stateParam = searchParams.get('state');
+  const cookieNonce = request.cookies.get('google_oauth_nonce')?.value;
+  let stateNonce: string | undefined;
+  if (stateParam) {
+    try {
+      stateNonce = JSON.parse(decodeURIComponent(stateParam))?.nonce;
+    } catch {
+      // Geçersiz state — aşağıdaki eşleşme kontrolü zaten reddedecek.
+    }
+  }
+
+  if (!cookieNonce || !stateNonce || cookieNonce !== stateNonce) {
+    console.error('❌ [CALLBACK] OAuth state/nonce eşleşmedi — olası CSRF denemesi');
+    return new Response(`
+      <!DOCTYPE html>
+      <html lang="tr">
+        <head>
+          <meta charset="UTF-8">
+          <meta http-equiv="Cross-Origin-Opener-Policy" content="unsafe-none">
+          <meta http-equiv="Cross-Origin-Embedder-Policy" content="unsafe-none">
+        </head>
+        <body>
+          <script>
+            console.error('❌ Google OAuth Error: Invalid state');
+            if (window.opener) {
+              window.opener.postMessage({
+                type: 'GOOGLE_LOGIN_ERROR',
+                error: 'Güvenlik doğrulaması başarısız oldu. Lütfen tekrar deneyin.'
+              }, '*');
+            }
+            setTimeout(() => window.close(), 100);
+          </script>
+        </body>
+      </html>
+    `, {
+      headers: {
         'Content-Type': 'text/html; charset=utf-8',
         'Cross-Origin-Opener-Policy': 'unsafe-none',
         'Cross-Origin-Embedder-Policy': 'unsafe-none'
@@ -216,18 +264,6 @@ export async function GET(request: NextRequest) {
       targetOrigin = targetOrigin.replace('www.', '');
     }
     
-    // State parametresinden returnUrl'i al
-    const stateParam = searchParams.get('state');
-    let returnUrl = '/';
-    if (stateParam) {
-      try {
-        const state = JSON.parse(decodeURIComponent(stateParam));
-        returnUrl = state.returnUrl || '/';
-      } catch (e) {
-        console.warn('⚠️ Could not parse state parameter:', e);
-      }
-    }
-
     // Popup için HTML response - postMessage ile ana pencereye mesaj gönder
     return new Response(`
       <!DOCTYPE html>

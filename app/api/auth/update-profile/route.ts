@@ -15,7 +15,6 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    console.log('📝 Profile update request body:', body);
 
     const { firstName, lastName, email, phone, birthDate, emailVerificationCode } = body;
 
@@ -36,7 +35,7 @@ export async function PUT(request: NextRequest) {
         { status: 404 }
       );
     }
-    console.log('✅ User found:', { id: user._id, name: user.name, email: user.email });
+    console.log('✅ User found, id:', user._id);
 
     // Email değişikliği varsa, doğrulama kodu kontrolü yap
     if (email && email !== user.email) {
@@ -95,13 +94,12 @@ export async function PUT(request: NextRequest) {
 
     // Kullanıcı bilgilerini güncelle
     const name = `${firstName} ${lastName}`.trim();
-    console.log('📝 Updating user data:', { 
-      oldName: user.name, 
-      newName: name, 
-      oldEmail: user.email, 
-      newEmail: email || user.email,
-      phone: phone || user.phone,
-      birthDate: birthDate || user.birthDate
+    // PII (isim/e-posta/telefon/doğum tarihi) production loglarına yazılmıyor.
+    console.log('📝 Updating user data, id:', user._id, {
+      nameChanged: name !== user.name,
+      emailChanged: !!(email && email !== user.email),
+      phoneChanged: !!(phone && phone !== user.phone),
+      birthDateProvided: birthDate !== undefined && birthDate !== null && birthDate !== ''
     });
     
     // OAuth kullanıcısı kontrolü

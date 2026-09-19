@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('✅ Token doğrulandı:', user.email);
+    console.log('✅ Token doğrulandı, userId:', user._id);
     
     return NextResponse.json({
       success: true,

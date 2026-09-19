@@ -36,8 +36,8 @@ export async function POST(request: NextRequest) {
     const user = await User.findOne({ email: email.toLowerCase() });
     
     if (!user) {
-      // Güvenlik için kullanıcı bulunamasa da aynı mesajı döndür
-      console.log('📧 E-posta bulunamadı:', email);
+      // Güvenlik için kullanıcı bulunamasa da aynı mesajı döndür; e-posta PII'si loglanmıyor.
+      console.log('📧 Doğrulama e-postası isteği: kayıtlı olmayan e-posta');
       return NextResponse.json(
         { 
           success: true, 
@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
       emailVerificationExpires: verificationTokenExpiry
     });
 
-    console.log('✅ Email doğrulama token\'ı oluşturuldu:', email);
+    console.log('✅ Email doğrulama token\'ı oluşturuldu, userId:', user._id);
 
     // E-posta gönderme işlemi
     const emailSent = await sendEmailVerificationEmail(email, verificationToken, user.name);
