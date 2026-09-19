@@ -96,8 +96,8 @@ export async function POST(request: NextRequest) {
     await connectDB();
     
     const body = await request.json();
-    const { productId, images, uploadedBy } = body;
-    
+    const { productId, images } = body;
+
     // Validasyon
     if (!productId) {
       return NextResponse.json(
@@ -105,21 +105,14 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    
+
     if (!images || !Array.isArray(images) || images.length === 0) {
       return NextResponse.json(
         { success: false, message: 'Görsel listesi gereklidir' },
         { status: 400 }
       );
     }
-    
-    if (!uploadedBy) {
-      return NextResponse.json(
-        { success: false, message: 'Yükleyen kişi bilgisi gereklidir' },
-        { status: 400 }
-      );
-    }
-    
+
     const product = await Product.findById(productId);
     if (!product) {
       return NextResponse.json(

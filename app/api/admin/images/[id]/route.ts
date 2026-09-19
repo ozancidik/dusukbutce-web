@@ -62,16 +62,8 @@ export async function PUT(
 
     const { id } = await params;
     const body = await request.json();
-    const { images, action, imageIndex, uploadedBy } = body;
-    
-    // Validasyon
-    if (!uploadedBy) {
-      return NextResponse.json(
-        { success: false, message: 'Yükleyen kişi bilgisi gereklidir' },
-        { status: 400 }
-      );
-    }
-    
+    const { images, action, imageIndex } = body;
+
     const product = await Product.findById(id);
     if (!product) {
       return NextResponse.json(

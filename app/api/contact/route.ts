@@ -2,9 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '../../../lib/mongodb';
 import Contact from '../../../models/Contact';
 import { sendContactNotification } from '../../../lib/email';
+import { checkRateLimit } from '../../../lib/rateLimit';
 
 export async function POST(request: NextRequest) {
   try {
+    // Kimlik doğrulaması olmayan, herkese açık form — sınırsız kayıt/mail
+    // tetiklemesine karşı koruma.
+    const limited = checkRateLimit(request, { name: 'contact', limit: 5, windowMs: 15 * 60_000 });
+    if (limited) return limited;
+
     const { name, email, subject, message } = await request.json();
 
     // Validation

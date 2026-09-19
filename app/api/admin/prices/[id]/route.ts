@@ -74,14 +74,14 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    ensureFullAdminRequest(request);
+    const decoded = ensureFullAdminRequest(request);
 
     await connectDB();
 
     const { id } = await params;
     const body = await request.json();
-    const { newPrice, changeReason, changedBy } = body;
-    
+    const { newPrice, changeReason } = body;
+
     // Validasyon
     if (newPrice === undefined || newPrice === null) {
       return NextResponse.json(
@@ -89,21 +89,19 @@ export async function PUT(
         { status: 400 }
       );
     }
-    
+
     if (newPrice < 0) {
       return NextResponse.json(
         { success: false, message: 'Fiyat negatif olamaz' },
         { status: 400 }
       );
     }
-    
-    if (!changedBy) {
-      return NextResponse.json(
-        { success: false, message: 'Değiştiren kişi bilgisi gereklidir' },
-        { status: 400 }
-      );
-    }
-    
+
+    // Audit alanı client body'sinden değil, doğrulanmış admin token'ından
+    // gelir — aksi halde bir admin değişikliği başka bir admin'in üzerine
+    // atfedebilirdi.
+    const changedBy = decoded.email || 'bilinmiyor';
+
     const product = await Product.findById(id);
     if (!product) {
       return NextResponse.json(
