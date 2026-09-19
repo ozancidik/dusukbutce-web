@@ -5,8 +5,10 @@ import connectDB from "@/lib/mongodb";
 import User from "@/models/User";
 import { sendNewSubmissionNotificationToAdmin } from '@/lib/email';
 import { getVerifiedUserId } from '@/lib/auth';
-import { AdminAuthError, ensureAdminRequest, handleAdminAuthError } from '@/app/api/admin/utils/requireAdmin';
+import { AdminAuthError, ensureAdminRequest, ensureFullAdminRequest, handleAdminAuthError } from '@/app/api/admin/utils/requireAdmin';
 import { generateSubmissionNumber } from '@/lib/numberGenerator';
+import { validateBody, submissionSchema } from '@/lib/validate';
+import { ALLOWED_FIELDS } from '@/lib/handleProductSubmission';
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,6 +17,9 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     console.log('📝 Gelen veri:', JSON.stringify(body, null, 2));
+
+    const v = validateBody(submissionSchema, body);
+    if (v.error) return v.error;
 
     // JWT token'dan userId al (imza doğrulanır — sahte userId engellenir)
     const userId = getVerifiedUserId(request);
@@ -52,9 +57,17 @@ export async function POST(request: NextRequest) {
     
     const submissionNumber = await generateSubmissionNumber();
 
+    // Sadece izin verilen ürün alanlarını al — offer/payment/listing/
+    // rejectionReason/customerResponse gibi admin-only iş akışı alanları
+    // client body'sinden kabul edilmez (bkz. lib/handleProductSubmission.ts).
+    const data: Record<string, unknown> = {};
+    for (const key of ALLOWED_FIELDS) {
+      if (body[key] !== undefined) data[key] = body[key];
+    }
+
     // Create submission with category and additional fields
     const submission = new ProductSubmission({
-      ...body,
+      ...data,
       submissionNumber,
       category: 'notebook',
       userId: userId || new mongoose.Types.ObjectId(),
@@ -188,7 +201,8 @@ export async function GET(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    ensureAdminRequest(request);
+    // Durum değiştiren yazma işlemi — salt-okunur (viewer) admin yapamaz.
+    ensureFullAdminRequest(request);
 
     const { submissionId, action, data } = await request.json();
 

@@ -4,11 +4,17 @@ import jwt from 'jsonwebtoken';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import { validateCSRFToken } from '@/lib/security';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
 export async function POST(request: NextRequest) {
   try {
+    // Brute-force koruması: IP başına 15 dakikada en fazla 5 giriş denemesi
+    // (admin hesapları normal kullanıcıdan çok daha yüksek yetkiye sahip).
+    const limited = checkRateLimit(request, { name: 'admin-login', limit: 5, windowMs: 15 * 60_000 });
+    if (limited) return limited;
+
     if (!JWT_SECRET) {
       console.error('Admin auth error: JWT_SECRET is not configured');
       return NextResponse.json(
