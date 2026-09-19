@@ -330,16 +330,7 @@ export async function GET(request: NextRequest) {
                     console.warn('⚠️ [CALLBACK] postMessage error for origin:', origin, e);
                   }
                 });
-                
-                // Wildcard fallback (güvenlik riski var ama gerekli)
-                try {
-                  window.opener.postMessage(messageData, '*');
-                  console.log('✅ [CALLBACK] postMessage sent to wildcard');
-                  successCount++;
-                } catch (e) {
-                  console.warn('⚠️ [CALLBACK] postMessage wildcard error:', e);
-                }
-                
+
                 console.log('📊 [CALLBACK] Total successful sends:', successCount);
                 return successCount > 0;
               } catch (e) {
@@ -347,6 +338,11 @@ export async function GET(request: NextRequest) {
                 return false;
               }
             };
+
+            // NOT: Wildcard ('*') fallback KALDIRILDI — JWT içeren messageData, opener'ın
+            // GERÇEK origin'i doğrulanmadan herhangi bir sayfaya (örn. window.open() ile
+            // bu callback'i popup olarak açmış saldırgan sayfasına) sızabiliyordu.
+            // localStorage fallback (yukarıda) zaten aynı-origin garantisi veriyor.
             
             // Hemen gönder
             console.log('🚀 [CALLBACK] Attempting to send message...');
