@@ -1,0 +1,226 @@
+# ECC Agent Routing Configuration (dusukbutce-web)
+# Web-specific orchestration for Next.js/MongoDB backend
+
+version: "2.0"
+name: "dusukbutce-web-automation"
+
+# Global settings
+global:
+  mode: "autonomous"  # Auto-trigger agents based on events
+  parallel_execution: true
+  max_concurrent_agents: 4
+  timeout_per_agent: 300s  # 5 min
+  learning_enabled: true
+
+# Event sources
+event_sources:
+  - type: "git"
+    events:
+      - "commit"
+      - "push"
+      - "file_change"
+
+  - type: "api_event"
+    events:
+      - "endpoint_change"
+      - "schema_update"
+      - "middleware_change"
+
+  - type: "database_event"
+    events:
+      - "migration"
+      - "model_change"
+
+# Agent definitions & triggers (web-specific)
+agents:
+  # API Integration Validator
+  api-validator:
+    enabled: true
+    triggers:
+      - event: "file_change"
+        pattern: "app/api/**/*.ts"
+      - event: "commit"
+        message: "*api*"
+    actions:
+      - "validate-endpoints"
+      - "test-request-response"
+      - "check-error-handling"
+    dependencies: []
+    timeout: 120s
+    retry_on_failure: true
+    max_retries: 3
+
+  # Humanizer (Documentation Polish)
+  humanizer:
+    enabled: true
+    triggers:
+      - event: "file_change"
+        pattern: "app/api/**/*.ts"
+      - event: "commit"
+        message: "*docs*"
+    actions:
+      - "polish-api-docs"
+      - "validate-tone"
+      - "check-clarity"
+    dependencies: []
+    timeout: 60s
+    skill: "/humanizer"
+    auto_apply: true
+
+  # Code Quality (Next.js specific)
+  code-quality:
+    enabled: true
+    triggers:
+      - event: "file_change"
+        pattern: "**/*.{ts,tsx}"
+      - event: "commit"
+    actions:
+      - "eslint"
+      - "typescript-check"
+      - "prettier-format"
+      - "next-lint"
+    dependencies: []
+    timeout: 180s
+    parallel_with: ["backend-qa"]
+    auto_fix: true
+
+  # Backend QA (Integration Tests)
+  backend-qa:
+    enabled: true
+    triggers:
+      - event: "file_change"
+        pattern: "app/api/**"
+      - event: "commit"
+        message: "*feature*"
+    actions:
+      - "api-tests"
+      - "integration-tests"
+      - "database-tests"
+    dependencies:
+      - "code-quality"
+    timeout: 240s
+    parallel_with: ["code-quality"]
+
+  # Security Scanner
+  security-scanner:
+    enabled: true
+    triggers:
+      - event: "file_change"
+        pattern: "app/api/**"
+      - event: "commit"
+        message: "*security*"
+      - event: "daily"
+        time: "02:00"
+    actions:
+      - "dependency-audit"
+      - "secret-scan"
+      - "vulnerability-check"
+      - "auth-validation"
+    dependencies: []
+    timeout: 300s
+
+  # Build Optimizer (Next.js)
+  build-optimizer:
+    enabled: true
+    triggers:
+      - event: "commit"
+      - event: "file_change"
+        pattern: "package.json|tsconfig.json|next.config.js"
+    actions:
+      - "bundle-size-check"
+      - "build-performance"
+      - "optimize-exports"
+    dependencies:
+      - "code-quality"
+    timeout: 300s
+    auto_fix: true
+
+  # Load Tester (Performance baseline)
+  load-tester:
+    enabled: true
+    triggers:
+      - event: "commit"
+        branch: "main"
+      - event: "file_change"
+        pattern: "app/api/**"
+    actions:
+      - "load-test-api"
+      - "latency-baseline"
+      - "throughput-check"
+    dependencies:
+      - "backend-qa"
+    timeout: 600s
+    environment: "staging"
+
+# Decision tree: Which agents run based on context
+decision_engine:
+  rules:
+    - condition: "file_contains('app/api') && commit"
+      agents: ["api-validator", "humanizer", "code-quality", "backend-qa", "security-scanner"]
+
+    - condition: "file_contains('lib/auth') && commit"
+      agents: ["security-scanner", "code-quality", "backend-qa"]
+
+    - condition: "file_contains('models') && commit"
+      agents: ["code-quality", "backend-qa", "security-scanner"]
+
+    - condition: "file_contains('package.json') && commit"
+      agents: ["security-scanner", "build-optimizer"]
+
+    - condition: "branch == 'main' && commit"
+      agents: ["code-quality", "backend-qa", "security-scanner", "build-optimizer", "load-tester"]
+
+    - condition: "commit.message contains 'URGENT'"
+      agents: ["security-scanner", "code-quality"]
+      priority: "high"
+
+# Reporting & dashboarding
+reporting:
+  enabled: true
+  outputs:
+    - type: "markdown"
+      path: ".claude-flow/automation-reports/{timestamp}-{branch}.md"
+
+    - type: "json"
+      path: ".claude-flow/metrics/{timestamp}-metrics.json"
+
+    - type: "dashboard"
+      url: "http://localhost:8765"
+
+  include_metrics:
+    - "execution_time"
+    - "success_rate"
+    - "agent_decisions"
+    - "learning_insights"
+
+# Learning system: Optimize future runs
+learning:
+  enabled: true
+  track:
+    - "agent_duration_per_file_type"
+    - "common_failure_patterns"
+    - "optimal_agent_order"
+    - "api_test_flakiness"
+
+  optimize:
+    - "Skip agents if recent successful run"
+    - "Parallel agents if no dependencies"
+    - "Increase timeout on repeated failures"
+    - "Suggest better triggers based on history"
+
+  storage: ".ecc/learning-metrics.db"
+
+# Fallback & error handling
+error_handling:
+  on_agent_timeout: "skip_dependent"
+  on_agent_failure: "report_and_continue"
+  on_critical_failure: "notify_and_stop"
+
+  notifications:
+    - channel: "stdout"
+      level: "error"
+    - channel: "report"
+      level: "all"
+
+# Dry-run mode for testing
+dry_run: false

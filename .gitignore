@@ -42,3 +42,10 @@ yarn-error.log*
 
 # Claude Code (yerel ayarlar — commit'lenmez)
 .claude/settings.local.json
+
+# Ruflo local secrets and runtime data
+.env.local
+.env.*.local
+.claude-flow/data/
+.claude-flow/logs/
+.claude-flow/sessions/
