@@ -134,19 +134,18 @@ export async function GET(request: NextRequest) {
 // POST - Toplu fiyat güncelleme
 export async function POST(request: NextRequest) {
   try {
-    ensureFullAdminRequest(request);
+    const decoded = ensureFullAdminRequest(request);
 
     await connectDB();
-    
+
     const body = await request.json();
-    const { 
-      productIds, 
-      updateType, 
-      updateValue, 
-      changeReason, 
-      changedBy 
+    const {
+      productIds,
+      updateType,
+      updateValue,
+      changeReason
     } = body;
-    
+
     // Validasyon
     if (!productIds || !Array.isArray(productIds) || productIds.length === 0) {
       return NextResponse.json(
@@ -154,28 +153,26 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    
+
     if (!updateType || !['fixed', 'percentage', 'multiply'].includes(updateType)) {
       return NextResponse.json(
         { success: false, message: 'Geçersiz güncelleme tipi' },
         { status: 400 }
       );
     }
-    
+
     if (updateValue === undefined || updateValue === null) {
       return NextResponse.json(
         { success: false, message: 'Güncelleme değeri gereklidir' },
         { status: 400 }
       );
     }
-    
-    if (!changedBy) {
-      return NextResponse.json(
-        { success: false, message: 'Değiştiren kişi bilgisi gereklidir' },
-        { status: 400 }
-      );
-    }
-    
+
+    // Audit alanı client body'sinden değil, doğrulanmış admin token'ından
+    // gelir — aksi halde bir admin değişikliği başka bir admin'in üzerine
+    // atfedebilirdi.
+    const changedBy = decoded.email || 'bilinmiyor';
+
     const results = [];
     const errors = [];
     

@@ -2,9 +2,14 @@ import { NextRequest } from "next/server";
 import connectDB from "@/lib/mongodb";
 import { NextResponse } from "next/server";
 import User from '@/models/User';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 export async function POST(request: NextRequest) {
   try {
+    // Kimlik doğrulaması olmayan, toplu e-posta enumeration'a karşı koruma.
+    const limited = checkRateLimit(request, { name: 'check-email', limit: 20, windowMs: 15 * 60_000 });
+    if (limited) return limited;
+
     await connectDB();
 
     const body = await request.json();

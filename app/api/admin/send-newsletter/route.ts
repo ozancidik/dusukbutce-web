@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from 'nodemailer';
 import { AdminAuthError, ensureFullAdminRequest, handleAdminAuthError } from "../utils/requireAdmin";
+import connectDB from "@/lib/mongodb";
+import User from "@/models/User";
+import { sanitizeInput } from "@/lib/security";
 
 // Google Workspace transporter fonksiyonu (lib/email.ts'den aynı mantık)
 let cachedTransporter: nodemailer.Transporter | null = null;
@@ -38,14 +41,40 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    await connectDB();
+
+    // Alıcı listesi client body'sinden olduğu gibi güvenilmez — gerçekten
+    // acceptNewsletter:true olan kayıtlı kullanıcılarla kesişimi alınır.
+    const requestedEmails = (subscribers as Array<{ email?: string }>)
+      .map((s) => (typeof s?.email === 'string' ? s.email.toLowerCase().trim() : null))
+      .filter((e): e is string => !!e);
+
+    const verifiedSubscribers = await User.find({
+      email: { $in: requestedEmails },
+      acceptNewsletter: true,
+    }).select('email name');
+
+    if (verifiedSubscribers.length === 0) {
+      return NextResponse.json(
+        { success: false, error: 'Gönderilecek geçerli (aboneliği açık) alıcı bulunamadı' },
+        { status: 400 }
+      );
+    }
+
     // Google Workspace transporter kullan
     const transporter = createTransporter();
 
     let successCount = 0;
     let failedCount = 0;
 
+    // Admin'in yazdığı içerik e-posta HTML'ine kaçışsız gömülmüyor — bir
+    // admin hesabı ele geçirilse bile alıcıların posta istemcisinde
+    // script/markup çalıştıramaz.
+    const safeSubject = sanitizeInput(subject);
+    const safeMessage = sanitizeInput(message);
+
     // Her aboneye mail gönder
-    for (const subscriber of subscribers) {
+    for (const subscriber of verifiedSubscribers) {
       try {
         const mailOptions = {
           from: {
@@ -54,22 +83,22 @@ export async function POST(request: NextRequest) {
           },
           replyTo: 'info@dusukbutce.com',
           to: subscriber.email,
-          subject: subject,
+          subject: safeSubject,
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
               <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); border-radius: 12px 12px 0 0;">
                 <h1 style="color: white; margin: 0; font-size: 24px;">Düşük Bütçe 📧</h1>
               </div>
-              
+
               <div style="background: white; padding: 30px; border: 1px solid #e5e7eb; border-top: none;">
                 <div style="background: #f0f9ff; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
                   <p style="color: #374151; margin: 0; line-height: 1.6;">
-                    Merhaba <strong>${subscriber.name}</strong>,
+                    Merhaba <strong>${sanitizeInput(subscriber.name || '')}</strong>,
                   </p>
                 </div>
-                
+
                 <div style="color: #374151; line-height: 1.8; margin: 20px 0; white-space: pre-wrap;">
-                  ${message}
+                  ${safeMessage}
                 </div>
                 
                 <div style="margin: 30px 0; text-align: center;">
