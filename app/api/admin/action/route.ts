@@ -21,10 +21,12 @@ export async function POST(request: NextRequest) {
     
     // Token doğrula
     const decoded = ensureFullAdminRequest(request);
-    console.log('✅ Token doğrulandı:', decoded);
+    console.log('✅ Token doğrulandı, adminRole:', decoded.adminRole || 'full');
 
     const { submissionId, action, amount, notes, reason, customerEmail, customerName, productName, paymentMethod } = await request.json();
-    console.log('📝 Request data:', { submissionId, action, amount, notes, customerEmail, customerName, productName });
+    // Müşteri PII'si (email/isim) production loglarına yazılmıyor — sadece
+    // işlem meta verisi loglanıyor.
+    console.log('📝 Request data:', { submissionId, action, amount });
 
     if (!submissionId || !action) {
       return NextResponse.json(
