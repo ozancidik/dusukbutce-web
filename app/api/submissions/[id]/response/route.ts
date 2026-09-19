@@ -148,7 +148,8 @@ export async function PUT(
       const productName = `${updatedSubmission.brand} ${updatedSubmission.model}`.trim();
       const offerAmount = updatedSubmission.offerAmount || updatedSubmission.offer?.amount || 0;
       
-      console.log('📧 Müşteri bilgileri:', { customerEmail, customerName, productName, offerAmount });
+      // Müşteri PII'si (email/isim) production loglarına yazılmıyor.
+      console.log('📧 Bildirim maili hazırlanıyor:', { productName, offerAmount });
 
       // Email gönderimini async yap (kullanıcı beklemeden response döndür)
       if (action === 'accepted') {

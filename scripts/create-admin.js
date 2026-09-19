@@ -30,9 +30,19 @@ async function createAdmin() {
     await mongoose.connect(MONGODB_URI);
     console.log('✅ MongoDB bağlantısı başarılı\n');
 
-    const email = 'admin@dusukbutce.com';
-    const password = 'Admin123!';
-    const name = 'Admin Düşük Bütçe';
+    const email = process.env.ADMIN_EMAIL || 'admin@dusukbutce.com';
+    const password = process.env.ADMIN_PASSWORD;
+    const name = process.env.ADMIN_NAME || 'Admin Düşük Bütçe';
+
+    if (!password) {
+      console.error('❌ ADMIN_PASSWORD ortam değişkeni gerekli (sabit/zayıf bir şifre kodlanmıyor).');
+      console.error('   Kullanım: ADMIN_PASSWORD="GüçlüBirŞifre123!" node scripts/create-admin.js');
+      process.exit(1);
+    }
+    if (password.length < 12) {
+      console.error('❌ ADMIN_PASSWORD en az 12 karakter olmalı.');
+      process.exit(1);
+    }
 
     // Mevcut admin var mı kontrol et
     const existingUser = await User.findOne({ email });
