@@ -1,0 +1,15 @@
+<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Gamepad body -->
+  <path d="M 12 28 Q 12 20 20 20 L 44 20 Q 52 20 52 28 L 52 36 Q 52 44 44 44 L 20 44 Q 12 44 12 36 Z" stroke="#EC4899" stroke-width="2"/>
+  <!-- D-Pad (left) -->
+  <line x1="22" y1="30" x2="22" y2="38" stroke="#EC4899" stroke-width="1.5"/>
+  <line x1="18" y1="34" x2="26" y2="34" stroke="#EC4899" stroke-width="1.5"/>
+  <!-- Action buttons (right) -->
+  <circle cx="42" cy="30" r="2" stroke="#EC4899" stroke-width="1.5"/>
+  <circle cx="48" cy="32" r="2" stroke="#EC4899" stroke-width="1.5"/>
+  <circle cx="44" cy="36" r="2" stroke="#EC4899" stroke-width="1.5"/>
+  <circle cx="38" cy="34" r="2" stroke="#EC4899" stroke-width="1.5"/>
+  <!-- Shoulder buttons -->
+  <line x1="16" y1="22" x2="22" y2="22" stroke="#EC4899" stroke-width="1.5"/>
+  <line x1="42" y1="22" x2="48" y2="22" stroke="#EC4899" stroke-width="1.5"/>
+</svg>

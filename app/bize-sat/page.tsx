@@ -43,7 +43,7 @@ export default function BizeSatPage() {
     { name: 'Oyuncu Direksiyonu', path: '/bize-sat/gaming-direksiyon', icon: '/steering-wheel.png' },
     { name: 'Yazıcı', path: '/bize-sat/yazici', icon: '🖨️' },
     { name: 'Tarayıcı', path: '/bize-sat/tarayici', icon: '🔍' },
-    { name: 'Fotokopi Makinesi', path: '/bize-sat/fotokopi-makinesi', icon: '📄' }
+    { name: 'Fotokopi Makinesi', path: '/bize-sat/fotokopi-makinesi', icon: '/file.svg' }
   ];
 
   const gamingCategories = [
