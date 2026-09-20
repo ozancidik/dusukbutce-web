@@ -1,0 +1,1017 @@
+{
+  "config": {
+    "argv": [
+      "/Users/ozan.cidik/.nvm/versions/node/v20.20.0/bin/node",
+      "/Users/ozan.cidik/Desktop/dusukbutce-web/node_modules/.bin/playwright",
+      "test",
+      "tests/bize-sat-flow.test.ts",
+      "--reporter=json"
+    ],
+    "rootDir": "/Users/ozan.cidik/Desktop/dusukbutce-web",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "/Users/ozan.cidik/Desktop/dusukbutce-web",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 4,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "tests/bize-sat-flow.test.ts",
+      "file": "tests/bize-sat-flow.test.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Bize-Sat Flow Tests",
+          "file": "tests/bize-sat-flow.test.ts",
+          "line": 5,
+          "column": 6,
+          "specs": [],
+          "suites": [
+            {
+              "title": "Kategori Listeleme & Navigasyon",
+              "file": "tests/bize-sat-flow.test.ts",
+              "line": 8,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "✅ Bize-Sat sayfası yüklenmesi",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 3687,
+                          "error": {
+                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText(/ne satmak istiyorsun|kategori|bilgisayar|elektronik/i)\nExpected: visible\nError: strict mode violation: getByText(/ne satmak istiyorsun|kategori|bilgisayar|elektronik/i) resolved to 3 elements:\n    1) <h1>Ne satmak istiyorsun?</h1> aka getByRole('heading', { name: 'Ne satmak istiyorsun?' })\n    2) <h2>Bilgisayar Bileşenleri</h2> aka getByRole('heading', { name: 'Bilgisayar Bileşenleri' })\n    3) <title>Düşük Bütçe - En Uygun Fiyatlı Bilgisayar, Laptop…</title> aka getByText('Düşük Bütçe - En Uygun Fiyatl')\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByText(/ne satmak istiyorsun|kategori|bilgisayar|elektronik/i) with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText(/ne satmak istiyorsun|kategori|bilgisayar|elektronik/i)\u001b[22m\n",
+                            "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText(/ne satmak istiyorsun|kategori|bilgisayar|elektronik/i)\nExpected: visible\nError: strict mode violation: getByText(/ne satmak istiyorsun|kategori|bilgisayar|elektronik/i) resolved to 3 elements:\n    1) <h1>Ne satmak istiyorsun?</h1> aka getByRole('heading', { name: 'Ne satmak istiyorsun?' })\n    2) <h2>Bilgisayar Bileşenleri</h2> aka getByRole('heading', { name: 'Bilgisayar Bileşenleri' })\n    3) <title>Düşük Bütçe - En Uygun Fiyatlı Bilgisayar, Laptop…</title> aka getByText('Düşük Bütçe - En Uygun Fiyatl')\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByText(/ne satmak istiyorsun|kategori|bilgisayar|elektronik/i) with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText(/ne satmak istiyorsun|kategori|bilgisayar|elektronik/i)\u001b[22m\n\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/bize-sat-flow.test.ts:14:92",
+                            "location": {
+                              "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/bize-sat-flow.test.ts",
+                              "column": 92,
+                              "line": 14
+                            },
+                            "snippet": "  12 |\n  13 |       // Başlık kontrol\n> 14 |       await expect(page.getByText(/ne satmak istiyorsun|kategori|bilgisayar|elektronik/i)).toBeVisible();\n     |                                                                                            ^\n  15 |\n  16 |       // En az bir kategori butonunun görülebilir olması\n  17 |       const categoryButtons = page.locator('[class*=\"category\"]');"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/bize-sat-flow.test.ts",
+                                "column": 92,
+                                "line": 14
+                              },
+                              "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText(/ne satmak istiyorsun|kategori|bilgisayar|elektronik/i)\nExpected: visible\nError: strict mode violation: getByText(/ne satmak istiyorsun|kategori|bilgisayar|elektronik/i) resolved to 3 elements:\n    1) <h1>Ne satmak istiyorsun?</h1> aka getByRole('heading', { name: 'Ne satmak istiyorsun?' })\n    2) <h2>Bilgisayar Bileşenleri</h2> aka getByRole('heading', { name: 'Bilgisayar Bileşenleri' })\n    3) <title>Düşük Bütçe - En Uygun Fiyatlı Bilgisayar, Laptop…</title> aka getByText('Düşük Bütçe - En Uygun Fiyatl')\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByText(/ne satmak istiyorsun|kategori|bilgisayar|elektronik/i) with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText(/ne satmak istiyorsun|kategori|bilgisayar|elektronik/i)\u001b[22m\n\n\n  12 |\n  13 |       // Başlık kontrol\n> 14 |       await expect(page.getByText(/ne satmak istiyorsun|kategori|bilgisayar|elektronik/i)).toBeVisible();\n     |                                                                                            ^\n  15 |\n  16 |       // En az bir kategori butonunun görülebilir olması\n  17 |       const categoryButtons = page.locator('[class*=\"category\"]');\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/bize-sat-flow.test.ts:14:92"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:39:01.110Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-bize-sat-flow-Bize-S-c06ed-Bize-Sat-sayfası-yüklenmesi/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/bize-sat-flow.test.ts",
+                            "column": 92,
+                            "line": 14
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "55d3ac2663dbda965100-b4f08e5cf85a0d7c0ad0",
+                  "file": "tests/bize-sat-flow.test.ts",
+                  "line": 10,
+                  "column": 9
+                },
+                {
+                  "title": "✅ Tüm kategorilerin görülebilir olması",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 1,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 1105,
+                          "error": {
+                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText(/Kasa/i)\nExpected: visible\nError: strict mode violation: getByText(/Kasa/i) resolved to 2 elements:\n    1) <div>…</div> aka getByRole('link', { name: '🖥️ Masaüstü (Kasa)' })\n    2) <div>…</div> aka getByRole('link', { name: 'Boş Kasa Boş Kasa' })\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByText(/Kasa/i) with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText(/Kasa/i)\u001b[22m\n",
+                            "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText(/Kasa/i)\nExpected: visible\nError: strict mode violation: getByText(/Kasa/i) resolved to 2 elements:\n    1) <div>…</div> aka getByRole('link', { name: '🖥️ Masaüstü (Kasa)' })\n    2) <div>…</div> aka getByRole('link', { name: 'Boş Kasa Boş Kasa' })\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByText(/Kasa/i) with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText(/Kasa/i)\u001b[22m\n\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/bize-sat-flow.test.ts:34:37",
+                            "location": {
+                              "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/bize-sat-flow.test.ts",
+                              "column": 37,
+                              "line": 34
+                            },
+                            "snippet": "  32 |         const categoryBtn = page.getByText(new RegExp(category, 'i'));\n  33 |         if (categoryBtn) {\n> 34 |           await expect(categoryBtn).toBeVisible();\n     |                                     ^\n  35 |         }\n  36 |       }\n  37 |     });"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/bize-sat-flow.test.ts",
+                                "column": 37,
+                                "line": 34
+                              },
+                              "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText(/Kasa/i)\nExpected: visible\nError: strict mode violation: getByText(/Kasa/i) resolved to 2 elements:\n    1) <div>…</div> aka getByRole('link', { name: '🖥️ Masaüstü (Kasa)' })\n    2) <div>…</div> aka getByRole('link', { name: 'Boş Kasa Boş Kasa' })\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByText(/Kasa/i) with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText(/Kasa/i)\u001b[22m\n\n\n  32 |         const categoryBtn = page.getByText(new RegExp(category, 'i'));\n  33 |         if (categoryBtn) {\n> 34 |           await expect(categoryBtn).toBeVisible();\n     |                                     ^\n  35 |         }\n  36 |       }\n  37 |     });\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/bize-sat-flow.test.ts:34:37"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:39:05.359Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-bize-sat-flow-Bize-S-87891-orilerin-görülebilir-olması/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/bize-sat-flow.test.ts",
+                            "column": 37,
+                            "line": 34
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "55d3ac2663dbda965100-331d2e3703286ebf69bd",
+                  "file": "tests/bize-sat-flow.test.ts",
+                  "line": 22,
+                  "column": 9
+                },
+                {
+                  "title": "✅ Kategori ikonları render edilmesi",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 2,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 961,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:39:07.183Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "55d3ac2663dbda965100-a2e86d7cfbe4974e54e3",
+                  "file": "tests/bize-sat-flow.test.ts",
+                  "line": 39,
+                  "column": 9
+                },
+                {
+                  "title": "✅ Kategori seçimi - Bileşenler",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 2,
+                          "parallelIndex": 0,
+                          "status": "timedOut",
+                          "duration": 30043,
+                          "error": {
+                            "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                            "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                          },
+                          "errors": [
+                            {
+                              "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                            },
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/bize-sat-flow.test.ts",
+                                "column": 27,
+                                "line": 53
+                              },
+                              "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText(/işlemci/i)\u001b[22m\n\n\n  51 |       const cpuCategory = page.getByText(/işlemci/i);\n  52 |       if (cpuCategory) {\n> 53 |         await cpuCategory.click();\n     |                           ^\n  54 |\n  55 |         // İşlemci sayfasına yönlendirilmesi bekleniyor\n  56 |         await expect(page).toHaveURL(/.*islemci/i);\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/bize-sat-flow.test.ts:53:27"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:39:08.295Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-bize-sat-flow-Bize-S-9f91d-ategori-seçimi---Bileşenler/error-context.md"
+                            }
+                          ]
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "55d3ac2663dbda965100-1c8e2bf8541698a552a7",
+                  "file": "tests/bize-sat-flow.test.ts",
+                  "line": 48,
+                  "column": 9
+                },
+                {
+                  "title": "✅ Kategori seçimi - Aksesuarlar",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 3,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 1478,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:39:38.723Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "55d3ac2663dbda965100-68134887afe65a6de4e4",
+                  "file": "tests/bize-sat-flow.test.ts",
+                  "line": 60,
+                  "column": 9
+                },
+                {
+                  "title": "✅ Kategori seçimi - Oyun Konsolları",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 3,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 1435,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:39:40.327Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "55d3ac2663dbda965100-720af26f9890d43f747e",
+                  "file": "tests/bize-sat-flow.test.ts",
+                  "line": 72,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "Responsive Tasarım Testleri",
+              "file": "tests/bize-sat-flow.test.ts",
+              "line": 86,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "✅ Mobile view - Kategoriler görüntülenmesi",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 3,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 467,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:39:41.767Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "55d3ac2663dbda965100-c3ba7db93bbbed2204da",
+                  "file": "tests/bize-sat-flow.test.ts",
+                  "line": 88,
+                  "column": 9
+                },
+                {
+                  "title": "✅ Tablet view - Grid layout",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 3,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 484,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:39:42.242Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "55d3ac2663dbda965100-32e0fa780e14a39b4b8e",
+                  "file": "tests/bize-sat-flow.test.ts",
+                  "line": 99,
+                  "column": 9
+                },
+                {
+                  "title": "✅ Desktop view - Full layout",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 3,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 905,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:39:42.736Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "55d3ac2663dbda965100-e35e14a20b6befaf7b61",
+                  "file": "tests/bize-sat-flow.test.ts",
+                  "line": 107,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "İlan Oluşturma Senaryoları",
+              "file": "tests/bize-sat-flow.test.ts",
+              "line": 117,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "✅ İlan oluşturma formu açılması",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 3,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 654,
+                          "error": {
+                            "message": "Error: locator.click: Error: strict mode violation: getByText(/iş aç|yeni iş|satış|create/i) resolved to 2 elements:\n    1) <p>Ürün satışı için önce giriş yapmanız gerekiyor.</p> aka getByText('Ürün satışı için önce giriş')\n    2) <a href=\"/satis-sozlesmesi\">Satış Sözleşmesi</a> aka getByRole('link', { name: 'Satış Sözleşmesi' })\n\nCall log:\n\u001b[2m  - waiting for getByText(/iş aç|yeni iş|satış|create/i)\u001b[22m\n",
+                            "stack": "Error: locator.click: Error: strict mode violation: getByText(/iş aç|yeni iş|satış|create/i) resolved to 2 elements:\n    1) <p>Ürün satışı için önce giriş yapmanız gerekiyor.</p> aka getByText('Ürün satışı için önce giriş')\n    2) <a href=\"/satis-sozlesmesi\">Satış Sözleşmesi</a> aka getByRole('link', { name: 'Satış Sözleşmesi' })\n\nCall log:\n\u001b[2m  - waiting for getByText(/iş aç|yeni iş|satış|create/i)\u001b[22m\n\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/bize-sat-flow.test.ts:124:32",
+                            "location": {
+                              "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/bize-sat-flow.test.ts",
+                              "column": 32,
+                              "line": 124
+                            },
+                            "snippet": "  122 |       const createListingBtn = page.getByText(/iş aç|yeni iş|satış|create/i);\n  123 |       if (createListingBtn) {\n> 124 |         await createListingBtn.click();\n      |                                ^\n  125 |\n  126 |         // Form görüntülenmesi bekleniyor\n  127 |         await expect(page.getByLabel(/başlık|title|fiyat|price/i)).toBeDefined();"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/bize-sat-flow.test.ts",
+                                "column": 32,
+                                "line": 124
+                              },
+                              "message": "Error: locator.click: Error: strict mode violation: getByText(/iş aç|yeni iş|satış|create/i) resolved to 2 elements:\n    1) <p>Ürün satışı için önce giriş yapmanız gerekiyor.</p> aka getByText('Ürün satışı için önce giriş')\n    2) <a href=\"/satis-sozlesmesi\">Satış Sözleşmesi</a> aka getByRole('link', { name: 'Satış Sözleşmesi' })\n\nCall log:\n\u001b[2m  - waiting for getByText(/iş aç|yeni iş|satış|create/i)\u001b[22m\n\n\n  122 |       const createListingBtn = page.getByText(/iş aç|yeni iş|satış|create/i);\n  123 |       if (createListingBtn) {\n> 124 |         await createListingBtn.click();\n      |                                ^\n  125 |\n  126 |         // Form görüntülenmesi bekleniyor\n  127 |         await expect(page.getByLabel(/başlık|title|fiyat|price/i)).toBeDefined();\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/bize-sat-flow.test.ts:124:32"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:39:43.653Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-bize-sat-flow-Bize-S-f614a-an-oluşturma-formu-açılması/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/bize-sat-flow.test.ts",
+                            "column": 32,
+                            "line": 124
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "55d3ac2663dbda965100-7a97d1c292041b988105",
+                  "file": "tests/bize-sat-flow.test.ts",
+                  "line": 119,
+                  "column": 9
+                },
+                {
+                  "title": "✅ Zorunlu alanlar validation",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 4,
+                          "parallelIndex": 0,
+                          "status": "timedOut",
+                          "duration": 30030,
+                          "error": {
+                            "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                            "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                          },
+                          "errors": [
+                            {
+                              "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                            },
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/bize-sat-flow.test.ts",
+                                "column": 32,
+                                "line": 136
+                              },
+                              "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText(/iş aç|yeni iş/i)\u001b[22m\n\n\n  134 |       const createListingBtn = page.getByText(/iş aç|yeni iş/i);\n  135 |       if (createListingBtn) {\n> 136 |         await createListingBtn.click();\n      |                                ^\n  137 |\n  138 |         // Boş form submit\n  139 |         const submitBtn = page.getByRole('button', { name: /submit|gönder/i });\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/bize-sat-flow.test.ts:136:32"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:39:44.615Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-bize-sat-flow-Bize-S-3b41d--Zorunlu-alanlar-validation/error-context.md"
+                            }
+                          ]
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "55d3ac2663dbda965100-bf6373c8b6b62e6c16b2",
+                  "file": "tests/bize-sat-flow.test.ts",
+                  "line": 131,
+                  "column": 9
+                },
+                {
+                  "title": "✅ Resim yüklemesi",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 5,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 656,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:40:15.101Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "55d3ac2663dbda965100-e936700860150e32c494",
+                  "file": "tests/bize-sat-flow.test.ts",
+                  "line": 149,
+                  "column": 9
+                },
+                {
+                  "title": "✅ Fiyat girişi validation",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 5,
+                          "parallelIndex": 0,
+                          "status": "timedOut",
+                          "duration": 30022,
+                          "error": {
+                            "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                            "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                          },
+                          "errors": [
+                            {
+                              "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                            },
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/bize-sat-flow.test.ts",
+                                "column": 26,
+                                "line": 164
+                              },
+                              "message": "Error: locator.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByLabel(/fiyat|price/i)\u001b[22m\n\n\n  162 |       if (priceInput) {\n  163 |         // Negatif fiyat girişi\n> 164 |         await priceInput.fill('-100');\n      |                          ^\n  165 |\n  166 |         const submitBtn = page.getByRole('button', { name: /submit/i });\n  167 |         if (submitBtn) {\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/bize-sat-flow.test.ts:164:26"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:40:15.917Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-bize-sat-flow-Bize-S-0f6bf-ı-✅-Fiyat-girişi-validation/error-context.md"
+                            }
+                          ]
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "55d3ac2663dbda965100-c4f10a49351a3b59e091",
+                  "file": "tests/bize-sat-flow.test.ts",
+                  "line": 158,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "WhatsApp Entegrasyonu",
+              "file": "tests/bize-sat-flow.test.ts",
+              "line": 178,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "✅ WhatsApp butonu görüntülenmesi",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 6,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 741,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:40:46.261Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "55d3ac2663dbda965100-b58ee45f659926c236a0",
+                  "file": "tests/bize-sat-flow.test.ts",
+                  "line": 180,
+                  "column": 9
+                },
+                {
+                  "title": "✅ WhatsApp linki doğru format",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 6,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 638,
+                          "error": {
+                            "message": "Error: locator.getAttribute: Error: strict mode violation: locator('a[href*=\"wa.me\"]') resolved to 2 elements:\n    1) <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://wa.me/905385793412?text=Merhaba! Düşük Bütçe'den ürün hakkında bilgi almak istiyorum.\">…</a> aka getByRole('link').filter({ hasText: /^$/ }).nth(4)\n    2) <a target=\"_blank\" class=\"whatsapp-button\" rel=\"noopener noreferrer\" href=\"https://wa.me/905385793412?text=Merhaba! Düşük Bütçe'den ürün hakkında bilgi almak istiyorum.\">…</a> aka getByRole('link', { name: 'WhatsApp Destek Hattı' })\n\nCall log:\n\u001b[2m  - waiting for locator('a[href*=\"wa.me\"]')\u001b[22m\n",
+                            "stack": "Error: locator.getAttribute: Error: strict mode violation: locator('a[href*=\"wa.me\"]') resolved to 2 elements:\n    1) <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://wa.me/905385793412?text=Merhaba! Düşük Bütçe'den ürün hakkında bilgi almak istiyorum.\">…</a> aka getByRole('link').filter({ hasText: /^$/ }).nth(4)\n    2) <a target=\"_blank\" class=\"whatsapp-button\" rel=\"noopener noreferrer\" href=\"https://wa.me/905385793412?text=Merhaba! Düşük Bütçe'den ürün hakkında bilgi almak istiyorum.\">…</a> aka getByRole('link', { name: 'WhatsApp Destek Hattı' })\n\nCall log:\n\u001b[2m  - waiting for locator('a[href*=\"wa.me\"]')\u001b[22m\n\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/bize-sat-flow.test.ts:192:41",
+                            "location": {
+                              "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/bize-sat-flow.test.ts",
+                              "column": 41,
+                              "line": 192
+                            },
+                            "snippet": "  190 |       const whatsappLink = page.locator('a[href*=\"wa.me\"]');\n  191 |       if (await whatsappLink.count() > 0) {\n> 192 |         const href = await whatsappLink.getAttribute('href');\n      |                                         ^\n  193 |         expect(href).toContain('wa.me');\n  194 |       }\n  195 |     });"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/bize-sat-flow.test.ts",
+                                "column": 41,
+                                "line": 192
+                              },
+                              "message": "Error: locator.getAttribute: Error: strict mode violation: locator('a[href*=\"wa.me\"]') resolved to 2 elements:\n    1) <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://wa.me/905385793412?text=Merhaba! Düşük Bütçe'den ürün hakkında bilgi almak istiyorum.\">…</a> aka getByRole('link').filter({ hasText: /^$/ }).nth(4)\n    2) <a target=\"_blank\" class=\"whatsapp-button\" rel=\"noopener noreferrer\" href=\"https://wa.me/905385793412?text=Merhaba! Düşük Bütçe'den ürün hakkında bilgi almak istiyorum.\">…</a> aka getByRole('link', { name: 'WhatsApp Destek Hattı' })\n\nCall log:\n\u001b[2m  - waiting for locator('a[href*=\"wa.me\"]')\u001b[22m\n\n\n  190 |       const whatsappLink = page.locator('a[href*=\"wa.me\"]');\n  191 |       if (await whatsappLink.count() > 0) {\n> 192 |         const href = await whatsappLink.getAttribute('href');\n      |                                         ^\n  193 |         expect(href).toContain('wa.me');\n  194 |       }\n  195 |     });\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/bize-sat-flow.test.ts:192:41"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:40:47.164Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-bize-sat-flow-Bize-S-ef449-WhatsApp-linki-doğru-format/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/bize-sat-flow.test.ts",
+                            "column": 41,
+                            "line": 192
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "55d3ac2663dbda965100-45fd521445871fc0d756",
+                  "file": "tests/bize-sat-flow.test.ts",
+                  "line": 187,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "Arama Fonksiyonu",
+              "file": "tests/bize-sat-flow.test.ts",
+              "line": 199,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "✅ Arama kutusu görüntülenmesi",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 7,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 750,
+                          "error": {
+                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByPlaceholder(/ara|search/i)\nExpected: visible\nError: strict mode violation: getByPlaceholder(/ara|search/i) resolved to 2 elements:\n    1) <input value=\"\" type=\"text\" placeholder=\"Ürün, kategori veya marka ara...\"/> aka getByRole('textbox', { name: 'Ürün, kategori veya marka ara' })\n    2) <input value=\"\" type=\"text\" placeholder=\"Ürün, kategori veya marka ara...\"/> aka getByPlaceholder('Ürün, kategori veya marka ara').nth(1)\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByPlaceholder(/ara|search/i) with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByPlaceholder(/ara|search/i)\u001b[22m\n",
+                            "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByPlaceholder(/ara|search/i)\nExpected: visible\nError: strict mode violation: getByPlaceholder(/ara|search/i) resolved to 2 elements:\n    1) <input value=\"\" type=\"text\" placeholder=\"Ürün, kategori veya marka ara...\"/> aka getByRole('textbox', { name: 'Ürün, kategori veya marka ara' })\n    2) <input value=\"\" type=\"text\" placeholder=\"Ürün, kategori veya marka ara...\"/> aka getByPlaceholder('Ürün, kategori veya marka ara').nth(1)\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByPlaceholder(/ara|search/i) with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByPlaceholder(/ara|search/i)\u001b[22m\n\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/bize-sat-flow.test.ts:205:31",
+                            "location": {
+                              "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/bize-sat-flow.test.ts",
+                              "column": 31,
+                              "line": 205
+                            },
+                            "snippet": "  203 |\n  204 |       const searchBox = page.getByPlaceholder(/ara|search/i);\n> 205 |       await expect(searchBox).toBeVisible();\n      |                               ^\n  206 |     });\n  207 |\n  208 |     test('✅ Kategoriye göre arama', async ({ page }) => {"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/bize-sat-flow.test.ts",
+                                "column": 31,
+                                "line": 205
+                              },
+                              "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByPlaceholder(/ara|search/i)\nExpected: visible\nError: strict mode violation: getByPlaceholder(/ara|search/i) resolved to 2 elements:\n    1) <input value=\"\" type=\"text\" placeholder=\"Ürün, kategori veya marka ara...\"/> aka getByRole('textbox', { name: 'Ürün, kategori veya marka ara' })\n    2) <input value=\"\" type=\"text\" placeholder=\"Ürün, kategori veya marka ara...\"/> aka getByPlaceholder('Ürün, kategori veya marka ara').nth(1)\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByPlaceholder(/ara|search/i) with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByPlaceholder(/ara|search/i)\u001b[22m\n\n\n  203 |\n  204 |       const searchBox = page.getByPlaceholder(/ara|search/i);\n> 205 |       await expect(searchBox).toBeVisible();\n      |                               ^\n  206 |     });\n  207 |\n  208 |     test('✅ Kategoriye göre arama', async ({ page }) => {\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/bize-sat-flow.test.ts:205:31"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:40:48.150Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-bize-sat-flow-Bize-S-4cd30-Arama-kutusu-görüntülenmesi/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/bize-sat-flow.test.ts",
+                            "column": 31,
+                            "line": 205
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "55d3ac2663dbda965100-7f3682dc7b5151a8e8da",
+                  "file": "tests/bize-sat-flow.test.ts",
+                  "line": 201,
+                  "column": 9
+                },
+                {
+                  "title": "✅ Kategoriye göre arama",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 8,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 871,
+                          "error": {
+                            "message": "Error: locator.fill: Error: strict mode violation: getByPlaceholder(/ara|search/i) resolved to 2 elements:\n    1) <input value=\"\" type=\"text\" placeholder=\"Ürün, kategori veya marka ara...\"/> aka getByRole('textbox', { name: 'Ürün, kategori veya marka ara' })\n    2) <input value=\"\" type=\"text\" placeholder=\"Ürün, kategori veya marka ara...\"/> aka getByPlaceholder('Ürün, kategori veya marka ara').nth(1)\n\nCall log:\n\u001b[2m  - waiting for getByPlaceholder(/ara|search/i)\u001b[22m\n",
+                            "stack": "Error: locator.fill: Error: strict mode violation: getByPlaceholder(/ara|search/i) resolved to 2 elements:\n    1) <input value=\"\" type=\"text\" placeholder=\"Ürün, kategori veya marka ara...\"/> aka getByRole('textbox', { name: 'Ürün, kategori veya marka ara' })\n    2) <input value=\"\" type=\"text\" placeholder=\"Ürün, kategori veya marka ara...\"/> aka getByPlaceholder('Ürün, kategori veya marka ara').nth(1)\n\nCall log:\n\u001b[2m  - waiting for getByPlaceholder(/ara|search/i)\u001b[22m\n\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/bize-sat-flow.test.ts:213:25",
+                            "location": {
+                              "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/bize-sat-flow.test.ts",
+                              "column": 25,
+                              "line": 213
+                            },
+                            "snippet": "  211 |       const searchBox = page.getByPlaceholder(/ara|search/i);\n  212 |       if (searchBox) {\n> 213 |         await searchBox.fill('RAM');\n      |                         ^\n  214 |\n  215 |         // Arama sonuçlarında RAM kategorisi bulunması bekleniyor\n  216 |         const results = page.locator('[class*=\"search-result\"]');"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/bize-sat-flow.test.ts",
+                                "column": 25,
+                                "line": 213
+                              },
+                              "message": "Error: locator.fill: Error: strict mode violation: getByPlaceholder(/ara|search/i) resolved to 2 elements:\n    1) <input value=\"\" type=\"text\" placeholder=\"Ürün, kategori veya marka ara...\"/> aka getByRole('textbox', { name: 'Ürün, kategori veya marka ara' })\n    2) <input value=\"\" type=\"text\" placeholder=\"Ürün, kategori veya marka ara...\"/> aka getByPlaceholder('Ürün, kategori veya marka ara').nth(1)\n\nCall log:\n\u001b[2m  - waiting for getByPlaceholder(/ara|search/i)\u001b[22m\n\n\n  211 |       const searchBox = page.getByPlaceholder(/ara|search/i);\n  212 |       if (searchBox) {\n> 213 |         await searchBox.fill('RAM');\n      |                         ^\n  214 |\n  215 |         // Arama sonuçlarında RAM kategorisi bulunması bekleniyor\n  216 |         const results = page.locator('[class*=\"search-result\"]');\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/bize-sat-flow.test.ts:213:25"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:40:49.339Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-bize-sat-flow-Bize-S-994a3-onu-✅-Kategoriye-göre-arama/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/bize-sat-flow.test.ts",
+                            "column": 25,
+                            "line": 213
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "55d3ac2663dbda965100-0846add2d5d585afd9b1",
+                  "file": "tests/bize-sat-flow.test.ts",
+                  "line": 208,
+                  "column": 9
+                },
+                {
+                  "title": "✅ Boş arama sonuçları",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 9,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 905,
+                          "error": {
+                            "message": "Error: locator.fill: Error: strict mode violation: getByPlaceholder(/ara|search/i) resolved to 2 elements:\n    1) <input value=\"\" type=\"text\" placeholder=\"Ürün, kategori veya marka ara...\"/> aka getByRole('textbox', { name: 'Ürün, kategori veya marka ara' })\n    2) <input value=\"\" type=\"text\" placeholder=\"Ürün, kategori veya marka ara...\"/> aka getByPlaceholder('Ürün, kategori veya marka ara').nth(1)\n\nCall log:\n\u001b[2m  - waiting for getByPlaceholder(/ara|search/i)\u001b[22m\n",
+                            "stack": "Error: locator.fill: Error: strict mode violation: getByPlaceholder(/ara|search/i) resolved to 2 elements:\n    1) <input value=\"\" type=\"text\" placeholder=\"Ürün, kategori veya marka ara...\"/> aka getByRole('textbox', { name: 'Ürün, kategori veya marka ara' })\n    2) <input value=\"\" type=\"text\" placeholder=\"Ürün, kategori veya marka ara...\"/> aka getByPlaceholder('Ürün, kategori veya marka ara').nth(1)\n\nCall log:\n\u001b[2m  - waiting for getByPlaceholder(/ara|search/i)\u001b[22m\n\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/bize-sat-flow.test.ts:226:25",
+                            "location": {
+                              "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/bize-sat-flow.test.ts",
+                              "column": 25,
+                              "line": 226
+                            },
+                            "snippet": "  224 |       const searchBox = page.getByPlaceholder(/ara|search/i);\n  225 |       if (searchBox) {\n> 226 |         await searchBox.fill('XYZ123NonExistent');\n      |                         ^\n  227 |\n  228 |         // No results mesajı bekleniyor\n  229 |         const noResults = page.getByText(/not.*found|sonuç.*yok|no.*results/i);"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/bize-sat-flow.test.ts",
+                                "column": 25,
+                                "line": 226
+                              },
+                              "message": "Error: locator.fill: Error: strict mode violation: getByPlaceholder(/ara|search/i) resolved to 2 elements:\n    1) <input value=\"\" type=\"text\" placeholder=\"Ürün, kategori veya marka ara...\"/> aka getByRole('textbox', { name: 'Ürün, kategori veya marka ara' })\n    2) <input value=\"\" type=\"text\" placeholder=\"Ürün, kategori veya marka ara...\"/> aka getByPlaceholder('Ürün, kategori veya marka ara').nth(1)\n\nCall log:\n\u001b[2m  - waiting for getByPlaceholder(/ara|search/i)\u001b[22m\n\n\n  224 |       const searchBox = page.getByPlaceholder(/ara|search/i);\n  225 |       if (searchBox) {\n> 226 |         await searchBox.fill('XYZ123NonExistent');\n      |                         ^\n  227 |\n  228 |         // No results mesajı bekleniyor\n  229 |         const noResults = page.getByText(/not.*found|sonuç.*yok|no.*results/i);\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/bize-sat-flow.test.ts:226:25"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:40:50.610Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-bize-sat-flow-Bize-S-4ebe2-iyonu-✅-Boş-arama-sonuçları/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/bize-sat-flow.test.ts",
+                            "column": 25,
+                            "line": 226
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "55d3ac2663dbda965100-347e7ee5fbfbc6660cfa",
+                  "file": "tests/bize-sat-flow.test.ts",
+                  "line": 221,
+                  "column": 9
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-09-20T04:39:00.267Z",
+    "duration": 111406.177,
+    "expected": 8,
+    "skipped": 0,
+    "unexpected": 10,
+    "flaky": 0
+  }
+}

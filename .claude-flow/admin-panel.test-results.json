@@ -1,0 +1,1819 @@
+{
+  "config": {
+    "argv": [
+      "/Users/ozan.cidik/.nvm/versions/node/v20.20.0/bin/node",
+      "/Users/ozan.cidik/Desktop/dusukbutce-web/node_modules/.bin/playwright",
+      "test",
+      "tests/admin-panel.test.ts",
+      "--reporter=json"
+    ],
+    "rootDir": "/Users/ozan.cidik/Desktop/dusukbutce-web",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "/Users/ozan.cidik/Desktop/dusukbutce-web",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 4,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "tests/admin-panel.test.ts",
+      "file": "tests/admin-panel.test.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Admin Panel Testleri",
+          "file": "tests/admin-panel.test.ts",
+          "line": 5,
+          "column": 6,
+          "specs": [],
+          "suites": [
+            {
+              "title": "Admin Panel Erişimi",
+              "file": "tests/admin-panel.test.ts",
+              "line": 8,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "✅ Admin sayfasına erişim",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 3635,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:39:01.117Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "8782dea60d90ab9a2d17-4fdd840388d2c3097d7f",
+                  "file": "tests/admin-panel.test.ts",
+                  "line": 10,
+                  "column": 9
+                },
+                {
+                  "title": "❌ Admin olmayan kullanıcı erişimi",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 917,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:39:04.922Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "8782dea60d90ab9a2d17-8df7713d36a76518a105",
+                  "file": "tests/admin-panel.test.ts",
+                  "line": 18,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "Admin Dashboard",
+              "file": "tests/admin-panel.test.ts",
+              "line": 29,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "✅ Dashboard metriği gösterimi",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 996,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:39:05.856Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "8782dea60d90ab9a2d17-1f48ac2152b7c5aa15ae",
+                  "file": "tests/admin-panel.test.ts",
+                  "line": 31,
+                  "column": 9
+                },
+                {
+                  "title": "✅ Kullanıcı sayısı",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 1296,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:39:06.861Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "8782dea60d90ab9a2d17-10ed3d23669111f5a36f",
+                  "file": "tests/admin-panel.test.ts",
+                  "line": 39,
+                  "column": 9
+                },
+                {
+                  "title": "✅ İlan sayısı",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 943,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:39:08.171Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "8782dea60d90ab9a2d17-d9dd53ae47b76c637a60",
+                  "file": "tests/admin-panel.test.ts",
+                  "line": 46,
+                  "column": 9
+                },
+                {
+                  "title": "✅ Teklif sayısı",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 565,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:39:09.125Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "8782dea60d90ab9a2d17-b77b359a1bb0551cc9cf",
+                  "file": "tests/admin-panel.test.ts",
+                  "line": 53,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "Kullanıcı Yönetimi",
+              "file": "tests/admin-panel.test.ts",
+              "line": 62,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "✅ Kullanıcı listesi",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 637,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:39:09.736Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "8782dea60d90ab9a2d17-4cb93ac1bfe2a38b764b",
+                  "file": "tests/admin-panel.test.ts",
+                  "line": 64,
+                  "column": 9
+                },
+                {
+                  "title": "✅ Kullanıcı arama",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 989,
+                          "error": {
+                            "message": "Error: locator.fill: Error: strict mode violation: getByPlaceholder(/ara|search/i) resolved to 2 elements:\n    1) <input value=\"\" type=\"text\" placeholder=\"Ürün, kategori veya marka ara...\"/> aka getByRole('textbox', { name: 'Ürün, kategori veya marka ara' })\n    2) <input value=\"\" type=\"text\" placeholder=\"Ürün, kategori veya marka ara...\"/> aka getByPlaceholder('Ürün, kategori veya marka ara').nth(1)\n\nCall log:\n\u001b[2m  - waiting for getByPlaceholder(/ara|search/i)\u001b[22m\n",
+                            "stack": "Error: locator.fill: Error: strict mode violation: getByPlaceholder(/ara|search/i) resolved to 2 elements:\n    1) <input value=\"\" type=\"text\" placeholder=\"Ürün, kategori veya marka ara...\"/> aka getByRole('textbox', { name: 'Ürün, kategori veya marka ara' })\n    2) <input value=\"\" type=\"text\" placeholder=\"Ürün, kategori veya marka ara...\"/> aka getByPlaceholder('Ürün, kategori veya marka ara').nth(1)\n\nCall log:\n\u001b[2m  - waiting for getByPlaceholder(/ara|search/i)\u001b[22m\n\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts:76:25",
+                            "location": {
+                              "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                              "column": 25,
+                              "line": 76
+                            },
+                            "snippet": "  74 |       const searchBox = page.getByPlaceholder(/ara|search/i);\n  75 |       if (searchBox) {\n> 76 |         await searchBox.fill('test');\n     |                         ^\n  77 |\n  78 |         // Arama sonuçları bekleniyor\n  79 |         const results = page.locator('[class*=\"user-row\"]');"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                                "column": 25,
+                                "line": 76
+                              },
+                              "message": "Error: locator.fill: Error: strict mode violation: getByPlaceholder(/ara|search/i) resolved to 2 elements:\n    1) <input value=\"\" type=\"text\" placeholder=\"Ürün, kategori veya marka ara...\"/> aka getByRole('textbox', { name: 'Ürün, kategori veya marka ara' })\n    2) <input value=\"\" type=\"text\" placeholder=\"Ürün, kategori veya marka ara...\"/> aka getByPlaceholder('Ürün, kategori veya marka ara').nth(1)\n\nCall log:\n\u001b[2m  - waiting for getByPlaceholder(/ara|search/i)\u001b[22m\n\n\n  74 |       const searchBox = page.getByPlaceholder(/ara|search/i);\n  75 |       if (searchBox) {\n> 76 |         await searchBox.fill('test');\n     |                         ^\n  77 |\n  78 |         // Arama sonuçları bekleniyor\n  79 |         const results = page.locator('[class*=\"user-row\"]');\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts:76:25"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:39:10.390Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-admin-panel-Admin-Pa-cdf9f--Yönetimi-✅-Kullanıcı-arama/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                            "column": 25,
+                            "line": 76
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "8782dea60d90ab9a2d17-353d08da137dfeea67b1",
+                  "file": "tests/admin-panel.test.ts",
+                  "line": 71,
+                  "column": 9
+                },
+                {
+                  "title": "✅ Kullanıcı detayları",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 1,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 576,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:39:11.753Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "8782dea60d90ab9a2d17-15e56f52bfc53c394839",
+                  "file": "tests/admin-panel.test.ts",
+                  "line": 84,
+                  "column": 9
+                },
+                {
+                  "title": "✅ Kullanıcı düzenleme",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 1,
+                          "parallelIndex": 0,
+                          "status": "timedOut",
+                          "duration": 30034,
+                          "error": {
+                            "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                            "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                          },
+                          "errors": [
+                            {
+                              "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                            },
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                                "column": 23,
+                                "line": 102
+                              },
+                              "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /düzenle|edit/i }).first()\u001b[22m\n\n\n  100 |       const editBtn = page.getByRole('button', { name: /düzenle|edit/i }).first();\n  101 |       if (editBtn) {\n> 102 |         await editBtn.click();\n      |                       ^\n  103 |\n  104 |         // Edit formu açılmalı\n  105 |         const nameField = page.getByLabel(/ad|name/i);\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts:102:23"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:39:12.472Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-admin-panel-Admin-Pa-33286-etimi-✅-Kullanıcı-düzenleme/error-context.md"
+                            }
+                          ]
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "8782dea60d90ab9a2d17-01646c3be2534e8a9623",
+                  "file": "tests/admin-panel.test.ts",
+                  "line": 97,
+                  "column": 9
+                },
+                {
+                  "title": "❌ Kullanıcı silme - Onay dialog",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 2,
+                          "parallelIndex": 0,
+                          "status": "timedOut",
+                          "duration": 30019,
+                          "error": {
+                            "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                            "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                          },
+                          "errors": [
+                            {
+                              "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                            },
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                                "column": 25,
+                                "line": 115
+                              },
+                              "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /sil|delete/i }).first()\u001b[22m\n\n\n  113 |       const deleteBtn = page.getByRole('button', { name: /sil|delete/i }).first();\n  114 |       if (deleteBtn) {\n> 115 |         await deleteBtn.click();\n      |                         ^\n  116 |\n  117 |         // Onay dialog bekleniyor\n  118 |         const confirmBtn = page.getByRole('button', { name: /evet|yes|confirm/i });\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts:115:25"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:39:42.961Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-admin-panel-Admin-Pa-8482f-llanıcı-silme---Onay-dialog/error-context.md"
+                            }
+                          ]
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "8782dea60d90ab9a2d17-d1be92cb3aadc9f23597",
+                  "file": "tests/admin-panel.test.ts",
+                  "line": 110,
+                  "column": 9
+                },
+                {
+                  "title": "✅ Rol yönetimi",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 3,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 589,
+                          "error": {
+                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0\u001b[39m\nReceived:   \u001b[31m0\u001b[39m",
+                            "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0\u001b[39m\nReceived:   \u001b[31m0\u001b[39m\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts:129:39",
+                            "location": {
+                              "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                              "column": 39,
+                              "line": 129
+                            },
+                            "snippet": "  127 |       if (roleSelect) {\n  128 |         const options = roleSelect.locator('option');\n> 129 |         expect(await options.count()).toBeGreaterThan(0);\n      |                                       ^\n  130 |       }\n  131 |     });\n  132 |   });"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                                "column": 39,
+                                "line": 129
+                              },
+                              "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0\u001b[39m\nReceived:   \u001b[31m0\u001b[39m\n\n  127 |       if (roleSelect) {\n  128 |         const options = roleSelect.locator('option');\n> 129 |         expect(await options.count()).toBeGreaterThan(0);\n      |                                       ^\n  130 |       }\n  131 |     });\n  132 |   });\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts:129:39"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:40:13.377Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-admin-panel-Admin-Pa-e6743-ıcı-Yönetimi-✅-Rol-yönetimi/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                            "column": 39,
+                            "line": 129
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "8782dea60d90ab9a2d17-14ff908303487fcdd060",
+                  "file": "tests/admin-panel.test.ts",
+                  "line": 123,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "İlan Yönetimi",
+              "file": "tests/admin-panel.test.ts",
+              "line": 135,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "✅ İlan listesi",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 4,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 460,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:40:14.358Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "8782dea60d90ab9a2d17-cbff0855c081212e9bb6",
+                  "file": "tests/admin-panel.test.ts",
+                  "line": 137,
+                  "column": 9
+                },
+                {
+                  "title": "✅ İlan onaylama",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 4,
+                          "parallelIndex": 0,
+                          "status": "timedOut",
+                          "duration": 30037,
+                          "error": {
+                            "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                            "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                          },
+                          "errors": [
+                            {
+                              "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                            },
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                                "column": 26,
+                                "line": 149
+                              },
+                              "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /onayla|approve/i }).first()\u001b[22m\n\n\n  147 |       const approveBtn = page.getByRole('button', { name: /onayla|approve/i }).first();\n  148 |       if (approveBtn) {\n> 149 |         await approveBtn.click();\n      |                          ^\n  150 |\n  151 |         // Success mesajı bekleniyor\n  152 |         const successMsg = page.getByText(/approved|onaylandı/i);\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts:149:26"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:40:14.917Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-admin-panel-Admin-Pa-7dd25-an-Yönetimi-✅-İlan-onaylama/error-context.md"
+                            }
+                          ]
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "8782dea60d90ab9a2d17-1bb8f037ab3fa02bfbcf",
+                  "file": "tests/admin-panel.test.ts",
+                  "line": 144,
+                  "column": 9
+                },
+                {
+                  "title": "✅ İlan reddetme",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 5,
+                          "parallelIndex": 0,
+                          "status": "timedOut",
+                          "duration": 30032,
+                          "error": {
+                            "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                            "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                          },
+                          "errors": [
+                            {
+                              "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                            },
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                                "column": 25,
+                                "line": 162
+                              },
+                              "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /reddet|reject/i }).first()\u001b[22m\n\n\n  160 |       const rejectBtn = page.getByRole('button', { name: /reddet|reject/i }).first();\n  161 |       if (rejectBtn) {\n> 162 |         await rejectBtn.click();\n      |                         ^\n  163 |\n  164 |         // Rejection reason dialog bekleniyor\n  165 |         const reasonInput = page.getByLabel(/neden|reason/i);\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts:162:25"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:40:45.285Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-admin-panel-Admin-Pa-8eaaf-an-Yönetimi-✅-İlan-reddetme/error-context.md"
+                            }
+                          ]
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "8782dea60d90ab9a2d17-094ea421c7274906b901",
+                  "file": "tests/admin-panel.test.ts",
+                  "line": 157,
+                  "column": 9
+                },
+                {
+                  "title": "✅ İlan silme",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 6,
+                          "parallelIndex": 0,
+                          "status": "timedOut",
+                          "duration": 30039,
+                          "error": {
+                            "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                            "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                          },
+                          "errors": [
+                            {
+                              "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                            },
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                                "column": 25,
+                                "line": 175
+                              },
+                              "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /sil|delete/i }).first()\u001b[22m\n\n\n  173 |       const deleteBtn = page.getByRole('button', { name: /sil|delete/i }).first();\n  174 |       if (deleteBtn) {\n> 175 |         await deleteBtn.click();\n      |                         ^\n  176 |\n  177 |         // Onay dialog bekleniyor\n  178 |         const confirmBtn = page.getByRole('button', { name: /confirm|yes/i });\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts:175:25"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:41:15.811Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-admin-panel-Admin-Pa-bbb56--İlan-Yönetimi-✅-İlan-silme/error-context.md"
+                            }
+                          ]
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "8782dea60d90ab9a2d17-09e72d11247b1481df4c",
+                  "file": "tests/admin-panel.test.ts",
+                  "line": 170,
+                  "column": 9
+                },
+                {
+                  "title": "✅ İlan filtreleme - Durum",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 7,
+                          "parallelIndex": 0,
+                          "status": "timedOut",
+                          "duration": 30020,
+                          "error": {
+                            "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                            "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                          },
+                          "errors": [
+                            {
+                              "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                            },
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                                "column": 28,
+                                "line": 188
+                              },
+                              "message": "Error: locator.selectOption: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByLabel(/durum|status/i)\u001b[22m\n\n\n  186 |       const statusFilter = page.getByLabel(/durum|status/i);\n  187 |       if (statusFilter) {\n> 188 |         await statusFilter.selectOption('pending');\n      |                            ^\n  189 |\n  190 |         // Filtre uygulanmalı\n  191 |         const results = page.locator('[class*=\"listing-row\"]');\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts:188:28"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:41:46.277Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-admin-panel-Admin-Pa-386dd-i-✅-İlan-filtreleme---Durum/error-context.md"
+                            }
+                          ]
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "8782dea60d90ab9a2d17-4b7865d983f4db91267f",
+                  "file": "tests/admin-panel.test.ts",
+                  "line": 183,
+                  "column": 9
+                },
+                {
+                  "title": "✅ İlan filtreleme - Kategori",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 8,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 1118,
+                          "error": {
+                            "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/admin/listings\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin/listings\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/admin/listings\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin/listings\", waiting until \"load\"\u001b[22m\n\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts:197:18",
+                            "location": {
+                              "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                              "column": 18,
+                              "line": 197
+                            },
+                            "snippet": "  195 |\n  196 |     test('✅ İlan filtreleme - Kategori', async ({ page }) => {\n> 197 |       await page.goto(`${BASE_URL}/admin/listings`);\n      |                  ^\n  198 |\n  199 |       const categoryFilter = page.getByLabel(/kategori|category/i);\n  200 |       if (categoryFilter) {"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                                "column": 18,
+                                "line": 197
+                              },
+                              "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/admin/listings\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin/listings\", waiting until \"load\"\u001b[22m\n\n\n  195 |\n  196 |     test('✅ İlan filtreleme - Kategori', async ({ page }) => {\n> 197 |       await page.goto(`${BASE_URL}/admin/listings`);\n      |                  ^\n  198 |\n  199 |       const categoryFilter = page.getByLabel(/kategori|category/i);\n  200 |       if (categoryFilter) {\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts:197:18"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:42:16.910Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-admin-panel-Admin-Pa-16c28--İlan-filtreleme---Kategori/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                            "column": 18,
+                            "line": 197
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "8782dea60d90ab9a2d17-66fe249fac60d7e94d37",
+                  "file": "tests/admin-panel.test.ts",
+                  "line": 196,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "Teklif Yönetimi (Admin)",
+              "file": "tests/admin-panel.test.ts",
+              "line": 211,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "✅ Teklif listesi",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 9,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 1103,
+                          "error": {
+                            "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/admin/offers\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin/offers\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/admin/offers\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin/offers\", waiting until \"load\"\u001b[22m\n\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts:214:18",
+                            "location": {
+                              "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                              "column": 18,
+                              "line": 214
+                            },
+                            "snippet": "  212 |\n  213 |     test('✅ Teklif listesi', async ({ page }) => {\n> 214 |       await page.goto(`${BASE_URL}/admin/offers`);\n      |                  ^\n  215 |\n  216 |       const offerTable = page.locator('[class*=\"table\"]');\n  217 |       expect(await offerTable.count()).toBeGreaterThanOrEqual(0);"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                                "column": 18,
+                                "line": 214
+                              },
+                              "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/admin/offers\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin/offers\", waiting until \"load\"\u001b[22m\n\n\n  212 |\n  213 |     test('✅ Teklif listesi', async ({ page }) => {\n> 214 |       await page.goto(`${BASE_URL}/admin/offers`);\n      |                  ^\n  215 |\n  216 |       const offerTable = page.locator('[class*=\"table\"]');\n  217 |       expect(await offerTable.count()).toBeGreaterThanOrEqual(0);\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts:214:18"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:42:18.376Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-admin-panel-Admin-Pa-58724-timi-Admin-✅-Teklif-listesi/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                            "column": 18,
+                            "line": 214
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "8782dea60d90ab9a2d17-a35d44ae0ff25f82a9e3",
+                  "file": "tests/admin-panel.test.ts",
+                  "line": 213,
+                  "column": 9
+                },
+                {
+                  "title": "✅ Teklif detayları",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 10,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 1130,
+                          "error": {
+                            "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/admin/offers\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin/offers\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/admin/offers\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin/offers\", waiting until \"load\"\u001b[22m\n\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts:221:18",
+                            "location": {
+                              "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                              "column": 18,
+                              "line": 221
+                            },
+                            "snippet": "  219 |\n  220 |     test('✅ Teklif detayları', async ({ page }) => {\n> 221 |       await page.goto(`${BASE_URL}/admin/offers`);\n      |                  ^\n  222 |\n  223 |       const firstOffer = page.locator('[class*=\"offer-row\"]').first();\n  224 |       if (await firstOffer.count() > 0) {"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                                "column": 18,
+                                "line": 221
+                              },
+                              "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/admin/offers\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin/offers\", waiting until \"load\"\u001b[22m\n\n\n  219 |\n  220 |     test('✅ Teklif detayları', async ({ page }) => {\n> 221 |       await page.goto(`${BASE_URL}/admin/offers`);\n      |                  ^\n  222 |\n  223 |       const firstOffer = page.locator('[class*=\"offer-row\"]').first();\n  224 |       if (await firstOffer.count() > 0) {\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts:221:18"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:42:19.830Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-admin-panel-Admin-Pa-8bb1d-mi-Admin-✅-Teklif-detayları/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                            "column": 18,
+                            "line": 221
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "8782dea60d90ab9a2d17-b12bcd5880a5ce9a2281",
+                  "file": "tests/admin-panel.test.ts",
+                  "line": 220,
+                  "column": 9
+                },
+                {
+                  "title": "✅ Anlaşmazlık çözümü",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 11,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 1112,
+                          "error": {
+                            "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/admin/offers\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin/offers\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/admin/offers\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin/offers\", waiting until \"load\"\u001b[22m\n\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts:234:18",
+                            "location": {
+                              "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                              "column": 18,
+                              "line": 234
+                            },
+                            "snippet": "  232 |\n  233 |     test('✅ Anlaşmazlık çözümü', async ({ page }) => {\n> 234 |       await page.goto(`${BASE_URL}/admin/offers`);\n      |                  ^\n  235 |\n  236 |       const disputeBtn = page.getByRole('button', { name: /anlaşmazlık|dispute|resolver/i }).first();\n  237 |       if (disputeBtn) {"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                                "column": 18,
+                                "line": 234
+                              },
+                              "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/admin/offers\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin/offers\", waiting until \"load\"\u001b[22m\n\n\n  232 |\n  233 |     test('✅ Anlaşmazlık çözümü', async ({ page }) => {\n> 234 |       await page.goto(`${BASE_URL}/admin/offers`);\n      |                  ^\n  235 |\n  236 |       const disputeBtn = page.getByRole('button', { name: /anlaşmazlık|dispute|resolver/i }).first();\n  237 |       if (disputeBtn) {\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts:234:18"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:42:21.450Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-admin-panel-Admin-Pa-128ee--Admin-✅-Anlaşmazlık-çözümü/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                            "column": 18,
+                            "line": 234
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "8782dea60d90ab9a2d17-9007f8a32b100c08eca4",
+                  "file": "tests/admin-panel.test.ts",
+                  "line": 233,
+                  "column": 9
+                },
+                {
+                  "title": "✅ Teklif iptal",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 12,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 1122,
+                          "error": {
+                            "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/admin/offers\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin/offers\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/admin/offers\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin/offers\", waiting until \"load\"\u001b[22m\n\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts:247:18",
+                            "location": {
+                              "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                              "column": 18,
+                              "line": 247
+                            },
+                            "snippet": "  245 |\n  246 |     test('✅ Teklif iptal', async ({ page }) => {\n> 247 |       await page.goto(`${BASE_URL}/admin/offers`);\n      |                  ^\n  248 |\n  249 |       const cancelBtn = page.getByRole('button', { name: /iptal|cancel/i }).first();\n  250 |       if (cancelBtn) {"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                                "column": 18,
+                                "line": 247
+                              },
+                              "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/admin/offers\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin/offers\", waiting until \"load\"\u001b[22m\n\n\n  245 |\n  246 |     test('✅ Teklif iptal', async ({ page }) => {\n> 247 |       await page.goto(`${BASE_URL}/admin/offers`);\n      |                  ^\n  248 |\n  249 |       const cancelBtn = page.getByRole('button', { name: /iptal|cancel/i }).first();\n  250 |       if (cancelBtn) {\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts:247:18"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:42:22.929Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-admin-panel-Admin-Pa-90333-netimi-Admin-✅-Teklif-iptal/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                            "column": 18,
+                            "line": 247
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "8782dea60d90ab9a2d17-744aa7cdf1ee8108b69d",
+                  "file": "tests/admin-panel.test.ts",
+                  "line": 246,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "Raporlar",
+              "file": "tests/admin-panel.test.ts",
+              "line": 261,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "✅ Günlük rapor",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 13,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 1115,
+                          "error": {
+                            "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/admin/reports/daily\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin/reports/daily\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/admin/reports/daily\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin/reports/daily\", waiting until \"load\"\u001b[22m\n\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts:264:18",
+                            "location": {
+                              "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                              "column": 18,
+                              "line": 264
+                            },
+                            "snippet": "  262 |\n  263 |     test('✅ Günlük rapor', async ({ page }) => {\n> 264 |       await page.goto(`${BASE_URL}/admin/reports/daily`);\n      |                  ^\n  265 |\n  266 |       // Rapor gösterilmesi bekleniyor\n  267 |       const reportContent = page.locator('[class*=\"report\"]');"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                                "column": 18,
+                                "line": 264
+                              },
+                              "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/admin/reports/daily\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin/reports/daily\", waiting until \"load\"\u001b[22m\n\n\n  262 |\n  263 |     test('✅ Günlük rapor', async ({ page }) => {\n> 264 |       await page.goto(`${BASE_URL}/admin/reports/daily`);\n      |                  ^\n  265 |\n  266 |       // Rapor gösterilmesi bekleniyor\n  267 |       const reportContent = page.locator('[class*=\"report\"]');\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts:264:18"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:42:24.405Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-admin-panel-Admin-Pa-e6c9e-eri-Raporlar-✅-Günlük-rapor/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                            "column": 18,
+                            "line": 264
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "8782dea60d90ab9a2d17-20ad5e1b6a6c67d3fbe6",
+                  "file": "tests/admin-panel.test.ts",
+                  "line": 263,
+                  "column": 9
+                },
+                {
+                  "title": "✅ Haftalık rapor",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 14,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 1096,
+                          "error": {
+                            "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/admin/reports/weekly\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin/reports/weekly\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/admin/reports/weekly\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin/reports/weekly\", waiting until \"load\"\u001b[22m\n\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts:272:18",
+                            "location": {
+                              "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                              "column": 18,
+                              "line": 272
+                            },
+                            "snippet": "  270 |\n  271 |     test('✅ Haftalık rapor', async ({ page }) => {\n> 272 |       await page.goto(`${BASE_URL}/admin/reports/weekly`);\n      |                  ^\n  273 |\n  274 |       // Rapor gösterilmesi bekleniyor\n  275 |       const reportContent = page.locator('[class*=\"report\"]');"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                                "column": 18,
+                                "line": 272
+                              },
+                              "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/admin/reports/weekly\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin/reports/weekly\", waiting until \"load\"\u001b[22m\n\n\n  270 |\n  271 |     test('✅ Haftalık rapor', async ({ page }) => {\n> 272 |       await page.goto(`${BASE_URL}/admin/reports/weekly`);\n      |                  ^\n  273 |\n  274 |       // Rapor gösterilmesi bekleniyor\n  275 |       const reportContent = page.locator('[class*=\"report\"]');\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts:272:18"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:42:25.889Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-admin-panel-Admin-Pa-6cd46-i-Raporlar-✅-Haftalık-rapor/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                            "column": 18,
+                            "line": 272
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "8782dea60d90ab9a2d17-c4f51c3f448f0a78512e",
+                  "file": "tests/admin-panel.test.ts",
+                  "line": 271,
+                  "column": 9
+                },
+                {
+                  "title": "✅ Aktivite logu",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 15,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 1119,
+                          "error": {
+                            "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/admin/activity\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin/activity\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/admin/activity\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin/activity\", waiting until \"load\"\u001b[22m\n\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts:280:18",
+                            "location": {
+                              "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                              "column": 18,
+                              "line": 280
+                            },
+                            "snippet": "  278 |\n  279 |     test('✅ Aktivite logu', async ({ page }) => {\n> 280 |       await page.goto(`${BASE_URL}/admin/activity`);\n      |                  ^\n  281 |\n  282 |       const activityLog = page.locator('[class*=\"log-entry\"]');\n  283 |       expect(await activityLog.count()).toBeGreaterThanOrEqual(0);"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                                "column": 18,
+                                "line": 280
+                              },
+                              "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/admin/activity\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin/activity\", waiting until \"load\"\u001b[22m\n\n\n  278 |\n  279 |     test('✅ Aktivite logu', async ({ page }) => {\n> 280 |       await page.goto(`${BASE_URL}/admin/activity`);\n      |                  ^\n  281 |\n  282 |       const activityLog = page.locator('[class*=\"log-entry\"]');\n  283 |       expect(await activityLog.count()).toBeGreaterThanOrEqual(0);\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts:280:18"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:42:27.339Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-admin-panel-Admin-Pa-047dc-ri-Raporlar-✅-Aktivite-logu/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                            "column": 18,
+                            "line": 280
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "8782dea60d90ab9a2d17-ff5ed808315bad1be711",
+                  "file": "tests/admin-panel.test.ts",
+                  "line": 279,
+                  "column": 9
+                },
+                {
+                  "title": "✅ Rapor dışa aktarma",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 16,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 1116,
+                          "error": {
+                            "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/admin/reports\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin/reports\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/admin/reports\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin/reports\", waiting until \"load\"\u001b[22m\n\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts:287:18",
+                            "location": {
+                              "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                              "column": 18,
+                              "line": 287
+                            },
+                            "snippet": "  285 |\n  286 |     test('✅ Rapor dışa aktarma', async ({ page }) => {\n> 287 |       await page.goto(`${BASE_URL}/admin/reports`);\n      |                  ^\n  288 |\n  289 |       const exportBtn = page.getByRole('button', { name: /dışa|export|download/i });\n  290 |       if (exportBtn) {"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                                "column": 18,
+                                "line": 287
+                              },
+                              "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/admin/reports\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin/reports\", waiting until \"load\"\u001b[22m\n\n\n  285 |\n  286 |     test('✅ Rapor dışa aktarma', async ({ page }) => {\n> 287 |       await page.goto(`${BASE_URL}/admin/reports`);\n      |                  ^\n  288 |\n  289 |       const exportBtn = page.getByRole('button', { name: /dışa|export|download/i });\n  290 |       if (exportBtn) {\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts:287:18"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:42:28.823Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-admin-panel-Admin-Pa-1894f-porlar-✅-Rapor-dışa-aktarma/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                            "column": 18,
+                            "line": 287
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "8782dea60d90ab9a2d17-3d25383fe34e18d47edc",
+                  "file": "tests/admin-panel.test.ts",
+                  "line": 286,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "Admin Ayarları",
+              "file": "tests/admin-panel.test.ts",
+              "line": 301,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "✅ Admin ayarları sayfası",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 17,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 1128,
+                          "error": {
+                            "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/admin/settings\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin/settings\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/admin/settings\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin/settings\", waiting until \"load\"\u001b[22m\n\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts:304:18",
+                            "location": {
+                              "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                              "column": 18,
+                              "line": 304
+                            },
+                            "snippet": "  302 |\n  303 |     test('✅ Admin ayarları sayfası', async ({ page }) => {\n> 304 |       await page.goto(`${BASE_URL}/admin/settings`);\n      |                  ^\n  305 |\n  306 |       const settings = page.locator('[class*=\"setting\"]');\n  307 |       expect(await settings.count()).toBeGreaterThanOrEqual(0);"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                                "column": 18,
+                                "line": 304
+                              },
+                              "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/admin/settings\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin/settings\", waiting until \"load\"\u001b[22m\n\n\n  302 |\n  303 |     test('✅ Admin ayarları sayfası', async ({ page }) => {\n> 304 |       await page.goto(`${BASE_URL}/admin/settings`);\n      |                  ^\n  305 |\n  306 |       const settings = page.locator('[class*=\"setting\"]');\n  307 |       expect(await settings.count()).toBeGreaterThanOrEqual(0);\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts:304:18"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:42:30.304Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-admin-panel-Admin-Pa-494ad-rı-✅-Admin-ayarları-sayfası/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                            "column": 18,
+                            "line": 304
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "8782dea60d90ab9a2d17-58cd6b0fe5a558d71c41",
+                  "file": "tests/admin-panel.test.ts",
+                  "line": 303,
+                  "column": 9
+                },
+                {
+                  "title": "✅ Email ayarları",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 18,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 1133,
+                          "error": {
+                            "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/admin/settings/email\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin/settings/email\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/admin/settings/email\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin/settings/email\", waiting until \"load\"\u001b[22m\n\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts:311:18",
+                            "location": {
+                              "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                              "column": 18,
+                              "line": 311
+                            },
+                            "snippet": "  309 |\n  310 |     test('✅ Email ayarları', async ({ page }) => {\n> 311 |       await page.goto(`${BASE_URL}/admin/settings/email`);\n      |                  ^\n  312 |\n  313 |       const emailSettings = page.getByLabel(/email|mail/i);\n  314 |       await expect(emailSettings).toBeDefined();"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                                "column": 18,
+                                "line": 311
+                              },
+                              "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/admin/settings/email\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin/settings/email\", waiting until \"load\"\u001b[22m\n\n\n  309 |\n  310 |     test('✅ Email ayarları', async ({ page }) => {\n> 311 |       await page.goto(`${BASE_URL}/admin/settings/email`);\n      |                  ^\n  312 |\n  313 |       const emailSettings = page.getByLabel(/email|mail/i);\n  314 |       await expect(emailSettings).toBeDefined();\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts:311:18"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:42:31.970Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-admin-panel-Admin-Pa-e271a-n-Ayarları-✅-Email-ayarları/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                            "column": 18,
+                            "line": 311
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "8782dea60d90ab9a2d17-85cd64a0ba94c88bae04",
+                  "file": "tests/admin-panel.test.ts",
+                  "line": 310,
+                  "column": 9
+                },
+                {
+                  "title": "✅ Sistem ayarları",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 19,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 1110,
+                          "error": {
+                            "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/admin/settings/system\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin/settings/system\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/admin/settings/system\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin/settings/system\", waiting until \"load\"\u001b[22m\n\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts:318:18",
+                            "location": {
+                              "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                              "column": 18,
+                              "line": 318
+                            },
+                            "snippet": "  316 |\n  317 |     test('✅ Sistem ayarları', async ({ page }) => {\n> 318 |       await page.goto(`${BASE_URL}/admin/settings/system`);\n      |                  ^\n  319 |\n  320 |       const systemSettings = page.getByLabel(/sistem|system/i);\n  321 |       await expect(systemSettings).toBeDefined();"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                                "column": 18,
+                                "line": 318
+                              },
+                              "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/admin/settings/system\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin/settings/system\", waiting until \"load\"\u001b[22m\n\n\n  316 |\n  317 |     test('✅ Sistem ayarları', async ({ page }) => {\n> 318 |       await page.goto(`${BASE_URL}/admin/settings/system`);\n      |                  ^\n  319 |\n  320 |       const systemSettings = page.getByLabel(/sistem|system/i);\n  321 |       await expect(systemSettings).toBeDefined();\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts:318:18"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:42:33.487Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-admin-panel-Admin-Pa-d91b1--Ayarları-✅-Sistem-ayarları/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                            "column": 18,
+                            "line": 318
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "8782dea60d90ab9a2d17-5b3ea619f50786db6bb8",
+                  "file": "tests/admin-panel.test.ts",
+                  "line": 317,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "Admin Bildirimleri",
+              "file": "tests/admin-panel.test.ts",
+              "line": 326,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "✅ Bildirim merkezi",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 20,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 1163,
+                          "error": {
+                            "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/admin\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/admin\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin\", waiting until \"load\"\u001b[22m\n\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts:329:18",
+                            "location": {
+                              "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                              "column": 18,
+                              "line": 329
+                            },
+                            "snippet": "  327 |\n  328 |     test('✅ Bildirim merkezi', async ({ page }) => {\n> 329 |       await page.goto(`${BASE_URL}/admin`);\n      |                  ^\n  330 |\n  331 |       const notificationBell = page.locator('[class*=\"notification-bell\"]');\n  332 |       if (notificationBell) {"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                                "column": 18,
+                                "line": 329
+                              },
+                              "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/admin\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin\", waiting until \"load\"\u001b[22m\n\n\n  327 |\n  328 |     test('✅ Bildirim merkezi', async ({ page }) => {\n> 329 |       await page.goto(`${BASE_URL}/admin`);\n      |                  ^\n  330 |\n  331 |       const notificationBell = page.locator('[class*=\"notification-bell\"]');\n  332 |       if (notificationBell) {\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts:329:18"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:42:34.962Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-admin-panel-Admin-Pa-55cf4-irimleri-✅-Bildirim-merkezi/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                            "column": 18,
+                            "line": 329
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "8782dea60d90ab9a2d17-02373865e553c3e611b6",
+                  "file": "tests/admin-panel.test.ts",
+                  "line": 328,
+                  "column": 9
+                },
+                {
+                  "title": "✅ Okunmamış bildirim badge",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 21,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 1115,
+                          "error": {
+                            "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/admin\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/admin\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin\", waiting until \"load\"\u001b[22m\n\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts:342:18",
+                            "location": {
+                              "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                              "column": 18,
+                              "line": 342
+                            },
+                            "snippet": "  340 |\n  341 |     test('✅ Okunmamış bildirim badge', async ({ page }) => {\n> 342 |       await page.goto(`${BASE_URL}/admin`);\n      |                  ^\n  343 |\n  344 |       const badge = page.locator('[class*=\"notification-badge\"]');\n  345 |       // Badge görünebilir veya görünmeyebilir"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                                "column": 18,
+                                "line": 342
+                              },
+                              "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/admin\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/admin\", waiting until \"load\"\u001b[22m\n\n\n  340 |\n  341 |     test('✅ Okunmamış bildirim badge', async ({ page }) => {\n> 342 |       await page.goto(`${BASE_URL}/admin`);\n      |                  ^\n  343 |\n  344 |       const badge = page.locator('[class*=\"notification-badge\"]');\n  345 |       // Badge görünebilir veya görünmeyebilir\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts:342:18"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:42:36.769Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-admin-panel-Admin-Pa-2cb1f--✅-Okunmamış-bildirim-badge/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/admin-panel.test.ts",
+                            "column": 18,
+                            "line": 342
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "8782dea60d90ab9a2d17-eebf5911e29402564295",
+                  "file": "tests/admin-panel.test.ts",
+                  "line": 341,
+                  "column": 9
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-09-20T04:39:00.266Z",
+    "duration": 217753.217,
+    "expected": 9,
+    "skipped": 0,
+    "unexpected": 22,
+    "flaky": 0
+  }
+}

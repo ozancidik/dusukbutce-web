@@ -1,0 +1,959 @@
+{
+  "config": {
+    "argv": [
+      "/Users/ozan.cidik/.nvm/versions/node/v20.20.0/bin/node",
+      "/Users/ozan.cidik/Desktop/dusukbutce-web/node_modules/.bin/playwright",
+      "test",
+      "tests/auth.test.ts",
+      "--reporter=json"
+    ],
+    "rootDir": "/Users/ozan.cidik/Desktop/dusukbutce-web",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "/Users/ozan.cidik/Desktop/dusukbutce-web",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 4,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "tests/auth.test.ts",
+      "file": "tests/auth.test.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Authentication & Authorization Tests",
+          "file": "tests/auth.test.ts",
+          "line": 5,
+          "column": 6,
+          "specs": [],
+          "suites": [
+            {
+              "title": "Register Scenarios",
+              "file": "tests/auth.test.ts",
+              "line": 8,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "✅ Register - Başarılı kayıt",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 704,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:39:01.097Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "50b23cc03cd3ccb31cb2-b65fe758cfb6f75cbd95",
+                  "file": "tests/auth.test.ts",
+                  "line": 10,
+                  "column": 9
+                },
+                {
+                  "title": "❌ Register - Boş form gönderimi",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "timedOut",
+                          "duration": 30022,
+                          "error": {
+                            "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                            "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                          },
+                          "errors": [
+                            {
+                              "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                            },
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts",
+                                "column": 25,
+                                "line": 22
+                              },
+                              "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /submit|kaydet|gönder/i })\u001b[22m\n\n\n  20 |       const submitBtn = page.getByRole('button', { name: /submit|kaydet|gönder/i });\n  21 |       if (submitBtn) {\n> 22 |         await submitBtn.click();\n     |                         ^\n  23 |         // Validation error bekleniyor\n  24 |         await expect(page.getByText(/required|zorunlu/i)).toBeVisible();\n  25 |       }\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts:22:25"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:39:01.990Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-auth-Authentication--12c8c-gister---Boş-form-gönderimi/error-context.md"
+                            }
+                          ]
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "50b23cc03cd3ccb31cb2-6aabd8dcc18af71ac3fe",
+                  "file": "tests/auth.test.ts",
+                  "line": 17,
+                  "column": 9
+                },
+                {
+                  "title": "❌ Register - Invalid email",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 1,
+                          "parallelIndex": 0,
+                          "status": "timedOut",
+                          "duration": 30042,
+                          "error": {
+                            "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                            "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                          },
+                          "errors": [
+                            {
+                              "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                            },
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts",
+                                "column": 26,
+                                "line": 32
+                              },
+                              "message": "Error: locator.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByLabel(/email/i)\u001b[22m\n\n\n  30 |       const emailInput = page.getByLabel(/email/i);\n  31 |       if (emailInput) {\n> 32 |         await emailInput.fill('invalid-email');\n     |                          ^\n  33 |         const submitBtn = page.getByRole('button', { name: /submit/i });\n  34 |         if (submitBtn) {\n  35 |           await submitBtn.click();\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts:32:26"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:39:32.400Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-auth-Authentication--b3d86--❌-Register---Invalid-email/error-context.md"
+                            }
+                          ]
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "50b23cc03cd3ccb31cb2-3a1a74840308a3483e80",
+                  "file": "tests/auth.test.ts",
+                  "line": 28,
+                  "column": 9
+                },
+                {
+                  "title": "❌ Register - Password mismatch",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 2,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 833,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:40:02.881Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "50b23cc03cd3ccb31cb2-b35794a1e4586cc5e420",
+                  "file": "tests/auth.test.ts",
+                  "line": 41,
+                  "column": 9
+                },
+                {
+                  "title": "❌ Register - Email already exists",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 2,
+                          "parallelIndex": 0,
+                          "status": "timedOut",
+                          "duration": 30023,
+                          "error": {
+                            "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                            "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                          },
+                          "errors": [
+                            {
+                              "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                            },
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts",
+                                "column": 26,
+                                "line": 53
+                              },
+                              "message": "Error: locator.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByLabel(/email/i)\u001b[22m\n\n\n  51 |       const emailInput = page.getByLabel(/email/i);\n  52 |       if (emailInput) {\n> 53 |         await emailInput.fill('existing@example.com');\n     |                          ^\n  54 |         const submitBtn = page.getByRole('button', { name: /submit/i });\n  55 |         if (submitBtn) {\n  56 |           await submitBtn.click();\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts:53:26"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:40:03.846Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-auth-Authentication--c37ae-ster---Email-already-exists/error-context.md"
+                            }
+                          ]
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "50b23cc03cd3ccb31cb2-8e813699bc3ff29f62c5",
+                  "file": "tests/auth.test.ts",
+                  "line": 48,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "Login Scenarios",
+              "file": "tests/auth.test.ts",
+              "line": 65,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "✅ Login - Başarılı giriş",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 3,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 775,
+                          "error": {
+                            "message": "Error: locator.click: Error: strict mode violation: getByText(/giriş|login/i) resolved to 2 elements:\n    1) <button class=\"jsx-e784ed9b9e6cb6fe\">…</button> aka getByRole('button', { name: 'Giriş Yap' })\n    2) <div class=\"jsx-e784ed9b9e6cb6fe\">Giriş</div> aka getByText('Giriş', { exact: true })\n\nCall log:\n\u001b[2m  - waiting for getByText(/giriş|login/i)\u001b[22m\n",
+                            "stack": "Error: locator.click: Error: strict mode violation: getByText(/giriş|login/i) resolved to 2 elements:\n    1) <button class=\"jsx-e784ed9b9e6cb6fe\">…</button> aka getByRole('button', { name: 'Giriş Yap' })\n    2) <div class=\"jsx-e784ed9b9e6cb6fe\">Giriş</div> aka getByText('Giriş', { exact: true })\n\nCall log:\n\u001b[2m  - waiting for getByText(/giriş|login/i)\u001b[22m\n\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts:71:24",
+                            "location": {
+                              "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts",
+                              "column": 24,
+                              "line": 71
+                            },
+                            "snippet": "  69 |       const loginBtn = page.getByText(/giriş|login/i);\n  70 |       if (loginBtn) {\n> 71 |         await loginBtn.click();\n     |                        ^\n  72 |         const emailInput = page.getByLabel(/email/i);\n  73 |         const passwordInput = page.getByLabel(/password/i);\n  74 |"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts",
+                                "column": 24,
+                                "line": 71
+                              },
+                              "message": "Error: locator.click: Error: strict mode violation: getByText(/giriş|login/i) resolved to 2 elements:\n    1) <button class=\"jsx-e784ed9b9e6cb6fe\">…</button> aka getByRole('button', { name: 'Giriş Yap' })\n    2) <div class=\"jsx-e784ed9b9e6cb6fe\">Giriş</div> aka getByText('Giriş', { exact: true })\n\nCall log:\n\u001b[2m  - waiting for getByText(/giriş|login/i)\u001b[22m\n\n\n  69 |       const loginBtn = page.getByText(/giriş|login/i);\n  70 |       if (loginBtn) {\n> 71 |         await loginBtn.click();\n     |                        ^\n  72 |         const emailInput = page.getByLabel(/email/i);\n  73 |         const passwordInput = page.getByLabel(/password/i);\n  74 |\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts:71:24"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:40:34.159Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-auth-Authentication--0418b-os-✅-Login---Başarılı-giriş/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts",
+                            "column": 24,
+                            "line": 71
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "50b23cc03cd3ccb31cb2-b6af1ece785abf7fb956",
+                  "file": "tests/auth.test.ts",
+                  "line": 67,
+                  "column": 9
+                },
+                {
+                  "title": "❌ Login - Yanlış password",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 4,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 662,
+                          "error": {
+                            "message": "Error: locator.click: Error: strict mode violation: getByText(/giriş|login/i) resolved to 2 elements:\n    1) <button class=\"jsx-e784ed9b9e6cb6fe\">…</button> aka getByRole('button', { name: 'Giriş Yap' })\n    2) <div class=\"jsx-e784ed9b9e6cb6fe\">Giriş</div> aka getByText('Giriş', { exact: true })\n\nCall log:\n\u001b[2m  - waiting for getByText(/giriş|login/i)\u001b[22m\n",
+                            "stack": "Error: locator.click: Error: strict mode violation: getByText(/giriş|login/i) resolved to 2 elements:\n    1) <button class=\"jsx-e784ed9b9e6cb6fe\">…</button> aka getByRole('button', { name: 'Giriş Yap' })\n    2) <div class=\"jsx-e784ed9b9e6cb6fe\">Giriş</div> aka getByText('Giriş', { exact: true })\n\nCall log:\n\u001b[2m  - waiting for getByText(/giriş|login/i)\u001b[22m\n\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts:90:24",
+                            "location": {
+                              "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts",
+                              "column": 24,
+                              "line": 90
+                            },
+                            "snippet": "  88 |       const loginBtn = page.getByText(/giriş|login/i);\n  89 |       if (loginBtn) {\n> 90 |         await loginBtn.click();\n     |                        ^\n  91 |         const emailInput = page.getByLabel(/email/i);\n  92 |         const passwordInput = page.getByLabel(/password/i);\n  93 |"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts",
+                                "column": 24,
+                                "line": 90
+                              },
+                              "message": "Error: locator.click: Error: strict mode violation: getByText(/giriş|login/i) resolved to 2 elements:\n    1) <button class=\"jsx-e784ed9b9e6cb6fe\">…</button> aka getByRole('button', { name: 'Giriş Yap' })\n    2) <div class=\"jsx-e784ed9b9e6cb6fe\">Giriş</div> aka getByText('Giriş', { exact: true })\n\nCall log:\n\u001b[2m  - waiting for getByText(/giriş|login/i)\u001b[22m\n\n\n  88 |       const loginBtn = page.getByText(/giriş|login/i);\n  89 |       if (loginBtn) {\n> 90 |         await loginBtn.click();\n     |                        ^\n  91 |         const emailInput = page.getByLabel(/email/i);\n  92 |         const passwordInput = page.getByLabel(/password/i);\n  93 |\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts:90:24"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:40:35.341Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-auth-Authentication--8a282-s-❌-Login---Yanlış-password/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts",
+                            "column": 24,
+                            "line": 90
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "50b23cc03cd3ccb31cb2-fe48b95d10667dc3846c",
+                  "file": "tests/auth.test.ts",
+                  "line": 86,
+                  "column": 9
+                },
+                {
+                  "title": "❌ Login - Non-existent user",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 5,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 815,
+                          "error": {
+                            "message": "Error: locator.click: Error: strict mode violation: getByText(/giriş|login/i) resolved to 2 elements:\n    1) <button class=\"jsx-e784ed9b9e6cb6fe\">…</button> aka getByRole('button', { name: 'Giriş Yap' })\n    2) <div class=\"jsx-e784ed9b9e6cb6fe\">Giriş</div> aka getByText('Giriş', { exact: true })\n\nCall log:\n\u001b[2m  - waiting for getByText(/giriş|login/i)\u001b[22m\n",
+                            "stack": "Error: locator.click: Error: strict mode violation: getByText(/giriş|login/i) resolved to 2 elements:\n    1) <button class=\"jsx-e784ed9b9e6cb6fe\">…</button> aka getByRole('button', { name: 'Giriş Yap' })\n    2) <div class=\"jsx-e784ed9b9e6cb6fe\">Giriş</div> aka getByText('Giriş', { exact: true })\n\nCall log:\n\u001b[2m  - waiting for getByText(/giriş|login/i)\u001b[22m\n\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts:109:24",
+                            "location": {
+                              "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts",
+                              "column": 24,
+                              "line": 109
+                            },
+                            "snippet": "  107 |       const loginBtn = page.getByText(/giriş|login/i);\n  108 |       if (loginBtn) {\n> 109 |         await loginBtn.click();\n      |                        ^\n  110 |         const emailInput = page.getByLabel(/email/i);\n  111 |         const passwordInput = page.getByLabel(/password/i);\n  112 |"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts",
+                                "column": 24,
+                                "line": 109
+                              },
+                              "message": "Error: locator.click: Error: strict mode violation: getByText(/giriş|login/i) resolved to 2 elements:\n    1) <button class=\"jsx-e784ed9b9e6cb6fe\">…</button> aka getByRole('button', { name: 'Giriş Yap' })\n    2) <div class=\"jsx-e784ed9b9e6cb6fe\">Giriş</div> aka getByText('Giriş', { exact: true })\n\nCall log:\n\u001b[2m  - waiting for getByText(/giriş|login/i)\u001b[22m\n\n\n  107 |       const loginBtn = page.getByText(/giriş|login/i);\n  108 |       if (loginBtn) {\n> 109 |         await loginBtn.click();\n      |                        ^\n  110 |         const emailInput = page.getByLabel(/email/i);\n  111 |         const passwordInput = page.getByLabel(/password/i);\n  112 |\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts:109:24"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:40:36.502Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-auth-Authentication--692a5-❌-Login---Non-existent-user/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts",
+                            "column": 24,
+                            "line": 109
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "50b23cc03cd3ccb31cb2-f3e5760324fd37939449",
+                  "file": "tests/auth.test.ts",
+                  "line": 105,
+                  "column": 9
+                },
+                {
+                  "title": "❌ Login - Empty fields",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 6,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 672,
+                          "error": {
+                            "message": "Error: locator.click: Error: strict mode violation: getByText(/giriş|login/i) resolved to 2 elements:\n    1) <button class=\"jsx-e784ed9b9e6cb6fe\">…</button> aka getByRole('button', { name: 'Giriş Yap' })\n    2) <div class=\"jsx-e784ed9b9e6cb6fe\">Giriş</div> aka getByText('Giriş', { exact: true })\n\nCall log:\n\u001b[2m  - waiting for getByText(/giriş|login/i)\u001b[22m\n",
+                            "stack": "Error: locator.click: Error: strict mode violation: getByText(/giriş|login/i) resolved to 2 elements:\n    1) <button class=\"jsx-e784ed9b9e6cb6fe\">…</button> aka getByRole('button', { name: 'Giriş Yap' })\n    2) <div class=\"jsx-e784ed9b9e6cb6fe\">Giriş</div> aka getByText('Giriş', { exact: true })\n\nCall log:\n\u001b[2m  - waiting for getByText(/giriş|login/i)\u001b[22m\n\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts:128:24",
+                            "location": {
+                              "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts",
+                              "column": 24,
+                              "line": 128
+                            },
+                            "snippet": "  126 |       const loginBtn = page.getByText(/giriş|login/i);\n  127 |       if (loginBtn) {\n> 128 |         await loginBtn.click();\n      |                        ^\n  129 |         const submitBtn = page.getByRole('button', { name: /login/i });\n  130 |         if (submitBtn) {\n  131 |           await submitBtn.click();"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts",
+                                "column": 24,
+                                "line": 128
+                              },
+                              "message": "Error: locator.click: Error: strict mode violation: getByText(/giriş|login/i) resolved to 2 elements:\n    1) <button class=\"jsx-e784ed9b9e6cb6fe\">…</button> aka getByRole('button', { name: 'Giriş Yap' })\n    2) <div class=\"jsx-e784ed9b9e6cb6fe\">Giriş</div> aka getByText('Giriş', { exact: true })\n\nCall log:\n\u001b[2m  - waiting for getByText(/giriş|login/i)\u001b[22m\n\n\n  126 |       const loginBtn = page.getByText(/giriş|login/i);\n  127 |       if (loginBtn) {\n> 128 |         await loginBtn.click();\n      |                        ^\n  129 |         const submitBtn = page.getByRole('button', { name: /login/i });\n  130 |         if (submitBtn) {\n  131 |           await submitBtn.click();\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts:128:24"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:40:37.735Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-auth-Authentication--dfaad-rios-❌-Login---Empty-fields/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts",
+                            "column": 24,
+                            "line": 128
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "50b23cc03cd3ccb31cb2-10f1d62490b971608658",
+                  "file": "tests/auth.test.ts",
+                  "line": 124,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "Logout Scenarios",
+              "file": "tests/auth.test.ts",
+              "line": 140,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "✅ Logout - Başarılı çıkış",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 7,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 628,
+                          "error": {
+                            "message": "Error: locator.click: Error: strict mode violation: getByText(/giriş|login/i) resolved to 2 elements:\n    1) <button class=\"jsx-e784ed9b9e6cb6fe\">…</button> aka getByRole('button', { name: 'Giriş Yap' })\n    2) <div class=\"jsx-e784ed9b9e6cb6fe\">Giriş</div> aka getByText('Giriş', { exact: true })\n\nCall log:\n\u001b[2m  - waiting for getByText(/giriş|login/i)\u001b[22m\n",
+                            "stack": "Error: locator.click: Error: strict mode violation: getByText(/giriş|login/i) resolved to 2 elements:\n    1) <button class=\"jsx-e784ed9b9e6cb6fe\">…</button> aka getByRole('button', { name: 'Giriş Yap' })\n    2) <div class=\"jsx-e784ed9b9e6cb6fe\">Giriş</div> aka getByText('Giriş', { exact: true })\n\nCall log:\n\u001b[2m  - waiting for getByText(/giriş|login/i)\u001b[22m\n\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts:148:24",
+                            "location": {
+                              "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts",
+                              "column": 24,
+                              "line": 148
+                            },
+                            "snippet": "  146 |       const loginBtn = page.getByText(/giriş|login/i);\n  147 |       if (loginBtn) {\n> 148 |         await loginBtn.click();\n      |                        ^\n  149 |         const emailInput = page.getByLabel(/email/i);\n  150 |         const passwordInput = page.getByLabel(/password/i);\n  151 |"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts",
+                                "column": 24,
+                                "line": 148
+                              },
+                              "message": "Error: locator.click: Error: strict mode violation: getByText(/giriş|login/i) resolved to 2 elements:\n    1) <button class=\"jsx-e784ed9b9e6cb6fe\">…</button> aka getByRole('button', { name: 'Giriş Yap' })\n    2) <div class=\"jsx-e784ed9b9e6cb6fe\">Giriş</div> aka getByText('Giriş', { exact: true })\n\nCall log:\n\u001b[2m  - waiting for getByText(/giriş|login/i)\u001b[22m\n\n\n  146 |       const loginBtn = page.getByText(/giriş|login/i);\n  147 |       if (loginBtn) {\n> 148 |         await loginBtn.click();\n      |                        ^\n  149 |         const emailInput = page.getByLabel(/email/i);\n  150 |         const passwordInput = page.getByLabel(/password/i);\n  151 |\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts:148:24"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:40:38.802Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-auth-Authentication--c5078-s-✅-Logout---Başarılı-çıkış/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts",
+                            "column": 24,
+                            "line": 148
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "50b23cc03cd3ccb31cb2-8918a41032ae8064a9c4",
+                  "file": "tests/auth.test.ts",
+                  "line": 142,
+                  "column": 9
+                },
+                {
+                  "title": "✅ Logout - Session cleared",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 8,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 5608,
+                          "error": {
+                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveURL\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/.*login|signin/i\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveURL\" with timeout 5000ms\u001b[22m\n\u001b[2m    10 × locator resolved to <html lang=\"tr\">…</html>\u001b[22m\n\u001b[2m       - unexpected value \"http://localhost:3000/account\"\u001b[22m\n\u001b[2m    4 × locator resolved to <html lang=\"tr\">…</html>\u001b[22m\n\u001b[2m      - unexpected value \"http://localhost:3000/\"\u001b[22m\n",
+                            "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveURL\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/.*login|signin/i\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveURL\" with timeout 5000ms\u001b[22m\n\u001b[2m    10 × locator resolved to <html lang=\"tr\">…</html>\u001b[22m\n\u001b[2m       - unexpected value \"http://localhost:3000/account\"\u001b[22m\n\u001b[2m    4 × locator resolved to <html lang=\"tr\">…</html>\u001b[22m\n\u001b[2m      - unexpected value \"http://localhost:3000/\"\u001b[22m\n\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts:174:26",
+                            "location": {
+                              "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts",
+                              "column": 26,
+                              "line": 174
+                            },
+                            "snippet": "  172 |\n  173 |       // Login sayfasına yönlendirilmesi bekleniyor\n> 174 |       await expect(page).toHaveURL(/.*login|signin/i);\n      |                          ^\n  175 |     });\n  176 |   });\n  177 |"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts",
+                                "column": 26,
+                                "line": 174
+                              },
+                              "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveURL\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/.*login|signin/i\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveURL\" with timeout 5000ms\u001b[22m\n\u001b[2m    10 × locator resolved to <html lang=\"tr\">…</html>\u001b[22m\n\u001b[2m       - unexpected value \"http://localhost:3000/account\"\u001b[22m\n\u001b[2m    4 × locator resolved to <html lang=\"tr\">…</html>\u001b[22m\n\u001b[2m      - unexpected value \"http://localhost:3000/\"\u001b[22m\n\n\n  172 |\n  173 |       // Login sayfasına yönlendirilmesi bekleniyor\n> 174 |       await expect(page).toHaveURL(/.*login|signin/i);\n      |                          ^\n  175 |     });\n  176 |   });\n  177 |\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts:174:26"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:40:39.830Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-auth-Authentication--cec55--✅-Logout---Session-cleared/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts",
+                            "column": 26,
+                            "line": 174
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "50b23cc03cd3ccb31cb2-ca8a1e08c06525d16091",
+                  "file": "tests/auth.test.ts",
+                  "line": 169,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "Session Scenarios",
+              "file": "tests/auth.test.ts",
+              "line": 179,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "✅ Session persistence - Sayfa yenilemesinde session korunması",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 9,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 686,
+                          "error": {
+                            "message": "Error: locator.click: Error: strict mode violation: getByText(/giriş|login/i) resolved to 2 elements:\n    1) <button class=\"jsx-e784ed9b9e6cb6fe\">…</button> aka getByRole('button', { name: 'Giriş Yap' })\n    2) <div class=\"jsx-e784ed9b9e6cb6fe\">Giriş</div> aka getByText('Giriş', { exact: true })\n\nCall log:\n\u001b[2m  - waiting for getByText(/giriş|login/i)\u001b[22m\n",
+                            "stack": "Error: locator.click: Error: strict mode violation: getByText(/giriş|login/i) resolved to 2 elements:\n    1) <button class=\"jsx-e784ed9b9e6cb6fe\">…</button> aka getByRole('button', { name: 'Giriş Yap' })\n    2) <div class=\"jsx-e784ed9b9e6cb6fe\">Giriş</div> aka getByText('Giriş', { exact: true })\n\nCall log:\n\u001b[2m  - waiting for getByText(/giriş|login/i)\u001b[22m\n\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts:187:24",
+                            "location": {
+                              "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts",
+                              "column": 24,
+                              "line": 187
+                            },
+                            "snippet": "  185 |       const loginBtn = page.getByText(/giriş|login/i);\n  186 |       if (loginBtn) {\n> 187 |         await loginBtn.click();\n      |                        ^\n  188 |         const emailInput = page.getByLabel(/email/i);\n  189 |         const passwordInput = page.getByLabel(/password/i);\n  190 |"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts",
+                                "column": 24,
+                                "line": 187
+                              },
+                              "message": "Error: locator.click: Error: strict mode violation: getByText(/giriş|login/i) resolved to 2 elements:\n    1) <button class=\"jsx-e784ed9b9e6cb6fe\">…</button> aka getByRole('button', { name: 'Giriş Yap' })\n    2) <div class=\"jsx-e784ed9b9e6cb6fe\">Giriş</div> aka getByText('Giriş', { exact: true })\n\nCall log:\n\u001b[2m  - waiting for getByText(/giriş|login/i)\u001b[22m\n\n\n  185 |       const loginBtn = page.getByText(/giriş|login/i);\n  186 |       if (loginBtn) {\n> 187 |         await loginBtn.click();\n      |                        ^\n  188 |         const emailInput = page.getByLabel(/email/i);\n  189 |         const passwordInput = page.getByLabel(/password/i);\n  190 |\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts:187:24"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:40:45.909Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-auth-Authentication--fa515-lemesinde-session-korunması/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts",
+                            "column": 24,
+                            "line": 187
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "50b23cc03cd3ccb31cb2-6b6fca6b670ea91c6df4",
+                  "file": "tests/auth.test.ts",
+                  "line": 181,
+                  "column": 9
+                },
+                {
+                  "title": "✅ Session timeout - Uzun inaktivite sonrası logout",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 10,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 722,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:40:47.070Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "50b23cc03cd3ccb31cb2-8b2c35d8500705995782",
+                  "file": "tests/auth.test.ts",
+                  "line": 208,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "Password Recovery Scenarios",
+              "file": "tests/auth.test.ts",
+              "line": 217,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "✅ Password recovery - Email gönderimi",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 10,
+                          "parallelIndex": 0,
+                          "status": "timedOut",
+                          "duration": 30021,
+                          "error": {
+                            "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                            "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                          },
+                          "errors": [
+                            {
+                              "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                            },
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts",
+                                "column": 34,
+                                "line": 224
+                              },
+                              "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText(/forgot.*password|şifremi unuttum/i)\u001b[22m\n\n\n  222 |       const forgotPasswordLink = page.getByText(/forgot.*password|şifremi unuttum/i);\n  223 |       if (forgotPasswordLink) {\n> 224 |         await forgotPasswordLink.click();\n      |                                  ^\n  225 |\n  226 |         const emailInput = page.getByLabel(/email/i);\n  227 |         if (emailInput) {\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts:224:34"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:40:47.899Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-auth-Authentication--90668--recovery---Email-gönderimi/error-context.md"
+                            }
+                          ]
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "50b23cc03cd3ccb31cb2-4358bfcf49cda2b2b75e",
+                  "file": "tests/auth.test.ts",
+                  "line": 219,
+                  "column": 9
+                },
+                {
+                  "title": "❌ Password recovery - Invalid email",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 11,
+                          "parallelIndex": 0,
+                          "status": "timedOut",
+                          "duration": 30044,
+                          "error": {
+                            "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                            "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                          },
+                          "errors": [
+                            {
+                              "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                            },
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts",
+                                "column": 34,
+                                "line": 242
+                              },
+                              "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText(/forgot.*password/i)\u001b[22m\n\n\n  240 |       const forgotPasswordLink = page.getByText(/forgot.*password/i);\n  241 |       if (forgotPasswordLink) {\n> 242 |         await forgotPasswordLink.click();\n      |                                  ^\n  243 |\n  244 |         const emailInput = page.getByLabel(/email/i);\n  245 |         if (emailInput) {\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/auth.test.ts:242:34"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:41:18.286Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-auth-Authentication--a6b6f-rd-recovery---Invalid-email/error-context.md"
+                            }
+                          ]
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "50b23cc03cd3ccb31cb2-2d9557b21aea61b0755d",
+                  "file": "tests/auth.test.ts",
+                  "line": 237,
+                  "column": 9
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-09-20T04:39:00.266Z",
+    "duration": 168221.138,
+    "expected": 3,
+    "skipped": 0,
+    "unexpected": 12,
+    "flaky": 0
+  }
+}

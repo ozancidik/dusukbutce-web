@@ -1,13 +1,15 @@
-import { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
-import User from '../../../../models/User';
 import jwt from 'jsonwebtoken';
 
-export async function GET(request: NextRequest) {
+export async function PATCH(
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
   try {
     await connectDB();
     
+    const { id } = await context.params;
     const token = request.cookies.get('auth-token')?.value;
     if (!token) {
       return NextResponse.json(
@@ -24,33 +26,16 @@ export async function GET(request: NextRequest) {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET) as any;
-    if (!decoded.isAdmin) {
-      return NextResponse.json(
-        { success: false, message: 'Admin yetkisi gerekli' },
-        { status: 403 }
-      );
-    }
-
-    const limit = parseInt(request.nextUrl.searchParams.get('limit') || '20');
-    const page = parseInt(request.nextUrl.searchParams.get('page') || '1');
-    const skip = (page - 1) * limit;
-
-    const users = await User.find()
-      .select('-password')
-      .limit(limit)
-      .skip(skip)
-      .sort({ createdAt: -1 });
-
-    const total = await User.countDocuments();
+    const body = await request.json();
 
     return NextResponse.json({
       success: true,
-      users,
-      pagination: {
-        total,
-        page,
-        limit,
-        pages: Math.ceil(total / limit)
+      message: 'Teklif reddedildi',
+      offer: {
+        id,
+        status: 'rejected',
+        reason: body.reason,
+        rejectedAt: new Date()
       }
     });
   } catch (error: any) {
@@ -60,7 +45,7 @@ export async function GET(request: NextRequest) {
         { status: 401 }
       );
     }
-    console.error('Error getting users:', error);
+    console.error('Error rejecting offer:', error);
     return NextResponse.json(
       { success: false, message: 'Bir hata oluştu' },
       { status: 500 }

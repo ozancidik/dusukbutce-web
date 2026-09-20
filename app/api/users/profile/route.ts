@@ -4,10 +4,11 @@ import connectDB from "@/lib/mongodb";
 import User from '../../../../models/User';
 import jwt from 'jsonwebtoken';
 
-export async function GET(request: NextRequest) {
+export async function PATCH(request: NextRequest) {
   try {
     await connectDB();
-    
+
+    // Authenticated user'ı al
     const token = request.cookies.get('auth-token')?.value;
     if (!token) {
       return NextResponse.json(
@@ -24,33 +25,40 @@ export async function GET(request: NextRequest) {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET) as any;
-    if (!decoded.isAdmin) {
+    const body = await request.json();
+
+    // Güncellenebilir alanlar
+    const updates: any = {};
+    if (body.name) updates.name = body.name;
+    if (body.phone) updates.phone = body.phone;
+    if (body.birthDate) updates.birthDate = body.birthDate;
+    if (body.bio) updates.bio = body.bio;
+    if (body.address) updates.address = body.address;
+
+    const user = await User.findByIdAndUpdate(
+      decoded.userId,
+      updates,
+      { new: true }
+    ).select('-password');
+
+    if (!user) {
       return NextResponse.json(
-        { success: false, message: 'Admin yetkisi gerekli' },
-        { status: 403 }
+        { success: false, message: 'Kullanıcı bulunamadı' },
+        { status: 404 }
       );
     }
 
-    const limit = parseInt(request.nextUrl.searchParams.get('limit') || '20');
-    const page = parseInt(request.nextUrl.searchParams.get('page') || '1');
-    const skip = (page - 1) * limit;
-
-    const users = await User.find()
-      .select('-password')
-      .limit(limit)
-      .skip(skip)
-      .sort({ createdAt: -1 });
-
-    const total = await User.countDocuments();
-
     return NextResponse.json({
       success: true,
-      users,
-      pagination: {
-        total,
-        page,
-        limit,
-        pages: Math.ceil(total / limit)
+      message: 'Profil güncellendi',
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+        phone: user.phone || '',
+        birthDate: user.birthDate || '',
+        bio: user.bio || '',
+        address: user.address || ''
       }
     });
   } catch (error: any) {
@@ -60,7 +68,7 @@ export async function GET(request: NextRequest) {
         { status: 401 }
       );
     }
-    console.error('Error getting users:', error);
+    console.error('Error updating profile:', error);
     return NextResponse.json(
       { success: false, message: 'Bir hata oluştu' },
       { status: 500 }

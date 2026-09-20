@@ -1,0 +1,71 @@
+
+🧪 Backend API Tests
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📂 Categories:
+❌ [undefined] GET /categories
+
+🔐 Authentication:
+❌ [undefined] POST /auth/register
+❌ [undefined] POST /auth/login
+❌ [undefined] GET /auth/me
+✅ [undefined] POST /auth/logout
+
+👤 Users:
+❌ [undefined] GET /users/1
+❌ [undefined] PATCH /users/profile
+
+📋 Listings:
+❌ [undefined] POST /listings
+✅ [undefined] GET /listings?category=ram&limit=10
+❌ [undefined] GET /listings/1
+❌ [undefined] GET /listings/search?q=RAM
+❌ [undefined] PATCH /listings/1
+❌ [undefined] DELETE /listings/1
+
+💬 Offers:
+❌ [undefined] POST /offers
+❌ [undefined] GET /offers/my-offers
+❌ [undefined] PATCH /offers/1/accept
+❌ [undefined] PATCH /offers/1/reject
+❌ [undefined] POST /offers/1/counter
+
+⚙️  Admin:
+❌ [undefined] GET /admin/users?limit=20
+❌ [undefined] GET /admin/listings?status=pending
+❌ [undefined] GET /admin/stats
+❌ [undefined] PATCH /admin/listings/1/approve
+❌ [undefined] PATCH /admin/listings/1/reject
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 Results:
+   Total: 23
+   Passed: 2 ✅
+   Failed: 21 ❌
+   Pass Rate: 9%
+
+🔴 Failed Endpoints:
+   [ERROR] GET /categories
+   [ERROR] POST /auth/register
+   [ERROR] POST /auth/login
+   [ERROR] GET /auth/me
+   [ERROR] GET /users/1
+   [ERROR] PATCH /users/profile
+   [ERROR] POST /listings
+   [ERROR] GET /listings/1
+   [ERROR] GET /listings/search?q=RAM
+   [ERROR] PATCH /listings/1
+   [ERROR] DELETE /listings/1
+   [ERROR] POST /offers
+   [ERROR] GET /offers/my-offers
+   [ERROR] PATCH /offers/1/accept
+   [ERROR] PATCH /offers/1/reject
+   [ERROR] POST /offers/1/counter
+   [ERROR] GET /admin/users?limit=20
+   [ERROR] GET /admin/listings?status=pending
+   [ERROR] GET /admin/stats
+   [ERROR] PATCH /admin/listings/1/approve
+   [ERROR] PATCH /admin/listings/1/reject
+
