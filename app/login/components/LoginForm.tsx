@@ -62,6 +62,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
         <input
           id="email"
           type="email"
+          data-testid="login-email-input"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder={isAdminForm ? "admin@example.com" : "ornek@email.com"}
@@ -101,6 +102,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
           <input
             id="password"
             type={showPassword ? "text" : "password"}
+            data-testid="login-password-input"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             autoComplete="current-password"
@@ -305,6 +307,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
 
       <button
         type="submit"
+        data-testid="login-submit-button"
         disabled={isLoading}
         style={{
           width: "100%",

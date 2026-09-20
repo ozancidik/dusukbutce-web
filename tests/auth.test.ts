@@ -8,7 +8,7 @@ test.describe('Authentication & Authorization Tests', () => {
   test.describe('Register Scenarios', () => {
 
     test('✅ Register - Başarılı kayıt', async ({ page }) => {
-      await page.goto(`${BASE_URL}/auth/register`);
+      await page.goto(`${BASE_URL}/register`);
       await page.waitForLoadState('networkidle');
       // Form yüklenmesini kontrol et
       const form = page.locator('form');
@@ -16,7 +16,7 @@ test.describe('Authentication & Authorization Tests', () => {
     });
 
     test('❌ Register - Boş form gönderimi', async ({ page }) => {
-      await page.goto(`${BASE_URL}/auth/register`);
+      await page.goto(`${BASE_URL}/register`);
       await page.waitForLoadState('networkidle');
       // Submit button'ı bul
       const submitBtn = page.locator('button[type="submit"]').first();
@@ -28,7 +28,7 @@ test.describe('Authentication & Authorization Tests', () => {
     });
 
     test('❌ Register - Invalid email', async ({ page }) => {
-      await page.goto(`${BASE_URL}/auth/register`);
+      await page.goto(`${BASE_URL}/register`);
       await page.waitForLoadState('networkidle');
       const emailInput = page.locator('input[type="email"]').first();
       if (await emailInput.isVisible({ timeout: 3000 }).catch(() => false)) {
@@ -41,14 +41,14 @@ test.describe('Authentication & Authorization Tests', () => {
 
     test('❌ Register - Password mismatch', async ({ page }) => {
       // Skip - complex form validation
-      await page.goto(`${BASE_URL}/auth/register`);
+      await page.goto(`${BASE_URL}/register`);
       await page.waitForLoadState('networkidle');
       const form = page.locator('form');
       await expect(form).toBeVisible({ timeout: 5000 });
     });
 
     test('❌ Register - Email already exists', async ({ page }) => {
-      await page.goto(`${BASE_URL}/auth/register`);
+      await page.goto(`${BASE_URL}/register`);
       await page.waitForLoadState('networkidle');
       const emailInput = page.locator('input[type="email"]').first();
       if (await emailInput.isVisible({ timeout: 3000 }).catch(() => false)) {
@@ -70,29 +70,29 @@ test.describe('Authentication & Authorization Tests', () => {
     test('✅ Login - Başarılı giriş', async ({ page }) => {
       await page.goto(`${BASE_URL}/login`);
       await page.waitForLoadState('networkidle');
-      const emailInput = page.locator('input[type="email"], input[name*="email"]');
-      const passwordInput = page.locator('input[type="password"], input[name*="password"]');
-      const loginBtn = page.locator('button[type="submit"], button:has-text("Giriş")');
+      const emailInput = page.getByTestId('login-email-input');
+      const passwordInput = page.getByTestId('login-password-input');
+      const loginBtn = page.getByTestId('login-submit-button');
 
-      await emailInput.first().fill('test@example.com', { timeout: 5000 });
-      await passwordInput.first().fill('password123', { timeout: 5000 });
-      await loginBtn.first().click({ timeout: 5000 });
+      await emailInput.fill('test@example.com', { timeout: 5000 });
+      await passwordInput.fill('password123', { timeout: 5000 });
+      await loginBtn.click({ timeout: 5000 });
 
-      // Dashboard veya home page'e yönlendirilmesi bekleniyor
+      // Home page'e yönlendirilmesi bekleniyor
       await page.waitForNavigation({ timeout: 10000 }).catch(() => {});
-      await expect(page).toHaveURL(/.*(?:home|dashboard|account|profile)/i, { timeout: 5000 });
+      await expect(page).toHaveURL(/.*\/$/, { timeout: 5000 });
     });
 
     test('❌ Login - Yanlış password', async ({ page }) => {
       await page.goto(`${BASE_URL}/login`);
       await page.waitForLoadState('networkidle');
-      const emailInput = page.locator('input[type="email"], input[name*="email"]');
-      const passwordInput = page.locator('input[type="password"], input[name*="password"]');
-      const loginBtn = page.locator('button[type="submit"], button:has-text("Giriş")');
+      const emailInput = page.getByTestId('login-email-input');
+      const passwordInput = page.getByTestId('login-password-input');
+      const loginBtn = page.getByTestId('login-submit-button');
 
-      await emailInput.first().fill('test@example.com', { timeout: 5000 });
-      await passwordInput.first().fill('wrongpassword', { timeout: 5000 });
-      await loginBtn.first().click({ timeout: 5000 });
+      await emailInput.fill('test@example.com', { timeout: 5000 });
+      await passwordInput.fill('wrongpassword', { timeout: 5000 });
+      await loginBtn.click({ timeout: 5000 });
 
       // Error message bekleniyor
       await expect(page.locator('text=/yanlış|hata|invalid|incorrect/i')).toBeVisible({ timeout: 3000 });
@@ -140,8 +140,8 @@ test.describe('Authentication & Authorization Tests', () => {
       await page.waitForNavigation({ timeout: 10000 }).catch(() => {});
 
       // Logout butonunu bul ve tıkla
-      const logoutBtn = page.locator('button:has-text("Çıkış"), a:has-text("Çıkış")');
-      await logoutBtn.first().click({ timeout: 5000 });
+      const logoutBtn = page.getByTestId('logout-button');
+      await logoutBtn.click({ timeout: 5000 });
 
       // Login sayfasına dönülmesi bekleniyor
       await expect(page).toHaveURL(/.*(?:login|signin)/i, { timeout: 5000 });
@@ -178,8 +178,8 @@ test.describe('Authentication & Authorization Tests', () => {
       await page.reload();
 
       // Session devam etmeli - logout butonu görünür olmalı
-      const logoutBtn = page.locator('button:has-text("Çıkış"), a:has-text("Çıkış")');
-      await expect(logoutBtn.first()).toBeVisible({ timeout: 3000 });
+      const logoutBtn = page.getByTestId('logout-button');
+      await expect(logoutBtn).toBeVisible({ timeout: 3000 });
     });
 
     test('✅ Session timeout - Uzun inaktivite sonrası logout', async ({ page }) => {
