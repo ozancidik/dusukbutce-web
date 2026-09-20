@@ -6,22 +6,22 @@
 
 # Test info
 
-- Name: tests/auth.test.ts >> Authentication & Authorization Tests >> Login Scenarios >> ✅ Login - Başarılı giriş
-- Location: tests/auth.test.ts:70:9
+- Name: auth.test.ts >> Authentication & Authorization Tests >> Login Scenarios >> ❌ Login - Yanlış password
+- Location: tests/auth.test.ts:86:9
 
 # Error details
 
 ```
-Error: expect(page).toHaveURL(expected) failed
+Error: expect(locator).toBeVisible() failed
 
-Expected pattern: /.*(?:home|dashboard|account|profile)/i
-Received string:  "http://localhost:3000/login"
-Timeout: 5000ms
+Locator: locator('text=/yanlış|hata|invalid|incorrect/i')
+Expected: visible
+Timeout: 3000ms
+Error: element(s) not found
 
 Call log:
-  - Expect "toHaveURL" with timeout 5000ms
-    14 × locator resolved to <html lang="tr">…</html>
-       - unexpected value "http://localhost:3000/login"
+  - Expect "toBeVisible" locator('text=/yanlış|hata|invalid|incorrect/i') with timeout 3000ms
+  - waiting for locator('text=/yanlış|hata|invalid|incorrect/i')
 
 ```
 
@@ -61,7 +61,7 @@ Call log:
     - /placeholder: ornek@email.com
     - text: test@example.com
   - text: Şifre
-  - textbox "Şifre": password123
+  - textbox "Şifre": wrongpassword
   - button "Şifreyi göster":
     - img
   - checkbox "Beni Hatırla"
@@ -226,8 +226,7 @@ Call log:
   80  | 
   81  |       // Dashboard veya home page'e yönlendirilmesi bekleniyor
   82  |       await page.waitForNavigation({ timeout: 10000 }).catch(() => {});
-> 83  |       await expect(page).toHaveURL(/.*(?:home|dashboard|account|profile)/i, { timeout: 5000 });
-      |                          ^ Error: expect(page).toHaveURL(expected) failed
+  83  |       await expect(page).toHaveURL(/.*(?:home|dashboard|account|profile)/i, { timeout: 5000 });
   84  |     });
   85  | 
   86  |     test('❌ Login - Yanlış password', async ({ page }) => {
@@ -242,7 +241,8 @@ Call log:
   95  |       await loginBtn.first().click({ timeout: 5000 });
   96  | 
   97  |       // Error message bekleniyor
-  98  |       await expect(page.locator('text=/yanlış|hata|invalid|incorrect/i')).toBeVisible({ timeout: 3000 });
+> 98  |       await expect(page.locator('text=/yanlış|hata|invalid|incorrect/i')).toBeVisible({ timeout: 3000 });
+      |                                                                           ^ Error: expect(locator).toBeVisible() failed
   99  |     });
   100 | 
   101 |     test('❌ Login - Non-existent user', async ({ page }) => {
@@ -328,4 +328,19 @@ Call log:
   181 |       const logoutBtn = page.locator('button:has-text("Çıkış"), a:has-text("Çıkış")');
   182 |       await expect(logoutBtn.first()).toBeVisible({ timeout: 3000 });
   183 |     });
+  184 | 
+  185 |     test('✅ Session timeout - Uzun inaktivite sonrası logout', async ({ page }) => {
+  186 |       // Bu test gerçek environment'te çalışması için timeout ayarı gerekir
+  187 |       // Placeholder test
+  188 |       await page.goto(`${BASE_URL}`);
+  189 |       await expect(page).toHaveURL(/.*localhost/i);
+  190 |     });
+  191 |   });
+  192 | 
+  193 |   // ==================== PASSWORD RECOVERY TESTS ====================
+  194 |   test.describe('Password Recovery Scenarios', () => {
+  195 | 
+  196 |     test('✅ Password recovery - Email gönderimi', async ({ page }) => {
+  197 |       await page.goto(`${BASE_URL}/auth/forgot-password`);
+  198 |       await page.waitForLoadState('networkidle');
 ```
