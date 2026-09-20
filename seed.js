@@ -18,6 +18,24 @@ const testListings = [
     price: 5000,
     status: 'listed',
     createdAt: new Date()
+  },
+  {
+    title: 'Pending Approval Test',
+    description: 'For admin approval endpoint',
+    category: 'ssd',
+    condition: 'excellent',
+    price: 3000,
+    status: 'pending',
+    createdAt: new Date()
+  },
+  {
+    title: 'Pending Rejection Test',
+    description: 'For admin rejection endpoint',
+    category: 'gpu',
+    condition: 'good',
+    price: 8000,
+    status: 'pending',
+    createdAt: new Date()
   }
 ];
 
