@@ -31,26 +31,20 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const limit = parseInt(request.nextUrl.searchParams.get('limit') || '20');
-    const page = parseInt(request.nextUrl.searchParams.get('page') || '1');
-    const skip = (page - 1) * limit;
-
-    const users = await User.find()
-      .select('-password')
-      .limit(limit)
-      .skip(skip)
-      .sort({ createdAt: -1 });
-
-    const total = await User.countDocuments();
+    const totalUsers = await User.countDocuments();
+    const totalListings = 0; // Listings modeli gerekli
+    const totalOffers = 0; // Offers modeli gerekli
+    const pendingListings = 0;
 
     return NextResponse.json({
       success: true,
-      users,
-      pagination: {
-        total,
-        page,
-        limit,
-        pages: Math.ceil(total / limit)
+      stats: {
+        totalUsers,
+        totalListings,
+        totalOffers,
+        pendingListings,
+        activeListings: totalListings - pendingListings,
+        completedOffers: 0
       }
     });
   } catch (error: any) {
@@ -60,7 +54,7 @@ export async function GET(request: NextRequest) {
         { status: 401 }
       );
     }
-    console.error('Error getting users:', error);
+    console.error('Error getting stats:', error);
     return NextResponse.json(
       { success: false, message: 'Bir hata oluştu' },
       { status: 500 }

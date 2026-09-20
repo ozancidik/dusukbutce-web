@@ -1,0 +1,43 @@
+
+🧪 Backend API Tests
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📂 Categories:
+❌ [undefined] GET /categories
+
+🔐 Authentication:
+❌ [undefined] POST /auth/register
+❌ [undefined] POST /auth/login
+⚠️  Skipping authenticated endpoints (no auth token)
+✅ [undefined] POST /auth/logout
+
+👤 Users:
+❌ [undefined] GET /users/507f1f77bcf86cd799439011
+
+📋 Listings:
+✅ [undefined] GET /listings?category=ram&limit=10
+❌ [undefined] GET /listings/507f1f77bcf86cd799439011
+❌ [undefined] GET /listings/search?q=RAM
+
+💬 Offers:
+⚠️  Skipping offer endpoints (no auth token)
+
+⚙️  Admin:
+⚠️  Skipping admin endpoints (no auth token)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 Results:
+   Total: 8
+   Passed: 2 ✅
+   Failed: 6 ❌
+   Pass Rate: 25.0%
+
+🔴 Failed Endpoints:
+   [undefined] GET /categories
+   [undefined] POST /auth/register
+   [undefined] POST /auth/login
+   [undefined] GET /users/507f1f77bcf86cd799439011
+   [undefined] GET /listings/507f1f77bcf86cd799439011
+   [undefined] GET /listings/search?q=RAM

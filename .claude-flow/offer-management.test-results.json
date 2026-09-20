@@ -1,0 +1,981 @@
+{
+  "config": {
+    "argv": [
+      "/Users/ozan.cidik/.nvm/versions/node/v20.20.0/bin/node",
+      "/Users/ozan.cidik/Desktop/dusukbutce-web/node_modules/.bin/playwright",
+      "test",
+      "tests/offer-management.test.ts",
+      "--reporter=json"
+    ],
+    "rootDir": "/Users/ozan.cidik/Desktop/dusukbutce-web",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "/Users/ozan.cidik/Desktop/dusukbutce-web",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 4,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "tests/offer-management.test.ts",
+      "file": "tests/offer-management.test.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Teklif (Offer) Yönetimi Testleri",
+          "file": "tests/offer-management.test.ts",
+          "line": 5,
+          "column": 6,
+          "specs": [],
+          "suites": [
+            {
+              "title": "Teklif Alma Senaryoları",
+              "file": "tests/offer-management.test.ts",
+              "line": 8,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "✅ Teklif alma - Başarılı",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "timedOut",
+                          "duration": 30031,
+                          "error": {
+                            "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                            "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                          },
+                          "errors": [
+                            {
+                              "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                            },
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts",
+                                "column": 24,
+                                "line": 16
+                              },
+                              "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText(/teklif ver|make offer|fiyat teklif/i)\u001b[22m\n\n\n  14 |       const offerBtn = page.getByText(/teklif ver|make offer|fiyat teklif/i);\n  15 |       if (offerBtn) {\n> 16 |         await offerBtn.click();\n     |                        ^\n  17 |\n  18 |         // Teklif formu\n  19 |         const priceInput = page.getByLabel(/teklif fiyatı|offer price/i);\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts:16:24"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:39:01.086Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-offer-management-Tek-74377-rı-✅-Teklif-alma---Başarılı/error-context.md"
+                            }
+                          ]
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "bd93494974e794722235-042ebaa568c14791e9f6",
+                  "file": "tests/offer-management.test.ts",
+                  "line": 10,
+                  "column": 9
+                },
+                {
+                  "title": "❌ Teklif alma - Geçersiz fiyat",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 1,
+                          "parallelIndex": 0,
+                          "status": "timedOut",
+                          "duration": 30040,
+                          "error": {
+                            "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                            "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                          },
+                          "errors": [
+                            {
+                              "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                            },
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts",
+                                "column": 24,
+                                "line": 39
+                              },
+                              "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText(/teklif ver/i)\u001b[22m\n\n\n  37 |       const offerBtn = page.getByText(/teklif ver/i);\n  38 |       if (offerBtn) {\n> 39 |         await offerBtn.click();\n     |                        ^\n  40 |\n  41 |         const priceInput = page.getByLabel(/teklif fiyatı/i);\n  42 |         if (priceInput) {\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts:39:24"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:39:31.674Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-offer-management-Tek-5da87-eklif-alma---Geçersiz-fiyat/error-context.md"
+                            }
+                          ]
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "bd93494974e794722235-d26e369bf0e1ea2a818b",
+                  "file": "tests/offer-management.test.ts",
+                  "line": 34,
+                  "column": 9
+                },
+                {
+                  "title": "❌ Teklif alma - Boş fiyat",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 2,
+                          "parallelIndex": 0,
+                          "status": "timedOut",
+                          "duration": 30046,
+                          "error": {
+                            "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                            "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                          },
+                          "errors": [
+                            {
+                              "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                            },
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts",
+                                "column": 24,
+                                "line": 61
+                              },
+                              "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText(/teklif ver/i)\u001b[22m\n\n\n  59 |       const offerBtn = page.getByText(/teklif ver/i);\n  60 |       if (offerBtn) {\n> 61 |         await offerBtn.click();\n     |                        ^\n  62 |\n  63 |         const submitBtn = page.getByRole('button', { name: /gönder/i });\n  64 |         if (submitBtn) {\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts:61:24"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:40:02.392Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-offer-management-Tek-4a857-ı-❌-Teklif-alma---Boş-fiyat/error-context.md"
+                            }
+                          ]
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "bd93494974e794722235-2e6d06956814b7d51de1",
+                  "file": "tests/offer-management.test.ts",
+                  "line": 56,
+                  "column": 9
+                },
+                {
+                  "title": "✅ Teklif alma - Not/Mesaj eklenmesi",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 3,
+                          "parallelIndex": 0,
+                          "status": "timedOut",
+                          "duration": 30026,
+                          "error": {
+                            "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                            "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                          },
+                          "errors": [
+                            {
+                              "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                            },
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts",
+                                "column": 24,
+                                "line": 78
+                              },
+                              "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText(/teklif ver/i)\u001b[22m\n\n\n  76 |       const offerBtn = page.getByText(/teklif ver/i);\n  77 |       if (offerBtn) {\n> 78 |         await offerBtn.click();\n     |                        ^\n  79 |\n  80 |         const noteInput = page.getByLabel(/not|message|açıklama/i);\n  81 |         if (noteInput) {\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts:78:24"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:40:32.936Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-offer-management-Tek-89718--alma---Not-Mesaj-eklenmesi/error-context.md"
+                            }
+                          ]
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "bd93494974e794722235-98b440eb5c6b0021ccb7",
+                  "file": "tests/offer-management.test.ts",
+                  "line": 73,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "Teklif Yönetimi Senaryoları",
+              "file": "tests/offer-management.test.ts",
+              "line": 90,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "✅ Teklifleri görüntüleme",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 4,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 971,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:41:03.368Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "bd93494974e794722235-dac2f6d331c1be35ab4f",
+                  "file": "tests/offer-management.test.ts",
+                  "line": 92,
+                  "column": 9
+                },
+                {
+                  "title": "✅ Teklif detaylarını görüntüleme",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 4,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 449,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:41:04.441Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "bd93494974e794722235-c6533ffcb6189b313d5a",
+                  "file": "tests/offer-management.test.ts",
+                  "line": 101,
+                  "column": 9
+                },
+                {
+                  "title": "✅ Teklifi kabul etme",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 4,
+                          "parallelIndex": 0,
+                          "status": "timedOut",
+                          "duration": 30041,
+                          "error": {
+                            "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                            "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                          },
+                          "errors": [
+                            {
+                              "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                            },
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts",
+                                "column": 25,
+                                "line": 119
+                              },
+                              "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /kabul et|accept|onay/i }).first()\u001b[22m\n\n\n  117 |       const acceptBtn = page.getByRole('button', { name: /kabul et|accept|onay/i }).first();\n  118 |       if (acceptBtn) {\n> 119 |         await acceptBtn.click();\n      |                         ^\n  120 |\n  121 |         // Confirmation dialog bekleniyor\n  122 |         const confirmBtn = page.getByRole('button', { name: /onayla|confirm|yes/i });\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts:119:25"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:41:04.902Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-offer-management-Tek-65a67-yoları-✅-Teklifi-kabul-etme/error-context.md"
+                            }
+                          ]
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "bd93494974e794722235-8627422d0baaf8837813",
+                  "file": "tests/offer-management.test.ts",
+                  "line": 114,
+                  "column": 9
+                },
+                {
+                  "title": "✅ Teklifi reddetme",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 5,
+                          "parallelIndex": 0,
+                          "status": "timedOut",
+                          "duration": 30038,
+                          "error": {
+                            "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                            "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                          },
+                          "errors": [
+                            {
+                              "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                            },
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts",
+                                "column": 25,
+                                "line": 137
+                              },
+                              "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /reddet|reject|decline/i }).first()\u001b[22m\n\n\n  135 |       const rejectBtn = page.getByRole('button', { name: /reddet|reject|decline/i }).first();\n  136 |       if (rejectBtn) {\n> 137 |         await rejectBtn.click();\n      |                         ^\n  138 |\n  139 |         // Rejection reason input bekleniyor\n  140 |         const reasonInput = page.getByLabel(/neden|reason|açıklama/i);\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts:137:25"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:41:35.308Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-offer-management-Tek-50ef3-aryoları-✅-Teklifi-reddetme/error-context.md"
+                            }
+                          ]
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "bd93494974e794722235-311de5c1e04770586cc1",
+                  "file": "tests/offer-management.test.ts",
+                  "line": 132,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "Karşı Teklif Senaryoları",
+              "file": "tests/offer-management.test.ts",
+              "line": 157,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "✅ Karşı teklif gönderme",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 6,
+                          "parallelIndex": 0,
+                          "status": "timedOut",
+                          "duration": 30023,
+                          "error": {
+                            "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                            "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                          },
+                          "errors": [
+                            {
+                              "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                            },
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts",
+                                "column": 31,
+                                "line": 164
+                              },
+                              "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /karşı teklif|counter|suggest price/i }).first()\u001b[22m\n\n\n  162 |       const counterOfferBtn = page.getByRole('button', { name: /karşı teklif|counter|suggest price/i }).first();\n  163 |       if (counterOfferBtn) {\n> 164 |         await counterOfferBtn.click();\n      |                               ^\n  165 |\n  166 |         // Counter offer formu\n  167 |         const priceInput = page.getByLabel(/fiyat|price/i);\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts:164:31"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:42:05.832Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-offer-management-Tek-d6ab3-arı-✅-Karşı-teklif-gönderme/error-context.md"
+                            }
+                          ]
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "bd93494974e794722235-a553ef1b5e522f9f47bb",
+                  "file": "tests/offer-management.test.ts",
+                  "line": 159,
+                  "column": 9
+                },
+                {
+                  "title": "❌ Karşı teklif - Orijinal fiyattan daha düşük",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 7,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 1156,
+                          "error": {
+                            "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/tekliflerim\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/tekliflerim\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/tekliflerim\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/tekliflerim\", waiting until \"load\"\u001b[22m\n\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts:183:18",
+                            "location": {
+                              "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts",
+                              "column": 18,
+                              "line": 183
+                            },
+                            "snippet": "  181 |\n  182 |     test('❌ Karşı teklif - Orijinal fiyattan daha düşük', async ({ page }) => {\n> 183 |       await page.goto(`${BASE_URL}/tekliflerim`);\n      |                  ^\n  184 |\n  185 |       const counterOfferBtn = page.getByRole('button', { name: /karşı teklif/i }).first();\n  186 |       if (counterOfferBtn) {"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts",
+                                "column": 18,
+                                "line": 183
+                              },
+                              "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/tekliflerim\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/tekliflerim\", waiting until \"load\"\u001b[22m\n\n\n  181 |\n  182 |     test('❌ Karşı teklif - Orijinal fiyattan daha düşük', async ({ page }) => {\n> 183 |       await page.goto(`${BASE_URL}/tekliflerim`);\n      |                  ^\n  184 |\n  185 |       const counterOfferBtn = page.getByRole('button', { name: /karşı teklif/i }).first();\n  186 |       if (counterOfferBtn) {\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts:183:18"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:42:36.473Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-offer-management-Tek-df592-rijinal-fiyattan-daha-düşük/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts",
+                            "column": 18,
+                            "line": 183
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "bd93494974e794722235-b8b21f23037a891a1566",
+                  "file": "tests/offer-management.test.ts",
+                  "line": 182,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "Fiyat Değişikliği Senaryoları",
+              "file": "tests/offer-management.test.ts",
+              "line": 207,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "✅ Orijinal ürün fiyatını güncelleme",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 8,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 1244,
+                          "error": {
+                            "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ilanlar%C4%B1m\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ilanlar%C4%B1m\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ilanlar%C4%B1m\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ilanlar%C4%B1m\", waiting until \"load\"\u001b[22m\n\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts:210:18",
+                            "location": {
+                              "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts",
+                              "column": 18,
+                              "line": 210
+                            },
+                            "snippet": "  208 |\n  209 |     test('✅ Orijinal ürün fiyatını güncelleme', async ({ page }) => {\n> 210 |       await page.goto(`${BASE_URL}/ilanlarım`); // My listings\n      |                  ^\n  211 |\n  212 |       const editBtn = page.getByRole('button', { name: /düzenle|edit/i }).first();\n  213 |       if (editBtn) {"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts",
+                                "column": 18,
+                                "line": 210
+                              },
+                              "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ilanlar%C4%B1m\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ilanlar%C4%B1m\", waiting until \"load\"\u001b[22m\n\n\n  208 |\n  209 |     test('✅ Orijinal ürün fiyatını güncelleme', async ({ page }) => {\n> 210 |       await page.goto(`${BASE_URL}/ilanlarım`); // My listings\n      |                  ^\n  211 |\n  212 |       const editBtn = page.getByRole('button', { name: /düzenle|edit/i }).first();\n  213 |       if (editBtn) {\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts:210:18"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:42:38.065Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-offer-management-Tek-5da4b-al-ürün-fiyatını-güncelleme/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts",
+                            "column": 18,
+                            "line": 210
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "bd93494974e794722235-f6b2e903df7fe827d646",
+                  "file": "tests/offer-management.test.ts",
+                  "line": 209,
+                  "column": 9
+                },
+                {
+                  "title": "✅ Fiyat düşürme - İlanı hızlandırma",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 9,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 1109,
+                          "error": {
+                            "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ilanlar%C4%B1m\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ilanlar%C4%B1m\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ilanlar%C4%B1m\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ilanlar%C4%B1m\", waiting until \"load\"\u001b[22m\n\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts:235:18",
+                            "location": {
+                              "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts",
+                              "column": 18,
+                              "line": 235
+                            },
+                            "snippet": "  233 |\n  234 |     test('✅ Fiyat düşürme - İlanı hızlandırma', async ({ page }) => {\n> 235 |       await page.goto(`${BASE_URL}/ilanlarım`);\n      |                  ^\n  236 |\n  237 |       const editBtn = page.getByRole('button', { name: /düzenle/i }).first();\n  238 |       if (editBtn) {"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts",
+                                "column": 18,
+                                "line": 235
+                              },
+                              "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ilanlar%C4%B1m\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ilanlar%C4%B1m\", waiting until \"load\"\u001b[22m\n\n\n  233 |\n  234 |     test('✅ Fiyat düşürme - İlanı hızlandırma', async ({ page }) => {\n> 235 |       await page.goto(`${BASE_URL}/ilanlarım`);\n      |                  ^\n  236 |\n  237 |       const editBtn = page.getByRole('button', { name: /düzenle/i }).first();\n  238 |       if (editBtn) {\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts:235:18"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:42:41.351Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-offer-management-Tek-38b92-düşürme---İlanı-hızlandırma/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts",
+                            "column": 18,
+                            "line": 235
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "bd93494974e794722235-62e530def98cfd9d00f7",
+                  "file": "tests/offer-management.test.ts",
+                  "line": 234,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "Teklif Zaman Aşımı Senaryoları",
+              "file": "tests/offer-management.test.ts",
+              "line": 261,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "✅ Teklif süresi gösterimi",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 10,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 1350,
+                          "error": {
+                            "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/tekliflerim\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/tekliflerim\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/tekliflerim\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/tekliflerim\", waiting until \"load\"\u001b[22m\n\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts:264:18",
+                            "location": {
+                              "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts",
+                              "column": 18,
+                              "line": 264
+                            },
+                            "snippet": "  262 |\n  263 |     test('✅ Teklif süresi gösterimi', async ({ page }) => {\n> 264 |       await page.goto(`${BASE_URL}/tekliflerim`);\n      |                  ^\n  265 |\n  266 |       const offerCard = page.locator('[class*=\"offer-card\"]').first();\n  267 |       if (await offerCard.count() > 0) {"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts",
+                                "column": 18,
+                                "line": 264
+                              },
+                              "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/tekliflerim\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/tekliflerim\", waiting until \"load\"\u001b[22m\n\n\n  262 |\n  263 |     test('✅ Teklif süresi gösterimi', async ({ page }) => {\n> 264 |       await page.goto(`${BASE_URL}/tekliflerim`);\n      |                  ^\n  265 |\n  266 |       const offerCard = page.locator('[class*=\"offer-card\"]').first();\n  267 |       if (await offerCard.count() > 0) {\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts:264:18"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:42:43.085Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-offer-management-Tek-f8198-ı-✅-Teklif-süresi-gösterimi/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts",
+                            "column": 18,
+                            "line": 264
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "bd93494974e794722235-400aae513051b37e411d",
+                  "file": "tests/offer-management.test.ts",
+                  "line": 263,
+                  "column": 9
+                },
+                {
+                  "title": "✅ Süresi dolmuş teklif görüntülenmesi",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 11,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 1275,
+                          "error": {
+                            "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/tekliflerim\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/tekliflerim\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/tekliflerim\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/tekliflerim\", waiting until \"load\"\u001b[22m\n\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts:274:18",
+                            "location": {
+                              "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts",
+                              "column": 18,
+                              "line": 274
+                            },
+                            "snippet": "  272 |\n  273 |     test('✅ Süresi dolmuş teklif görüntülenmesi', async ({ page }) => {\n> 274 |       await page.goto(`${BASE_URL}/tekliflerim`);\n      |                  ^\n  275 |\n  276 |       const expiredOffers = page.getByText(/expired|süresi.*dolmuş|ended/i);\n  277 |       // Varsa görüntülenmeli"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts",
+                                "column": 18,
+                                "line": 274
+                              },
+                              "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/tekliflerim\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/tekliflerim\", waiting until \"load\"\u001b[22m\n\n\n  272 |\n  273 |     test('✅ Süresi dolmuş teklif görüntülenmesi', async ({ page }) => {\n> 274 |       await page.goto(`${BASE_URL}/tekliflerim`);\n      |                  ^\n  275 |\n  276 |       const expiredOffers = page.getByText(/expired|süresi.*dolmuş|ended/i);\n  277 |       // Varsa görüntülenmeli\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts:274:18"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:42:45.287Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-offer-management-Tek-b3b5e-olmuş-teklif-görüntülenmesi/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts",
+                            "column": 18,
+                            "line": 274
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "bd93494974e794722235-d337164828dcd0bceab2",
+                  "file": "tests/offer-management.test.ts",
+                  "line": 273,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "Bildirim Senaryoları",
+              "file": "tests/offer-management.test.ts",
+              "line": 282,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "✅ Yeni teklif bildirimi",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [
+                        {
+                          "workerIndex": 12,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 1384,
+                          "error": {
+                            "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"load\"\u001b[22m\n\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts:286:18",
+                            "location": {
+                              "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts",
+                              "column": 18,
+                              "line": 286
+                            },
+                            "snippet": "  284 |     test('✅ Yeni teklif bildirimi', async ({ page }) => {\n  285 |       // Bu test real-time event gerektiriyor\n> 286 |       await page.goto(`${BASE_URL}`);\n      |                  ^\n  287 |\n  288 |       // Notification badge kontrol\n  289 |       const badge = page.locator('[class*=\"notification-badge\"]');"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts",
+                                "column": 18,
+                                "line": 286
+                              },
+                              "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/\", waiting until \"load\"\u001b[22m\n\n\n  284 |     test('✅ Yeni teklif bildirimi', async ({ page }) => {\n  285 |       // Bu test real-time event gerektiriyor\n> 286 |       await page.goto(`${BASE_URL}`);\n      |                  ^\n  287 |\n  288 |       // Notification badge kontrol\n  289 |       const badge = page.locator('[class*=\"notification-badge\"]');\n    at /Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts:286:18"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-09-20T04:42:47.504Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/ozan.cidik/Desktop/dusukbutce-web/test-results/tests-offer-management-Tek-45ad4-arı-✅-Yeni-teklif-bildirimi/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/ozan.cidik/Desktop/dusukbutce-web/tests/offer-management.test.ts",
+                            "column": 18,
+                            "line": 286
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "bd93494974e794722235-18f2dc62fcfd16bce0fe",
+                  "file": "tests/offer-management.test.ts",
+                  "line": 284,
+                  "column": 9
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-09-20T04:39:00.270Z",
+    "duration": 229079.394,
+    "expected": 2,
+    "skipped": 0,
+    "unexpected": 13,
+    "flaky": 0
+  }
+}

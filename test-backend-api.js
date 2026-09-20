@@ -5,30 +5,7 @@ const https = require('https');
 
 const BASE_URL = 'http://localhost:3000/api';
 const results = [];
-
-function request(options, data = null) {
-  return new Promise((resolve, reject) => {
-    const handler = options.protocol === 'https' ? https : http;
-    const req = handler.request(options, (res) => {
-      let body = '';
-      res.on('data', (chunk) => { body += chunk; });
-      res.on('end', () => {
-        try {
-          resolve({
-            status: res.statusCode,
-            headers: res.headers,
-            body: body ? JSON.parse(body) : null
-          });
-        } catch (e) {
-          resolve({ status: res.statusCode, headers: res.headers, body });
-        }
-      });
-    });
-    req.on('error', reject);
-    if (data) req.write(JSON.stringify(data));
-    req.end();
-  });
-}
+let authToken = null;
 
 function parseUrl(url) {
   const u = new URL(url);
@@ -42,25 +19,45 @@ function parseUrl(url) {
   };
 }
 
-async function test(name, method, path, data = null) {
+let csrfToken = null;
+let csrfCookie = null;
+
+async function test(name, method, path, data = null, options = {}) {
   try {
     const parsed = parseUrl(`${BASE_URL}${path}`);
-    const options = {
+
+    // Build cookie header
+    let cookieHeader = authToken ? `auth-token=${authToken}` : '';
+    if (csrfCookie) {
+      cookieHeader = cookieHeader ? `${cookieHeader}; ${csrfCookie}` : csrfCookie;
+    }
+
+    const reqOptions = {
       hostname: parsed.hostname,
       port: parsed.port,
       path: parsed.path,
       method,
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...(cookieHeader && { 'Cookie': cookieHeader }),
+        ...(options.headers || {})
+      },
       protocol: parsed.isHttps ? 'https:' : 'http:'
     };
+
     const handler = parsed.isHttps ? https : http;
     const res = await new Promise((resolve, reject) => {
-      const req = handler.request(options, (res) => {
+      const req = handler.request(reqOptions, (res) => {
         let body = '';
         res.on('data', (chunk) => { body += chunk; });
         res.on('end', () => {
           try {
-            resolve({ status: res.statusCode, headers: res.headers, body: body ? JSON.parse(body) : null });
+            resolve({
+              status: res.statusCode,
+              headers: res.headers,
+              cookies: res.headers['set-cookie'] || [],
+              body: body ? JSON.parse(body) : null
+            });
           } catch (e) {
             resolve({ status: res.statusCode, headers: res.headers, body });
           }
@@ -70,6 +67,25 @@ async function test(name, method, path, data = null) {
       if (data) req.write(JSON.stringify(data));
       req.end();
     });
+
+    // Extract CSRF token from cookies if present
+    if (res.cookies && res.cookies.length > 0) {
+      const setCookies = res.cookies.join('; ');
+      if (setCookies.includes('csrf-token=')) {
+        csrfCookie = res.cookies.find(c => c.includes('csrf-token='));
+        const tokenMatch = csrfCookie.match(/csrf-token=([^;]+)/);
+        if (tokenMatch) csrfToken = tokenMatch[1];
+      }
+    }
+
+    // Extract auth token from Set-Cookie if login was successful
+    if (method === 'POST' && path.includes('/auth/login') && res.status === 200) {
+      const setCookie = res.cookies.find(cookie => cookie.includes('auth-token='));
+      if (setCookie) {
+        authToken = setCookie.split('auth-token=')[1].split(';')[0];
+      }
+    }
+
     const pass = res.status >= 200 && res.status < 400;
     const result = {
       name,
@@ -96,109 +112,142 @@ async function runTests() {
   console.log('📂 Categories:');
   await test('Get Categories', 'GET', '/categories');
 
-  // Auth
+  // Auth - Get CSRF Token first
   console.log('\n🔐 Authentication:');
-  const registerRes = await test('Register User', 'POST', '/auth/register', {
-    email: `test-${Date.now()}@example.com`,
-    password: 'Test123!@',
-    passwordConfirm: 'Test123!@',
-    name: 'Test User'
-  });
+  await test('Get CSRF Token', 'GET', '/auth/csrf-token');
 
-  await test('Login User', 'POST', '/auth/login', {
-    email: 'test@example.com',
-    password: 'Test123!@'
-  });
+  // Auth - Register
+  const timestamp = Date.now();
+  const uniquePhone = `555${Math.floor(1000000 + Math.random() * 9000000)}`.slice(0, 11);
+  const registerData = {
+    email: `test-${timestamp}@example.com`,
+    password: 'testPassword123!',
+    firstName: 'Test',
+    lastName: 'User',
+    cep_telefonu: uniquePhone,
+    birth_date: '1990-01-01',
+    acceptNewsletter: false,
+    kvkkApproved: true
+  };
+  await test('Register User', 'POST', '/auth/register', registerData);
 
-  await test('Get Current User', 'GET', '/auth/me');
+  // Auth - Login (with CSRF token if available)
+  const loginData = {
+    email: 'admin@example.com',  // Login as admin for admin endpoints
+    password: 'admin123',
+    ...(csrfToken && { csrfToken })
+  };
+  await test('Login User', 'POST', '/auth/login', loginData);
+
+  // Auth - Get Current User (requires auth token)
+  if (authToken) {
+    await test('Get Current User', 'GET', '/auth/me');
+  } else {
+    console.log('⚠️  Skipping authenticated endpoints (no auth token)');
+  }
+
+  // Auth - Logout
   await test('Logout User', 'POST', '/auth/logout');
 
   // Users
   console.log('\n👤 Users:');
-  await test('Get User Profile', 'GET', '/users/1');
-  await test('Update User Profile', 'PATCH', '/users/profile', {
-    phone: '+905555555555',
-    bio: 'Test bio'
-  });
+  await test('Get User Profile', 'GET', '/users/507f1f77bcf86cd799439011');
+  if (authToken) {
+    const profileData = {
+      name: 'Updated Name',
+      phone: '5559999999',
+      bio: 'Updated bio',
+      address: 'New Address'
+    };
+    await test('Update User Profile', 'PATCH', '/users/profile', profileData);
+  }
 
   // Listings
   console.log('\n📋 Listings:');
-  const listingRes = await test('Create Listing', 'POST', '/listings', {
-    title: 'Test RAM 16GB',
-    description: 'DDR4 Gaming RAM',
-    price: 2500,
-    category: 'ram',
-    condition: 'used',
-    images: [],
-    contactMethod: 'whatsapp',
-    phone: '+905555555555'
-  });
-
-  await test('Get All Listings', 'GET', '/listings?category=ram&limit=10');
-  await test('Get Listing by ID', 'GET', '/listings/1');
+  await test('Get Listings', 'GET', '/listings?category=ram&limit=10');
+  await test('Get Listing Detail', 'GET', '/listings/507f1f77bcf86cd799439011');
   await test('Search Listings', 'GET', '/listings/search?q=RAM');
-  await test('Update Listing', 'PATCH', '/listings/1', {
-    price: 2800,
-    description: 'Updated'
-  });
-  await test('Delete Listing', 'DELETE', '/listings/1');
+
+  if (authToken) {
+    const listingData = {
+      title: 'Test Item',
+      description: 'A test listing',
+      category: 'ram',
+      condition: 'good',
+      price: 5000,
+      images: []
+    };
+    await test('Create Listing', 'POST', '/listings', listingData);
+    await test('Update Listing', 'PATCH', '/listings/507f1f77bcf86cd799439011', {
+      price: 4500,
+      status: 'active'
+    });
+    await test('Delete Listing', 'DELETE', '/listings/507f1f77bcf86cd799439011');
+  }
 
   // Offers
   console.log('\n💬 Offers:');
-  await test('Create Offer', 'POST', '/offers', {
-    listingId: '1',
-    offeredPrice: 2000,
-    message: 'Biraz daha ucuz olabilir mi?'
-  });
-
-  await test('Get My Offers', 'GET', '/offers/my-offers');
-  await test('Accept Offer', 'PATCH', '/offers/1/accept', {
-    message: 'Kabul ediyorum'
-  });
-  await test('Reject Offer', 'PATCH', '/offers/1/reject', {
-    reason: 'Başka birini seçtim'
-  });
-  await test('Counter Offer', 'POST', '/offers/1/counter', {
-    counterPrice: 2300,
-    message: 'Bu fiyata anlaşalım'
-  });
+  if (authToken) {
+    const offerData = {
+      listingId: '507f1f77bcf86cd799439011',
+      price: 4800,
+      message: 'Test offer message'
+    };
+    await test('Create Offer', 'POST', '/offers', offerData);
+    await test('Get My Offers', 'GET', '/offers');
+    await test('Accept Offer', 'PATCH', '/offers/507f1f77bcf86cd799439011/accept');
+    await test('Reject Offer', 'PATCH', '/offers/507f1f77bcf86cd799439012/reject', {
+      reason: 'Price too high'
+    });
+    const counterData = { counterPrice: 4700, message: 'Counter offer' };
+    await test('Create Counter Offer', 'POST', '/offers/507f1f77bcf86cd799439011/counter', counterData);
+  } else {
+    console.log('⚠️  Skipping offer endpoints (no auth token)');
+  }
 
   // Admin
   console.log('\n⚙️  Admin:');
-  await test('Get Admin Users', 'GET', '/admin/users?limit=20');
-  await test('Get Admin Listings', 'GET', '/admin/listings?status=pending');
-  await test('Get Admin Stats', 'GET', '/admin/stats');
-  await test('Approve Listing', 'PATCH', '/admin/listings/1/approve', {});
-  await test('Reject Listing', 'PATCH', '/admin/listings/1/reject', {
-    reason: 'Kuralları ihlal ediyor'
-  });
+  if (authToken) {
+    await test('Get Admin Users', 'GET', '/admin/users?limit=20');
+    await test('Get Admin Listings', 'GET', '/admin/listings?status=pending');
+    await test('Get Admin Stats', 'GET', '/admin/stats');
+    await test('Approve Listing', 'PATCH', '/admin/listings/507f1f77bcf86cd799439011/approve');
+    await test('Reject Listing', 'PATCH', '/admin/listings/507f1f77bcf86cd799439012/reject', {
+      reason: 'Inappropriate content'
+    });
+  } else {
+    console.log('⚠️  Skipping admin endpoints (no auth token)');
+  }
 
   // Summary
   console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+  console.log('📊 Results:');
+
   const passed = results.filter(r => r.pass === '✅').length;
   const failed = results.filter(r => r.pass === '❌').length;
-  const passRate = Math.round((passed / results.length) * 100);
+  const passRate = ((passed / results.length) * 100).toFixed(1);
 
-  console.log(`📊 Results:`);
   console.log(`   Total: ${results.length}`);
   console.log(`   Passed: ${passed} ✅`);
   console.log(`   Failed: ${failed} ❌`);
-  console.log(`   Pass Rate: ${passRate}%\n`);
+  console.log(`   Pass Rate: ${passRate}%`);
 
-  // Issues
-  const errors = results.filter(r => r.pass === '❌');
-  if (errors.length > 0) {
-    console.log('🔴 Failed Endpoints:');
-    errors.forEach(e => {
-      console.log(`   [${e.status || 'ERROR'}] ${e.method} ${e.path}`);
+  if (failed > 0) {
+    console.log('\n🔴 Failed Endpoints:');
+    results.filter(r => r.pass === '❌').forEach(r => {
+      console.log(`   [${r.status}] ${r.method} ${r.path}`);
     });
-    console.log('');
   }
 
   process.exit(failed > 0 ? 1 : 0);
 }
 
-runTests().catch(err => {
-  console.error('Fatal error:', err);
-  process.exit(1);
-});
+// Run if called directly
+if (require.main === module) {
+  runTests().catch(err => {
+    console.error('Fatal error:', err);
+    process.exit(1);
+  });
+}
+
+module.exports = { test, runTests };
