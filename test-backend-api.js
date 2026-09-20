@@ -15,9 +15,11 @@ console.log(seedOutput);
 
 // Extract IDs from seed output
 const adminIdMatch = seedOutput.match(/admin@example\.com \(ID: ([a-f0-9]+)\)/);
-const listingIdMatch = seedOutput.match(/Created listing: ([a-f0-9]+)/);
+const listingMatches = seedOutput.match(/Created listing: ([a-f0-9]+)/g);
 const adminUserId = adminIdMatch ? adminIdMatch[1] : '6ab0228828a7ffeba6b85f30';
-const listingId = listingIdMatch ? listingIdMatch[1] : '6ab022b7505c1d57c113e140';
+const listingId = listingMatches ? listingMatches[0].match(/([a-f0-9]+)$/)[1] : '6ab022b7505c1d57c113e140';
+const adminApprovalListingId = listingMatches && listingMatches[1] ? listingMatches[1].match(/([a-f0-9]+)$/)[1] : '6ab01ca11d7e594ee9cb0f82';
+const adminRejectionListingId = listingMatches && listingMatches[2] ? listingMatches[2].match(/([a-f0-9]+)$/)[1] : '6ab01ca11d7e594ee9cb0f83';
 
 function parseUrl(url) {
   const u = new URL(url);
@@ -227,8 +229,8 @@ async function runTests() {
     await test('Get Admin Users', 'GET', '/admin/users?limit=20');
     await test('Get Admin Listings', 'GET', '/admin/listings?status=pending');
     await test('Get Admin Stats', 'GET', '/admin/stats');
-    await test('Approve Listing', 'PATCH', '/admin/listings/6ab01ca11d7e594ee9cb0f82/approve');
-    await test('Reject Listing', 'PATCH', '/admin/listings/6ab01ca11d7e594ee9cb0f83/reject', {
+    await test('Approve Listing', 'PATCH', `/admin/listings/${adminApprovalListingId}/approve`);
+    await test('Reject Listing', 'PATCH', `/admin/listings/${adminRejectionListingId}/reject`, {
       reason: 'Inappropriate content'
     });
   } else {
