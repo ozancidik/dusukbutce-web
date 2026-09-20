@@ -6,22 +6,22 @@
 
 # Test info
 
-- Name: tests/auth.test.ts >> Authentication & Authorization Tests >> Login Scenarios >> ❌ Login - Empty fields
-- Location: tests/auth.test.ts:116:9
+- Name: auth.test.ts >> Authentication & Authorization Tests >> Register Scenarios >> ✅ Register - Başarılı kayıt
+- Location: tests/auth.test.ts:10:9
 
 # Error details
 
 ```
 Error: expect(locator).toBeVisible() failed
 
-Locator: locator('text=/required|zorunlu|hata/i')
+Locator: locator('form')
 Expected: visible
-Timeout: 3000ms
+Timeout: 5000ms
 Error: element(s) not found
 
 Call log:
-  - Expect "toBeVisible" locator('text=/required|zorunlu|hata/i') with timeout 3000ms
-  - waiting for locator('text=/required|zorunlu|hata/i')
+  - Expect "toBeVisible" locator('form') with timeout 5000ms
+  - waiting for locator('form')
 
 ```
 
@@ -36,48 +36,91 @@ Call log:
     - img
     - text: Giriş Yap
     - img
-  - link "Giriş Yap":
-    - /url: /login?returnUrl=%2F
-    - img
-    - text: Giriş Yap
-  - link "Kayıt Ol":
-    - /url: /register
-    - img
-    - text: Kayıt Ol
   - link "Sepet":
     - /url: /sepet
     - button "Sepet":
       - img
       - text: Sepet
-- navigation:
-  - link "Anasayfa":
-    - /url: /
-  - text: "> Giriş Yap"
 - main:
-  - heading "Giriş Yap" [level=1]
-  - paragraph: Hesabınıza giriş yapın
-  - text: Email
-  - textbox "Email":
-    - /placeholder: ornek@email.com
-  - text: Şifre
-  - textbox "Şifre"
-  - button "Şifreyi göster":
-    - img
-  - checkbox "Beni Hatırla"
-  - text: Beni Hatırla
-  - link "Şifremi unuttum":
-    - /url: /sifremi-unuttum
-  - button "Giriş Yap"
-  - text: veya
-  - button "Google ile Giriş Yap":
-    - img
-    - text: Google ile Giriş Yap
-  - button "Facebook ile Giriş Yap":
-    - img
-    - text: Facebook ile Giriş Yap
-  - paragraph: Hesabınız yok mu?
-  - link "Kayıt olun":
-    - /url: /register
+  - heading "2. El Ürününü" [level=2]
+  - link "BİZE SAT":
+    - /url: /bize-sat
+    - button "BİZE SAT"
+  - heading "Kategoriler" [level=3]
+  - link "💻 Dizüstü (Notebook)":
+    - /url: /bize-sat/notebook
+  - link "🖥️ Masaüstü (Kasa)":
+    - /url: /bize-sat/masaustu
+  - link "🖥️ Monitör":
+    - /url: /bize-sat/monitor
+  - link "Ekran Kartı Ekran Kartı":
+    - /url: /bize-sat/ekran-karti
+    - img "Ekran Kartı"
+    - text: Ekran Kartı
+  - link "İşlemci İşlemci":
+    - /url: /bize-sat/islemci
+    - img "İşlemci"
+    - text: İşlemci
+  - link "RAM RAM":
+    - /url: /bize-sat/ram
+    - img "RAM"
+    - text: RAM
+  - link "SSD SSD":
+    - /url: /bize-sat/ssd
+    - img "SSD"
+    - text: SSD
+  - link "Soğutucu Soğutucu":
+    - /url: /bize-sat/sogutucu
+    - img "Soğutucu"
+    - text: Soğutucu
+  - link "Boş Kasa Boş Kasa":
+    - /url: /bize-sat/kasa
+    - img "Boş Kasa"
+    - text: Boş Kasa
+  - link "📄 Fotokopi Makinesi":
+    - /url: /bize-sat/fotokopi-makinesi
+  - link "🖨️ Yazıcı":
+    - /url: /bize-sat/yazici
+  - link "📱 Cep Telefonu":
+    - /url: /bize-sat/cep-telefonu
+  - link "PlayStation PlayStation":
+    - /url: /bize-sat/playstation
+    - img "PlayStation"
+    - text: PlayStation
+  - link "Gamepad Gamepad":
+    - /url: /bize-sat/gamepad
+    - img "Gamepad"
+    - text: Gamepad
+  - link "Xbox Xbox":
+    - /url: /bize-sat/xbox
+    - img "Xbox"
+    - text: Xbox
+  - link "⌨️ Klavye":
+    - /url: /bize-sat/klavye
+  - link "🖱️ Mouse":
+    - /url: /bize-sat/mouse
+  - link "Tablet Tablet":
+    - /url: /bize-sat/tablet
+    - img "Tablet"
+    - text: Tablet
+  - link "🎧 Kulaklık":
+    - /url: /bize-sat/kulaklik
+  - link "Ses Sistemi Ses Sistemi":
+    - /url: /bize-sat/ses-sistemi
+    - img "Ses Sistemi"
+    - text: Ses Sistemi
+  - link "🔍 Tarayıcı":
+    - /url: /bize-sat/tarayici
+  - link "Uzman Ekibimizden Destek Al 🚚 İstanbul içi aynı gün teslim alalım TEKNİK SERVİS Kategoriler 🖥️ PC Onarım 💻 Laptop Tamiri 🖥️ Monitör Tamiri 💾 Format Atma 🔧 Parça Montajı 📱 Telefon Onarım 📱 Tablet Tamiri ⚙️ PC Toplama 💿 Veri Kurtarma":
+    - /url: /teknik-servis
+    - text: Uzman Ekibimizden Destek Al 🚚 İstanbul içi aynı gün teslim alalım
+    - button "TEKNİK SERVİS"
+    - heading "Kategoriler" [level=3]
+    - text: 🖥️ PC Onarım 💻 Laptop Tamiri 🖥️ Monitör Tamiri 💾 Format Atma 🔧 Parça Montajı 📱 Telefon Onarım 📱 Tablet Tamiri ⚙️ PC Toplama 💿 Veri Kurtarma
+  - link "SATILIK İLANLAR":
+    - /url: /satilik-ilanlar
+    - button "SATILIK İLANLAR"
+  - text: 📋 Henüz satılık ilan yok Admin panelinden ilan eklendiğinde burada otomatik görünecek.
 - contentinfo:
   - text: 🚚
   - heading "Güvenilir Gönderim" [level=3]
@@ -143,6 +186,28 @@ Call log:
 # Test source
 
 ```ts
+  1   | import { test, expect } from '@playwright/test';
+  2   | 
+  3   | const BASE_URL = 'http://localhost:3000';
+  4   | 
+  5   | test.describe('Authentication & Authorization Tests', () => {
+  6   | 
+  7   |   // ==================== REGISTER TESTS ====================
+  8   |   test.describe('Register Scenarios', () => {
+  9   | 
+  10  |     test('✅ Register - Başarılı kayıt', async ({ page }) => {
+  11  |       await page.goto(`${BASE_URL}/auth/register`);
+  12  |       await page.waitForLoadState('networkidle');
+  13  |       // Form yüklenmesini kontrol et
+  14  |       const form = page.locator('form');
+> 15  |       await expect(form).toBeVisible({ timeout: 5000 });
+      |                          ^ Error: expect(locator).toBeVisible() failed
+  16  |     });
+  17  | 
+  18  |     test('❌ Register - Boş form gönderimi', async ({ page }) => {
+  19  |       await page.goto(`${BASE_URL}/auth/register`);
+  20  |       await page.waitForLoadState('networkidle');
+  21  |       // Submit button'ı bul
   22  |       const submitBtn = page.locator('button[type="submit"]').first();
   23  |       if (await submitBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
   24  |         await submitBtn.click({ timeout: 5000 });
@@ -237,112 +302,4 @@ Call log:
   113 |       await expect(page.locator('text=/not.*found|does.*not.*exist|no.*account|hata/i')).toBeVisible({ timeout: 3000 });
   114 |     });
   115 | 
-  116 |     test('❌ Login - Empty fields', async ({ page }) => {
-  117 |       await page.goto(`${BASE_URL}/login`);
-  118 |       await page.waitForLoadState('networkidle');
-  119 |       const submitBtn = page.locator('button[type="submit"], button:has-text("Giriş")');
-  120 |       await submitBtn.first().click({ timeout: 5000 });
-  121 |       // Required field errors bekleniyor
-> 122 |       await expect(page.locator('text=/required|zorunlu|hata/i')).toBeVisible({ timeout: 3000 });
-      |                                                                   ^ Error: expect(locator).toBeVisible() failed
-  123 |     });
-  124 |   });
-  125 | 
-  126 |   // ==================== LOGOUT TESTS ====================
-  127 |   test.describe('Logout Scenarios', () => {
-  128 | 
-  129 |     test('✅ Logout - Başarılı çıkış', async ({ page }) => {
-  130 |       await page.goto(`${BASE_URL}/login`);
-  131 |       await page.waitForLoadState('networkidle');
-  132 | 
-  133 |       const emailInput = page.locator('input[type="email"]');
-  134 |       const passwordInput = page.locator('input[type="password"]');
-  135 |       const loginBtn = page.locator('button[type="submit"], button:has-text("Giriş")');
-  136 | 
-  137 |       await emailInput.first().fill('test@example.com', { timeout: 5000 });
-  138 |       await passwordInput.first().fill('password123', { timeout: 5000 });
-  139 |       await loginBtn.first().click({ timeout: 5000 });
-  140 |       await page.waitForNavigation({ timeout: 10000 }).catch(() => {});
-  141 | 
-  142 |       // Logout butonunu bul ve tıkla
-  143 |       const logoutBtn = page.locator('button:has-text("Çıkış"), a:has-text("Çıkış")');
-  144 |       await logoutBtn.first().click({ timeout: 5000 });
-  145 | 
-  146 |       // Login sayfasına dönülmesi bekleniyor
-  147 |       await expect(page).toHaveURL(/.*(?:login|signin)/i, { timeout: 5000 });
-  148 |     });
-  149 | 
-  150 |     test('✅ Logout - Session cleared', async ({ page }) => {
-  151 |       // Logout sonrası authenticated endpoints'e erişim engellenmeli
-  152 |       await page.goto(`${BASE_URL}/profile`);
-  153 |       await page.waitForLoadState('networkidle');
-  154 | 
-  155 |       // Login sayfasına yönlendirilmesi bekleniyor
-  156 |       await expect(page).toHaveURL(/.*(?:login|signin|auth)/i, { timeout: 5000 });
-  157 |     });
-  158 |   });
-  159 | 
-  160 |   // ==================== SESSION TESTS ====================
-  161 |   test.describe('Session Scenarios', () => {
-  162 | 
-  163 |     test('✅ Session persistence - Sayfa yenilemesinde session korunması', async ({ page }) => {
-  164 |       await page.goto(`${BASE_URL}/login`);
-  165 |       await page.waitForLoadState('networkidle');
-  166 | 
-  167 |       // Login yap
-  168 |       const emailInput = page.locator('input[type="email"], input[name*="email"]');
-  169 |       const passwordInput = page.locator('input[type="password"], input[name*="password"]');
-  170 |       const loginBtn = page.locator('button[type="submit"], button:has-text("Giriş")');
-  171 | 
-  172 |       await emailInput.first().fill('test@example.com', { timeout: 5000 });
-  173 |       await passwordInput.first().fill('password123', { timeout: 5000 });
-  174 |       await loginBtn.first().click({ timeout: 5000 });
-  175 |       await page.waitForNavigation({ timeout: 10000 }).catch(() => {});
-  176 | 
-  177 |       // Sayfayı yenile
-  178 |       await page.reload();
-  179 | 
-  180 |       // Session devam etmeli - logout butonu görünür olmalı
-  181 |       const logoutBtn = page.locator('button:has-text("Çıkış"), a:has-text("Çıkış")');
-  182 |       await expect(logoutBtn.first()).toBeVisible({ timeout: 3000 });
-  183 |     });
-  184 | 
-  185 |     test('✅ Session timeout - Uzun inaktivite sonrası logout', async ({ page }) => {
-  186 |       // Bu test gerçek environment'te çalışması için timeout ayarı gerekir
-  187 |       // Placeholder test
-  188 |       await page.goto(`${BASE_URL}`);
-  189 |       await expect(page).toHaveURL(/.*localhost/i);
-  190 |     });
-  191 |   });
-  192 | 
-  193 |   // ==================== PASSWORD RECOVERY TESTS ====================
-  194 |   test.describe('Password Recovery Scenarios', () => {
-  195 | 
-  196 |     test('✅ Password recovery - Email gönderimi', async ({ page }) => {
-  197 |       await page.goto(`${BASE_URL}/auth/forgot-password`);
-  198 |       await page.waitForLoadState('networkidle');
-  199 | 
-  200 |       const emailInput = page.locator('input[type="email"], input[name*="email"]');
-  201 |       const submitBtn = page.locator('button[type="submit"], button:has-text("Gönder")');
-  202 | 
-  203 |       if (await emailInput.first().isVisible({ timeout: 3000 }).catch(() => false)) {
-  204 |         await emailInput.first().fill('test@example.com', { timeout: 5000 });
-  205 |         await submitBtn.first().click({ timeout: 5000 });
-  206 | 
-  207 |         // Success message bekleniyor
-  208 |         await expect(page.locator('text=/check.*email|link.*sent|sent.*you|başarı/i')).toBeVisible({ timeout: 3000 });
-  209 |       }
-  210 |     });
-  211 | 
-  212 |     test('❌ Password recovery - Invalid email', async ({ page }) => {
-  213 |       await page.goto(`${BASE_URL}/auth/forgot-password`);
-  214 |       await page.waitForLoadState('networkidle');
-  215 | 
-  216 |       const emailInput = page.locator('input[type="email"], input[name*="email"]');
-  217 |       const submitBtn = page.locator('button[type="submit"], button:has-text("Gönder")');
-  218 | 
-  219 |       if (await emailInput.first().isVisible({ timeout: 3000 }).catch(() => false)) {
-  220 |         await emailInput.first().fill('invalid-nonexistent@example.com', { timeout: 5000 });
-  221 |         await submitBtn.first().click({ timeout: 5000 });
-  222 | 
 ```

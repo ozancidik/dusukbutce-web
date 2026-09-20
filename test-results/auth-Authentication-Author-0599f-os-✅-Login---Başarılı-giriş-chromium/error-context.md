@@ -6,22 +6,22 @@
 
 # Test info
 
-- Name: tests/auth.test.ts >> Authentication & Authorization Tests >> Register Scenarios >> ❌ Register - Password mismatch
-- Location: tests/auth.test.ts:42:9
+- Name: auth.test.ts >> Authentication & Authorization Tests >> Login Scenarios >> ✅ Login - Başarılı giriş
+- Location: tests/auth.test.ts:70:9
 
 # Error details
 
 ```
-Error: expect(locator).toBeVisible() failed
+Error: expect(page).toHaveURL(expected) failed
 
-Locator: locator('form')
-Expected: visible
+Expected pattern: /.*(?:home|dashboard|account|profile)/i
+Received string:  "http://localhost:3000/login"
 Timeout: 5000ms
-Error: element(s) not found
 
 Call log:
-  - Expect "toBeVisible" locator('form') with timeout 5000ms
-  - waiting for locator('form')
+  - Expect "toHaveURL" with timeout 5000ms
+    14 × locator resolved to <html lang="tr">…</html>
+       - unexpected value "http://localhost:3000/login"
 
 ```
 
@@ -36,91 +36,49 @@ Call log:
     - img
     - text: Giriş Yap
     - img
+  - link "Giriş Yap":
+    - /url: /login?returnUrl=%2F
+    - img
+    - text: Giriş Yap
+  - link "Kayıt Ol":
+    - /url: /register
+    - img
+    - text: Kayıt Ol
   - link "Sepet":
     - /url: /sepet
     - button "Sepet":
       - img
       - text: Sepet
+- navigation:
+  - link "Anasayfa":
+    - /url: /
+  - text: "> Giriş Yap"
 - main:
-  - heading "2. El Ürününü" [level=2]
-  - link "BİZE SAT":
-    - /url: /bize-sat
-    - button "BİZE SAT"
-  - heading "Kategoriler" [level=3]
-  - link "💻 Dizüstü (Notebook)":
-    - /url: /bize-sat/notebook
-  - link "🖥️ Masaüstü (Kasa)":
-    - /url: /bize-sat/masaustu
-  - link "🖥️ Monitör":
-    - /url: /bize-sat/monitor
-  - link "Ekran Kartı Ekran Kartı":
-    - /url: /bize-sat/ekran-karti
-    - img "Ekran Kartı"
-    - text: Ekran Kartı
-  - link "İşlemci İşlemci":
-    - /url: /bize-sat/islemci
-    - img "İşlemci"
-    - text: İşlemci
-  - link "RAM RAM":
-    - /url: /bize-sat/ram
-    - img "RAM"
-    - text: RAM
-  - link "SSD SSD":
-    - /url: /bize-sat/ssd
-    - img "SSD"
-    - text: SSD
-  - link "Soğutucu Soğutucu":
-    - /url: /bize-sat/sogutucu
-    - img "Soğutucu"
-    - text: Soğutucu
-  - link "Boş Kasa Boş Kasa":
-    - /url: /bize-sat/kasa
-    - img "Boş Kasa"
-    - text: Boş Kasa
-  - link "📄 Fotokopi Makinesi":
-    - /url: /bize-sat/fotokopi-makinesi
-  - link "🖨️ Yazıcı":
-    - /url: /bize-sat/yazici
-  - link "📱 Cep Telefonu":
-    - /url: /bize-sat/cep-telefonu
-  - link "PlayStation PlayStation":
-    - /url: /bize-sat/playstation
-    - img "PlayStation"
-    - text: PlayStation
-  - link "Gamepad Gamepad":
-    - /url: /bize-sat/gamepad
-    - img "Gamepad"
-    - text: Gamepad
-  - link "Xbox Xbox":
-    - /url: /bize-sat/xbox
-    - img "Xbox"
-    - text: Xbox
-  - link "⌨️ Klavye":
-    - /url: /bize-sat/klavye
-  - link "🖱️ Mouse":
-    - /url: /bize-sat/mouse
-  - link "Tablet Tablet":
-    - /url: /bize-sat/tablet
-    - img "Tablet"
-    - text: Tablet
-  - link "🎧 Kulaklık":
-    - /url: /bize-sat/kulaklik
-  - link "Ses Sistemi Ses Sistemi":
-    - /url: /bize-sat/ses-sistemi
-    - img "Ses Sistemi"
-    - text: Ses Sistemi
-  - link "🔍 Tarayıcı":
-    - /url: /bize-sat/tarayici
-  - link "Uzman Ekibimizden Destek Al 🚚 İstanbul içi aynı gün teslim alalım TEKNİK SERVİS Kategoriler 🖥️ PC Onarım 💻 Laptop Tamiri 🖥️ Monitör Tamiri 💾 Format Atma 🔧 Parça Montajı 📱 Telefon Onarım 📱 Tablet Tamiri ⚙️ PC Toplama 💿 Veri Kurtarma":
-    - /url: /teknik-servis
-    - text: Uzman Ekibimizden Destek Al 🚚 İstanbul içi aynı gün teslim alalım
-    - button "TEKNİK SERVİS"
-    - heading "Kategoriler" [level=3]
-    - text: 🖥️ PC Onarım 💻 Laptop Tamiri 🖥️ Monitör Tamiri 💾 Format Atma 🔧 Parça Montajı 📱 Telefon Onarım 📱 Tablet Tamiri ⚙️ PC Toplama 💿 Veri Kurtarma
-  - link "SATILIK İLANLAR":
-    - /url: /satilik-ilanlar
-    - button "SATILIK İLANLAR"
-  - text: 📋 Henüz satılık ilan yok Admin panelinden ilan eklendiğinde burada otomatik görünecek.
+  - heading "Giriş Yap" [level=1]
+  - paragraph: Hesabınıza giriş yapın
+  - text: Email
+  - textbox "Email":
+    - /placeholder: ornek@email.com
+    - text: test@example.com
+  - text: Şifre
+  - textbox "Şifre": password123
+  - button "Şifreyi göster":
+    - img
+  - checkbox "Beni Hatırla"
+  - text: Beni Hatırla
+  - link "Şifremi unuttum":
+    - /url: /sifremi-unuttum
+  - button "Giriş Yap"
+  - text: veya
+  - button "Google ile Giriş Yap":
+    - img
+    - text: Google ile Giriş Yap
+  - button "Facebook ile Giriş Yap":
+    - img
+    - text: Facebook ile Giriş Yap
+  - paragraph: Hesabınız yok mu?
+  - link "Kayıt olun":
+    - /url: /register
 - contentinfo:
   - text: 🚚
   - heading "Güvenilir Gönderim" [level=3]
@@ -232,8 +190,7 @@ Call log:
   44  |       await page.goto(`${BASE_URL}/auth/register`);
   45  |       await page.waitForLoadState('networkidle');
   46  |       const form = page.locator('form');
-> 47  |       await expect(form).toBeVisible({ timeout: 5000 });
-      |                          ^ Error: expect(locator).toBeVisible() failed
+  47  |       await expect(form).toBeVisible({ timeout: 5000 });
   48  |     });
   49  | 
   50  |     test('❌ Register - Email already exists', async ({ page }) => {
@@ -269,7 +226,8 @@ Call log:
   80  | 
   81  |       // Dashboard veya home page'e yönlendirilmesi bekleniyor
   82  |       await page.waitForNavigation({ timeout: 10000 }).catch(() => {});
-  83  |       await expect(page).toHaveURL(/.*(?:home|dashboard|account|profile)/i, { timeout: 5000 });
+> 83  |       await expect(page).toHaveURL(/.*(?:home|dashboard|account|profile)/i, { timeout: 5000 });
+      |                          ^ Error: expect(page).toHaveURL(expected) failed
   84  |     });
   85  | 
   86  |     test('❌ Login - Yanlış password', async ({ page }) => {
@@ -334,4 +292,40 @@ Call log:
   145 | 
   146 |       // Login sayfasına dönülmesi bekleniyor
   147 |       await expect(page).toHaveURL(/.*(?:login|signin)/i, { timeout: 5000 });
+  148 |     });
+  149 | 
+  150 |     test('✅ Logout - Session cleared', async ({ page }) => {
+  151 |       // Logout sonrası authenticated endpoints'e erişim engellenmeli
+  152 |       await page.goto(`${BASE_URL}/profile`);
+  153 |       await page.waitForLoadState('networkidle');
+  154 | 
+  155 |       // Login sayfasına yönlendirilmesi bekleniyor
+  156 |       await expect(page).toHaveURL(/.*(?:login|signin|auth)/i, { timeout: 5000 });
+  157 |     });
+  158 |   });
+  159 | 
+  160 |   // ==================== SESSION TESTS ====================
+  161 |   test.describe('Session Scenarios', () => {
+  162 | 
+  163 |     test('✅ Session persistence - Sayfa yenilemesinde session korunması', async ({ page }) => {
+  164 |       await page.goto(`${BASE_URL}/login`);
+  165 |       await page.waitForLoadState('networkidle');
+  166 | 
+  167 |       // Login yap
+  168 |       const emailInput = page.locator('input[type="email"], input[name*="email"]');
+  169 |       const passwordInput = page.locator('input[type="password"], input[name*="password"]');
+  170 |       const loginBtn = page.locator('button[type="submit"], button:has-text("Giriş")');
+  171 | 
+  172 |       await emailInput.first().fill('test@example.com', { timeout: 5000 });
+  173 |       await passwordInput.first().fill('password123', { timeout: 5000 });
+  174 |       await loginBtn.first().click({ timeout: 5000 });
+  175 |       await page.waitForNavigation({ timeout: 10000 }).catch(() => {});
+  176 | 
+  177 |       // Sayfayı yenile
+  178 |       await page.reload();
+  179 | 
+  180 |       // Session devam etmeli - logout butonu görünür olmalı
+  181 |       const logoutBtn = page.locator('button:has-text("Çıkış"), a:has-text("Çıkış")');
+  182 |       await expect(logoutBtn.first()).toBeVisible({ timeout: 3000 });
+  183 |     });
 ```
