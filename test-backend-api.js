@@ -151,10 +151,11 @@ async function runTests() {
 
   // Users
   console.log('\n👤 Users:');
-  await test('Get User Profile', 'GET', '/users/507f1f77bcf86cd799439011');
+  const testUserId = '507f1f77bcf86cd799439011'; // Admin user ID from seed
+  await test('Get User Profile', 'GET', `/users/${testUserId}`);
   if (authToken) {
     const profileData = {
-      name: 'Updated Name',
+      name: 'Updated Admin Name',
       phone: '5559999999',
       bio: 'Updated bio',
       address: 'New Address'
@@ -164,9 +165,10 @@ async function runTests() {
 
   // Listings
   console.log('\n📋 Listings:');
+  const testListingId = '6ab01953bb9e06742d9aee10'; // Real listing ID from DB
   await test('Get Listings', 'GET', '/listings?category=ram&limit=10');
-  await test('Get Listing Detail', 'GET', '/listings/507f1f77bcf86cd799439011');
-  await test('Search Listings', 'GET', '/listings/search?q=RAM');
+  await test('Get Listing Detail', 'GET', `/listings/${testListingId}`);
+  await test('Search Listings', 'GET', '/listings/search?q=Test');
 
   if (authToken) {
     const listingData = {
@@ -178,29 +180,29 @@ async function runTests() {
       images: []
     };
     await test('Create Listing', 'POST', '/listings', listingData);
-    await test('Update Listing', 'PATCH', '/listings/507f1f77bcf86cd799439011', {
+    await test('Update Listing', 'PATCH', `/listings/${testListingId}`, {
       price: 4500,
       status: 'active'
     });
-    await test('Delete Listing', 'DELETE', '/listings/507f1f77bcf86cd799439011');
+    await test('Delete Listing', 'DELETE', '/listings/6ab01953bb9e06742d9aee10');
   }
 
   // Offers
   console.log('\n💬 Offers:');
   if (authToken) {
     const offerData = {
-      listingId: '507f1f77bcf86cd799439011',
+      listingId: '6ab01953bb9e06742d9aee10',
       price: 4800,
       message: 'Test offer message'
     };
     await test('Create Offer', 'POST', '/offers', offerData);
     await test('Get My Offers', 'GET', '/offers');
-    await test('Accept Offer', 'PATCH', '/offers/507f1f77bcf86cd799439011/accept');
-    await test('Reject Offer', 'PATCH', '/offers/507f1f77bcf86cd799439012/reject', {
+    await test('Accept Offer', 'PATCH', '/offers/6ab01953bb9e06742d9aee10/accept');
+    await test('Reject Offer', 'PATCH', '/offers/6ab01953bb9e06742d9aee11/reject', {
       reason: 'Price too high'
     });
     const counterData = { counterPrice: 4700, message: 'Counter offer' };
-    await test('Create Counter Offer', 'POST', '/offers/507f1f77bcf86cd799439011/counter', counterData);
+    await test('Create Counter Offer', 'POST', '/offers/6ab01953bb9e06742d9aee10/counter', counterData);
   } else {
     console.log('⚠️  Skipping offer endpoints (no auth token)');
   }
@@ -211,8 +213,8 @@ async function runTests() {
     await test('Get Admin Users', 'GET', '/admin/users?limit=20');
     await test('Get Admin Listings', 'GET', '/admin/listings?status=pending');
     await test('Get Admin Stats', 'GET', '/admin/stats');
-    await test('Approve Listing', 'PATCH', '/admin/listings/507f1f77bcf86cd799439011/approve');
-    await test('Reject Listing', 'PATCH', '/admin/listings/507f1f77bcf86cd799439012/reject', {
+    await test('Approve Listing', 'PATCH', '/admin/listings/6ab01953bb9e06742d9aee10/approve');
+    await test('Reject Listing', 'PATCH', '/admin/listings/6ab01953bb9e06742d9aee11/reject', {
       reason: 'Inappropriate content'
     });
   } else {
