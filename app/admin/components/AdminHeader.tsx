@@ -92,6 +92,7 @@ export default function AdminHeader({ isMobile, submissions, onLogout }: AdminHe
           </div>
 
           <button
+            data-testid="logout-button"
             onClick={onLogout}
             style={{
               background: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',
