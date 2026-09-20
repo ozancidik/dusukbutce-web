@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
-import Listing from '@/models/Listing';
+import ProductSubmission from '@/models/ProductSubmission';
 
 export async function GET(request: NextRequest) {
   try {
@@ -16,12 +16,13 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Search by title or description
+    // Search by title or description in ProductSubmission
     const searchFilter = {
       $or: [
         { title: { $regex: query, $options: 'i' } },
         { description: { $regex: query, $options: 'i' } }
-      ]
+      ],
+      status: 'listed'
     };
 
     // Add category filter if provided
@@ -29,7 +30,7 @@ export async function GET(request: NextRequest) {
       ? { ...searchFilter, category }
       : searchFilter;
 
-    const listings = await Listing.find(filter)
+    const listings = await ProductSubmission.find(filter)
       .limit(50)
       .sort({ createdAt: -1 });
 

@@ -26,7 +26,6 @@ export async function PATCH(
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET) as any;
-    const body = await request.json();
 
     return NextResponse.json({
       success: true,

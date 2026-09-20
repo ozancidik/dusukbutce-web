@@ -2,10 +2,22 @@
 
 const http = require('http');
 const https = require('https');
+const { execSync } = require('child_process');
 
 const BASE_URL = 'http://localhost:3000/api';
 const results = [];
 let authToken = null;
+
+// Run seed and capture IDs
+console.log('🌱 Running seed before tests...');
+const seedOutput = execSync('node seed.js', { encoding: 'utf-8' });
+console.log(seedOutput);
+
+// Extract IDs from seed output
+const adminIdMatch = seedOutput.match(/admin@example\.com \(ID: ([a-f0-9]+)\)/);
+const listingIdMatch = seedOutput.match(/Created listing: ([a-f0-9]+)/);
+const adminUserId = adminIdMatch ? adminIdMatch[1] : '6ab0228828a7ffeba6b85f30';
+const listingId = listingIdMatch ? listingIdMatch[1] : '6ab022b7505c1d57c113e140';
 
 function parseUrl(url) {
   const u = new URL(url);
@@ -151,8 +163,7 @@ async function runTests() {
 
   // Users
   console.log('\n👤 Users:');
-  const testUserId = '507f1f77bcf86cd799439011'; // Admin user ID from seed
-  await test('Get User Profile', 'GET', `/users/${testUserId}`);
+  await test('Get User Profile', 'GET', `/users/${adminUserId}`);
   if (authToken) {
     const profileData = {
       name: 'Updated Admin Name',
@@ -165,9 +176,8 @@ async function runTests() {
 
   // Listings
   console.log('\n📋 Listings:');
-  const testListingId = '6ab01953bb9e06742d9aee10'; // Real listing ID from DB
   await test('Get Listings', 'GET', '/listings?category=ram&limit=10');
-  await test('Get Listing Detail', 'GET', `/listings/${testListingId}`);
+  await test('Get Listing Detail', 'GET', `/listings/${listingId}`);
   await test('Search Listings', 'GET', '/listings/search?q=Test');
 
   if (authToken) {
@@ -176,33 +186,37 @@ async function runTests() {
       description: 'A test listing',
       category: 'ram',
       condition: 'good',
+      cosmeticCondition: 'excellent',
+      model: 'Test Model',
+      brand: 'Test Brand',
+      userId: adminUserId,
       price: 5000,
       images: []
     };
     await test('Create Listing', 'POST', '/listings', listingData);
-    await test('Update Listing', 'PATCH', `/listings/${testListingId}`, {
+    await test('Update Listing', 'PATCH', `/listings/${listingId}`, {
       price: 4500,
       status: 'active'
     });
-    await test('Delete Listing', 'DELETE', '/listings/6ab01953bb9e06742d9aee10');
+    await test('Delete Listing', 'DELETE', `/listings/${listingId}`);
   }
 
   // Offers
   console.log('\n💬 Offers:');
   if (authToken) {
     const offerData = {
-      listingId: '6ab01953bb9e06742d9aee10',
+      listingId: listingId,
       price: 4800,
       message: 'Test offer message'
     };
     await test('Create Offer', 'POST', '/offers', offerData);
     await test('Get My Offers', 'GET', '/offers');
-    await test('Accept Offer', 'PATCH', '/offers/6ab01953bb9e06742d9aee10/accept');
-    await test('Reject Offer', 'PATCH', '/offers/6ab01953bb9e06742d9aee11/reject', {
+    await test('Accept Offer', 'PATCH', '/offers/6ab01ca11d7e594ee9cb0f82/accept');
+    await test('Reject Offer', 'PATCH', '/offers/6ab01ca11d7e594ee9cb0f83/reject', {
       reason: 'Price too high'
     });
     const counterData = { counterPrice: 4700, message: 'Counter offer' };
-    await test('Create Counter Offer', 'POST', '/offers/6ab01953bb9e06742d9aee10/counter', counterData);
+    await test('Create Counter Offer', 'POST', '/offers/6ab01ca11d7e594ee9cb0f82/counter', counterData);
   } else {
     console.log('⚠️  Skipping offer endpoints (no auth token)');
   }
@@ -213,8 +227,8 @@ async function runTests() {
     await test('Get Admin Users', 'GET', '/admin/users?limit=20');
     await test('Get Admin Listings', 'GET', '/admin/listings?status=pending');
     await test('Get Admin Stats', 'GET', '/admin/stats');
-    await test('Approve Listing', 'PATCH', '/admin/listings/6ab01953bb9e06742d9aee10/approve');
-    await test('Reject Listing', 'PATCH', '/admin/listings/6ab01953bb9e06742d9aee11/reject', {
+    await test('Approve Listing', 'PATCH', '/admin/listings/6ab01ca11d7e594ee9cb0f82/approve');
+    await test('Reject Listing', 'PATCH', '/admin/listings/6ab01ca11d7e594ee9cb0f83/reject', {
       reason: 'Inappropriate content'
     });
   } else {

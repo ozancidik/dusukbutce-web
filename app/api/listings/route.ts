@@ -18,3 +18,21 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ success: true, data: [] }, { status: 200 });
   }
 }
+
+export async function POST(request: NextRequest) {
+  try {
+    await connectDB();
+    
+    const body = await request.json();
+    const submission = await ProductSubmission.create({
+      ...body,
+      status: body.status || 'listed',
+      createdAt: new Date()
+    });
+
+    return NextResponse.json({ success: true, data: submission }, { status: 201 });
+  } catch (error: any) {
+    console.error('Error creating listing:', error?.message || error);
+    return NextResponse.json({ success: false, message: 'Listing creation failed' }, { status: 500 });
+  }
+}
