@@ -990,12 +990,14 @@ export default function RegisterPage() {
         </form>
 
         {error && (
-          <div style={{ 
-            color: "#dc2626", 
-            marginTop: "16px", 
-            padding: "12px", 
-            background: "#fef2f2", 
-            border: "1px solid #fecaca", 
+          <div
+            data-testid="register-error-message"
+            style={{
+            color: "#dc2626",
+            marginTop: "16px",
+            padding: "12px",
+            background: "#fef2f2",
+            border: "1px solid #fecaca",
             borderRadius: "8px",
             fontSize: "14px"
           }}>

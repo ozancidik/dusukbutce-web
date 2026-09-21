@@ -22,8 +22,8 @@ test.describe('Authentication & Authorization Tests', () => {
       const submitBtn = page.locator('button[type="submit"]').first();
       if (await submitBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
         await submitBtn.click({ timeout: 5000 });
-        // Validation error bekleniyor - generic hata text'i
-        await expect(page.locator('text=/zorunlu|required|error|hata/i')).toBeVisible({ timeout: 3000 });
+        // Validation error bekleniyor - register error message div'ine bak
+        await expect(page.locator('[data-testid="register-error-message"]')).toBeVisible({ timeout: 3000 });
       }
     });
 
@@ -35,7 +35,7 @@ test.describe('Authentication & Authorization Tests', () => {
         await emailInput.fill('invalid-email', { timeout: 5000 });
         const submitBtn = page.locator('button[type="submit"]').first();
         await submitBtn.click({ timeout: 5000 });
-        await expect(page.locator('text=/email|hata/i')).toBeVisible({ timeout: 3000 });
+        await expect(page.locator('[data-testid="register-error-message"]')).toBeVisible({ timeout: 3000 });
       }
     });
 
@@ -59,7 +59,7 @@ test.describe('Authentication & Authorization Tests', () => {
         }
         const submitBtn = page.locator('button[type="submit"]').first();
         await submitBtn.click({ timeout: 5000 });
-        await expect(page.locator('text=/zaten.*var|duplicate|already|kayıtlı/i')).toBeVisible({ timeout: 3000 });
+        await expect(page.locator('[data-testid="register-error-message"]')).toBeVisible({ timeout: 3000 });
       }
     });
   });
@@ -95,31 +95,31 @@ test.describe('Authentication & Authorization Tests', () => {
       await loginBtn.click({ timeout: 5000 });
 
       // Error message bekleniyor
-      await expect(page.locator('text=/yanlış|hata|invalid|incorrect/i')).toBeVisible({ timeout: 3000 });
+      await expect(page.locator('[data-testid="login-error-message"]')).toBeVisible({ timeout: 3000 });
     });
 
     test('❌ Login - Non-existent user', async ({ page }) => {
       await page.goto(`${BASE_URL}/login`);
       await page.waitForLoadState('networkidle');
-      const emailInput = page.locator('input[type="email"], input[name*="email"]');
-      const passwordInput = page.locator('input[type="password"], input[name*="password"]');
-      const loginBtn = page.locator('button[type="submit"], button:has-text("Giriş")');
+      const emailInput = page.getByTestId('login-email-input');
+      const passwordInput = page.getByTestId('login-password-input');
+      const loginBtn = page.getByTestId('login-submit-button');
 
-      await emailInput.first().fill('nonexistent@example.com', { timeout: 5000 });
-      await passwordInput.first().fill('password123', { timeout: 5000 });
-      await loginBtn.first().click({ timeout: 5000 });
+      await emailInput.fill('nonexistent@example.com', { timeout: 5000 });
+      await passwordInput.fill('password123', { timeout: 5000 });
+      await loginBtn.click({ timeout: 5000 });
 
       // User not found error bekleniyor
-      await expect(page.locator('text=/not.*found|does.*not.*exist|no.*account|hata/i')).toBeVisible({ timeout: 3000 });
+      await expect(page.locator('[data-testid="login-error-message"]')).toBeVisible({ timeout: 3000 });
     });
 
     test('❌ Login - Empty fields', async ({ page }) => {
       await page.goto(`${BASE_URL}/login`);
       await page.waitForLoadState('networkidle');
-      const submitBtn = page.locator('button[type="submit"], button:has-text("Giriş")');
-      await submitBtn.first().click({ timeout: 5000 });
+      const loginBtn = page.getByTestId('login-submit-button');
+      await loginBtn.click({ timeout: 5000 });
       // Required field errors bekleniyor
-      await expect(page.locator('text=/required|zorunlu|hata/i')).toBeVisible({ timeout: 3000 });
+      await expect(page.locator('[data-testid="login-error-message"]')).toBeVisible({ timeout: 3000 });
     });
   });
 

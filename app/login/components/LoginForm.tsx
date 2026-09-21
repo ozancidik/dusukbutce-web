@@ -214,6 +214,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
 
       {error && (
         <div
+          data-testid="login-error-message"
           style={{
             background: isEmailSent ? "#f0fdf4" : emailVerificationError ? "#fef3c7" : "#fef2f2",
             color: isEmailSent ? "#166534" : emailVerificationError ? "#d97706" : "#dc2626",
