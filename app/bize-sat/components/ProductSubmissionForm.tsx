@@ -234,6 +234,7 @@ export default function ProductSubmissionForm({ config }: Props) {
             </label>
             <input
               type="number"
+              data-testid="price-input"
               required={field.required}
               value={formData[field.name] || ''}
               onChange={(e) => handleInputChange(field.name, parseInt(e.target.value) || 0)}
