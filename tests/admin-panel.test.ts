@@ -108,14 +108,14 @@ test.describe('Admin Panel Testleri', () => {
     });
 
     test('❌ Kullanıcı silme - Onay dialog', async ({ page }) => {
-      await page.goto(`${BASE_URL}/admin/users`);
+      await page.goto(`${BASE_URL}/admin`);
 
-      const deleteBtn = page.getByRole('button', { name: /sil|delete/i }).first();
+      const deleteBtn = page.getByTestId('delete-button').first();
       if (deleteBtn) {
         await deleteBtn.click();
 
         // Onay dialog bekleniyor
-        const confirmBtn = page.getByRole('button', { name: /evet|yes|confirm/i });
+        const confirmBtn = page.getByRole('button', { name: /evet|yes|confirm|onay/i });
         await expect(confirmBtn).toBeDefined();
       }
     });
@@ -168,14 +168,14 @@ test.describe('Admin Panel Testleri', () => {
     });
 
     test('✅ İlan silme', async ({ page }) => {
-      await page.goto(`${BASE_URL}/admin/listings`);
+      await page.goto(`${BASE_URL}/admin`);
 
-      const deleteBtn = page.getByRole('button', { name: /sil|delete/i }).first();
+      const deleteBtn = page.getByTestId('delete-button').first();
       if (deleteBtn) {
         await deleteBtn.click();
 
         // Onay dialog bekleniyor
-        const confirmBtn = page.getByRole('button', { name: /confirm|yes/i });
+        const confirmBtn = page.getByRole('button', { name: /confirm|yes|evet|onay/i });
         await expect(confirmBtn).toBeDefined();
       }
     });

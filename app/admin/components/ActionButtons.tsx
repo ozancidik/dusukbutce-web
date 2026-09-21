@@ -135,6 +135,7 @@ export default function ActionButtons({ submission, isMobile, onAction, onDelete
       </button>
 
       <button
+        data-testid="delete-button"
         onClick={() => onDelete(submission._id)}
         style={{
           background: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',
