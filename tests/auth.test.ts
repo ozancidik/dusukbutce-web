@@ -18,6 +18,12 @@ test.describe('Authentication & Authorization Tests', () => {
     test('❌ Register - Boş form gönderimi', async ({ page }) => {
       await page.goto(`${BASE_URL}/register`);
       await page.waitForLoadState('networkidle');
+      // KVKK checkbox'larını check et (button enable olması için)
+      const checkboxes = page.locator('input[type="checkbox"]');
+      const count = await checkboxes.count();
+      for (let i = 0; i < Math.min(count, 2); i++) {
+        await checkboxes.nth(i).check().catch(() => {});
+      }
       // Submit button'ı bul
       const submitBtn = page.locator('button[type="submit"]').first();
       if (await submitBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
@@ -33,6 +39,12 @@ test.describe('Authentication & Authorization Tests', () => {
       const emailInput = page.locator('input[type="email"]').first();
       if (await emailInput.isVisible({ timeout: 3000 }).catch(() => false)) {
         await emailInput.fill('invalid-email', { timeout: 5000 });
+        // KVKK checkbox'larını check et
+        const checkboxes = page.locator('input[type="checkbox"]');
+        const count = await checkboxes.count();
+        for (let i = 0; i < Math.min(count, 2); i++) {
+          await checkboxes.nth(i).check().catch(() => {});
+        }
         const submitBtn = page.locator('button[type="submit"]').first();
         await submitBtn.click({ timeout: 5000 });
         await expect(page.locator('[data-testid="register-error-message"]')).toBeVisible({ timeout: 3000 });
@@ -56,6 +68,12 @@ test.describe('Authentication & Authorization Tests', () => {
         const phoneInput = page.locator('input[type="tel"], input[type="text"][name*="phone"], input[placeholder*="telefon"]').first();
         if (await phoneInput.isVisible({ timeout: 2000 }).catch(() => false)) {
           await phoneInput.fill('05559999999', { timeout: 5000 });
+        }
+        // KVKK checkbox'larını check et (button enable olması için)
+        const checkboxes = page.locator('input[type="checkbox"]');
+        const count = await checkboxes.count();
+        for (let i = 0; i < Math.min(count, 2); i++) {
+          await checkboxes.nth(i).check().catch(() => {});
         }
         const submitBtn = page.locator('button[type="submit"]').first();
         await submitBtn.click({ timeout: 5000 });
