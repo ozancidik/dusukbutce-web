@@ -28,117 +28,114 @@ Received:   0
         - link [ref=e6] [cursor=pointer]:
           - /url: /
           - img "Düşük Bütçe" [ref=e7]
-        - generic [ref=e10]:
-          - textbox "Ürün, kategori veya marka ara..." [ref=e11]
-          - generic [ref=e12]: 🔍
-        - generic [ref=e13]:
-          - button "Giriş Yap" [ref=e15] [cursor=pointer]
-          - link [ref=e21] [cursor=pointer]:
+        - generic [ref=e8]:
+          - button "Giriş Yap" [ref=e10] [cursor=pointer]
+          - link [ref=e16] [cursor=pointer]:
             - /url: /sepet
-            - button "Sepet" [ref=e22]
-    - navigation [ref=e27]:
-      - generic [ref=e28]:
-        - link "Anasayfa" [ref=e29] [cursor=pointer]:
+            - button "Sepet" [ref=e17]
+    - navigation [ref=e22]:
+      - generic [ref=e23]:
+        - link "Anasayfa" [ref=e24] [cursor=pointer]:
           - /url: /
-        - generic [ref=e30]: ">"
-        - link "Admin" [ref=e31] [cursor=pointer]:
+        - generic [ref=e25]: ">"
+        - link "Admin" [ref=e26] [cursor=pointer]:
           - /url: /admin
-        - generic [ref=e32]: ">"
-        - generic [ref=e33]: Users
-    - main [ref=e34]:
-      - generic [ref=e36]:
-        - heading "404" [level=1] [ref=e37]
-        - heading "Sayfa Bulunamadı" [level=2] [ref=e38]
-        - paragraph [ref=e39]: Aradığınız sayfa mevcut değil. 3 saniye sonra ana sayfaya yönlendirileceksiniz.
-        - button "Ana Sayfaya Git" [ref=e40] [cursor=pointer]
-        - generic [ref=e41]:
-          - paragraph [ref=e42]:
-            - strong [ref=e43]: "Önerilen sayfalar:"
-          - generic [ref=e44]:
-            - button "Ana Sayfa" [ref=e45] [cursor=pointer]
-            - button "Bize Sat" [ref=e46] [cursor=pointer]
-            - button "Satılık İlanlar" [ref=e47] [cursor=pointer]
-            - button "Ürünler" [ref=e48] [cursor=pointer]
-    - contentinfo [ref=e49]:
-      - generic [ref=e51]:
-        - generic [ref=e52]:
-          - generic [ref=e53]: 🚚
-          - heading "Güvenilir Gönderim" [level=3] [ref=e54]
-          - paragraph [ref=e55]: Hızlı ve güvenli gönderim
-        - generic [ref=e56]:
-          - generic [ref=e57]: 😊 ⭐⭐⭐⭐⭐
-          - heading "Müşteri Memnuniyeti" [level=3] [ref=e58]
-          - paragraph [ref=e59]: Memnuniyetiniz önceliğimiz
-        - generic [ref=e60]:
-          - generic [ref=e61]: 💳🛡️
-          - heading "Güvenli Ödeme" [level=3] [ref=e62]
-          - paragraph [ref=e63]: "%100 güvenli ödeme altyapısı"
-        - generic [ref=e64]:
-          - generic [ref=e65]: ✅
-          - heading "Kaliteli Markalar" [level=3] [ref=e66]
-          - paragraph [ref=e67]: Sadece bilinen kaliteli markalar
-      - generic [ref=e69]:
-        - generic [ref=e70]:
-          - heading "KURUMSAL" [level=4] [ref=e71]
-          - generic [ref=e72]:
-            - link "Hakkımızda" [ref=e73] [cursor=pointer]:
+        - generic [ref=e27]: ">"
+        - generic [ref=e28]: Users
+    - main [ref=e29]:
+      - generic [ref=e31]:
+        - heading "404" [level=1] [ref=e32]
+        - heading "Sayfa Bulunamadı" [level=2] [ref=e33]
+        - paragraph [ref=e34]: Aradığınız sayfa mevcut değil. 3 saniye sonra ana sayfaya yönlendirileceksiniz.
+        - button "Ana Sayfaya Git" [ref=e35] [cursor=pointer]
+        - generic [ref=e36]:
+          - paragraph [ref=e37]:
+            - strong [ref=e38]: "Önerilen sayfalar:"
+          - generic [ref=e39]:
+            - button "Ana Sayfa" [ref=e40] [cursor=pointer]
+            - button "Bize Sat" [ref=e41] [cursor=pointer]
+            - button "Satılık İlanlar" [ref=e42] [cursor=pointer]
+            - button "Ürünler" [ref=e43] [cursor=pointer]
+    - contentinfo [ref=e44]:
+      - generic [ref=e46]:
+        - generic [ref=e47]:
+          - generic [ref=e48]: 🚚
+          - heading "Güvenilir Gönderim" [level=3] [ref=e49]
+          - paragraph [ref=e50]: Hızlı ve güvenli gönderim
+        - generic [ref=e51]:
+          - generic [ref=e52]: 😊 ⭐⭐⭐⭐⭐
+          - heading "Müşteri Memnuniyeti" [level=3] [ref=e53]
+          - paragraph [ref=e54]: Memnuniyetiniz önceliğimiz
+        - generic [ref=e55]:
+          - generic [ref=e56]: 💳🛡️
+          - heading "Güvenli Ödeme" [level=3] [ref=e57]
+          - paragraph [ref=e58]: "%100 güvenli ödeme altyapısı"
+        - generic [ref=e59]:
+          - generic [ref=e60]: ✅
+          - heading "Kaliteli Markalar" [level=3] [ref=e61]
+          - paragraph [ref=e62]: Sadece bilinen kaliteli markalar
+      - generic [ref=e64]:
+        - generic [ref=e65]:
+          - heading "KURUMSAL" [level=4] [ref=e66]
+          - generic [ref=e67]:
+            - link "Hakkımızda" [ref=e68] [cursor=pointer]:
               - /url: /hakkimizda
-            - link "Banka Hesaplarımız" [ref=e74] [cursor=pointer]:
+            - link "Banka Hesaplarımız" [ref=e69] [cursor=pointer]:
               - /url: /banka-hesaplari
-            - link "İletişim" [ref=e75] [cursor=pointer]:
+            - link "İletişim" [ref=e70] [cursor=pointer]:
               - /url: /iletisim
-        - generic [ref=e76]:
-          - heading "SİTE KULLANIMI" [level=4] [ref=e77]
-          - generic [ref=e78]:
-            - link "KVKK Bilgilendirme" [ref=e79] [cursor=pointer]:
+        - generic [ref=e71]:
+          - heading "SİTE KULLANIMI" [level=4] [ref=e72]
+          - generic [ref=e73]:
+            - link "KVKK Bilgilendirme" [ref=e74] [cursor=pointer]:
               - /url: /gizlilik-politikasi
-            - link "Satış Sözleşmesi" [ref=e80] [cursor=pointer]:
+            - link "Satış Sözleşmesi" [ref=e75] [cursor=pointer]:
               - /url: /satis-sozlesmesi
-            - link "Şartlar ve Koşullar" [ref=e81] [cursor=pointer]:
+            - link "Şartlar ve Koşullar" [ref=e76] [cursor=pointer]:
               - /url: /kullanim-sartlari
-            - link "Sık Sorulan Sorular" [ref=e82] [cursor=pointer]:
+            - link "Sık Sorulan Sorular" [ref=e77] [cursor=pointer]:
               - /url: /sss
-        - generic [ref=e83]:
-          - heading "HESAP BİLGİLERİ" [level=4] [ref=e84]
-          - generic [ref=e85]:
-            - link "Hesabım" [ref=e86] [cursor=pointer]:
+        - generic [ref=e78]:
+          - heading "HESAP BİLGİLERİ" [level=4] [ref=e79]
+          - generic [ref=e80]:
+            - link "Hesabım" [ref=e81] [cursor=pointer]:
               - /url: /profile
-            - link "Sipariş Takibi" [ref=e87] [cursor=pointer]:
+            - link "Sipariş Takibi" [ref=e82] [cursor=pointer]:
               - /url: /siparisler
-            - link "Karşılaştırma Listem" [ref=e88] [cursor=pointer]:
+            - link "Karşılaştırma Listem" [ref=e83] [cursor=pointer]:
               - /url: /karsilastir
-            - link "Favori Ürünlerim" [ref=e89] [cursor=pointer]:
+            - link "Favori Ürünlerim" [ref=e84] [cursor=pointer]:
               - /url: /favoriler
-            - link "Tekliflerim" [ref=e90] [cursor=pointer]:
+            - link "Tekliflerim" [ref=e85] [cursor=pointer]:
               - /url: /tekliflerim
-        - generic [ref=e91]:
-          - heading "MAĞAZA ADRESİMİZ" [level=4] [ref=e92]
+        - generic [ref=e86]:
+          - heading "MAĞAZA ADRESİMİZ" [level=4] [ref=e87]
+          - generic [ref=e88]:
+            - generic [ref=e89]: 📍
+            - generic [ref=e90]:
+              - generic [ref=e91]: Atakent Mah. Yasemin Sokağı No:4
+              - generic [ref=e92]: 34760 Ümraniye/İstanbul
           - generic [ref=e93]:
-            - generic [ref=e94]: 📍
-            - generic [ref=e95]:
-              - generic [ref=e96]: Atakent Mah. Yasemin Sokağı No:4
-              - generic [ref=e97]: 34760 Ümraniye/İstanbul
-          - generic [ref=e98]:
-            - link [ref=e99] [cursor=pointer]:
+            - link [ref=e94] [cursor=pointer]:
               - /url: https://www.facebook.com/dusukbutce/
-              - img "Facebook" [ref=e100]
-            - link [ref=e101] [cursor=pointer]:
+              - img "Facebook" [ref=e95]
+            - link [ref=e96] [cursor=pointer]:
               - /url: https://instagram.com
-              - img "Instagram" [ref=e102]
-            - link [ref=e103] [cursor=pointer]:
+              - img "Instagram" [ref=e97]
+            - link [ref=e98] [cursor=pointer]:
               - /url: https://youtube.com
-              - img "YouTube" [ref=e104]
-            - link [ref=e105] [cursor=pointer]:
+              - img "YouTube" [ref=e99]
+            - link [ref=e100] [cursor=pointer]:
               - /url: https://wa.me/905385793412?text=Merhaba! Düşük Bütçe'den ürün hakkında bilgi almak istiyorum.
-      - generic [ref=e108]:
-        - generic [ref=e109]:
-          - generic [ref=e110]: DB
-          - generic [ref=e111]: Düşük Bütçe
-        - generic [ref=e112]: © 2026 Düşük Bütçe. Tüm hakları saklıdır.
-    - link "WhatsApp Destek Hattı" [ref=e113] [cursor=pointer]:
+      - generic [ref=e103]:
+        - generic [ref=e104]:
+          - generic [ref=e105]: DB
+          - generic [ref=e106]: Düşük Bütçe
+        - generic [ref=e107]: © 2026 Düşük Bütçe. Tüm hakları saklıdır.
+    - link "WhatsApp Destek Hattı" [ref=e108] [cursor=pointer]:
       - /url: https://wa.me/905385793412?text=Merhaba! Düşük Bütçe'den ürün hakkında bilgi almak istiyorum.
-  - button "Open Next.js Dev Tools" [ref=e122] [cursor=pointer]
-  - alert [ref=e126]
+  - button "Open Next.js Dev Tools" [ref=e117] [cursor=pointer]
+  - alert [ref=e121]
 ```
 
 # Test source
