@@ -115,11 +115,16 @@ export async function POST(request: NextRequest) {
     }
 
     // JWT token oluştur
+    // NOT: adminRole eklenmezse, adminRole:'viewer' olarak işaretlenmiş bir
+    // admin hesabı ensureFullAdminRequest()'teki viewer kısıtlamasını
+    // (requireAdmin.ts) bypass edebilir — token'da alan yoksa kısıtlama
+    // hiç uygulanamaz.
     const token = jwt.sign(
-      { 
+      {
         userId: user._id,
         email: user.email,
-        isAdmin: user.isAdmin
+        isAdmin: user.isAdmin,
+        ...(user.isAdmin && { adminRole: user.adminRole || 'full' })
       },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }

@@ -81,28 +81,54 @@ export default function AdminPage() {
       setIsMobile(window.innerWidth <= 768);
     };
     
-    const checkAdminStatus = () => {
+    const clearAdminData = () => {
+      localStorage.removeItem('adminLoggedIn');
+      localStorage.removeItem('adminEmail');
+      localStorage.removeItem('adminToken');
+      sessionStorage.removeItem('adminLoggedIn');
+      sessionStorage.removeItem('adminEmail');
+      sessionStorage.removeItem('adminToken');
+    };
+
+    const checkAdminStatus = async () => {
       console.log("🔍 Admin durumu kontrol ediliyor...");
       const adminLoggedIn = localStorage.getItem('adminLoggedIn') || sessionStorage.getItem('adminLoggedIn');
       const adminEmail = localStorage.getItem('adminEmail') || sessionStorage.getItem('adminEmail');
       const adminToken = localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken');
-      
+
       // Hassas bilgiler loglanmıyor - sadece durum kontrolü
       console.log("🔍 Admin durumu:", { isLoggedIn: !!adminLoggedIn, hasEmail: !!adminEmail, hasToken: !!adminToken });
-      
-      // Admin bilgileri eksikse veya token yoksa temizle ve yönlendir
+
+      // Admin bilgileri eksikse temizle ve yönlendir
       if (!adminLoggedIn || !adminEmail || !adminToken) {
         console.log("🔒 Admin giriş yapılmamış veya token eksik, admin bilgileri temizleniyor...");
-        localStorage.removeItem('adminLoggedIn');
-        localStorage.removeItem('adminEmail');
-        localStorage.removeItem('adminToken');
-        sessionStorage.removeItem('adminLoggedIn');
-        sessionStorage.removeItem('adminEmail');
-        sessionStorage.removeItem('adminToken');
+        clearAdminData();
         router.push('/');
         return;
       }
-      console.log("✅ Admin giriş yapılmış, submissions yükleniyor...");
+
+      // Token'ın localStorage'da "var olması" onun geçerli olduğu anlamına
+      // gelmez — sunucuya sormadan güvenmek (client-side trust) bu sayfayı
+      // sahte/süresi dolmuş bir token ile "açık" gösterir ve her istekte
+      // sessizce 401 alır. Backend'e sorup gerçekten doğrula.
+      try {
+        const verifyRes = await fetch('/api/admin/auth', {
+          headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+        if (!verifyRes.ok) {
+          console.log("🔒 Admin token backend doğrulamasından geçemedi, temizleniyor...");
+          clearAdminData();
+          router.push('/');
+          return;
+        }
+      } catch (verifyError) {
+        console.error("❌ Admin token doğrulama isteği başarısız:", verifyError);
+        clearAdminData();
+        router.push('/');
+        return;
+      }
+
+      console.log("✅ Admin giriş yapılmış ve doğrulandı, submissions yükleniyor...");
       setIsAuthenticated(true);
       loadSubmissions();
     };

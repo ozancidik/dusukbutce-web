@@ -3,27 +3,28 @@ import { test, expect } from '@playwright/test';
 const BASE_URL = 'http://localhost:3000';
 
 // Admin login helper
+// NOT: adminToken artık backend'de gerçekten doğrulanıyor (app/admin/page.tsx
+// checkAdminStatus -> /api/admin/auth GET). Sahte bir token enjekte etmek
+// (önceki versiyon) artık 401 ile başarısız olur — gerçek login akışının
+// ürettiği gerçek JWT'nin üzerine yazıp onu bozardı. Gerçek /api/auth/login
+// akışının localStorage'a yazdığı gerçek token'a güveniyoruz.
 async function loginAdminUser(page: any) {
   await page.goto(`${BASE_URL}/login`);
   const emailInput = page.getByTestId('login-email-input');
   const passwordInput = page.getByTestId('login-password-input');
   const loginBtn = page.getByTestId('login-submit-button');
-  // Admin account for testing (adjust if different in your system)
   await emailInput.fill('admin@example.com', { timeout: 5000 });
   await passwordInput.fill('password123', { timeout: 5000 });
   await loginBtn.click({ timeout: 5000 });
-  await page.waitForNavigation({ timeout: 10000 }).catch(() => {});
 
-  // Ensure localStorage persistence across page navigation
-  // Admin page requires adminToken to be set (line 88 of admin/page.tsx)
-  await page.evaluate(() => {
-    localStorage.setItem('adminLoggedIn', 'true');
-    localStorage.setItem('adminEmail', 'admin@example.com');
-    localStorage.setItem('adminToken', 'test-admin-token-' + Date.now());
-    sessionStorage.setItem('adminLoggedIn', 'true');
-    sessionStorage.setItem('adminEmail', 'admin@example.com');
-    sessionStorage.setItem('adminToken', 'test-admin-token-' + Date.now());
-  });
+  // useLoginForm.ts admin girişinde router.push('/admin') öncesi 1500ms
+  // bekliyor (LoginSuccess mesajı gösteriliyor) — client-side navigation
+  // olduğu için waitForNavigation bunu güvenilir yakalamaz, adminToken'ın
+  // localStorage'a yazıldığını doğrudan bekleyelim.
+  await page.waitForFunction(
+    () => !!(localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken')),
+    { timeout: 10000 }
+  ).catch(() => {});
 }
 
 test.describe('Admin Panel Testleri', () => {
