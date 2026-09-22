@@ -2,6 +2,18 @@ import { test, expect } from '@playwright/test';
 
 const BASE_URL = 'http://localhost:3000';
 
+// Login helper
+async function loginUser(page: any) {
+  await page.goto(`${BASE_URL}/login`);
+  const emailInput = page.getByTestId('login-email-input');
+  const passwordInput = page.getByTestId('login-password-input');
+  const loginBtn = page.getByTestId('login-submit-button');
+  await emailInput.fill('test@example.com', { timeout: 5000 });
+  await passwordInput.fill('password123', { timeout: 5000 });
+  await loginBtn.click({ timeout: 5000 });
+  await page.waitForNavigation({ timeout: 10000 }).catch(() => {});
+}
+
 test.describe('Bize-Sat Flow Tests', () => {
 
   // ==================== KATEGORI & NAVIGASYON ====================
@@ -117,6 +129,10 @@ test.describe('Bize-Sat Flow Tests', () => {
   test.describe('İlan Oluşturma Senaryoları', () => {
 
     test('✅ İlan oluşturma formu açılması', async ({ page }) => {
+      // Önce login yap
+      await loginUser(page);
+
+      // Sonra bize-sat sayfasına git
       await page.goto(`${BASE_URL}/bize-sat/ram`);
 
       const createListingBtn = page.getByText(/iş aç|yeni iş|satış|create/i);
@@ -129,6 +145,10 @@ test.describe('Bize-Sat Flow Tests', () => {
     });
 
     test('✅ Zorunlu alanlar validation', async ({ page }) => {
+      // Önce login yap
+      await loginUser(page);
+
+      // Sonra bize-sat sayfasına git
       await page.goto(`${BASE_URL}/bize-sat/ram`);
 
       const createListingBtn = page.getByText(/iş aç|yeni iş/i);
@@ -156,6 +176,10 @@ test.describe('Bize-Sat Flow Tests', () => {
     });
 
     test('✅ Fiyat girişi validation', async ({ page }) => {
+      // Önce login yap
+      await loginUser(page);
+
+      // Sonra bize-sat sayfasına git
       await page.goto(`${BASE_URL}/bize-sat/ram`);
 
       const priceInput = page.getByTestId('price-input');
