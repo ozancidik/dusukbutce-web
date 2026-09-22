@@ -35,10 +35,15 @@ test.describe('Admin Panel Testleri', () => {
     test('❌ Admin olmayan kullanıcı erişimi', async ({ page }) => {
       await page.goto(`${BASE_URL}/admin`);
 
-      // Non-admin users login sayfasına yönlendirilmeli
-      // veya access denied görmeli
-      const denyOrLogin = page.getByText(/login|access.*denied|yetkisiz/i);
-      // Yok olabilir veya görünebilir - environment bağlı
+      // Non-admin users login sayfasına yönlendirilmeli veya access denied görmeli
+      const loginMsg = page.getByText(/login|giriş/i);
+      const denyMsg = page.getByText(/access.*denied|yetkisiz/i);
+
+      const hasLoginMsg = await loginMsg.isVisible({ timeout: 5000 }).catch(() => false);
+      const hasDenyMsg = await denyMsg.isVisible({ timeout: 5000 }).catch(() => false);
+
+      // Either login message or deny message should be visible
+      expect(hasLoginMsg || hasDenyMsg).toBe(true);
     });
   });
 
