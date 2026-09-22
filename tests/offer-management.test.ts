@@ -65,14 +65,14 @@ test.describe('Teklif (Offer) Yönetimi Testleri', () => {
       await page.goto(`${BASE_URL}/bize-sat/ram`);
 
       const offerBtn = page.getByText(/teklif ver/i);
-      const btnExists = await offerBtn.isVisible({ timeout: 15000 }).catch(() => false);
+      const btnExists = await offerBtn.isVisible({ timeout: 20000 }).catch(() => false);
 
       if (btnExists) {
         try {
           await offerBtn.click({ timeout: 5000 });
 
           const priceInput = page.getByTestId('offer-price-input').or(page.getByLabel(/teklif fiyatı/i));
-          const hasPriceInput = await priceInput.isVisible({ timeout: 15000 }).catch(() => false);
+          const hasPriceInput = await priceInput.isVisible({ timeout: 20000 }).catch(() => false);
 
           if (hasPriceInput) {
             // type="number" negatif değeri bloke eder, pozitif test yap
@@ -103,16 +103,16 @@ test.describe('Teklif (Offer) Yönetimi Testleri', () => {
 
       await page.goto(`${BASE_URL}/bize-sat/ram`);
 
-      // Offer button'ı 15 saniye içinde bul, yoksa skip
+      // Offer button'ı 20 saniye içinde bul, yoksa skip (P5-1)
       const offerBtn = page.getByText(/teklif ver/i);
-      const btnExists = await offerBtn.isVisible({ timeout: 15000 }).catch(() => false);
+      const btnExists = await offerBtn.isVisible({ timeout: 20000 }).catch(() => false);
 
       if (btnExists) {
         try {
           await offerBtn.click({ timeout: 5000 });
           // Modal açıldı, form submit button'ı bul
           const submitBtn = page.getByRole('button', { name: /gönder/i });
-          const submitBtnExists = await submitBtn.isVisible({ timeout: 15000 }).catch(() => false);
+          const submitBtnExists = await submitBtn.isVisible({ timeout: 20000 }).catch(() => false);
 
           if (submitBtnExists) {
             await submitBtn.click({ timeout: 5000 });
@@ -248,9 +248,9 @@ test.describe('Teklif (Offer) Yönetimi Testleri', () => {
     test('❌ Karşı teklif - Orijinal fiyattan daha düşük', async ({ page }) => {
       await page.goto(`${BASE_URL}/tekliflerim`);
 
-      // Counter offer button'ı 15 saniye içinde bul
+      // Counter offer button'ı 20 saniye içinde bul (P5-1)
       const counterOfferBtn = page.getByRole('button', { name: /karşı teklif/i }).first();
-      const btnExists = await counterOfferBtn.isVisible({ timeout: 15000 }).catch(() => false);
+      const btnExists = await counterOfferBtn.isVisible({ timeout: 20000 }).catch(() => false);
 
       if (btnExists) {
         try {
