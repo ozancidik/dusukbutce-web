@@ -2,12 +2,35 @@ import { test, expect } from '@playwright/test';
 
 const BASE_URL = 'http://localhost:3000';
 
+// Login helper
+async function loginUser(page: any) {
+  await page.goto(`${BASE_URL}/login`);
+  const emailInput = page.getByTestId('login-email-input');
+  const passwordInput = page.getByTestId('login-password-input');
+  const loginBtn = page.getByTestId('login-submit-button');
+  await emailInput.fill('test@example.com', { timeout: 5000 });
+  await passwordInput.fill('password123', { timeout: 5000 });
+  await loginBtn.click({ timeout: 5000 });
+  await page.waitForNavigation({ timeout: 10000 }).catch(() => {});
+}
+
 test.describe('Teklif (Offer) Yönetimi Testleri', () => {
 
   // ==================== TEKLİF ALMA ====================
   test.describe('Teklif Alma Senaryoları', () => {
 
     test('✅ Teklif alma - Başarılı', async ({ page }) => {
+      // Önce login yap
+      await page.goto(`${BASE_URL}/login`);
+      const emailInput = page.getByTestId('login-email-input');
+      const passwordInput = page.getByTestId('login-password-input');
+      const loginBtn = page.getByTestId('login-submit-button');
+      await emailInput.fill('test@example.com', { timeout: 5000 });
+      await passwordInput.fill('password123', { timeout: 5000 });
+      await loginBtn.click({ timeout: 5000 });
+      await page.waitForNavigation({ timeout: 10000 }).catch(() => {});
+
+      // Sonra offer page'ine git
       await page.goto(`${BASE_URL}/bize-sat/ram`);
 
       // Bir ürüne teklif ver
