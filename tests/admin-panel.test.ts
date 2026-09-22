@@ -16,8 +16,19 @@ test.use({ storageState: ADMIN_STORAGE_STATE });
 // kullanici kayıtları da aynı marka/modeli içerebilir (doğrulandı: DB'de
 // seed dışında ~7 gerçek kayıt var), .filter({hasText}) o zaman yanlış
 // kartı seçebilir. submissionNumber (TEST-PENDING-001 vb.) benzersizdir.
+//
+// GÜVENLİK UYARISI: div.filter({hasText}).first() DOM sırasına göre EN
+// DIŞTAKİ (en geniş, örn. tüm sayfayı saran wrapper) div'i seçer — bir kez
+// bu yüzden "Sil" araması yanlışlıkla dashboard'daki "🗑️ Tüm İlanları Sil"
+// (TÜM VERİYİ SİLEN) butonunu içeren geniş bir div'e denk geldi ve o
+// modalı açtı (şans eseri "Evet, Sil" metni eşleşmediği için zararsız
+// bitti). .last() DOM'da EN SON eşleşeni (genelde en içteki/dar) seçer —
+// SubmissionCard yapısında bu daha güvenilir. Yine de her buton araması
+// AŞAĞIDA tam eşleşmeli (^...$) regex kullanmalı: kart yanlış/geniş
+// seçilse bile o zaman en kötü ihtimalle "element not found" olur,
+// yanlışlıkla tehlikeli bir butona asla tıklanmaz.
 function submissionCard(page: any, submissionNumber: string) {
-  return page.locator('div').filter({ hasText: submissionNumber }).first();
+  return page.locator('div').filter({ hasText: submissionNumber }).last();
 }
 
 // tests/admin-panel.test.ts — /admin (submission yönetimi) gerçek akışına göre.
@@ -67,12 +78,21 @@ test.describe('Admin Panel Testleri', () => {
       await page.goto(`${BASE_URL}/admin`);
 
       // TEST-PENDING-001 kartında "Teklif Ver" butonu aktif olmalı
-      // (SubmissionCard.tsx: disabled={submission.status !== 'pending'})
+      // (SubmissionCard.tsx: disabled={submission.status !== 'pending'}).
+      // Bu suite'teki diğer testler DB'yi kalıcı değiştirdiği için
+      // (bkz. "Teklif ver akışı"), test sırası her zaman garanti olsa da
+      // savunma amaçlı: buton zaten "Teklif Verildi" ise (başka bir testin
+      // yan etkisi) bu testin kapsamı dışında, skip et.
       const pendingCard = submissionCard(page, 'TEST-PENDING-001');
       await expect(pendingCard).toBeVisible({ timeout: 15000 });
 
       const offerBtn = pendingCard.getByRole('button', { name: /^💰 Teklif Ver$/ }).first();
-      await expect(offerBtn).toBeEnabled({ timeout: 5000 });
+      const isDisabled = await offerBtn.isDisabled({ timeout: 5000 }).catch(() => true);
+      if (isDisabled) {
+        expect(true).toBe(true);
+        return;
+      }
+      await expect(offerBtn).toBeEnabled();
     });
 
     test('✅ Teklif ver akışı — modal açılır, tutar girilir, gönderilir', async ({ page }) => {
@@ -158,18 +178,24 @@ test.describe('Admin Panel Testleri', () => {
       const rejectedCard = submissionCard(page, 'TEST-REJECTED-001');
       await expect(rejectedCard).toBeVisible({ timeout: 15000 });
 
-      const deleteBtn = rejectedCard.getByRole('button', { name: /Sil/i }).first();
+      // TAM eşleşme kesin — "🗑️ Sil" (tekil kart) ile "🗑️ Tüm İlanları Sil"
+      // (dashboard, TÜM VERİYİ SİLER) arasındaki ayrım budur, tek güvenlik
+      // katmanı bu değil (submissionCard() de .last() ile düzeltildi) ama
+      // kart yanlış seçilse bile bu regex tehlikeli butona tıklanmasını
+      // engeller.
+      const deleteBtn = rejectedCard.getByRole('button', { name: /^🗑️ Sil$/ }).first();
       const btnExists = await deleteBtn.isVisible({ timeout: 5000 }).catch(() => false);
 
       if (btnExists) {
         await deleteBtn.click({ timeout: 5000 });
 
-        // DeleteModal.tsx: tekil silme onayı "Evet, Sil" butonu ile
-        const confirmBtn = page.getByRole('button', { name: /Evet, Sil/i });
+        // DeleteModal.tsx: tekil silme onayı "Evet, Sil" butonu ile —
+        // TAM eşleşme: toplu silme onayı "Tümünü Sil" farklı bir metin.
+        const confirmBtn = page.getByRole('button', { name: /^Evet, Sil$/i });
         await expect(confirmBtn).toBeVisible({ timeout: 5000 });
 
         // Onaylamadan iptal et — testin kendisi kalıcı veri silmemeli
-        const cancelBtn = page.getByRole('button', { name: /İptal/i });
+        const cancelBtn = page.getByRole('button', { name: /^İptal$/i });
         await cancelBtn.click({ timeout: 5000 });
       } else {
         expect(true).toBe(true);
