@@ -115,10 +115,7 @@ export default function AdminPage() {
         const verifyRes = await fetch('/api/admin/auth', {
           headers: { 'Authorization': `Bearer ${adminToken}` }
         });
-        console.log("[DEBUG] /api/admin/auth GET status:", verifyRes.status);
         if (!verifyRes.ok) {
-          const errBody = await verifyRes.text().catch(() => '');
-          console.log("[DEBUG] /api/admin/auth GET error body:", errBody);
           console.log("🔒 Admin token backend doğrulamasından geçemedi, temizleniyor...");
           clearAdminData();
           router.push('/');
