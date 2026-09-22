@@ -59,6 +59,9 @@ test.describe('Teklif (Offer) Yönetimi Testleri', () => {
     });
 
     test('❌ Teklif alma - Geçersiz fiyat', async ({ page }) => {
+      // Login session kur
+      await loginUser(page);
+
       await page.goto(`${BASE_URL}/bize-sat/ram`);
 
       const offerBtn = page.getByText(/teklif ver/i);
@@ -83,6 +86,9 @@ test.describe('Teklif (Offer) Yönetimi Testleri', () => {
     });
 
     test('❌ Teklif alma - Boş fiyat', async ({ page }) => {
+      // Login session kur
+      await loginUser(page);
+
       await page.goto(`${BASE_URL}/bize-sat/ram`);
 
       const offerBtn = page.getByText(/teklif ver/i);
@@ -100,6 +106,9 @@ test.describe('Teklif (Offer) Yönetimi Testleri', () => {
     });
 
     test('✅ Teklif alma - Not/Mesaj eklenmesi', async ({ page }) => {
+      // Login session kur
+      await loginUser(page);
+
       await page.goto(`${BASE_URL}/bize-sat/ram`);
 
       const offerBtn = page.getByText(/teklif ver/i);
@@ -119,6 +128,9 @@ test.describe('Teklif (Offer) Yönetimi Testleri', () => {
   test.describe('Teklif Yönetimi Senaryoları', () => {
 
     test('✅ Teklifleri görüntüleme', async ({ page }) => {
+      // Login session kur
+      await loginUser(page);
+
       await page.goto(`${BASE_URL}/tekliflerim`); // Offers page
 
       // Alınan teklifler listesi
