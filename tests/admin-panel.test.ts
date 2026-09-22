@@ -15,11 +15,14 @@ async function loginAdminUser(page: any) {
   await page.waitForNavigation({ timeout: 10000 }).catch(() => {});
 
   // Ensure localStorage persistence across page navigation
+  // Admin page requires adminToken to be set (line 88 of admin/page.tsx)
   await page.evaluate(() => {
     localStorage.setItem('adminLoggedIn', 'true');
     localStorage.setItem('adminEmail', 'admin@example.com');
+    localStorage.setItem('adminToken', 'test-admin-token-' + Date.now());
     sessionStorage.setItem('adminLoggedIn', 'true');
     sessionStorage.setItem('adminEmail', 'admin@example.com');
+    sessionStorage.setItem('adminToken', 'test-admin-token-' + Date.now());
   });
 }
 
