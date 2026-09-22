@@ -71,6 +71,7 @@ export default function RegisterPage() {
   const checkEmailExists = useCallback(async (email: string) => {
     if (!email || !email.includes('@')) {
       setEmailExists(false);
+      console.log('[P5-2 DEBUG] Email check skipped:', { email });
       return;
     }
 
@@ -85,6 +86,7 @@ export default function RegisterPage() {
 
       if (response.ok) {
         const data = await response.json();
+        console.log('[P5-2 DEBUG] Email check result:', { email, exists: data.exists });
         setEmailExists(data.exists);
       }
     } catch (error) {
@@ -109,6 +111,7 @@ export default function RegisterPage() {
   useEffect(() => {
     const timer = setTimeout(() => {
       if (form.email) {
+        console.log('[P5-2 DEBUG] Email debounce triggered:', { email: form.email });
         checkEmailExists(form.email);
       } else {
         setEmailExists(false);
@@ -117,6 +120,11 @@ export default function RegisterPage() {
 
     return () => clearTimeout(timer);
   }, [form.email, checkEmailExists]);
+
+  // Log emailExists changes
+  useEffect(() => {
+    console.log('[P5-2 DEBUG] emailExists state changed:', { emailExists });
+  }, [emailExists]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -383,6 +391,28 @@ export default function RegisterPage() {
     emailExists ||
     phoneExists ||
     !acceptKvkk;
+
+  // Log button state
+  useEffect(() => {
+    console.log('[P5-2 DEBUG] Submit button state:', {
+      isSubmitDisabled,
+      reasons: {
+        isLoading,
+        firstNameTooShort: form.firstName.trim().length < 2,
+        lastNameTooShort: form.lastName.trim().length < 2,
+        invalidEmail: !emailFormatRegex.test(form.email.trim()),
+        invalidPhone: !phoneFormatRegex.test(form.cep_telefonu),
+        noBirthDate: !form.birthDate,
+        ageTooYoung,
+        passwordMismatch,
+        passwordTooShort: form.password.length < 6,
+        passwordNotConfirmed: form.password !== form.passwordConfirm,
+        emailExists,
+        phoneExists,
+        noKvkkAccept: !acceptKvkk
+      }
+    });
+  }, [isSubmitDisabled, isLoading, form.firstName, form.lastName, form.email, form.cep_telefonu, form.birthDate, ageTooYoung, passwordMismatch, form.password, form.passwordConfirm, emailExists, phoneExists, acceptKvkk]);
 
   return (
     <>

@@ -16,6 +16,15 @@ test.describe('Authentication & Authorization Tests', () => {
     });
 
     test('❌ Register - Email validation error', async ({ page }) => {
+      // Capture console logs for P5-2 debugging
+      const consoleLogs: string[] = [];
+      page.on('console', msg => {
+        if (msg.text().includes('[P5-2 DEBUG]')) {
+          consoleLogs.push(msg.text());
+          console.log('[TEST CAPTURE]', msg.text());
+        }
+      });
+
       await page.goto(`${BASE_URL}/register`);
       await page.waitForLoadState('networkidle');
 
@@ -34,6 +43,12 @@ test.describe('Authentication & Authorization Tests', () => {
       // KVKK checkbox check et
       const kvkkCheckbox = page.locator('input[type="checkbox"]').last();
       await kvkkCheckbox.check({ timeout: 5000 });
+
+      // Bir saniye daha bekle ve console'u kontrol et
+      await page.waitForTimeout(1000);
+      console.log('\n=== P5-2 Captured Console Logs ===');
+      consoleLogs.forEach(log => console.log(log));
+      console.log('===================================\n');
 
       // Submit button'ın enable olmasını bekle (en fazla 3 saniye)
       const submitBtn = page.locator('button[type="submit"]').first();
