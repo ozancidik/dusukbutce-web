@@ -28,10 +28,13 @@ test.describe('Authentication & Authorization Tests', () => {
       await page.goto(`${BASE_URL}/register`);
       await page.waitForLoadState('networkidle');
 
+      // Use unique email per test run (P5-5: avoid DB state collisions)
+      const uniqueEmail = `reg-${Date.now()}@example.com`;
+
       // Form'u geçerli format ile doldur
       await page.locator('input[name="firstName"]').fill('Test', { timeout: 5000 });
       await page.locator('input[name="lastName"]').fill('User', { timeout: 5000 });
-      await page.locator('input[name="email"]').fill('reg1@example.com', { timeout: 5000 });
+      await page.locator('input[name="email"]').fill(uniqueEmail, { timeout: 5000 });
       await page.locator('input[name="cep_telefonu"]').fill('(555) 111 11 11', { timeout: 5000 });
       await page.locator('input[name="birthDate"]').fill('2000-01-15', { timeout: 5000 });
       await page.locator('input[name="password"]').fill('password123', { timeout: 5000 });
@@ -75,7 +78,9 @@ test.describe('Authentication & Authorization Tests', () => {
       // Form'u doldur ama invalid email ile
       await page.locator('input[name="firstName"]').fill('Test2', { timeout: 5000 });
       await page.locator('input[name="lastName"]').fill('User', { timeout: 5000 });
-      await page.locator('input[name="email"]').fill('invalid-email-no-at', { timeout: 5000 });
+      // Use unique invalid email per test run (P5-5)
+      const uniqueInvalidEmail = `invalid-${Date.now()}`;
+      await page.locator('input[name="email"]').fill(uniqueInvalidEmail, { timeout: 5000 });
       await page.locator('input[name="cep_telefonu"]').fill('(555) 123 45 67', { timeout: 5000 });
       await page.locator('input[name="birthDate"]').fill('2010-01-15', { timeout: 5000 });
       await page.locator('input[name="password"]').fill('password123', { timeout: 5000 });
@@ -113,10 +118,14 @@ test.describe('Authentication & Authorization Tests', () => {
       await page.goto(`${BASE_URL}/register`);
       await page.waitForLoadState('networkidle');
 
-      // Form'u doldur - test@example.com (already exists)
+      // Use hardcoded test@example.com which MUST exist in test DB for this test
+      // If test DB is empty, this test will fail — that's expected (DB state test)
+      const testEmail = 'test@example.com'; // Known to exist for this test
+
+      // Form'u doldur - test@example.com (should already exist)
       await page.locator('input[name="firstName"]').fill('Test3', { timeout: 5000 });
       await page.locator('input[name="lastName"]').fill('User', { timeout: 5000 });
-      await page.locator('input[name="email"]').fill('test@example.com', { timeout: 5000 });
+      await page.locator('input[name="email"]').fill(testEmail, { timeout: 5000 });
       await page.locator('input[name="cep_telefonu"]').fill('(555) 123 45 67', { timeout: 5000 });
       await page.locator('input[name="birthDate"]').fill('2000-01-15', { timeout: 5000 });
       await page.locator('input[name="password"]').fill('password123', { timeout: 5000 });
