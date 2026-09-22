@@ -1,51 +1,19 @@
 import { test, expect } from '@playwright/test';
+import { ADMIN_STORAGE_STATE, USER_STORAGE_STATE } from './global-setup';
 
 const BASE_URL = 'http://localhost:3000';
 
-// Admin login helper
-// NOT: adminToken artık backend'de gerçekten doğrulanıyor (app/admin/page.tsx
-// checkAdminStatus -> /api/admin/auth GET). Sahte bir token enjekte etmek
-// (önceki versiyon) artık 401 ile başarısız olur — gerçek login akışının
-// ürettiği gerçek JWT'nin üzerine yazıp onu bozardı. Gerçek /api/auth/login
-// akışının localStorage'a yazdığı gerçek token'a güveniyoruz.
-async function loginAdminUser(page: any) {
-  await page.goto(`${BASE_URL}/login`);
-  // CSRF token sayfa yüklendikten sonra async fetch ediliyor
-  // (login/page.tsx fetchCsrfToken). Token gelmeden submit edilirse
-  // useLoginForm.ts "Güvenlik hatası: Lütfen sayfayı yenileyin." ile
-  // reddediyor — bu gerçek bir race condition (yavaş bağlantıda gerçek
-  // kullanıcılar da yaşayabilir), form çok hızlı doldurulup submit
-  // edildiğinde tetikleniyor.
-  await page.waitForLoadState('networkidle');
-  const emailInput = page.getByTestId('login-email-input');
-  const passwordInput = page.getByTestId('login-password-input');
-  const loginBtn = page.getByTestId('login-submit-button');
-  await emailInput.fill('admin@example.com', { timeout: 5000 });
-  await passwordInput.fill('admin123', { timeout: 5000 });
-  await loginBtn.click({ timeout: 5000 });
-
-  // useLoginForm.ts admin girişinde router.push('/admin') öncesi 1500ms
-  // bekliyor (LoginSuccess mesajı gösteriliyor) — client-side navigation
-  // olduğu için waitForNavigation bunu güvenilir yakalamaz, adminToken'ın
-  // localStorage'a yazıldığını doğrudan bekleyelim.
-  await page.waitForFunction(
-    () => !!(localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken')),
-    { timeout: 10000 }
-  ).catch(() => {});
-
-  // KRİTİK: Token yazılması ile router.push('/admin') çağrısı (1500ms
-  // setTimeout, useLoginForm.ts) AYRI olaylardır. Token yazıldıktan hemen
-  // sonra test kodu page.goto('/admin') çağırırsa, uygulamanın kendi
-  // client-side redirect'i İLE test'in goto()'su ÇAKIŞIR — Playwright bunu
-  // "Target page, context or browser has been closed" olarak raporlar.
-  // Otomatik yönlendirmenin tamamlanmasını bekleyip test kodunun AYRICA
-  // goto('/admin') çağırmasına gerek bırakmıyoruz.
-  await page.waitForURL(/\/admin/, { timeout: 8000 }).catch(() => {});
-}
+// Bu dosyadaki testler ÖNCEDEN LOGIN OLMUŞ bir admin session'ı ile başlar
+// (tests/global-setup.ts admin@example.com ile bir kez login olup
+// storageState'i kaydediyor). Her test kendi login'ini YAPMIYOR — bunun
+// sebebi /api/auth/login rate limit'i (IP başına 5 dakikada 10 deneme):
+// bu dosya + offer-management.test.ts birlikte ~16 login denemesi
+// yapıyordu ve tek bir suite run'ı KENDİ rate limit'ine takılıyordu.
+test.use({ storageState: ADMIN_STORAGE_STATE });
 
 // Submission kartını submissionNumber'a göre bulan yardımcı — marka/model
 // (ör. "Corsair Vengeance") ile arama YAPILMAMALI: production DB'de gerçek
-// kullanıcı kayıtları da aynı marka/modeli içerebilir (doğrulandı: DB'de
+// kullanici kayıtları da aynı marka/modeli içerebilir (doğrulandı: DB'de
 // seed dışında ~7 gerçek kayıt var), .filter({hasText}) o zaman yanlış
 // kartı seçebilir. submissionNumber (TEST-PENDING-001 vb.) benzersizdir.
 function submissionCard(page: any, submissionNumber: string) {
@@ -62,48 +30,41 @@ function submissionCard(page: any, submissionNumber: string) {
 // /admin/newsletter, /admin/teknik-servis, /admin/audit-log). Ayrıca birçok
 // assertion `count() >= 0` gibi matematiksel olarak her zaman doğru olan
 // ifadeler kullanıyordu — sayfa 404 olsa bile "geçiyordu". Bu dosya gerçek
-// /admin sayfasının submission yönetimi akışını (npm run seed:e2e /
-// tests/global-setup.ts ile oluşturulan TEST-PENDING-001, TEST-OFFERED-001,
-// TEST-REJECTED-001 kayıtlarına karşı) test eder.
+// /admin sayfasının submission yönetimi akışını (tests/global-setup.ts ile
+// oluşturulan TEST-PENDING-001, TEST-OFFERED-001, TEST-REJECTED-001
+// kayıtlarına karşı) test eder.
 test.describe('Admin Panel Testleri', () => {
 
   test.describe('Admin Panel Erişimi', () => {
 
     test('✅ Admin sayfasına erişim ve submission listesi', async ({ page }) => {
-      await loginAdminUser(page); // helper zaten /admin'e yönlendiriyor
+      await page.goto(`${BASE_URL}/admin`);
 
       // Seed edilen TEST-PENDING-001 kaydı görünmeli (gerçek veri, admin
       // panelinin ProductSubmission koleksiyonunu okuduğunun kanıtı)
       await expect(page.getByText('TEST-PENDING-001')).toBeVisible({ timeout: 15000 });
     });
 
-    test('❌ Admin olmayan kullanıcı erişimi engellenir', async ({ page }) => {
-      // Regular user login yap (admin değil)
-      await page.goto(`${BASE_URL}/login`);
-      await page.waitForLoadState('networkidle');
-      const emailInput = page.getByTestId('login-email-input');
-      const passwordInput = page.getByTestId('login-password-input');
-      const loginBtn = page.getByTestId('login-submit-button');
+    test('❌ Admin olmayan kullanıcı erişimi engellenir', async ({ browser }) => {
+      // Bu test dosyanın genelindeki admin storageState'ini DEĞİL, normal
+      // kullanıcı storageState'ini kullanmalı — ayrı bir context açıyoruz.
+      const context = await browser.newContext({ storageState: USER_STORAGE_STATE });
+      const page = await context.newPage();
 
-      await emailInput.fill('test@example.com', { timeout: 5000 });
-      await passwordInput.fill('password123', { timeout: 5000 });
-      await loginBtn.click({ timeout: 5000 });
-      await page.waitForTimeout(2000);
-
-      // Admin sayfasına git — checkAdminStatus() adminToken yokluğunda
-      // veya backend doğrulaması başarısız olursa '/'ye yönlendirir
-      // (app/admin/page.tsx).
+      // checkAdminStatus() adminToken yokluğunda veya backend doğrulaması
+      // başarısız olursa '/'ye yönlendirir (app/admin/page.tsx).
       await page.goto(`${BASE_URL}/admin`, { waitUntil: 'networkidle' });
       await page.waitForTimeout(1000);
 
       await expect(page).not.toHaveURL(/\/admin$/, { timeout: 5000 });
+      await context.close();
     });
   });
 
   test.describe('Submission Yönetimi', () => {
 
     test('✅ Bekleyen (pending) submission için Teklif Ver butonu aktif', async ({ page }) => {
-      await loginAdminUser(page); // helper zaten /admin'e yönlendiriyor
+      await page.goto(`${BASE_URL}/admin`);
 
       // TEST-PENDING-001 kartında "Teklif Ver" butonu aktif olmalı
       // (SubmissionCard.tsx: disabled={submission.status !== 'pending'})
@@ -115,7 +76,7 @@ test.describe('Admin Panel Testleri', () => {
     });
 
     test('✅ Teklif ver akışı — modal açılır, tutar girilir, gönderilir', async ({ page }) => {
-      await loginAdminUser(page); // helper zaten /admin'e yönlendiriyor
+      await page.goto(`${BASE_URL}/admin`);
 
       const pendingCard = submissionCard(page, 'TEST-PENDING-001');
       await expect(pendingCard).toBeVisible({ timeout: 15000 });
@@ -147,7 +108,7 @@ test.describe('Admin Panel Testleri', () => {
     });
 
     test('❌ Zaten teklif verilmiş (offered) submission tekrar teklife kapalı', async ({ page }) => {
-      await loginAdminUser(page); // helper zaten /admin'e yönlendiriyor
+      await page.goto(`${BASE_URL}/admin`);
 
       // TEST-OFFERED-001 kaydı — status: 'offered', buton "Teklif Verildi"
       // metnini gösterip disabled olmalı.
@@ -164,7 +125,7 @@ test.describe('Admin Panel Testleri', () => {
     });
 
     test('✅ Reddetme akışı — modal açılır, sebep girilir, gönderilir', async ({ page }) => {
-      await loginAdminUser(page); // helper zaten /admin'e yönlendiriyor
+      await page.goto(`${BASE_URL}/admin`);
 
       const pendingCard = submissionCard(page, 'TEST-PENDING-001');
       await expect(pendingCard).toBeVisible({ timeout: 15000 });
@@ -192,7 +153,7 @@ test.describe('Admin Panel Testleri', () => {
     });
 
     test('✅ Silme akışı — onay dialogu gösterilir', async ({ page }) => {
-      await loginAdminUser(page); // helper zaten /admin'e yönlendiriyor
+      await page.goto(`${BASE_URL}/admin`);
 
       const rejectedCard = submissionCard(page, 'TEST-REJECTED-001');
       await expect(rejectedCard).toBeVisible({ timeout: 15000 });
@@ -220,25 +181,21 @@ test.describe('Admin Panel Testleri', () => {
   test.describe('Diğer Admin Sayfaları', () => {
 
     test('✅ Ürünler sayfası yüklenir', async ({ page }) => {
-      await loginAdminUser(page);
       await page.goto(`${BASE_URL}/admin/urunler`, { waitUntil: 'networkidle' });
       await expect(page).toHaveURL(/urunler/);
     });
 
     test('✅ Fiyat yönetimi sayfası yüklenir', async ({ page }) => {
-      await loginAdminUser(page);
       await page.goto(`${BASE_URL}/admin/fiyat`, { waitUntil: 'networkidle' });
       await expect(page).toHaveURL(/fiyat/);
     });
 
     test('✅ Kategori yönetimi sayfası yüklenir', async ({ page }) => {
-      await loginAdminUser(page);
       await page.goto(`${BASE_URL}/admin/kategori`, { waitUntil: 'networkidle' });
       await expect(page).toHaveURL(/kategori/);
     });
 
     test('✅ Audit log sayfası yüklenir', async ({ page }) => {
-      await loginAdminUser(page);
       await page.goto(`${BASE_URL}/admin/audit-log`, { waitUntil: 'networkidle' });
       await expect(page).toHaveURL(/audit-log/);
     });

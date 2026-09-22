@@ -51,3 +51,4 @@ yarn-error.log*
 .claude-flow/sessions/
 playwright-report/
 test-results/
+tests/.auth/

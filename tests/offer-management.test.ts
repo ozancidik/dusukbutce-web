@@ -1,22 +1,15 @@
 import { test, expect } from '@playwright/test';
+import { USER_STORAGE_STATE } from './global-setup';
 
 const BASE_URL = 'http://localhost:3000';
 
-// Login helper
-async function loginUser(page: any) {
-  await page.goto(`${BASE_URL}/login`);
-  // CSRF token async fetch ediliyor (login/page.tsx) — token gelmeden
-  // submit edilirse "Güvenlik hatası: Lütfen sayfayı yenileyin." ile
-  // reddedilir. networkidle beklemesi bu race condition'ı önler.
-  await page.waitForLoadState('networkidle');
-  const emailInput = page.getByTestId('login-email-input');
-  const passwordInput = page.getByTestId('login-password-input');
-  const loginBtn = page.getByTestId('login-submit-button');
-  await emailInput.fill('test@example.com', { timeout: 5000 });
-  await passwordInput.fill('password123', { timeout: 5000 });
-  await loginBtn.click({ timeout: 5000 });
-  await page.waitForNavigation({ timeout: 10000 }).catch(() => {});
-}
+// Bu dosyadaki testler ÖNCEDEN LOGIN OLMUŞ bir kullanıcı session'ı ile
+// başlar (tests/global-setup.ts test@example.com ile bir kez login olup
+// storageState'i kaydediyor). Her test kendi login'ini YAPMIYOR — bunun
+// sebebi /api/auth/login rate limit'i (IP başına 5 dakikada 10 deneme):
+// bu dosya + admin-panel.test.ts birlikte ~16 login denemesi yapıyordu ve
+// tek bir suite run'ı KENDİ rate limit'ine takılıyordu.
+test.use({ storageState: USER_STORAGE_STATE });
 
 // Submission kartını submissionNumber'a göre bulan yardımcı — marka/model
 // (ör. "Dell XPS") ile arama YAPILMAMALI: production DB'de gerçek kullanıcı
@@ -39,7 +32,6 @@ test.describe('Teklif (Offer) Yönetimi Testleri', () => {
   test.describe('Tekliflerim Sayfası — Görüntüleme', () => {
 
     test('✅ Tekliflerim sayfası açılır ve teklif listelenir', async ({ page }) => {
-      await loginUser(page);
       await page.goto(`${BASE_URL}/tekliflerim`);
 
       // Seed edilen TEST-OFFERED-001 (Dell XPS 13, 15000 TL teklif) görünmeli
@@ -47,7 +39,6 @@ test.describe('Teklif (Offer) Yönetimi Testleri', () => {
     });
 
     test('✅ Teklif tutarı doğru gösterilir', async ({ page }) => {
-      await loginUser(page);
       await page.goto(`${BASE_URL}/tekliflerim`);
 
       const offeredCard = page.locator('div').filter({ hasText: 'TEST-OFFERED-001' }).first();
@@ -57,7 +48,6 @@ test.describe('Teklif (Offer) Yönetimi Testleri', () => {
     });
 
     test('✅ Reddedilmiş submission red sebebi ile gösterilir', async ({ page }) => {
-      await loginUser(page);
       await page.goto(`${BASE_URL}/tekliflerim`);
 
       // TEST-REJECTED-001 (LG 27UL500, rejectionReason: 'Test red nedeni')
@@ -74,7 +64,6 @@ test.describe('Teklif (Offer) Yönetimi Testleri', () => {
   test.describe('Teklif Kabul/Red Akışı', () => {
 
     test('✅ Teklifi Kabul Et butonu offered durumda aktif', async ({ page }) => {
-      await loginUser(page);
       await page.goto(`${BASE_URL}/tekliflerim`);
 
       const offeredCard = page.locator('div').filter({ hasText: 'TEST-OFFERED-001' }).first();
@@ -92,7 +81,6 @@ test.describe('Teklif (Offer) Yönetimi Testleri', () => {
     });
 
     test('✅ Teklifi kabul etme — modal açılır ve onaylanır', async ({ page }) => {
-      await loginUser(page);
       await page.goto(`${BASE_URL}/tekliflerim`);
 
       const offeredCard = page.locator('div').filter({ hasText: 'TEST-OFFERED-001' }).first();
@@ -121,7 +109,6 @@ test.describe('Teklif (Offer) Yönetimi Testleri', () => {
     });
 
     test('✅ Teklifi reddetme — modal açılır, sebep girilir, onaylanır', async ({ page }) => {
-      await loginUser(page);
       await page.goto(`${BASE_URL}/tekliflerim`);
 
       const offeredCard = page.locator('div').filter({ hasText: 'TEST-OFFERED-001' }).first();
@@ -162,33 +149,40 @@ test.describe('Teklif (Offer) Yönetimi Testleri', () => {
 
   test.describe('Yetkilendirme', () => {
 
-    test('❌ Login olmadan /tekliflerim erişimi engellenir', async ({ page }) => {
+    // Bu iki test FARKLI bir auth durumu gerektiriyor (login yok / farklı
+    // kullanıcı) — dosyanın genelindeki USER_STORAGE_STATE'i override edip
+    // boş/farklı context kullanıyoruz.
+    test('❌ Login olmadan /tekliflerim erişimi engellenir', async ({ browser }) => {
+      const context = await browser.newContext(); // storageState YOK — anonim
+      const page = await context.newPage();
       await page.goto(`${BASE_URL}/tekliflerim`, { waitUntil: 'networkidle' });
 
       // Login sayfasına yönlendirilmeli veya "giriş yapmalısınız" mesajı
-      const redirectedToLogin = await page.url().includes('login');
+      const redirectedToLogin = page.url().includes('login');
       const hasLoginPrompt = await page.getByText(/giriş yap/i).first().isVisible({ timeout: 3000 }).catch(() => false);
       expect(redirectedToLogin || hasLoginPrompt).toBe(true);
+      await context.close();
     });
 
-    test('❌ Başka kullanıcının tekliflerini göremez', async ({ page }) => {
+    test('❌ Başka kullanıcının tekliflerini göremez', async ({ browser }) => {
       // seller@example.com'un hiç submission'ı yok (tests/global-setup.ts) —
       // login olup /tekliflerim'e gittiğinde TEST-OFFERED-001 (test@'e ait)
-      // GÖRÜNMEMELİ (IDOR / broken access control kontrolü).
+      // GÖRÜNMEMELİ (IDOR / broken access control kontrolü). Farklı kullanıcı
+      // olduğu için ayrı context + kendi login'i gerekiyor (tek seferlik).
+      const context = await browser.newContext();
+      const page = await context.newPage();
       await page.goto(`${BASE_URL}/login`);
       await page.waitForLoadState('networkidle');
-      const emailInput = page.getByTestId('login-email-input');
-      const passwordInput = page.getByTestId('login-password-input');
-      const loginBtn = page.getByTestId('login-submit-button');
-      await emailInput.fill('seller@example.com', { timeout: 5000 });
-      await passwordInput.fill('seller123', { timeout: 5000 });
-      await loginBtn.click({ timeout: 5000 });
+      await page.getByTestId('login-email-input').fill('seller@example.com', { timeout: 5000 });
+      await page.getByTestId('login-password-input').fill('seller123', { timeout: 5000 });
+      await page.getByTestId('login-submit-button').click({ timeout: 5000 });
       await page.waitForTimeout(2000);
 
       await page.goto(`${BASE_URL}/tekliflerim`, { waitUntil: 'networkidle' });
 
       const otherUsersSubmission = page.getByText('TEST-OFFERED-001');
       await expect(otherUsersSubmission).not.toBeVisible({ timeout: 5000 });
+      await context.close();
     });
   });
 });
