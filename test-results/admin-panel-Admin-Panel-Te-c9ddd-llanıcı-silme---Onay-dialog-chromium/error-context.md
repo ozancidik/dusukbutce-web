@@ -7,7 +7,7 @@
 # Test info
 
 - Name: admin-panel.test.ts >> Admin Panel Testleri >> Kullanıcı Yönetimi >> ❌ Kullanıcı silme - Onay dialog
-- Location: tests/admin-panel.test.ts:110:9
+- Location: tests/admin-panel.test.ts:133:9
 
 # Error details
 
@@ -288,206 +288,206 @@ Call log:
 # Test source
 
 ```ts
-  15  |       await expect(adminContent).toBeDefined();
-  16  |     });
-  17  | 
-  18  |     test('❌ Admin olmayan kullanıcı erişimi', async ({ page }) => {
-  19  |       await page.goto(`${BASE_URL}/admin`);
-  20  | 
-  21  |       // Non-admin users login sayfasına yönlendirilmeli
-  22  |       // veya access denied görmeli
-  23  |       const denyOrLogin = page.getByText(/login|access.*denied|yetkisiz/i);
-  24  |       // Yok olabilir veya görünebilir - environment bağlı
-  25  |     });
-  26  |   });
-  27  | 
-  28  |   // ==================== DASHBOARD ====================
-  29  |   test.describe('Admin Dashboard', () => {
-  30  | 
-  31  |     test('✅ Dashboard metriği gösterimi', async ({ page }) => {
-  32  |       await page.goto(`${BASE_URL}/admin/dashboard`);
-  33  | 
-  34  |       // Metrikler görüntülenmesi bekleniyor
-  35  |       const metrics = page.locator('[class*="metric"]');
-  36  |       expect(await metrics.count()).toBeGreaterThanOrEqual(0);
-  37  |     });
-  38  | 
-  39  |     test('✅ Kullanıcı sayısı', async ({ page }) => {
-  40  |       await page.goto(`${BASE_URL}/admin/dashboard`);
-  41  | 
-  42  |       const userCount = page.getByText(/kullanıcı|users|total.*users/i);
-  43  |       await expect(userCount).toBeDefined();
-  44  |     });
-  45  | 
-  46  |     test('✅ İlan sayısı', async ({ page }) => {
-  47  |       await page.goto(`${BASE_URL}/admin/dashboard`);
-  48  | 
-  49  |       const listingCount = page.getByText(/iş|ilan|listing|posted/i);
-  50  |       await expect(listingCount).toBeDefined();
-  51  |     });
-  52  | 
-  53  |     test('✅ Teklif sayısı', async ({ page }) => {
-  54  |       await page.goto(`${BASE_URL}/admin/dashboard`);
-  55  | 
-  56  |       const offerCount = page.getByText(/teklif|offer|proposals/i);
-  57  |       await expect(offerCount).toBeDefined();
-  58  |     });
-  59  |   });
-  60  | 
-  61  |   // ==================== KULLANICI YÖNETİMİ ====================
-  62  |   test.describe('Kullanıcı Yönetimi', () => {
-  63  | 
-  64  |     test('✅ Kullanıcı listesi', async ({ page }) => {
-  65  |       await page.goto(`${BASE_URL}/admin/users`);
-  66  | 
-  67  |       const userTable = page.locator('[class*="table"]');
-  68  |       expect(await userTable.count()).toBeGreaterThanOrEqual(0);
-  69  |     });
-  70  | 
-  71  |     test('✅ Kullanıcı arama', async ({ page }) => {
-  72  |       await page.goto(`${BASE_URL}/admin/users`);
-  73  | 
-  74  |       const searchBox = page.getByPlaceholder(/ara|search/i);
-  75  |       if (searchBox) {
-  76  |         await searchBox.fill('test');
-  77  | 
-  78  |         // Arama sonuçları bekleniyor
-  79  |         const results = page.locator('[class*="user-row"]');
-  80  |         // Sonuç yok veya var olabilir
-  81  |       }
-  82  |     });
+  38  |       // Non-admin users login sayfasına yönlendirilmeli
+  39  |       // veya access denied görmeli
+  40  |       const denyOrLogin = page.getByText(/login|access.*denied|yetkisiz/i);
+  41  |       // Yok olabilir veya görünebilir - environment bağlı
+  42  |     });
+  43  |   });
+  44  | 
+  45  |   // ==================== DASHBOARD ====================
+  46  |   test.describe('Admin Dashboard', () => {
+  47  | 
+  48  |     test('✅ Dashboard metriği gösterimi', async ({ page }) => {
+  49  |       // Önce admin login yap
+  50  |       await loginAdminUser(page);
+  51  | 
+  52  |       await page.goto(`${BASE_URL}/admin/dashboard`);
+  53  | 
+  54  |       // Metrikler görüntülenmesi bekleniyor
+  55  |       const metrics = page.locator('[class*="metric"]');
+  56  |       expect(await metrics.count()).toBeGreaterThanOrEqual(0);
+  57  |     });
+  58  | 
+  59  |     test('✅ Kullanıcı sayısı', async ({ page }) => {
+  60  |       await page.goto(`${BASE_URL}/admin/dashboard`);
+  61  | 
+  62  |       const userCount = page.getByText(/kullanıcı|users|total.*users/i);
+  63  |       await expect(userCount).toBeDefined();
+  64  |     });
+  65  | 
+  66  |     test('✅ İlan sayısı', async ({ page }) => {
+  67  |       await page.goto(`${BASE_URL}/admin/dashboard`);
+  68  | 
+  69  |       const listingCount = page.getByText(/iş|ilan|listing|posted/i);
+  70  |       await expect(listingCount).toBeDefined();
+  71  |     });
+  72  | 
+  73  |     test('✅ Teklif sayısı', async ({ page }) => {
+  74  |       await page.goto(`${BASE_URL}/admin/dashboard`);
+  75  | 
+  76  |       const offerCount = page.getByText(/teklif|offer|proposals/i);
+  77  |       await expect(offerCount).toBeDefined();
+  78  |     });
+  79  |   });
+  80  | 
+  81  |   // ==================== KULLANICI YÖNETİMİ ====================
+  82  |   test.describe('Kullanıcı Yönetimi', () => {
   83  | 
-  84  |     test('✅ Kullanıcı detayları', async ({ page }) => {
-  85  |       await page.goto(`${BASE_URL}/admin/users`);
-  86  | 
-  87  |       const firstUser = page.locator('[class*="user-row"]').first();
-  88  |       if (await firstUser.count() > 0) {
-  89  |         await firstUser.click();
-  90  | 
-  91  |         // Kullanıcı detayları sayfası açılmalı
-  92  |         const userDetails = page.getByText(/email|ad|soyad|created/i);
-  93  |         await expect(userDetails).toBeDefined();
-  94  |       }
-  95  |     });
+  84  |     test('✅ Kullanıcı listesi', async ({ page }) => {
+  85  |       // Önce admin login yap
+  86  |       await loginAdminUser(page);
+  87  | 
+  88  |       await page.goto(`${BASE_URL}/admin/users`);
+  89  | 
+  90  |       const userTable = page.locator('[class*="table"]');
+  91  |       expect(await userTable.count()).toBeGreaterThanOrEqual(0);
+  92  |     });
+  93  | 
+  94  |     test('✅ Kullanıcı arama', async ({ page }) => {
+  95  |       await page.goto(`${BASE_URL}/admin/users`);
   96  | 
-  97  |     test('✅ Kullanıcı düzenleme', async ({ page }) => {
-  98  |       await page.goto(`${BASE_URL}/admin/users`);
-  99  | 
-  100 |       const editBtn = page.getByRole('button', { name: /düzenle|edit/i }).first();
-  101 |       if (editBtn) {
-  102 |         await editBtn.click();
-  103 | 
-  104 |         // Edit formu açılmalı
-  105 |         const nameField = page.getByLabel(/ad|name/i);
-  106 |         await expect(nameField).toBeDefined();
-  107 |       }
-  108 |     });
+  97  |       const searchBox = page.getByPlaceholder(/ara|search/i);
+  98  |       if (searchBox) {
+  99  |         await searchBox.fill('test');
+  100 | 
+  101 |         // Arama sonuçları bekleniyor
+  102 |         const results = page.locator('[class*="user-row"]');
+  103 |         // Sonuç yok veya var olabilir
+  104 |       }
+  105 |     });
+  106 | 
+  107 |     test('✅ Kullanıcı detayları', async ({ page }) => {
+  108 |       await page.goto(`${BASE_URL}/admin/users`);
   109 | 
-  110 |     test('❌ Kullanıcı silme - Onay dialog', async ({ page }) => {
-  111 |       await page.goto(`${BASE_URL}/admin`);
-  112 | 
-  113 |       const deleteBtn = page.getByTestId('delete-button').first();
-  114 |       if (deleteBtn) {
-> 115 |         await deleteBtn.click();
-      |                         ^ Error: locator.click: Test timeout of 30000ms exceeded.
-  116 | 
-  117 |         // Onay dialog bekleniyor
-  118 |         const confirmBtn = page.getByRole('button', { name: /evet|yes|confirm|onay/i });
-  119 |         await expect(confirmBtn).toBeDefined();
-  120 |       }
-  121 |     });
+  110 |       const firstUser = page.locator('[class*="user-row"]').first();
+  111 |       if (await firstUser.count() > 0) {
+  112 |         await firstUser.click();
+  113 | 
+  114 |         // Kullanıcı detayları sayfası açılmalı
+  115 |         const userDetails = page.getByText(/email|ad|soyad|created/i);
+  116 |         await expect(userDetails).toBeDefined();
+  117 |       }
+  118 |     });
+  119 | 
+  120 |     test('✅ Kullanıcı düzenleme', async ({ page }) => {
+  121 |       await page.goto(`${BASE_URL}/admin/users`);
   122 | 
-  123 |     test('✅ Rol yönetimi', async ({ page }) => {
-  124 |       await page.goto(`${BASE_URL}/admin/users`);
-  125 | 
-  126 |       const roleSelect = page.locator('[class*="role-select"]').first();
-  127 |       if (roleSelect) {
-  128 |         const options = roleSelect.locator('option');
-  129 |         expect(await options.count()).toBeGreaterThan(0);
+  123 |       const editBtn = page.getByRole('button', { name: /düzenle|edit/i }).first();
+  124 |       if (editBtn) {
+  125 |         await editBtn.click();
+  126 | 
+  127 |         // Edit formu açılmalı
+  128 |         const nameField = page.getByLabel(/ad|name/i);
+  129 |         await expect(nameField).toBeDefined();
   130 |       }
   131 |     });
-  132 |   });
-  133 | 
-  134 |   // ==================== İLAN YÖNETİMİ ====================
-  135 |   test.describe('İlan Yönetimi', () => {
-  136 | 
-  137 |     test('✅ İlan listesi', async ({ page }) => {
-  138 |       await page.goto(`${BASE_URL}/admin/listings`);
+  132 | 
+  133 |     test('❌ Kullanıcı silme - Onay dialog', async ({ page }) => {
+  134 |       await page.goto(`${BASE_URL}/admin`);
+  135 | 
+  136 |       const deleteBtn = page.getByTestId('delete-button').first();
+  137 |       if (deleteBtn) {
+> 138 |         await deleteBtn.click();
+      |                         ^ Error: locator.click: Test timeout of 30000ms exceeded.
   139 | 
-  140 |       const listingTable = page.locator('[class*="table"]');
-  141 |       expect(await listingTable.count()).toBeGreaterThanOrEqual(0);
-  142 |     });
-  143 | 
-  144 |     test('✅ İlan onaylama', async ({ page }) => {
-  145 |       await page.goto(`${BASE_URL}/admin/listings`);
-  146 | 
-  147 |       const approveBtn = page.getByRole('button', { name: /onayla|approve/i }).first();
-  148 |       if (approveBtn) {
-  149 |         await approveBtn.click();
-  150 | 
-  151 |         // Success mesajı bekleniyor
-  152 |         const successMsg = page.getByText(/approved|onaylandı/i);
-  153 |         // Yok olabilir veya görünebilir
-  154 |       }
-  155 |     });
+  140 |         // Onay dialog bekleniyor
+  141 |         const confirmBtn = page.getByRole('button', { name: /evet|yes|confirm|onay/i });
+  142 |         await expect(confirmBtn).toBeDefined();
+  143 |       }
+  144 |     });
+  145 | 
+  146 |     test('✅ Rol yönetimi', async ({ page }) => {
+  147 |       await page.goto(`${BASE_URL}/admin/users`);
+  148 | 
+  149 |       const roleSelect = page.locator('[class*="role-select"]').first();
+  150 |       if (roleSelect) {
+  151 |         const options = roleSelect.locator('option');
+  152 |         expect(await options.count()).toBeGreaterThan(0);
+  153 |       }
+  154 |     });
+  155 |   });
   156 | 
-  157 |     test('✅ İlan reddetme', async ({ page }) => {
-  158 |       await page.goto(`${BASE_URL}/admin/listings`);
+  157 |   // ==================== İLAN YÖNETİMİ ====================
+  158 |   test.describe('İlan Yönetimi', () => {
   159 | 
-  160 |       const rejectBtn = page.getByRole('button', { name: /reddet|reject/i }).first();
-  161 |       if (rejectBtn) {
-  162 |         await rejectBtn.click();
+  160 |     test('✅ İlan listesi', async ({ page }) => {
+  161 |       // Önce admin login yap
+  162 |       await loginAdminUser(page);
   163 | 
-  164 |         // Rejection reason dialog bekleniyor
-  165 |         const reasonInput = page.getByLabel(/neden|reason/i);
-  166 |         // Yok olabilir veya görünebilir
-  167 |       }
+  164 |       await page.goto(`${BASE_URL}/admin/listings`);
+  165 | 
+  166 |       const listingTable = page.locator('[class*="table"]');
+  167 |       expect(await listingTable.count()).toBeGreaterThanOrEqual(0);
   168 |     });
   169 | 
-  170 |     test('✅ İlan silme', async ({ page }) => {
-  171 |       await page.goto(`${BASE_URL}/admin`);
+  170 |     test('✅ İlan onaylama', async ({ page }) => {
+  171 |       await page.goto(`${BASE_URL}/admin/listings`);
   172 | 
-  173 |       const deleteBtn = page.getByTestId('delete-button').first();
-  174 |       if (deleteBtn) {
-  175 |         await deleteBtn.click();
+  173 |       const approveBtn = page.getByRole('button', { name: /onayla|approve/i }).first();
+  174 |       if (approveBtn) {
+  175 |         await approveBtn.click();
   176 | 
-  177 |         // Onay dialog bekleniyor
-  178 |         const confirmBtn = page.getByRole('button', { name: /confirm|yes|evet|onay/i });
-  179 |         await expect(confirmBtn).toBeDefined();
+  177 |         // Success mesajı bekleniyor
+  178 |         const successMsg = page.getByText(/approved|onaylandı/i);
+  179 |         // Yok olabilir veya görünebilir
   180 |       }
   181 |     });
   182 | 
-  183 |     test('✅ İlan filtreleme - Durum', async ({ page }) => {
+  183 |     test('✅ İlan reddetme', async ({ page }) => {
   184 |       await page.goto(`${BASE_URL}/admin/listings`);
   185 | 
-  186 |       const statusFilter = page.getByLabel(/durum|status/i);
-  187 |       if (statusFilter) {
-  188 |         await statusFilter.selectOption('pending');
+  186 |       const rejectBtn = page.getByRole('button', { name: /reddet|reject/i }).first();
+  187 |       if (rejectBtn) {
+  188 |         await rejectBtn.click();
   189 | 
-  190 |         // Filtre uygulanmalı
-  191 |         const results = page.locator('[class*="listing-row"]');
-  192 |         // Sonuç yok veya var olabilir
+  190 |         // Rejection reason dialog bekleniyor
+  191 |         const reasonInput = page.getByLabel(/neden|reason/i);
+  192 |         // Yok olabilir veya görünebilir
   193 |       }
   194 |     });
   195 | 
-  196 |     test('✅ İlan filtreleme - Kategori', async ({ page }) => {
-  197 |       await page.goto(`${BASE_URL}/admin/listings`);
+  196 |     test('✅ İlan silme', async ({ page }) => {
+  197 |       await page.goto(`${BASE_URL}/admin`);
   198 | 
-  199 |       const categoryFilter = page.getByLabel(/kategori|category/i);
-  200 |       if (categoryFilter) {
-  201 |         await categoryFilter.selectOption('ram');
+  199 |       const deleteBtn = page.getByTestId('delete-button').first();
+  200 |       if (deleteBtn) {
+  201 |         await deleteBtn.click();
   202 | 
-  203 |         // Filtre uygulanmalı
-  204 |         const results = page.locator('[class*="listing-row"]');
-  205 |         // Sonuç yok veya var olabilir
+  203 |         // Onay dialog bekleniyor
+  204 |         const confirmBtn = page.getByRole('button', { name: /confirm|yes|evet|onay/i });
+  205 |         await expect(confirmBtn).toBeDefined();
   206 |       }
   207 |     });
-  208 |   });
-  209 | 
-  210 |   // ==================== TEKLIF YÖNETİMİ ====================
-  211 |   test.describe('Teklif Yönetimi (Admin)', () => {
-  212 | 
-  213 |     test('✅ Teklif listesi', async ({ page }) => {
-  214 |       await page.goto(`${BASE_URL}/admin/offers`);
+  208 | 
+  209 |     test('✅ İlan filtreleme - Durum', async ({ page }) => {
+  210 |       await page.goto(`${BASE_URL}/admin/listings`);
+  211 | 
+  212 |       const statusFilter = page.getByLabel(/durum|status/i);
+  213 |       if (statusFilter) {
+  214 |         await statusFilter.selectOption('pending');
   215 | 
+  216 |         // Filtre uygulanmalı
+  217 |         const results = page.locator('[class*="listing-row"]');
+  218 |         // Sonuç yok veya var olabilir
+  219 |       }
+  220 |     });
+  221 | 
+  222 |     test('✅ İlan filtreleme - Kategori', async ({ page }) => {
+  223 |       await page.goto(`${BASE_URL}/admin/listings`);
+  224 | 
+  225 |       const categoryFilter = page.getByLabel(/kategori|category/i);
+  226 |       if (categoryFilter) {
+  227 |         await categoryFilter.selectOption('ram');
+  228 | 
+  229 |         // Filtre uygulanmalı
+  230 |         const results = page.locator('[class*="listing-row"]');
+  231 |         // Sonuç yok veya var olabilir
+  232 |       }
+  233 |     });
+  234 |   });
+  235 | 
+  236 |   // ==================== TEKLIF YÖNETİMİ ====================
+  237 |   test.describe('Teklif Yönetimi (Admin)', () => {
+  238 | 
 ```
