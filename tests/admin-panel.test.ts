@@ -10,6 +10,13 @@ const BASE_URL = 'http://localhost:3000';
 // akışının localStorage'a yazdığı gerçek token'a güveniyoruz.
 async function loginAdminUser(page: any) {
   await page.goto(`${BASE_URL}/login`);
+  // CSRF token sayfa yüklendikten sonra async fetch ediliyor
+  // (login/page.tsx fetchCsrfToken). Token gelmeden submit edilirse
+  // useLoginForm.ts "Güvenlik hatası: Lütfen sayfayı yenileyin." ile
+  // reddediyor — bu gerçek bir race condition (yavaş bağlantıda gerçek
+  // kullanıcılar da yaşayabilir), form çok hızlı doldurulup submit
+  // edildiğinde tetikleniyor.
+  await page.waitForLoadState('networkidle');
   const emailInput = page.getByTestId('login-email-input');
   const passwordInput = page.getByTestId('login-password-input');
   const loginBtn = page.getByTestId('login-submit-button');
@@ -25,6 +32,15 @@ async function loginAdminUser(page: any) {
     () => !!(localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken')),
     { timeout: 10000 }
   ).catch(() => {});
+
+  // KRİTİK: Token yazılması ile router.push('/admin') çağrısı (1500ms
+  // setTimeout, useLoginForm.ts) AYRI olaylardır. Token yazıldıktan hemen
+  // sonra test kodu page.goto('/admin') çağırırsa, uygulamanın kendi
+  // client-side redirect'i İLE test'in goto()'su ÇAKIŞIR — Playwright bunu
+  // "Target page, context or browser has been closed" olarak raporlar.
+  // Otomatik yönlendirmenin tamamlanmasını bekleyip test kodunun AYRICA
+  // goto('/admin') çağırmasına gerek bırakmıyoruz.
+  await page.waitForURL(/\/admin/, { timeout: 8000 }).catch(() => {});
 }
 
 // tests/admin-panel.test.ts — /admin (submission yönetimi) gerçek akışına göre.
@@ -45,8 +61,7 @@ test.describe('Admin Panel Testleri', () => {
   test.describe('Admin Panel Erişimi', () => {
 
     test('✅ Admin sayfasına erişim ve submission listesi', async ({ page }) => {
-      await loginAdminUser(page);
-      await page.goto(`${BASE_URL}/admin`);
+      await loginAdminUser(page); // helper zaten /admin'e yönlendiriyor
 
       // Seed edilen TEST-PENDING-001 kaydı görünmeli (gerçek veri, admin
       // panelinin ProductSubmission koleksiyonunu okuduğunun kanıtı)
@@ -78,8 +93,7 @@ test.describe('Admin Panel Testleri', () => {
   test.describe('Submission Yönetimi', () => {
 
     test('✅ Bekleyen (pending) submission için Teklif Ver butonu aktif', async ({ page }) => {
-      await loginAdminUser(page);
-      await page.goto(`${BASE_URL}/admin`);
+      await loginAdminUser(page); // helper zaten /admin'e yönlendiriyor
 
       // TEST-PENDING-001 kartında "Teklif Ver" butonu aktif olmalı
       // (SubmissionCard.tsx: disabled={submission.status !== 'pending'})
@@ -91,8 +105,7 @@ test.describe('Admin Panel Testleri', () => {
     });
 
     test('✅ Teklif ver akışı — modal açılır, tutar girilir, gönderilir', async ({ page }) => {
-      await loginAdminUser(page);
-      await page.goto(`${BASE_URL}/admin`);
+      await loginAdminUser(page); // helper zaten /admin'e yönlendiriyor
 
       await expect(page.getByText(/Corsair.*Vengeance/i).first()).toBeVisible({ timeout: 15000 });
 
@@ -114,8 +127,7 @@ test.describe('Admin Panel Testleri', () => {
     });
 
     test('❌ Zaten teklif verilmiş (offered) submission tekrar teklife kapalı', async ({ page }) => {
-      await loginAdminUser(page);
-      await page.goto(`${BASE_URL}/admin`);
+      await loginAdminUser(page); // helper zaten /admin'e yönlendiriyor
 
       // TEST-OFFERED-001 kaydı — status: 'offered', buton "Teklif Verildi"
       // metnini gösterip disabled olmalı.
@@ -130,8 +142,7 @@ test.describe('Admin Panel Testleri', () => {
     });
 
     test('✅ Reddetme akışı — modal açılır, sebep girilir, gönderilir', async ({ page }) => {
-      await loginAdminUser(page);
-      await page.goto(`${BASE_URL}/admin`);
+      await loginAdminUser(page); // helper zaten /admin'e yönlendiriyor
 
       await expect(page.getByText(/Corsair.*Vengeance/i).first()).toBeVisible({ timeout: 15000 });
 
@@ -159,8 +170,7 @@ test.describe('Admin Panel Testleri', () => {
     });
 
     test('✅ Silme akışı — onay dialogu gösterilir', async ({ page }) => {
-      await loginAdminUser(page);
-      await page.goto(`${BASE_URL}/admin`);
+      await loginAdminUser(page); // helper zaten /admin'e yönlendiriyor
 
       await expect(page.getByText(/LG.*27UL500|Monitör/i).first()).toBeVisible({ timeout: 15000 });
 
