@@ -2,6 +2,10 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: './tests',
+  // Testler DB'yi kalıcı olarak değiştiriyor (admin teklif ver/reddet/sil,
+  // kullanıcı kabul/red) — her run'ı bilinen, temiz bir durumdan başlatmak
+  // için globalSetup ile seed'i çalıştırıyoruz (bkz. tests/global-setup.ts).
+  globalSetup: require.resolve('./tests/global-setup.ts'),
   fullyParallel: false,
   forbidOnly: false,
   retries: 0,

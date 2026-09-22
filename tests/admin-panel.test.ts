@@ -97,19 +97,24 @@ test.describe('Admin Panel Testleri', () => {
 
       // TEST-PENDING-001 kartında "Teklif Ver" butonu aktif olmalı
       // (SubmissionCard.tsx: disabled={submission.status !== 'pending'})
-      const card = page.locator('text=/Corsair.*Vengeance/i').first();
-      await expect(card).toBeVisible({ timeout: 15000 });
+      // NOT: regex /Teklif Ver/i "Teklif Verildi" (offered kartın disabled
+      // butonu) metnini de eşleştirir (substring) — .first() DOM sırasına
+      // göre YANLIŞ (disabled) butonu seçebilir. Karta scope'layıp tam
+      // eşleşme (^...$) kullanmak gerekiyor.
+      const pendingCard = page.locator('div').filter({ hasText: 'Corsair' }).filter({ hasText: 'Vengeance' }).first();
+      await expect(pendingCard).toBeVisible({ timeout: 15000 });
 
-      const offerBtn = page.getByRole('button', { name: /Teklif Ver/i }).first();
+      const offerBtn = pendingCard.getByRole('button', { name: /^💰 Teklif Ver$/ }).first();
       await expect(offerBtn).toBeEnabled({ timeout: 5000 });
     });
 
     test('✅ Teklif ver akışı — modal açılır, tutar girilir, gönderilir', async ({ page }) => {
       await loginAdminUser(page); // helper zaten /admin'e yönlendiriyor
 
-      await expect(page.getByText(/Corsair.*Vengeance/i).first()).toBeVisible({ timeout: 15000 });
+      const pendingCard = page.locator('div').filter({ hasText: 'Corsair' }).filter({ hasText: 'Vengeance' }).first();
+      await expect(pendingCard).toBeVisible({ timeout: 15000 });
 
-      const offerBtn = page.getByRole('button', { name: /Teklif Ver/i }).first();
+      const offerBtn = pendingCard.getByRole('button', { name: /^💰 Teklif Ver$/ }).first();
       await offerBtn.click({ timeout: 5000 });
 
       // Modal başlığı: "Teklif Ver" (ActionModal.tsx)

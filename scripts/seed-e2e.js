@@ -141,10 +141,20 @@ async function seedDatabase() {
     });
 
     console.log('Ready for testing! 🚀');
-    process.exit(0);
+    // Sadece CLI'dan (`npm run seed:e2e`) doğrudan çalıştırıldığında
+    // process'i sonlandır. Playwright globalSetup gibi bir modül olarak
+    // import edildiğinde process.exit() TÜM test runner process'ini
+    // öldürür — bu durumda çağıran taraf kontrolü elinde tutmalı.
+    if (require.main === module) {
+      process.exit(0);
+    }
   } catch (error) {
     console.error('❌ Error seeding database:', error.message);
-    process.exit(1);
+    if (require.main === module) {
+      process.exit(1);
+    } else {
+      throw error;
+    }
   } finally {
     await mongoose.disconnect();
   }
