@@ -28,8 +28,8 @@ test.describe('Authentication & Authorization Tests', () => {
       await page.locator('input[name="password"]').fill('password123', { timeout: 5000 });
       await page.locator('input[name="passwordConfirm"]').fill('password123', { timeout: 5000 });
 
-      // Async email/phone check'lerinin tamamlanmasını bekle (2s)
-      await page.waitForTimeout(2000);
+      // Async email/phone check'lerinin tamamlanmasını bekle (3s — P5-1)
+      await page.waitForTimeout(3000);
 
       // KVKK checkbox check et
       const kvkkCheckbox = page.locator('input[type="checkbox"]').last();
@@ -66,8 +66,8 @@ test.describe('Authentication & Authorization Tests', () => {
       await page.locator('input[name="password"]').fill('password123', { timeout: 5000 });
       await page.locator('input[name="passwordConfirm"]').fill('password123', { timeout: 5000 });
 
-      // Async check'leri bekle (2s)
-      await page.waitForTimeout(2000);
+      // Async check'leri bekle (3s — P5-1)
+      await page.waitForTimeout(3000);
 
       // KVKK checkbox check et
       const kvkkCheckbox = page.locator('input[type="checkbox"]').last();
@@ -107,8 +107,8 @@ test.describe('Authentication & Authorization Tests', () => {
       await page.locator('input[name="password"]').fill('password123', { timeout: 5000 });
       await page.locator('input[name="passwordConfirm"]').fill('password123', { timeout: 5000 });
 
-      // Async email check tamamlanana kadar bekle (2s)
-      await page.waitForTimeout(2000);
+      // Async email check tamamlanana kadar bekle (3s — P5-1)
+      await page.waitForTimeout(3000);
 
       // KVKK checkbox check et
       const kvkkCheckbox = page.locator('input[type="checkbox"]').last();

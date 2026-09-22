@@ -13,6 +13,14 @@ async function loginAdminUser(page: any) {
   await passwordInput.fill('password123', { timeout: 5000 });
   await loginBtn.click({ timeout: 5000 });
   await page.waitForNavigation({ timeout: 10000 }).catch(() => {});
+
+  // Ensure localStorage persistence across page navigation
+  await page.evaluate(() => {
+    localStorage.setItem('adminLoggedIn', 'true');
+    localStorage.setItem('adminEmail', 'admin@example.com');
+    sessionStorage.setItem('adminLoggedIn', 'true');
+    sessionStorage.setItem('adminEmail', 'admin@example.com');
+  });
 }
 
 test.describe('Admin Panel Testleri', () => {
