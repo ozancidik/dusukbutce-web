@@ -28,14 +28,26 @@ export const useAuth = (
       }
 
       const { adminLoggedIn, adminEmail, adminToken, userLoggedIn, userEmail } = getUserLoginStatus();
-      
+
       // Admin token kontrolü
       if (adminLoggedIn === "true" || adminEmail) {
         validateAndCleanAdminToken();
       }
-      
+
       // Normal kullanıcı giriş yapmışsa returnUrl kontrolü yap
       const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
+      // KRİTİK: Admin kullanıcılar da isAdmin:true olan birer 'user' olduğu
+      // için userLoggedIn her zaman 'true' olur — bu blok admin/normal
+      // ayrımı yapmadan window.location.href = '/' ile HEMEN (senkron)
+      // yönlendiriyordu. useLoginForm.ts'in admin girişi sonrası 1500ms
+      // gecikmeli router.push('/admin') çağrısı bu senkron yönlendirmeden
+      // SONRA geliyordu, yani hiçbir zaman çalışamıyordu — admin kullanıcılar
+      // normal login formundan asla /admin'e ulaşamıyordu, hep ana sayfaya
+      // düşüyordu. Admin girişiyse bu bloğu atla, useLoginForm.ts kendi
+      // admin-specific yönlendirmesini yönetsin.
+      if (adminLoggedIn === "true") {
+        return;
+      }
       if (userLoggedIn === "true" && userEmail && currentPath === '/login') {
         const returnUrl = new URLSearchParams(window.location.search).get('returnUrl');
         
