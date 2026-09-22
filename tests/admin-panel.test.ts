@@ -2,12 +2,29 @@ import { test, expect } from '@playwright/test';
 
 const BASE_URL = 'http://localhost:3000';
 
+// Admin login helper
+async function loginAdminUser(page: any) {
+  await page.goto(`${BASE_URL}/login`);
+  const emailInput = page.getByTestId('login-email-input');
+  const passwordInput = page.getByTestId('login-password-input');
+  const loginBtn = page.getByTestId('login-submit-button');
+  // Admin account for testing (adjust if different in your system)
+  await emailInput.fill('admin@example.com', { timeout: 5000 });
+  await passwordInput.fill('password123', { timeout: 5000 });
+  await loginBtn.click({ timeout: 5000 });
+  await page.waitForNavigation({ timeout: 10000 }).catch(() => {});
+}
+
 test.describe('Admin Panel Testleri', () => {
 
   // ==================== ADMIN GİRİŞ ====================
   test.describe('Admin Panel Erişimi', () => {
 
     test('✅ Admin sayfasına erişim', async ({ page }) => {
+      // Önce admin login yap
+      await loginAdminUser(page);
+
+      // Sonra admin sayfasına git
       await page.goto(`${BASE_URL}/admin`);
 
       // Admin sayfası yüklenmeli veya login istemeli
@@ -29,6 +46,9 @@ test.describe('Admin Panel Testleri', () => {
   test.describe('Admin Dashboard', () => {
 
     test('✅ Dashboard metriği gösterimi', async ({ page }) => {
+      // Önce admin login yap
+      await loginAdminUser(page);
+
       await page.goto(`${BASE_URL}/admin/dashboard`);
 
       // Metrikler görüntülenmesi bekleniyor
@@ -62,6 +82,9 @@ test.describe('Admin Panel Testleri', () => {
   test.describe('Kullanıcı Yönetimi', () => {
 
     test('✅ Kullanıcı listesi', async ({ page }) => {
+      // Önce admin login yap
+      await loginAdminUser(page);
+
       await page.goto(`${BASE_URL}/admin/users`);
 
       const userTable = page.locator('[class*="table"]');
@@ -135,6 +158,9 @@ test.describe('Admin Panel Testleri', () => {
   test.describe('İlan Yönetimi', () => {
 
     test('✅ İlan listesi', async ({ page }) => {
+      // Önce admin login yap
+      await loginAdminUser(page);
+
       await page.goto(`${BASE_URL}/admin/listings`);
 
       const listingTable = page.locator('[class*="table"]');
@@ -211,6 +237,9 @@ test.describe('Admin Panel Testleri', () => {
   test.describe('Teklif Yönetimi (Admin)', () => {
 
     test('✅ Teklif listesi', async ({ page }) => {
+      // Önce admin login yap
+      await loginAdminUser(page);
+
       await page.goto(`${BASE_URL}/admin/offers`);
 
       const offerTable = page.locator('[class*="table"]');
@@ -261,6 +290,9 @@ test.describe('Admin Panel Testleri', () => {
   test.describe('Raporlar', () => {
 
     test('✅ Günlük rapor', async ({ page }) => {
+      // Önce admin login yap
+      await loginAdminUser(page);
+
       await page.goto(`${BASE_URL}/admin/reports/daily`);
 
       // Rapor gösterilmesi bekleniyor
@@ -301,6 +333,9 @@ test.describe('Admin Panel Testleri', () => {
   test.describe('Admin Ayarları', () => {
 
     test('✅ Admin ayarları sayfası', async ({ page }) => {
+      // Önce admin login yap
+      await loginAdminUser(page);
+
       await page.goto(`${BASE_URL}/admin/settings`);
 
       const settings = page.locator('[class*="setting"]');
@@ -326,6 +361,9 @@ test.describe('Admin Panel Testleri', () => {
   test.describe('Admin Bildirimleri', () => {
 
     test('✅ Bildirim merkezi', async ({ page }) => {
+      // Önce admin login yap
+      await loginAdminUser(page);
+
       await page.goto(`${BASE_URL}/admin`);
 
       const notificationBell = page.locator('[class*="notification-bell"]');
