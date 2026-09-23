@@ -21,7 +21,7 @@ import path from 'path';
 //    kullanıyor, tekrar tekrar login yapmıyor.
 import seedDatabase from '../scripts/seed-e2e';
 
-const BASE_URL = 'http://localhost:3000';
+const BASE_URL = process.env.TEST_BASE_URL || 'http://localhost:3000';
 export const ADMIN_STORAGE_STATE = path.join(__dirname, '.auth/admin.json');
 export const USER_STORAGE_STATE = path.join(__dirname, '.auth/user.json');
 
