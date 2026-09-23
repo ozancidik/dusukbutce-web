@@ -191,12 +191,13 @@ function HeaderComponent() {
           className="desktop-header">
             {/* Logo */}
             <Link href="/" style={{ textDecoration: "none", flexShrink: 0 }}>
-              <img 
-                src="/logo-copy.png" 
-                alt="Düşük Bütçe" 
-                width={160} 
-                height={60} 
-                style={{ 
+              <Image
+                src="/logo-copy.png"
+                alt="Düşük Bütçe"
+                width={160}
+                height={60}
+                priority
+                style={{
                   objectFit: "contain",
                   cursor: "pointer",
                   transition: "transform 0.2s"
@@ -656,12 +657,13 @@ function HeaderComponent() {
               marginBottom: "16px"
             }}>
               <Link href="/" style={{ textDecoration: "none", flexShrink: 0 }}>
-                <img 
-                  src="/logo-copy.png" 
-                  alt="Düşük Bütçe" 
-                  width={120} 
-                  height={45} 
-                  style={{ 
+                <Image
+                  src="/logo-copy.png"
+                  alt="Düşük Bütçe"
+                  width={120}
+                  height={45}
+                  priority
+                  style={{
                     objectFit: "contain",
                     cursor: "pointer",
                     transition: "transform 0.2s"
