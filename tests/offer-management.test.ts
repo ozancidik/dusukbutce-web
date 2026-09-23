@@ -148,18 +148,17 @@ test.describe('Teklif (Offer) Yönetimi Testleri', () => {
   });
 
   test.describe('Yetkilendirme', () => {
-
     // Bu iki test FARKLI bir auth durumu gerektiriyor (login yok / farklı
-    // kullanıcı) — dosyanın genelindeki USER_STORAGE_STATE'i override edip
-    // boş/farklı context kullanıyoruz. clearCookies() + localStorage temizliği
-    // EXPLICIT yapılıyor — browser.newContext() teorik olarak temiz başlamalı
-    // ama pratikte önceki bir sayfanın session'ını "görme" davranışı gözlendi.
-    test('❌ Login olmadan /tekliflerim erişimi engellenir', async ({ browser }) => {
-      const context = await browser.newContext();
-      const page = await context.newPage();
-      await context.clearCookies();
+    // kullanıcı) — dosyanın genelindeki test.use({storageState: USER_STORAGE_STATE})
+    // ayarını EXPLICIT boş bir state ile override ediyoruz. browser.newContext()
+    // (parametresiz) denendi ama pratikte dosya seviyesindeki storageState'i
+    // miras alıyor gibi davrandı (login olmuş "Test User" görünüyordu) —
+    // bunun yerine Playwright'ın kendi page/context fixture'ını, nested
+    // test.use ile boşaltılmış haliyle kullanmak güvenilir sonuç verdi.
+    test.use({ storageState: { cookies: [], origins: [] } });
+
+    test('❌ Login olmadan /tekliflerim erişimi engellenir', async ({ page }) => {
       await page.goto(`${BASE_URL}/tekliflerim`, { waitUntil: 'networkidle' });
-      await page.evaluate(() => { localStorage.clear(); sessionStorage.clear(); }).catch(() => {});
 
       // /tekliflerim'in kendisi client-side login-gate yapmıyor (backend'e
       // token'sız fetch atıyor, sonuç boş liste olarak dönüyor) — bu yüzden
@@ -168,16 +167,13 @@ test.describe('Teklif (Offer) Yönetimi Testleri', () => {
       // görünmemeli.
       const otherUsersSubmission = page.getByText('TEST-OFFERED-001');
       await expect(otherUsersSubmission).not.toBeVisible({ timeout: 5000 });
-      await context.close();
     });
 
-    test('❌ Başka kullanıcının tekliflerini göremez', async ({ browser }) => {
+    test('❌ Başka kullanıcının tekliflerini göremez', async ({ page }) => {
       // seller@example.com'un hiç submission'ı yok (tests/global-setup.ts) —
       // login olup /tekliflerim'e gittiğinde TEST-OFFERED-001 (test@'e ait)
       // GÖRÜNMEMELİ (IDOR / broken access control kontrolü). Farklı kullanıcı
-      // olduğu için ayrı context + kendi login'i gerekiyor (tek seferlik).
-      const context = await browser.newContext();
-      const page = await context.newPage();
+      // olduğu için kendi login'i gerekiyor (tek seferlik, boş state'ten).
       await page.goto(`${BASE_URL}/login`);
       await page.waitForLoadState('networkidle');
       await page.getByTestId('login-email-input').fill('seller@example.com', { timeout: 5000 });
@@ -189,7 +185,6 @@ test.describe('Teklif (Offer) Yönetimi Testleri', () => {
 
       const otherUsersSubmission = page.getByText('TEST-OFFERED-001');
       await expect(otherUsersSubmission).not.toBeVisible({ timeout: 5000 });
-      await context.close();
     });
   });
 });
