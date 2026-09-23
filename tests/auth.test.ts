@@ -291,9 +291,11 @@ test.describe('Authentication & Authorization Tests', () => {
 
     test('✅ Session timeout - Uzun inaktivite sonrası logout', async ({ page }) => {
       // Bu test gerçek environment'te çalışması için timeout ayarı gerekir
-      // Placeholder test
+      // Placeholder test — sadece ana sayfanın yüklendiğini doğruluyor.
+      // NOT: /.*localhost/i hardcoded kontrolü TEST_BASE_URL ile production'a
+      // karşı çalıştırıldığında (dusukbutce.com) yanlış pozitif fail veriyordu.
       await page.goto(`${BASE_URL}`);
-      await expect(page).toHaveURL(/.*localhost/i);
+      await expect(page).toHaveURL(new RegExp(new URL(BASE_URL).hostname));
     });
   });
 
