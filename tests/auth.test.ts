@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { USER_STORAGE_STATE } from './global-setup';
 
-const BASE_URL = 'http://localhost:3000';
+const BASE_URL = process.env.TEST_BASE_URL || 'http://localhost:3000';
 
 test.describe('Authentication & Authorization Tests', () => {
 

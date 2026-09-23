@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { ADMIN_STORAGE_STATE, USER_STORAGE_STATE } from './global-setup';
 
-const BASE_URL = 'http://localhost:3000';
+const BASE_URL = process.env.TEST_BASE_URL || 'http://localhost:3000';
 
 // Bu dosyadaki testler ÖNCEDEN LOGIN OLMUŞ bir admin session'ı ile başlar
 // (tests/global-setup.ts admin@example.com ile bir kez login olup
