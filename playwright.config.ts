@@ -13,7 +13,7 @@ export default defineConfig({
   timeout: 30000,
   reporter: 'html',
   use: {
-    baseURL: 'http://localhost:3000',
+    baseURL: process.env.TEST_BASE_URL || 'http://localhost:3000',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     navigationTimeout: 30000,
@@ -24,10 +24,14 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
   ],
-  webServer: {
-    command: 'npm run dev',
-    url: 'http://localhost:3000',
-    reuseExistingServer: true,
-    timeout: 60000,
-  },
+  // TEST_BASE_URL set edilmişse (ör. canlı/production'a karşı test) yerel
+  // dev server'ı hiç başlatma — zaten uzak bir URL'e test atılıyor.
+  ...(process.env.TEST_BASE_URL ? {} : {
+    webServer: {
+      command: 'npm run dev',
+      url: 'http://localhost:3000',
+      reuseExistingServer: true,
+      timeout: 60000,
+    },
+  }),
 });
