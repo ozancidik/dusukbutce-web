@@ -71,7 +71,6 @@ export default function RegisterPage() {
   const checkEmailExists = useCallback(async (email: string) => {
     if (!email || !email.includes('@')) {
       setEmailExists(false);
-      console.log('[P5-2 DEBUG] Email check skipped:', { email });
       return;
     }
 
@@ -86,7 +85,6 @@ export default function RegisterPage() {
 
       if (response.ok) {
         const data = await response.json();
-        console.log('[P5-2 DEBUG] Email check result:', { email, exists: data.exists });
         setEmailExists(data.exists);
       }
     } catch (error) {
@@ -111,7 +109,6 @@ export default function RegisterPage() {
   useEffect(() => {
     const timer = setTimeout(() => {
       if (form.email) {
-        console.log('[P5-2 DEBUG] Email debounce triggered:', { email: form.email });
         checkEmailExists(form.email);
       } else {
         setEmailExists(false);
@@ -120,11 +117,6 @@ export default function RegisterPage() {
 
     return () => clearTimeout(timer);
   }, [form.email, checkEmailExists]);
-
-  // Log emailExists changes
-  useEffect(() => {
-    console.log('[P5-2 DEBUG] emailExists state changed:', { emailExists });
-  }, [emailExists]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
