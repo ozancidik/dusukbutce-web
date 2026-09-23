@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { USER_STORAGE_STATE } from './global-setup';
 
 const BASE_URL = 'http://localhost:3000';
 
@@ -157,8 +158,15 @@ test.describe('Authentication & Authorization Tests', () => {
   test.describe('Login Scenarios', () => {
 
     test('✅ Login - Başarılı giriş', async ({ page }) => {
+      // CSRF token async fetch ediliyor (login/page.tsx). networkidle
+      // network isteğinin bittiğini gösterir ama React state update +
+      // re-render'ın TAMAMLANDIĞINI garanti etmez — form yine de disabled
+      // kalabilir. Gerçek CSRF response'unu beklemek daha sağlam.
+      const csrfPromise = page.waitForResponse(res => res.url().includes('/api/auth/csrf-token'), { timeout: 10000 }).catch(() => null);
       await page.goto(`${BASE_URL}/login`);
+      await csrfPromise;
       await page.waitForLoadState('networkidle');
+
       const emailInput = page.getByTestId('login-email-input');
       const passwordInput = page.getByTestId('login-password-input');
       const loginBtn = page.getByTestId('login-submit-button');
@@ -220,25 +228,23 @@ test.describe('Authentication & Authorization Tests', () => {
   // ==================== LOGOUT TESTS ====================
   test.describe('Logout Scenarios', () => {
 
-    test('✅ Logout - Başarılı çıkış', async ({ page }) => {
-      await page.goto(`${BASE_URL}/login`);
+    test('✅ Logout - Başarılı çıkış', async ({ browser }) => {
+      // Bu test "logout" aksiyonunu test ediyor, "login" akışını değil —
+      // önceden login olmuş USER_STORAGE_STATE ile başlamak hem rate
+      // limit'i azaltır (her test kendi login'ini yapmasın diye) hem de
+      // testi hızlandırır. tests/global-setup.ts admin+user için bir kez
+      // login olup bu state'i kaydediyor.
+      const context = await browser.newContext({ storageState: USER_STORAGE_STATE });
+      const page = await context.newPage();
+      await page.goto(`${BASE_URL}/`);
       await page.waitForLoadState('networkidle');
 
-      const emailInput = page.locator('input[type="email"]');
-      const passwordInput = page.locator('input[type="password"]');
-      const loginBtn = page.locator('button[type="submit"], button:has-text("Giriş")');
-
-      await emailInput.first().fill('test@example.com', { timeout: 5000 });
-      await passwordInput.first().fill('password123', { timeout: 5000 });
-      await loginBtn.first().click({ timeout: 5000 });
-      await page.waitForNavigation({ timeout: 10000 }).catch(() => {});
-
-      // Logout butonunu bul ve tıkla
       const logoutBtn = page.getByTestId('logout-button');
       await logoutBtn.click({ timeout: 5000 });
 
       // Login sayfasına dönülmesi bekleniyor
       await expect(page).toHaveURL(/.*(?:login|signin)/i, { timeout: 5000 });
+      await context.close();
     });
 
     test('✅ Logout - Session cleared', async ({ page }) => {
@@ -254,19 +260,14 @@ test.describe('Authentication & Authorization Tests', () => {
   // ==================== SESSION TESTS ====================
   test.describe('Session Scenarios', () => {
 
-    test('✅ Session persistence - Sayfa yenilemesinde session korunması', async ({ page }) => {
-      await page.goto(`${BASE_URL}/login`);
+    test('✅ Session persistence - Sayfa yenilemesinde session korunması', async ({ browser }) => {
+      // Bu test "sayfa yenilemesi" davranışını test ediyor, "login" akışını
+      // değil — önceden login olmuş USER_STORAGE_STATE ile başlıyoruz
+      // (bkz. "Logout - Başarılı çıkış" testindeki aynı gerekçe).
+      const context = await browser.newContext({ storageState: USER_STORAGE_STATE });
+      const page = await context.newPage();
+      await page.goto(`${BASE_URL}/`);
       await page.waitForLoadState('networkidle');
-
-      // Login yap
-      const emailInput = page.locator('input[type="email"], input[name*="email"]');
-      const passwordInput = page.locator('input[type="password"], input[name*="password"]');
-      const loginBtn = page.locator('button[type="submit"], button:has-text("Giriş")');
-
-      await emailInput.first().fill('test@example.com', { timeout: 5000 });
-      await passwordInput.first().fill('password123', { timeout: 5000 });
-      await loginBtn.first().click({ timeout: 5000 });
-      await page.waitForNavigation({ timeout: 10000 }).catch(() => {});
 
       // Sayfayı yenile
       await page.reload();
@@ -274,6 +275,7 @@ test.describe('Authentication & Authorization Tests', () => {
       // Session devam etmeli - logout butonu görünür olmalı
       const logoutBtn = page.getByTestId('logout-button');
       await expect(logoutBtn).toBeVisible({ timeout: 3000 });
+      await context.close();
     });
 
     test('✅ Session timeout - Uzun inaktivite sonrası logout', async ({ page }) => {
