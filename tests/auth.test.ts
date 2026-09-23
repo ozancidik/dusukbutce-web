@@ -239,8 +239,12 @@ test.describe('Authentication & Authorization Tests', () => {
       await page.goto(`${BASE_URL}/`);
       await page.waitForLoadState('networkidle');
 
-      const logoutBtn = page.getByTestId('logout-button');
-      await logoutBtn.click({ timeout: 5000 });
+      // NOT: data-testid="logout-button" SADECE admin header'ında var
+      // (app/admin/components/AdminHeader.tsx) — normal kullanıcı menüsünde
+      // (DesktopUserMenu.tsx) yok, orada "Çıkış Yap" düz metin ve önce
+      // kullanıcı adı butonuna tıklayıp dropdown'ı açmak gerekiyor.
+      await page.getByRole('button', { name: /Test User/i }).click({ timeout: 5000 });
+      await page.getByText('Çıkış Yap').click({ timeout: 5000 });
 
       // Login sayfasına dönülmesi bekleniyor
       await expect(page).toHaveURL(/.*(?:login|signin)/i, { timeout: 5000 });
@@ -271,10 +275,12 @@ test.describe('Authentication & Authorization Tests', () => {
 
       // Sayfayı yenile
       await page.reload();
+      await page.waitForLoadState('networkidle');
 
-      // Session devam etmeli - logout butonu görünür olmalı
-      const logoutBtn = page.getByTestId('logout-button');
-      await expect(logoutBtn).toBeVisible({ timeout: 3000 });
+      // Session devam etmeli - kullanıcı adı butonu görünür olmalı
+      // (data-testid="logout-button" sadece admin header'ında var, bkz.
+      // "Logout - Başarılı çıkış" testindeki not).
+      await expect(page.getByRole('button', { name: /Test User/i })).toBeVisible({ timeout: 5000 });
       await context.close();
     });
 
