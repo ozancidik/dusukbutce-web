@@ -10,7 +10,7 @@ test.describe('Authentication & Authorization Tests', () => {
 
     test('✅ Register - Başarılı kayıt', async ({ page }) => {
       await page.goto(`${BASE_URL}/register`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
       // Form yüklenmesini kontrol et
       const form = page.locator('form');
       await expect(form).toBeVisible({ timeout: 5000 });
@@ -27,7 +27,7 @@ test.describe('Authentication & Authorization Tests', () => {
       });
 
       await page.goto(`${BASE_URL}/register`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
 
       // Use unique email per test run (P5-5: avoid DB state collisions)
       const uniqueEmail = `reg-${Date.now()}@example.com`;
@@ -74,7 +74,7 @@ test.describe('Authentication & Authorization Tests', () => {
 
     test('❌ Register - Invalid email', async ({ page }) => {
       await page.goto(`${BASE_URL}/register`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
 
       // Form'u doldur ama invalid email ile
       await page.locator('input[name="firstName"]').fill('Test2', { timeout: 5000 });
@@ -110,14 +110,14 @@ test.describe('Authentication & Authorization Tests', () => {
     test('❌ Register - Password mismatch', async ({ page }) => {
       // Skip - complex form validation
       await page.goto(`${BASE_URL}/register`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
       const form = page.locator('form');
       await expect(form).toBeVisible({ timeout: 5000 });
     });
 
     test('❌ Register - Email already exists', async ({ page }) => {
       await page.goto(`${BASE_URL}/register`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
 
       // Use hardcoded test@example.com which MUST exist in test DB for this test
       // If test DB is empty, this test will fail — that's expected (DB state test)
@@ -165,7 +165,7 @@ test.describe('Authentication & Authorization Tests', () => {
       const csrfPromise = page.waitForResponse(res => res.url().includes('/api/auth/csrf-token'), { timeout: 10000 }).catch(() => null);
       await page.goto(`${BASE_URL}/login`);
       await csrfPromise;
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
 
       const emailInput = page.getByTestId('login-email-input');
       const passwordInput = page.getByTestId('login-password-input');
@@ -182,7 +182,7 @@ test.describe('Authentication & Authorization Tests', () => {
 
     test('❌ Login - Yanlış password', async ({ page }) => {
       await page.goto(`${BASE_URL}/login`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
       const emailInput = page.getByTestId('login-email-input');
       const passwordInput = page.getByTestId('login-password-input');
       const loginBtn = page.getByTestId('login-submit-button');
@@ -199,7 +199,7 @@ test.describe('Authentication & Authorization Tests', () => {
 
     test('❌ Login - Non-existent user', async ({ page }) => {
       await page.goto(`${BASE_URL}/login`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
       const emailInput = page.getByTestId('login-email-input');
       const passwordInput = page.getByTestId('login-password-input');
       const loginBtn = page.getByTestId('login-submit-button');
@@ -215,7 +215,7 @@ test.describe('Authentication & Authorization Tests', () => {
 
     test('❌ Login - Empty fields', async ({ page }) => {
       await page.goto(`${BASE_URL}/login`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
       const loginBtn = page.getByTestId('login-submit-button');
 
       // Browser HTML5 validation kullanıyor, form submit etmeyebilir
@@ -237,7 +237,7 @@ test.describe('Authentication & Authorization Tests', () => {
       const context = await browser.newContext({ storageState: USER_STORAGE_STATE });
       const page = await context.newPage();
       await page.goto(`${BASE_URL}/`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
 
       // NOT: data-testid="logout-button" SADECE admin header'ında var
       // (app/admin/components/AdminHeader.tsx) — normal kullanıcı menüsünde
@@ -259,7 +259,7 @@ test.describe('Authentication & Authorization Tests', () => {
     test('✅ Logout - Session cleared', async ({ page }) => {
       // Logout sonrası authenticated endpoints'e erişim engellenmeli
       await page.goto(`${BASE_URL}/profile`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
 
       // Login sayfasına yönlendirilmesi bekleniyor
       await expect(page).toHaveURL(/.*(?:login|signin|auth)/i, { timeout: 5000 });
@@ -276,11 +276,11 @@ test.describe('Authentication & Authorization Tests', () => {
       const context = await browser.newContext({ storageState: USER_STORAGE_STATE });
       const page = await context.newPage();
       await page.goto(`${BASE_URL}/`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
 
       // Sayfayı yenile
       await page.reload();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
 
       // Session devam etmeli - kullanıcı adı butonu görünür olmalı
       // (data-testid="logout-button" sadece admin header'ında var, bkz.
@@ -304,7 +304,7 @@ test.describe('Authentication & Authorization Tests', () => {
 
     test('✅ Password recovery - Email gönderimi', async ({ page }) => {
       await page.goto(`${BASE_URL}/auth/forgot-password`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
 
       const emailInput = page.locator('input[type="email"], input[name*="email"]');
       const submitBtn = page.locator('button[type="submit"], button:has-text("Gönder")');
@@ -320,7 +320,7 @@ test.describe('Authentication & Authorization Tests', () => {
 
     test('❌ Password recovery - Invalid email', async ({ page }) => {
       await page.goto(`${BASE_URL}/auth/forgot-password`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
 
       const emailInput = page.locator('input[type="email"], input[name*="email"]');
       const submitBtn = page.locator('button[type="submit"], button:has-text("Gönder")');

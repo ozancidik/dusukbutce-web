@@ -9,7 +9,7 @@ async function loginUser(page: any) {
   // submit edilirse "Güvenlik hatası: Lütfen sayfayı yenileyin." ile
   // reddedilir (bkz. tests/admin-panel.test.ts, tests/auth.test.ts'deki
   // aynı fix).
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
   const emailInput = page.getByTestId('login-email-input');
   const passwordInput = page.getByTestId('login-password-input');
   const loginBtn = page.getByTestId('login-submit-button');
@@ -150,7 +150,7 @@ test.describe('Bize-Sat Flow Tests', () => {
     test('✅ İlan oluşturma formu açılması', async ({ page }) => {
       await loginUser(page);
       await page.goto(`${BASE_URL}/bize-sat/ram`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
 
       // Login başarılıysa form doğrudan görünür olmalı (submit butonu var)
       const submitBtn = page.locator('button[type="submit"]').first();
@@ -160,7 +160,7 @@ test.describe('Bize-Sat Flow Tests', () => {
     test('✅ Zorunlu alanlar validation', async ({ page }) => {
       await loginUser(page);
       await page.goto(`${BASE_URL}/bize-sat/ram`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
 
       const submitBtn = page.locator('button[type="submit"]').first();
       const isVisible = await submitBtn.isVisible({ timeout: 10000 }).catch(() => false);
@@ -186,7 +186,7 @@ test.describe('Bize-Sat Flow Tests', () => {
     test('✅ Fiyat girişi validation', async ({ page }) => {
       await loginUser(page);
       await page.goto(`${BASE_URL}/bize-sat/ram`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
 
       // NOT: data-testid="price-input" hiç yok (kod tabanında doğrulandı) —
       // gerçek input type="number" ile bulunuyor.
