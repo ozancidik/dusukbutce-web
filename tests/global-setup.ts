@@ -28,8 +28,13 @@ export const USER_STORAGE_STATE = path.join(__dirname, '.auth/user.json');
 async function loginAndSaveState(baseUrl: string, email: string, password: string, outPath: string, isAdmin: boolean) {
   const browser = await chromium.launch();
   const page = await browser.newPage();
+  // NOT: waitForLoadState('networkidle') production'da (analytics/tracking
+  // script'leri sürekli network isteği attığı için sayfa hiç "idle" olmuyor)
+  // 30s'de timeout oluyordu. CSRF token response'unu doğrudan beklemek hem
+  // daha hızlı hem network gürültüsünden etkilenmiyor.
+  const csrfPromise = page.waitForResponse(res => res.url().includes('/api/auth/csrf-token'), { timeout: 15000 }).catch(() => null);
   await page.goto(`${baseUrl}/login`);
-  await page.waitForLoadState('networkidle');
+  await csrfPromise;
   await page.getByTestId('login-email-input').fill(email, { timeout: 5000 });
   await page.getByTestId('login-password-input').fill(password, { timeout: 5000 });
   await page.getByTestId('login-submit-button').click({ timeout: 5000 });

@@ -158,7 +158,7 @@ test.describe('Teklif (Offer) Yönetimi Testleri', () => {
     test.use({ storageState: { cookies: [], origins: [] } });
 
     test('❌ Login olmadan /tekliflerim erişimi engellenir', async ({ page }) => {
-      await page.goto(`${BASE_URL}/tekliflerim`, { waitUntil: 'networkidle' });
+      await page.goto(`${BASE_URL}/tekliflerim`, { waitUntil: 'domcontentloaded' });
 
       // /tekliflerim'in kendisi client-side login-gate yapmıyor (backend'e
       // token'sız fetch atıyor, sonuç boş liste olarak dönüyor) — bu yüzden
@@ -174,14 +174,15 @@ test.describe('Teklif (Offer) Yönetimi Testleri', () => {
       // login olup /tekliflerim'e gittiğinde TEST-OFFERED-001 (test@'e ait)
       // GÖRÜNMEMELİ (IDOR / broken access control kontrolü). Farklı kullanıcı
       // olduğu için kendi login'i gerekiyor (tek seferlik, boş state'ten).
+      const csrfPromise = page.waitForResponse(res => res.url().includes('/api/auth/csrf-token'), { timeout: 15000 }).catch(() => null);
       await page.goto(`${BASE_URL}/login`);
-      await page.waitForLoadState('networkidle');
+      await csrfPromise;
       await page.getByTestId('login-email-input').fill('seller@example.com', { timeout: 5000 });
       await page.getByTestId('login-password-input').fill('seller123', { timeout: 5000 });
       await page.getByTestId('login-submit-button').click({ timeout: 5000 });
       await page.waitForTimeout(2000);
 
-      await page.goto(`${BASE_URL}/tekliflerim`, { waitUntil: 'networkidle' });
+      await page.goto(`${BASE_URL}/tekliflerim`, { waitUntil: 'domcontentloaded' });
 
       const otherUsersSubmission = page.getByText('TEST-OFFERED-001');
       await expect(otherUsersSubmission).not.toBeVisible({ timeout: 5000 });

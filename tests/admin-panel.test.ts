@@ -64,7 +64,7 @@ test.describe('Admin Panel Testleri', () => {
 
       // checkAdminStatus() adminToken yokluğunda veya backend doğrulaması
       // başarısız olursa '/'ye yönlendirir (app/admin/page.tsx).
-      await page.goto(`${BASE_URL}/admin`, { waitUntil: 'networkidle' });
+      await page.goto(`${BASE_URL}/admin`, { waitUntil: 'domcontentloaded' });
       await page.waitForTimeout(1000);
 
       await expect(page).not.toHaveURL(/\/admin$/, { timeout: 5000 });
@@ -207,22 +207,22 @@ test.describe('Admin Panel Testleri', () => {
   test.describe('Diğer Admin Sayfaları', () => {
 
     test('✅ Ürünler sayfası yüklenir', async ({ page }) => {
-      await page.goto(`${BASE_URL}/admin/urunler`, { waitUntil: 'networkidle' });
+      await page.goto(`${BASE_URL}/admin/urunler`, { waitUntil: 'domcontentloaded' });
       await expect(page).toHaveURL(/urunler/);
     });
 
     test('✅ Fiyat yönetimi sayfası yüklenir', async ({ page }) => {
-      await page.goto(`${BASE_URL}/admin/fiyat`, { waitUntil: 'networkidle' });
+      await page.goto(`${BASE_URL}/admin/fiyat`, { waitUntil: 'domcontentloaded' });
       await expect(page).toHaveURL(/fiyat/);
     });
 
     test('✅ Kategori yönetimi sayfası yüklenir', async ({ page }) => {
-      await page.goto(`${BASE_URL}/admin/kategori`, { waitUntil: 'networkidle' });
+      await page.goto(`${BASE_URL}/admin/kategori`, { waitUntil: 'domcontentloaded' });
       await expect(page).toHaveURL(/kategori/);
     });
 
     test('✅ Audit log sayfası yüklenir', async ({ page }) => {
-      await page.goto(`${BASE_URL}/admin/audit-log`, { waitUntil: 'networkidle' });
+      await page.goto(`${BASE_URL}/admin/audit-log`, { waitUntil: 'domcontentloaded' });
       await expect(page).toHaveURL(/audit-log/);
     });
   });
