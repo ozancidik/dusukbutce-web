@@ -35,7 +35,11 @@ export const ALLOWED_FIELDS = [
   "capacity", "speed", "latency", "dpi", "connectivity", "switchType", "layout",
   "resolution", "panelType", "responseTime", "power", "ramFormFactor",
   // Masaüstü bilgisayar özel
-  "powerSupply", "motherboard", "case",
+  "powerSupply", "motherboard", "case", "psuBrand",
+  // Cep telefonu
+  "registrationType",
+  // Gaming direksiyon / direksiyon
+  "compatibility",
 ] as const;
 
 export async function handleProductSubmission(request: Request, source: string) {

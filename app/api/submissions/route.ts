@@ -7,6 +7,7 @@ import { sendNewSubmissionNotificationToAdmin } from '@/lib/email';
 import { getVerifiedUser, getVerifiedUserId } from '@/lib/auth';
 import { ALLOWED_FIELDS } from '@/lib/handleProductSubmission';
 import { generateSubmissionNumber } from '@/lib/numberGenerator';
+import { validateBody, submissionSchema } from '@/lib/validate';
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,6 +15,9 @@ export async function POST(request: NextRequest) {
     console.log('📝 Submission başlatılıyor...');
 
     const body = await request.json();
+
+    const v = validateBody(submissionSchema, body);
+    if (v.error) return v.error;
 
     // JWT token'dan userId al (imza doğrulanır; token yoksa misafir gönderimi)
     const userId = getVerifiedUserId(request);
@@ -23,7 +27,6 @@ export async function POST(request: NextRequest) {
       console.log('⚠️ MongoDB URI tanımlı değil, veri console\'a yazdırılıyor:');
       console.log('📊 Submission Data:', {
         ...body,
-        category: body.category || 'playstation',
         timestamp: new Date().toISOString()
       });
       
@@ -54,10 +57,13 @@ export async function POST(request: NextRequest) {
     const submissionNumber = await generateSubmissionNumber();
 
     // Create submission with category and additional fields
+    // (category zaten submissionSchema tarafından zorunlu kılınıyor ve
+    // yukarıdaki ALLOWED_FIELDS döngüsüyle data.category'ye kopyalandı —
+    // burada tekrar fallback yazmak, eksik category'yi sessizce 'playstation'
+    // olarak yanlış kaydetmek anlamına geliyordu.)
     const submission = new ProductSubmission({
       ...data,
       submissionNumber,
-      category: body.category || 'playstation',
       userId: userId || new mongoose.Types.ObjectId(),
       status: 'pending', // Yeni talep durumu
       createdAt: new Date(),

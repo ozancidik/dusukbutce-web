@@ -16,7 +16,8 @@ export const getCategoryDisplayName = (category: string): string => {
     'audio-system': 'Ses Sistemi',
     'case': 'Kasa',
     'cooler': 'Soğutucu',
-    'gaming-wheel': 'Gaming Direksiyon'
+    'gaming-wheel': 'Gaming Direksiyon',
+    'steering-wheel': 'Direksiyon'
   };
   
   return categoryMap[category] || category;
