@@ -489,10 +489,9 @@ export default function AdminPage() {
               }}>
                 Tüm kategorilerdeki satış taleplerini yönetin ve teklifler verin
               </p>
-              <div style={{
+              <div className="grid-cols-2 md:grid-cols-5" style={{
                 marginTop: '12px',
                 display: 'grid',
-                gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(5, 1fr)',
                 gap: '12px'
               }}>
                 <Link href="/satilik-ilanlar" style={{ textDecoration: 'none' }}>
