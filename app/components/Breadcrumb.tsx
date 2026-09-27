@@ -67,8 +67,6 @@ export default function Breadcrumb() {
       displayName = 'Oyuncu Direksiyonu';
     } else if (segment === 'steering-wheel') {
       displayName = 'Direksiyon';
-    } else if (segment === 'sound-system') {
-      displayName = 'Ses Sistemi';
     } else if (segment === 'buy') {
       displayName = 'Al';
     } else if (segment === 'sell') {

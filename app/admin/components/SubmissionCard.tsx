@@ -57,8 +57,7 @@ export default function SubmissionCard({
       'audio-system': 'Ses Sistemi',
       'case': 'Kasa',
       'cooler': 'Soğutucu',
-      'gaming-wheel': 'Gaming Direksiyon',
-      'sound-system': 'Ses Sistemi'
+      'gaming-wheel': 'Gaming Direksiyon'
     };
     return categoryMap[category] || category;
   };
