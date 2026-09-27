@@ -27,13 +27,13 @@ export const ALLOWED_FIELDS = [
   // İşlemci özel
   "stokFan", "cache", "socket",
   // Ekran kartı özel
-  "memory", "memoryType", "coreClock", "boostClock", "powerConsumption",
+  "memory", "memoryType", "memoryGeneration", "coreClock", "boostClock", "powerConsumption",
   "ports", "interface", "chipSet", "dviOutput", "furmarkResult", "opened",
   "thermalPadChanged", "miningUsed", "miningDuration", "warrantySticker",
   "coilWhine", "oxidation",
   // Kategoriye özel ek alanlar (RAM/SSD, mouse, klavye, monitör, ses sistemi)
   "capacity", "speed", "latency", "dpi", "connectivity", "switchType", "layout",
-  "resolution", "panelType", "responseTime", "power",
+  "resolution", "panelType", "responseTime", "power", "ramFormFactor",
   // Masaüstü bilgisayar özel
   "powerSupply", "motherboard", "case",
 ] as const;

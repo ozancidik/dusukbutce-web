@@ -59,6 +59,7 @@ export interface Submission {
   // Ekran kartı özel alanları
   memory?: string;
   memoryType?: string;
+  memoryGeneration?: string;
   coreClock?: string;
   boostClock?: string;
   powerConsumption?: string;
@@ -92,6 +93,7 @@ export interface Submission {
   speed?: string;
   type?: string;
   latency?: string;
+  ramFormFactor?: string;
   // SSD özel alanları
   readSpeed?: string;
   writeSpeed?: string;
@@ -100,6 +102,7 @@ export interface Submission {
   color?: string;
   // Klavye özel alanları
   switchType?: string;
+  layout?: string;
   rgb?: string;
   // Kasa özel alanları
   size?: string;
