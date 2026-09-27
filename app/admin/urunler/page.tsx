@@ -636,9 +636,8 @@ export default function AdminProductsPage() {
                     </span>
                   </div>
 
-                  <div style={{
+                  <div className="grid-cols-1 md:grid-cols-3" style={{
                     display: 'grid',
-                    gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
                     gap: isMobile ? '8px' : '16px',
                     marginBottom: '16px'
                   }}>
@@ -1179,9 +1178,8 @@ function ProductForm({ product, onSubmit, onCancel, isMobile }: {
         {product ? 'Ürünü Düzenle' : 'Yeni Ürün Ekle'}
       </h2>
 
-      <div style={{
+      <div className="grid-cols-1 md:grid-cols-2" style={{
         display: 'grid',
-        gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
         gap: '16px',
         marginBottom: '16px'
       }}>
@@ -1256,9 +1254,8 @@ function ProductForm({ product, onSubmit, onCancel, isMobile }: {
         </div>
       </div>
 
-      <div style={{
+      <div className="grid-cols-1 md:grid-cols-2" style={{
         display: 'grid',
-        gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
         gap: '16px',
         marginBottom: '16px'
       }}>
@@ -1317,9 +1314,8 @@ function ProductForm({ product, onSubmit, onCancel, isMobile }: {
         </div>
       </div>
 
-      <div style={{
+      <div className="grid-cols-1 md:grid-cols-2" style={{
         display: 'grid',
-        gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
         gap: '16px',
         marginBottom: '16px'
       }}>
