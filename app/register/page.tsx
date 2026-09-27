@@ -434,10 +434,9 @@ export default function RegisterPage() {
         <form onSubmit={handleSubmit}>
           {/* 1. Satır: Ad ve Soyad */}
           <div style={{ marginBottom: "20px" }}>
-            <div style={{ 
+            <div className="flex-col md:flex-row" style={{
               display: "flex", 
               gap: isMobile ? "0" : "12px",
-              flexDirection: isMobile ? "column" : "row"
             }}>
               <div style={{ flex: 1, marginBottom: isMobile ? "20px" : "0" }}>
                 <label
@@ -520,10 +519,9 @@ export default function RegisterPage() {
 
           {/* 2. Satır: Email ve Telefon */}
           <div style={{ marginBottom: "20px" }}>
-            <div style={{ 
+            <div className="flex-col md:flex-row" style={{
               display: "flex", 
               gap: isMobile ? "0" : "12px",
-              flexDirection: isMobile ? "column" : "row"
             }}>
               <div style={{ flex: 1, marginBottom: isMobile ? "20px" : "0" }}>
                 <label
@@ -699,10 +697,9 @@ export default function RegisterPage() {
 
           {/* 4. Satır: Şifre ve Şifre Tekrar */}
           <div style={{ marginBottom: "20px" }}>
-            <div style={{ 
+            <div className="flex-col md:flex-row" style={{
               display: "flex", 
               gap: isMobile ? "0" : "12px",
-              flexDirection: isMobile ? "column" : "row"
             }}>
               <div style={{ flex: 1, marginBottom: isMobile ? "20px" : "0" }}>
                 <label

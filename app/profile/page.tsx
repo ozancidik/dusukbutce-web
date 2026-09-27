@@ -1139,13 +1139,12 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      <div style={{ 
+      <div className="flex-col md:flex-row" style={{
         maxWidth: '1200px', 
         margin: '0 auto',
         padding: isMobile ? '0 12px 20px' : '0 20px 20px',
         display: 'flex',
         gap: '24px',
-        flexDirection: isMobile ? 'column' : 'row'
       }}>
         {/* Sol Sütun - Panelim Menüsü */}
         <div style={{ 

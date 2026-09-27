@@ -32,9 +32,8 @@ export default function PasswordValidation({ password, passwordErrors, isMobile 
         Şifre Gereksinimleri:
       </h4>
       
-      <div style={{
+      <div className="grid-cols-1 md:grid-cols-2" style={{
         display: 'grid',
-        gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
         gap: '6px'
       }}>
         <div style={{

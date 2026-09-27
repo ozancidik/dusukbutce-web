@@ -139,9 +139,8 @@ export default function OrdersPage() {
               }}>
                 📊 Sipariş Özeti
               </h3>
-              <div style={{
+              <div className="grid-cols-1 md:grid-cols-3" style={{
                 display: "grid",
-                gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)",
                 gap: "16px"
               }}>
                 <div style={{
@@ -250,9 +249,8 @@ export default function OrdersPage() {
                     e.currentTarget.style.transform = "translateY(0)";
                     e.currentTarget.style.boxShadow = "none";
                   }}>
-                    <div style={{
+                    <div className="grid-cols-1 md:grid-cols-3" style={{
                       display: "grid",
-                      gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr",
                       gap: "16px",
                       alignItems: "center"
                     }}>

@@ -213,9 +213,8 @@ function EvimdenAlPageContent() {
               }}>
                 Kişisel Bilgiler
               </h3>
-              <div style={{
+              <div className="grid-cols-1 md:grid-cols-2" style={{
                 display: 'grid',
-                gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
                 gap: '16px'
               }}>
                 <div>
@@ -319,9 +318,8 @@ function EvimdenAlPageContent() {
               }}>
                 Adres Bilgileri
               </h3>
-              <div style={{
+              <div className="grid-cols-1 md:grid-cols-2" style={{
                 display: 'grid',
-                gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
                 gap: '16px'
               }}>
                 <div>
@@ -632,9 +630,8 @@ function EvimdenAlPageContent() {
               }}>
                 Randevu Bilgileri
               </h3>
-              <div style={{
+              <div className="grid-cols-1 md:grid-cols-2" style={{
                 display: 'grid',
-                gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
                 gap: '16px'
               }}>
                 <div>
@@ -881,10 +878,9 @@ function EvimdenAlPageContent() {
             </div>
 
             {/* Action Buttons */}
-            <div style={{
+            <div className="flex-col md:flex-row" style={{
               display: 'flex',
               gap: '12px',
-              flexDirection: isMobile ? 'column' : 'row'
             }}>
               <button
                 onClick={handleAddressRedirect}

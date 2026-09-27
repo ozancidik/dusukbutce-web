@@ -598,9 +598,8 @@ function SearchResults() {
             )}
 
             {/* Results Grid */}
-            <div style={{
+            <div className="grid-cols-1 md:grid-cols-[repeat(auto-fill,minmax(300px,1fr))]" style={{
               display: 'grid',
-              gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(300px, 1fr))',
               gap: isMobile ? '16px' : '24px'
             }}>
               {results.map((result) => (
