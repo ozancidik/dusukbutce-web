@@ -118,7 +118,6 @@ export default function AdminMainHeader({
             <option value="playstation">PlayStation</option>
             <option value="tablet">Tablet</option>
             <option value="headphones">Kulaklık</option>
-            <option value="sound-system">Ses Sistemi</option>
             <option value="audio-system">Ses Sistemi</option>
             <option value="cooler">Soğutucu</option>
           </select>

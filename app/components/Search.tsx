@@ -165,20 +165,20 @@ export default function Search() {
       keywords: ['notebook', 'laptop', 'dizüstü', 'bilgisayar', 'laptop bilgisayar']
     },
     { 
-      name: 'Masaüstü Bilgisayar', 
-      path: '/bize-sat/desktop', 
+      name: 'Masaüstü Bilgisayar',
+      path: '/bize-sat/masaustu',
       icon: '🖥️',
       keywords: ['desktop', 'masaüstü', 'bilgisayar', 'pc', 'computer']
     },
     { 
-      name: 'İşlemci', 
-      path: '/bize-sat/processor', 
+      name: 'İşlemci',
+      path: '/bize-sat/islemci',
       icon: '⚡',
       keywords: ['processor', 'cpu', 'işlemci', 'processor']
     },
     { 
-      name: 'Ekran Kartı', 
-      path: '/bize-sat/graphics-card', 
+      name: 'Ekran Kartı',
+      path: '/bize-sat/ekran-karti',
       icon: '🎮',
       keywords: ['graphics card', 'gpu', 'ekran kartı', 'video card', 'graphics']
     },
@@ -195,14 +195,14 @@ export default function Search() {
       keywords: ['ssd', 'hard disk', 'disk', 'sabit disk', 'storage']
     },
     { 
-      name: 'Soğutucu', 
-      path: '/bize-sat/cooler', 
+      name: 'Soğutucu',
+      path: '/bize-sat/sogutucu',
       icon: '❄️',
       keywords: ['cooler', 'fan', 'soğutucu', 'fan', 'heatsink']
     },
     { 
-      name: 'Boş Kasa', 
-      path: '/bize-sat/case', 
+      name: 'Boş Kasa',
+      path: '/bize-sat/kasa',
       icon: '📦',
       keywords: ['case', 'kasa', 'computer case', 'pc case', 'boş kasa']
     },
@@ -213,8 +213,8 @@ export default function Search() {
       keywords: ['monitor', 'ekran', 'display', 'screen', 'monitör']
     },
     { 
-      name: 'Klavye', 
-      path: '/bize-sat/keyboard', 
+      name: 'Klavye',
+      path: '/bize-sat/klavye',
       icon: '⌨️',
       keywords: ['keyboard', 'klavye', 'keyboard']
     },
@@ -231,8 +231,8 @@ export default function Search() {
       keywords: ['tablet', 'tablet', 'ipad', 'android tablet']
     },
     { 
-      name: 'Kulaklık', 
-      path: '/bize-sat/headphones', 
+      name: 'Kulaklık',
+      path: '/bize-sat/kulaklik',
       icon: '🎧',
       keywords: ['headphones', 'headset', 'kulaklık', 'earphones']
     },
@@ -243,8 +243,8 @@ export default function Search() {
       keywords: ['sound system', 'speaker', 'ses sistemi', 'audio system']
     },
     { 
-      name: 'Oyuncu Direksiyonu', 
-      path: '/bize-sat/gaming-wheel', 
+      name: 'Oyuncu Direksiyonu',
+      path: '/bize-sat/gaming-direksiyon',
       icon: '🎮',
       keywords: ['gaming wheel', 'steering wheel', 'direksiyon', 'racing wheel', 'oyuncu direksiyonu']
     }
