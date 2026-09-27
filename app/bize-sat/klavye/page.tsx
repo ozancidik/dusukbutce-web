@@ -21,6 +21,8 @@ export default function KeyboardPage() {
     brand: '',
     model: '',
     switchType: '',
+    layout: '',
+    size: '',
     rgb: '',
     connectivity: '',
     color: '',
@@ -190,6 +192,8 @@ export default function KeyboardPage() {
           brand: '',
           model: '',
           switchType: '',
+          layout: '',
+          size: '',
           rgb: '',
           connectivity: '',
           color: '',
@@ -382,6 +386,71 @@ export default function KeyboardPage() {
                   onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
                   onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
                 />
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Klavye Düzeni
+                </label>
+                <select
+                  value={formData.layout}
+                  onChange={(e) => handleInputChange('layout', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                >
+                  <option value="">Seçin</option>
+                  <option value="TR-Q">Türkçe Q</option>
+                  <option value="TR-F">Türkçe F</option>
+                  <option value="US-Q">İngilizce Q (US)</option>
+                  <option value="Diğer">Diğer</option>
+                </select>
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Klavye Boyutu
+                </label>
+                <select
+                  value={formData.size}
+                  onChange={(e) => handleInputChange('size', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                >
+                  <option value="">Seçin</option>
+                  <option value="Full Size">Full Size (Numpad'li)</option>
+                  <option value="TKL">TKL (Numpad'siz)</option>
+                  <option value="75%">75%</option>
+                  <option value="60%">60%</option>
+                  <option value="Diğer">Diğer</option>
+                </select>
               </div>
               <div>
                 <label style={{
