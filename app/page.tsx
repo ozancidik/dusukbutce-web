@@ -209,9 +209,9 @@ export default function HomePage() {
       
       {/* Ana İçerik */}
       <div
+        className="flex flex-col lg:flex-row gap-5 lg:gap-10 max-w-[100vw] lg:max-w-[1600px]"
         style={{
           width: "100%",
-          maxWidth: isMobile ? "100vw" : "1600px",
           minWidth: "320px",
           minHeight: isIPhoneSE ? "auto" : (isIPadPro || isIPadAir ? "95vh" : "90vh"),
           margin: isIPhoneSE ? "0" : (isMobile ? "0" : "20px auto"),
@@ -224,11 +224,9 @@ export default function HomePage() {
           borderRadius: isIPhoneSE ? "0" : (isMobile ? "0" : "16px"),
           boxShadow: isIPhoneSE ? "none" : "0 4px 32px #0001",
           display: "flex",
-          flexDirection: isMobile ? "column" : "row",
           alignItems: isMobile ? "center" : "flex-start",
           justifyContent: isIPhoneSE ? "flex-start" : "space-between",
-          gap: isMobile ? "20px" : "40px",
-          overflow: isMobile ? "hidden" : "hidden"
+          overflow: "hidden"
         }}
       >
         
@@ -363,38 +361,10 @@ export default function HomePage() {
               Kategoriler
             </h3>
             
-            <div style={{
-              display: "grid",
-              gridTemplateColumns: isMobile ? (isIPadPro || isIPadAir ? "1fr 1fr" : "1fr") : "1fr 1fr",
-              gap: isMobile ? (isIPadPro ? "18px" : isIPadAir ? "17px" : "16px") : "16px"
-            }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Sol Sütun */}
               <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-                {(isMobile && !isIPadPro && !isIPadAir ? [
-                  // Mobil görünümde cep telefonu en üstte
-                  { name: 'Cep Telefonu', path: '/bize-sat/cep-telefonu', icon: '📱' },
-                  { name: 'Dizüstü (Notebook)', path: '/bize-sat/notebook', icon: '💻' },
-                  { name: 'Masaüstü (Kasa)', path: '/bize-sat/masaustu', icon: '🖥️' },
-                  { name: 'Monitör', path: '/bize-sat/monitor', icon: '🖥️' },
-                  { name: 'Ekran Kartı', path: '/bize-sat/ekran-karti', icon: '/graphic-card.png' },
-                  { name: 'İşlemci', path: '/bize-sat/islemci', icon: '/cpu-tower.png' },
-                  { name: 'RAM', path: '/bize-sat/ram', icon: '/ram.png' },
-                  { name: 'SSD', path: '/bize-sat/ssd', icon: '/ssd.png' },
-                  { name: 'Soğutucu', path: '/bize-sat/sogutucu', icon: '/sogutucu.png' },
-                  { name: 'Boş Kasa', path: '/bize-sat/kasa', icon: '/case.png' },
-                  { name: 'PlayStation', path: '/bize-sat/playstation', icon: '/playstation.png' },
-                  { name: 'Gamepad', path: '/bize-sat/gamepad', icon: '/gamepad.png' },
-                  { name: 'Xbox', path: '/bize-sat/xbox', icon: '/xbox.png' },
-                  { name: 'Klavye', path: '/bize-sat/klavye', icon: '⌨️' },
-                  { name: 'Mouse', path: '/bize-sat/mouse', icon: '🖱️' },
-                  { name: 'Tablet', path: '/bize-sat/tablet', icon: '/tablet.png' },
-                  { name: 'Kulaklık', path: '/bize-sat/kulaklik', icon: '🎧' },
-                  { name: 'Ses Sistemi', path: '/bize-sat/ses-sistemi', icon: '/sound-system.png' },
-                  // Mobil görünümde en altta alt alta
-                  { name: 'Fotokopi Makinesi', path: '/bize-sat/fotokopi-makinesi', icon: '📄' },
-                  { name: 'Yazıcı', path: '/bize-sat/yazici', icon: '🖨️' },
-                  { name: 'Tarayıcı', path: '/bize-sat/tarayici', icon: '🔍' }
-                ] : [
+                {[
                   { name: 'Dizüstü (Notebook)', path: '/bize-sat/notebook', icon: '💻' },
                   { name: 'Masaüstü (Kasa)', path: '/bize-sat/masaustu', icon: '🖥️' },
                   { name: 'Monitör', path: '/bize-sat/monitor', icon: '🖥️' },
@@ -406,7 +376,7 @@ export default function HomePage() {
                   { name: 'Boş Kasa', path: '/bize-sat/kasa', icon: '/case.png' },
                   { name: 'Fotokopi Makinesi', path: '/bize-sat/fotokopi-makinesi', icon: '📄' },
                   { name: 'Yazıcı', path: '/bize-sat/yazici', icon: '🖨️' }
-                ]).map((category, index) => (
+                ].map((category, index) => (
                   <Link key={index} href={category.path} style={{ textDecoration: 'none' }}>
                     <div style={{
                       display: 'flex',
@@ -460,8 +430,7 @@ export default function HomePage() {
                 ))}
               </div>
 
-              {/* Sağ Sütun - Desktop ve iPad görünümünde gösterilir */}
-              {(!isMobile || isIPadPro || isIPadAir) && (
+              {/* Sağ Sütun */}
               <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                 {[
                   { name: 'Cep Telefonu', path: '/bize-sat/cep-telefonu', icon: '📱' },
@@ -527,7 +496,6 @@ export default function HomePage() {
                   </Link>
                 ))}
               </div>
-              )}
             </div>
           </div>
 
@@ -547,15 +515,14 @@ export default function HomePage() {
 
 
         {/* Üç Sütun Yan Yana */}
-        <div style={{
+        <div
+          className="flex flex-col lg:flex-row gap-6 lg:gap-10 max-w-[calc(100%-40px)] lg:max-w-[1400px]"
+          style={{
           display: "flex",
-          flexDirection: isMobile ? "column" : "row",
-          gap: isMobile ? "24px" : "40px",
           marginBottom: "32px",
           marginTop: "0px",
           width: "100%",
-          maxWidth: isMobile ? "calc(100% - 40px)" : "1400px",
-          justifyContent: isMobile ? "center" : "center",
+          justifyContent: "center",
           alignItems: "flex-start"
         }}>
           
