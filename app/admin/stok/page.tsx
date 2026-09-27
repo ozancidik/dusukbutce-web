@@ -457,11 +457,10 @@ export default function AdminStockPage() {
         </div>
 
         {/* Stok Özet Kartları */}
-        <div style={{
+        <div className="grid-cols-1 md:grid-cols-4" style={{
           maxWidth: isMobile ? '100%' : '1400px',
           margin: '0 auto 24px auto',
           display: 'grid',
-          gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, 1fr)',
           gap: '16px'
         }}>
           <div style={{
@@ -867,9 +866,8 @@ export default function AdminStockPage() {
                       </span>
                     </div>
 
-                    <div style={{
+                    <div className="grid-cols-1 md:grid-cols-3" style={{
                       display: 'grid',
-                      gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
                       gap: isMobile ? '8px' : '12px',
                       marginBottom: '16px'
                     }}>

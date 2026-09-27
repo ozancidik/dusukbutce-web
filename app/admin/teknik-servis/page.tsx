@@ -359,10 +359,9 @@ export default function AdminTeknikServis() {
               Henüz talep bulunmuyor.
             </div>
           ) : (
-            <div style={{
+            <div className="grid-cols-1 md:grid-cols-[repeat(auto-fill,minmax(450px,1fr))]" style={{
               display: 'grid',
               gap: '16px',
-              gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(450px, 1fr))'
             }}>
               {filteredSubmissions.map((submission) => {
                 const statusColor = getStatusColor(submission.status);
@@ -427,9 +426,8 @@ export default function AdminTeknikServis() {
 
                     {/* Details */}
                     <div style={{ marginBottom: '16px' }}>
-                      <div style={{
+                      <div className="grid-cols-1 md:grid-cols-2" style={{
                         display: 'grid',
-                        gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
                         gap: '12px',
                         marginBottom: '12px'
                       }}>

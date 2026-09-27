@@ -284,10 +284,9 @@ export default function AdminSubmissions() {
               Henüz teklif bulunmuyor.
             </div>
           ) : (
-            <div style={{
+            <div className="grid-cols-1 md:grid-cols-[repeat(auto-fill,minmax(400px,1fr))]" style={{
               display: 'grid',
               gap: '16px',
-              gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(400px, 1fr))'
             }}>
               {submissions.map((submission) => (
                 <div
