@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '../../hooks/useAuth';
 import SubmissionPopup from '../../../components/SubmissionPopup';
 import LoginRequiredCard from '../components/LoginRequiredCard';
+import { uploadImage } from '@/lib/uploadImage';
 
 export default function GamepadPage() {
   const [isMobile, setIsMobile] = useState(false);
@@ -65,50 +66,6 @@ export default function GamepadPage() {
     };
   }, []);
 
-  // Resim sıkıştırma fonksiyonu
-  const compressImage = (base64String: string): Promise<string> => {
-    try {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      const img = new Image();
-      
-      return new Promise((resolve) => {
-        img.onload = () => {
-          // Maksimum boyutları belirle (daha yüksek çözünürlük için artırıldı)
-          const maxWidth = 1600;
-          const maxHeight = 1200;
-          
-          let { width, height } = img;
-          
-          // Boyutları orantılı olarak küçült
-          if (width > height) {
-            if (width > maxWidth) {
-              height = (height * maxWidth) / width;
-              width = maxWidth;
-            }
-          } else {
-            if (height > maxHeight) {
-              width = (width * maxHeight) / height;
-              height = maxHeight;
-            }
-          }
-          
-          canvas.width = width;
-          canvas.height = height;
-          ctx?.drawImage(img, 0, 0, width, height);
-          
-          // Kaliteyi artır (0.9 = %90 kalite - daha net görüntü için)
-          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.9);
-          resolve(compressedBase64);
-        };
-        
-        img.src = base64String;
-      });
-    } catch (error) {
-      console.warn('Resim sıkıştırma hatası:', error);
-      return Promise.resolve(base64String);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -651,29 +608,17 @@ export default function GamepadPage() {
                     const input = document.createElement('input');
                     input.type = 'file';
                     input.accept = 'image/*';
-                    input.onchange = (e) => {
+                    input.onchange = async (e) => {
                       const file = (e.target as HTMLInputElement).files?.[0];
-                      if (file) {
-                        if (file.size > 2 * 1024 * 1024) {
-                          alert('Dosya boyutu 2MB\'dan küçük olmalıdır');
-                          return;
-                        }
-                        const reader = new FileReader();
-                        reader.onload = async (e) => {
-                          const result = e.target?.result as string;
-                          try {
-                            const compressedImage = await compressImage(result);
-                            const newImages = [...formData.images];
-                            newImages[index] = compressedImage;
-                            handleInputChange('images', newImages);
-                          } catch (error) {
-                            console.error('Resim işleme hatası:', error);
-                            const newImages = [...formData.images];
-                            newImages[index] = result;
-                            handleInputChange('images', newImages);
-                          }
-                        };
-                        reader.readAsDataURL(file);
+                      if (!file) return;
+                      try {
+                        const url = await uploadImage(file);
+                        const newImages = [...formData.images];
+                        newImages[index] = url;
+                        handleInputChange('images', newImages);
+                      } catch (err) {
+                        console.error('Görsel yüklenemedi:', err);
+                        alert(err instanceof Error ? err.message : 'Görsel yüklenirken bir hata oluştu.');
                       }
                     };
                     input.click();
@@ -709,7 +654,7 @@ export default function GamepadPage() {
               margin: '0',
               textAlign: 'center'
             }}>
-              Her fotoğraf maksimum 2MB olmalıdır. JPG, PNG formatları desteklenir.
+              JPG, PNG formatları desteklenir.
             </p>
           </div>
 
