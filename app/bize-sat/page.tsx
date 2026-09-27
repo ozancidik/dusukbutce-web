@@ -76,9 +76,8 @@ export default function BizeSatPage() {
           Ne satmak istiyorsun?
         </h1>
 
-        <div className="category-grid" style={{
+        <div className="category-grid grid-cols-1 md:grid-cols-3" style={{
           display: 'grid',
-          gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr',
           gap: isMobile ? '32px' : '32px',
           alignItems: 'start'
         }}>

@@ -285,9 +285,8 @@ export default function PlayStationPage() {
         {!isLoggedIn && <LoginRequiredCard isMobile={isMobile} returnUrl="/bize-sat/playstation" />}
 
         {/* Form */}
-        <form onSubmit={handleSubmit} style={{
+        <form className="grid-cols-1 md:grid-cols-2" onSubmit={handleSubmit} style={{
           display: 'grid',
-          gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
           gap: isMobile ? '20px' : '24px'
         }}>
           <div style={{ marginBottom: isMobile ? '20px' : '24px' }}>
@@ -516,10 +515,9 @@ export default function PlayStationPage() {
           </div>
 
           {/* Checkboxes */}
-          <div style={{
+          <div className="grid-cols-1 md:grid-cols-3" style={{
             gridColumn: isMobile ? '1' : '1 / -1',
             display: 'grid',
-            gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
             gap: '16px',
             marginBottom: '24px'
           }}>
@@ -610,10 +608,9 @@ export default function PlayStationPage() {
 
           {/* Fatura Tarihi - Sadece hasInvoice true ise göster */}
           {formData.hasInvoice && (
-            <div style={{
+            <div className="grid-cols-1 md:grid-cols-3" style={{
               gridColumn: isMobile ? '1' : '1 / -1',
               display: 'grid',
-              gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
               gap: '16px',
               marginBottom: '24px'
             }}>
@@ -664,10 +661,9 @@ export default function PlayStationPage() {
               📷 Fotoğraflar
             </h2>
             
-            <div style={{
+            <div className="grid-rows-2 md:grid-rows-none" style={{
               display: 'grid',
               gridTemplateColumns: isMobile ? 'repeat(5, 1fr)' : 'repeat(5, 1fr)',
-              gridTemplateRows: isMobile ? 'repeat(2, 1fr)' : 'auto',
               gap: isMobile ? '8px' : '12px',
               marginBottom: '16px'
             }}>
