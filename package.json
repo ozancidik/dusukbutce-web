@@ -20,7 +20,9 @@
     "seed:e2e": "tsx scripts/seed-e2e.js",
     "setup": "npm install",
     "run:dev": "npm run setup && npm run dev",
-    "crawl-audit": "node scripts/crawl-audit.mjs"
+    "crawl-audit": "node scripts/crawl-audit.mjs",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@sentry/nextjs": "^10.1.0",
@@ -53,6 +55,11 @@
     "prettier": "3.9.9",
     "tailwindcss": "^4",
     "typescript": "^5",
-    "vitest": "^4.1.11"
+    "vitest": "^4.1.11",
+    "storybook": "^10.6.0",
+    "@storybook/nextjs": "^10.6.0",
+    "@storybook/addon-a11y": "^10.6.0",
+    "@storybook/addon-docs": "^10.6.0",
+    "@storybook/addon-onboarding": "^10.6.0"
   }
 }
