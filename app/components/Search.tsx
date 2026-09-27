@@ -236,9 +236,9 @@ export default function Search() {
       icon: '🎧',
       keywords: ['headphones', 'headset', 'kulaklık', 'earphones']
     },
-    { 
-      name: 'Ses Sistemi', 
-      path: '/bize-sat/sound-system', 
+    {
+      name: 'Ses Sistemi',
+      path: '/bize-sat/ses-sistemi',
       icon: '🔊',
       keywords: ['sound system', 'speaker', 'ses sistemi', 'audio system']
     },
