@@ -246,9 +246,8 @@ function TeklifTeslimatPageContent() {
             Teslimat Seçenekleri
           </h2>
           
-          <div style={{
+          <div className="grid-cols-1 md:grid-cols-2" style={{
             display: 'grid',
-            gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
             gap: '16px',
             marginBottom: '32px'
           }}>
@@ -360,9 +359,8 @@ function TeklifTeslimatPageContent() {
                 }}>
                   İletişim Bilgileri
                 </h3>
-                <div style={{
+                <div className="grid-cols-1 md:grid-cols-2" style={{
                   display: 'grid',
-                  gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
                   gap: '16px'
                 }}>
                   <div>
@@ -426,9 +424,8 @@ function TeklifTeslimatPageContent() {
                     />
                   </div>
                 </div>
-                <div style={{
+                <div className="grid-cols-1 md:grid-cols-2" style={{
                   display: 'grid',
-                  gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
                   gap: '16px',
                   marginTop: '16px'
                 }}>
@@ -532,9 +529,8 @@ function TeklifTeslimatPageContent() {
                   }}>
                     Kargo Firması Seçin
                   </h3>
-                  <div style={{
+                  <div className="grid-cols-1 md:grid-cols-2" style={{
                     display: 'grid',
-                    gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
                     gap: '12px'
                   }}>
                     {kargoOptions.map((option) => (
@@ -608,9 +604,8 @@ function TeklifTeslimatPageContent() {
                     </div>
                   </div>
                   
-                  <div style={{
+                  <div className="grid-cols-1 md:grid-cols-2" style={{
                     display: 'grid',
-                    gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
                     gap: '16px'
                   }}>
                     <div>

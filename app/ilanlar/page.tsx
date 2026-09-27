@@ -226,9 +226,8 @@ export default function ListingsPage() {
           {search ? 'Arama kriterlerine uygun ilan bulunamadı' : 'Henüz ilan bulunmuyor'}
         </div>
       ) : (
-        <div style={{ 
+        <div className="grid-cols-1 md:grid-cols-[repeat(auto-fill,minmax(400px,1fr))]" style={{
           display: 'grid', 
-          gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(400px, 1fr))', 
           gap: isMobile ? 16 : 24 
         }}>
           {filteredListings.map((listing) => (
@@ -252,12 +251,11 @@ export default function ListingsPage() {
             }}
             >
               {/* Ürün Başlığı */}
-              <div style={{
+              <div className="flex-col md:flex-row" style={{
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'flex-start',
                 marginBottom: isMobile ? '16px' : '20px',
-                flexDirection: isMobile ? 'column' : 'row',
                 gap: isMobile ? '8px' : '0'
               }}>
                 <h3 style={{ 
@@ -316,9 +314,8 @@ export default function ListingsPage() {
                 }}>
                   ⚙️ Teknik Özellikler
                 </h4>
-                <div style={{ 
+                <div className="grid-cols-1 md:grid-cols-2" style={{
                   display: 'grid', 
-                  gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', 
                   gap: isMobile ? '8px' : '12px',
                   fontSize: isMobile ? '13px' : '14px'
                 }}>
@@ -426,9 +423,8 @@ export default function ListingsPage() {
                 }}>
                   📋 Durum Bilgileri
                 </h4>
-                <div style={{ 
+                <div className="grid-cols-1 md:grid-cols-2" style={{
                   display: 'grid', 
-                  gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', 
                   gap: isMobile ? '8px' : '12px',
                   fontSize: isMobile ? '13px' : '14px'
                 }}>
@@ -506,9 +502,8 @@ export default function ListingsPage() {
                   }}>
                     🖥️ Ekran Durumu
                   </h4>
-                  <div style={{ 
+                  <div className="grid-cols-1 md:grid-cols-2" style={{
                     display: 'grid', 
-                    gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', 
                     gap: isMobile ? '8px' : '12px',
                     fontSize: isMobile ? '13px' : '14px'
                   }}>
@@ -552,9 +547,8 @@ export default function ListingsPage() {
                   }}>
                     📸 Ürün Fotoğrafları ({listing.images.length} adet)
                   </h4>
-                  <div style={{
+                  <div className="grid-cols-3 md:grid-cols-4" style={{
                     display: 'grid',
-                    gridTemplateColumns: isMobile ? 'repeat(3, 1fr)' : 'repeat(4, 1fr)',
                     gap: isMobile ? '6px' : '8px'
                   }}>
                     {listing.images.slice(0, 4).map((image, index) => (
@@ -589,7 +583,7 @@ export default function ListingsPage() {
               )}
 
               {/* Alt Bilgiler */}
-              <div style={{ 
+              <div className="flex-col md:flex-row" style={{
                 display: 'flex', 
                 justifyContent: 'space-between', 
                 alignItems: 'center',
@@ -597,7 +591,6 @@ export default function ListingsPage() {
                 color: '#6b7280',
                 paddingTop: '16px',
                 borderTop: '1px solid #e5e7eb',
-                flexDirection: isMobile ? 'column' : 'row',
                 gap: isMobile ? '8px' : '0'
               }}>
                 <div>

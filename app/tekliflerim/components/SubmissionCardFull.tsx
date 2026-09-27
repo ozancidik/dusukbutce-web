@@ -215,9 +215,8 @@ export default function SubmissionCardFull({
           </button>
         </div>
 
-        <div style={{
+        <div className="grid-cols-1 md:grid-cols-[repeat(auto-fit,minmax(180px,1fr))]" style={{
           display: 'grid',
-          gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(180px, 1fr))',
           gap: isMobile ? '12px' : '16px'
         }}>
           {/* Marka & Model - En Önemli */}
@@ -448,9 +447,8 @@ export default function SubmissionCardFull({
               </p>
             </div>
           </div>
-          <div style={{
+          <div className="grid-cols-1 md:grid-cols-[repeat(auto-fit,minmax(200px,1fr))]" style={{
             display: 'grid',
-            gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(200px, 1fr))',
             gap: '16px'
           }}>
             <div>
@@ -735,9 +733,8 @@ export default function SubmissionCardFull({
               İlan Detayları
             </h4>
           </div>
-          <div style={{
+          <div className="grid-cols-1 md:grid-cols-[repeat(auto-fit,minmax(200px,1fr))]" style={{
             display: 'grid',
-            gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(200px, 1fr))',
             gap: '12px'
           }}>
             <div>

@@ -201,9 +201,8 @@ export default function BizdenAlPage() {
           }}>
             Kategoriler
           </h2>
-          <div style={{
+          <div className="grid-cols-3 md:grid-cols-[repeat(auto-fit,minmax(120px,1fr))]" style={{
             display: 'grid',
-            gridTemplateColumns: isMobile ? 'repeat(3, 1fr)' : 'repeat(auto-fit, minmax(120px, 1fr))',
             gap: '12px'
           }}>
             {categories.map((category) => (
@@ -290,9 +289,8 @@ export default function BizdenAlPage() {
             </div>
           )}
 
-          <div style={{
+          <div className="grid-cols-1 md:grid-cols-[repeat(auto-fit,minmax(280px,1fr))]" style={{
             display: 'grid',
-            gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(280px, 1fr))',
             gap: '24px'
           }}>
             {!isLoading && !error && filteredListings.map((item) => {
@@ -506,9 +504,8 @@ export default function BizdenAlPage() {
           }}>
             Neden Bizden Satın Almalısınız?
           </h3>
-          <div style={{
+          <div className="grid-cols-1 md:grid-cols-3" style={{
             display: 'grid',
-            gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
             gap: '24px',
             marginTop: '24px'
           }}>
