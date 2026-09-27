@@ -491,7 +491,8 @@ export default function SubmissionDetailModal({
               {/* Ekran Kartı alanları */}
               {renderField('Chip Set', submission.chipSet)}
               {renderField('Bellek', submission.memory)}
-              {renderField('Bellek Tipi', submission.memoryType)}
+              {renderField('Bellek Tipi', submission.memoryGeneration)}
+              {renderField('Bellek Arayüzü (Bit)', submission.memoryType)}
               {renderField('Portlar', submission.ports)}
               {renderField('DVI Çıkışı', submission.dviOutput)}
               {renderField('Furmark Sonucu', submission.furmarkResult)}
@@ -531,6 +532,7 @@ export default function SubmissionDetailModal({
               {renderField('Timing', submission.timing)}
               {renderField('Voltaj', submission.voltage)}
               {renderField('Soğutucu', submission.cooler)}
+              {renderField('Uyumluluk', submission.ramFormFactor)}
               
               {/* SSD alanları */}
               {renderField('Kapasite', submission.capacity)}
@@ -552,6 +554,8 @@ export default function SubmissionDetailModal({
               
               {/* Klavye alanları */}
               {renderField('Switch Tipi', submission.switchType)}
+              {renderField('Klavye Düzeni', submission.layout)}
+              {renderField('Klavye Boyutu', submission.size)}
               {renderField('Mekanik', submission.mechanical)}
               {renderField('RGB', submission.rgb)}
               {renderField('Kablosuz', submission.wireless)}

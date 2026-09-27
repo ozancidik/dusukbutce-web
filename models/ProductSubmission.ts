@@ -134,7 +134,14 @@ const productSubmissionSchema = new mongoose.Schema({
   // Masaüstü bilgisayar özel alanları
   powerSupply: { type: String },
   motherboard: { type: String },
-  case: { type: String }
+  case: { type: String },
+  // RAM form faktörü (Masaüstü/DIMM vs Notebook/SO-DIMM) — itopya.com'daki
+  // "Ram Uyumluluğu" alanına karşılık gelir, farklı ürün gruplarını ayırır.
+  ramFormFactor: { type: String },
+  // Ekran kartı bellek nesli (GDDR6/GDDR6X/GDDR7). "memoryType" alanı
+  // burada tarihsel olarak bellek arayüzü (bit genişliği) için kullanılıyor,
+  // ikisini karıştırmamak için ayrı bir alan.
+  memoryGeneration: { type: String }
 });
 
 export default mongoose.models.ProductSubmission || mongoose.model('ProductSubmission', productSubmissionSchema); 

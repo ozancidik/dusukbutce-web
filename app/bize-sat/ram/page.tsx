@@ -24,6 +24,7 @@ export default function RamPage() {
     speed: '',
     type: '',
     latency: '',
+    ramFormFactor: '',
     description: '',
     cosmeticCondition: 'Mükemmel',
     hasBox: false,
@@ -214,6 +215,7 @@ export default function RamPage() {
           speed: '',
           type: '',
           latency: '',
+          ramFormFactor: '',
           description: '',
           cosmeticCondition: 'Mükemmel',
           hasBox: false,
@@ -479,6 +481,36 @@ export default function RamPage() {
                   onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
                   onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
                 />
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Uyumluluk
+                </label>
+                <select
+                  value={formData.ramFormFactor}
+                  onChange={(e) => handleInputChange('ramFormFactor', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                >
+                  <option value="">Seçin</option>
+                  <option value="Masaüstü (DIMM)">Masaüstü (DIMM)</option>
+                  <option value="Notebook (SO-DIMM)">Notebook (SO-DIMM)</option>
+                </select>
               </div>
               <div>
                 <label style={{

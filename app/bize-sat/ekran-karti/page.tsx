@@ -30,6 +30,7 @@ export default function GraphicsCardPage() {
     model: '',
     memory: '',
     memoryType: '',
+    memoryGeneration: '',
     ports: '',
     dviOutput: '',
     furmarkResult: '',
@@ -153,6 +154,7 @@ export default function GraphicsCardPage() {
           model: '',
           memory: '',
           memoryType: '',
+          memoryGeneration: '',
           ports: '',
           dviOutput: '',
           furmarkResult: '',
@@ -410,7 +412,7 @@ export default function GraphicsCardPage() {
                   color: '#374151',
                   marginBottom: '6px'
                 }}>
-                  Bit Değeri
+                  Bellek Arayüzü (Bit)
                 </label>
                 <input
                   type="text"
@@ -429,6 +431,39 @@ export default function GraphicsCardPage() {
                   onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
                   onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
                 />
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Bellek Tipi
+                </label>
+                <select
+                  value={formData.memoryGeneration}
+                  onChange={(e) => handleInputChange('memoryGeneration', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                >
+                  <option value="">Seçin</option>
+                  <option value="GDDR6">GDDR6</option>
+                  <option value="GDDR6X">GDDR6X</option>
+                  <option value="GDDR7">GDDR7</option>
+                  <option value="HBM2">HBM2</option>
+                  <option value="Diğer">Diğer</option>
+                </select>
               </div>
               <div>
                 <label style={{
