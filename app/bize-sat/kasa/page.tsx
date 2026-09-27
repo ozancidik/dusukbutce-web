@@ -22,6 +22,7 @@ export default function CasePage() {
     model: '',
     size: '',
     material: '',
+    psuBrand: '',
     powerSupplyWatt: '',
     description: '',
     cosmeticCondition: 'Mükemmel',
@@ -190,6 +191,7 @@ export default function CasePage() {
           model: '',
           size: '',
           material: '',
+          psuBrand: '',
           powerSupplyWatt: '',
           description: '',
           cosmeticCondition: 'Mükemmel',
@@ -434,8 +436,8 @@ export default function CasePage() {
                   </label>
                   <input
                     type="text"
-                    value={formData.brand}
-                    onChange={(e) => handleInputChange('brand', e.target.value)}
+                    value={formData.psuBrand}
+                    onChange={(e) => handleInputChange('psuBrand', e.target.value)}
                     placeholder="Örn: Corsair, Seasonic"
                     disabled={formData.material === 'Yok'}
                     style={{
