@@ -1,21 +1,31 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npx @claude-flow*)",
-      "Bash(npx claude-flow*)",
       "Bash(node .claude/*)",
-      "mcp__claude-flow__*"
+      "mcp__claude-flow__swarm_*",
+      "mcp__claude-flow__agent_spawn",
+      "mcp__claude-flow__agent_status",
+      "mcp__claude-flow__agent_list",
+      "mcp__claude-flow__task_*",
+      "mcp__claude-flow__memory_store",
+      "mcp__claude-flow__memory_retrieve",
+      "mcp__claude-flow__memory_search",
+      "mcp__claude-flow__memory_list",
+      "mcp__claude-flow__coordination_*",
+      "mcp__claude-flow__performance_report",
+      "mcp__claude-flow__system_status"
     ],
     "deny": [
       "Read(./.env)",
       "Read(./.env.*)",
-      "mcp__claude-flow__terminal_*",
-      "mcp__claude-flow__http_fetch",
-      "mcp__claude-flow__x_*",
-      "mcp__claude-flow__federation_*",
-      "mcp__claude-flow__seraphina_guidance",
-      "mcp__claude-flow__transfer_*",
-      "mcp__claude-flow__agent_execute",
+      "mcp__claude-flow__managed_agent_*",
+      "mcp__claude-flow__wasm_agent_*",
+      "mcp__claude-flow__github_*",
+      "mcp__claude-flow__workflow_execute",
+      "mcp__claude-flow__workflow_run",
+      "mcp__claude-flow__browser_*",
+      "mcp__claude-flow__metaharness_redblue",
+      "mcp__claude-flow__metaharness_threat_model",
       "Bash(npx claude-flow*)",
       "Bash(npx ruflo*)",
       "Bash(npx @claude-flow*)"
