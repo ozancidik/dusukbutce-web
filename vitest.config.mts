@@ -10,7 +10,11 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: ['**/*.test.ts'],
-    exclude: ['node_modules', '.next'],
+    // tests/ Playwright'a ait (playwright.config.ts: testDir: './tests') —
+    // dahil edilirse vitest onun test.describe() cagrilarini kendi test
+    // runner'iyla calistirmaya calisiyor ve "Playwright Test did not expect
+    // test.describe() to be called here" hatasiyla tum suite'i patlatiyordu.
+    exclude: ['node_modules', '.next', 'tests'],
     // Bazı modüller (lib/mongodb.ts) import edildiği anda MONGODB_URI'nin
     // tanımlı olmasını zorunlu kılıyor — testler gerçek bir bağlantı
     // kurmuyor, bu sadece o "tanımlı mı?" kontrolünü geçmek için (CI'daki
