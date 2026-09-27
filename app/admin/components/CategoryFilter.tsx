@@ -34,7 +34,6 @@ export default function CategoryFilter({
     { value: 'gamepad', label: 'Gamepad' },
     { value: 'case', label: 'Kasa' },
     { value: 'cooler', label: 'Soğutucu' },
-    { value: 'sound-system', label: 'Ses Sistemi' },
     { value: 'audio-system', label: 'Ses Sistemi' }
   ];
 

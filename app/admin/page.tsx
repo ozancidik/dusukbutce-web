@@ -928,7 +928,6 @@ export default function AdminPage() {
               <option value="case">Kasa</option>
               <option value="cooler">Soğutucu</option>
               <option value="gaming-wheel">Gaming Direksiyon</option>
-              <option value="sound-system">Ses Sistemi</option>
             </select>
             <span style={{
               fontSize: isMobile ? '12px' : '14px',
