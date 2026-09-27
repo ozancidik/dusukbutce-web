@@ -20,7 +20,7 @@ export default function ProfileActions({
 }: ProfileActionsProps) {
   if (isEditing) {
     return (
-      <div style={{ display: 'flex', gap: '12px', flexDirection: isMobile ? 'column' : 'row' }}>
+      <div className="flex-col md:flex-row" style={{ display: 'flex', gap: '12px' }}>
         <button
           type="button"
           onClick={handleSave}
@@ -59,7 +59,7 @@ export default function ProfileActions({
   }
 
   return (
-    <div style={{ display: 'flex', gap: '12px', flexDirection: isMobile ? 'column' : 'row' }}>
+    <div className="flex-col md:flex-row" style={{ display: 'flex', gap: '12px' }}>
       <button
         onClick={handleEdit}
         style={{

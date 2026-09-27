@@ -190,9 +190,8 @@ function KargoIleGonderPageContent() {
           }}>
             Kargo Süreci
           </h2>
-          <div style={{
+          <div className="grid-cols-1 md:grid-cols-4" style={{
             display: 'grid',
-            gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, 1fr)',
             gap: '16px'
           }}>
             <div style={{ textAlign: 'center' }}>
@@ -301,9 +300,8 @@ function KargoIleGonderPageContent() {
               }}>
                 Kişisel Bilgiler
               </h3>
-              <div style={{
+              <div className="grid-cols-1 md:grid-cols-2" style={{
                 display: 'grid',
-                gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
                 gap: '16px'
               }}>
                 <div>
@@ -408,9 +406,8 @@ function KargoIleGonderPageContent() {
               }}>
                 Teslimat Adresi
               </h3>
-              <div style={{
+              <div className="grid-cols-1 md:grid-cols-2" style={{
                 display: 'grid',
-                gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
                 gap: '16px'
               }}>
                 <div>
@@ -597,9 +594,8 @@ function KargoIleGonderPageContent() {
               }}>
                 Kargo Seçenekleri
               </h3>
-              <div style={{
+              <div className="grid-cols-1 md:grid-cols-2" style={{
                 display: 'grid',
-                gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
                 gap: '12px'
               }}>
                 {shippingOptions.map((option) => (

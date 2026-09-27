@@ -174,9 +174,8 @@ export default function PrivacyPolicyPage() {
                 2. Toplanan Bilgiler
               </h2>
             </div>
-            <div style={{
+            <div className="grid-cols-1 md:grid-cols-2" style={{
               display: "grid",
-              gridTemplateColumns: isMobile ? "1fr" : "repeat(2, 1fr)",
               gap: "16px",
               marginBottom: "20px"
             }}>
@@ -394,11 +393,10 @@ export default function PrivacyPolicyPage() {
           </div>
 
           {/* Action Buttons */}
-          <div style={{ 
+          <div className="flex-col md:flex-row" style={{
             textAlign: "center", 
             marginTop: "40px",
             display: "flex",
-            flexDirection: isMobile ? "column" : "row",
             gap: "16px",
             justifyContent: "center"
           }}>

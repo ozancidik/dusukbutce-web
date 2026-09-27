@@ -502,9 +502,8 @@ export default function AdreslerimPage() {
                   🔍 Arama ve Filtreleme
                 </h4>
                 
-                <div style={{
+                <div className="grid-cols-1 md:grid-cols-3" style={{
                   display: 'grid',
-                  gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
                   gap: '16px',
                   marginBottom: '16px'
                 }}>
@@ -671,9 +670,8 @@ export default function AdreslerimPage() {
                   </button>
                 </div>
 
-                <div style={{
+                <div className="grid-cols-1 md:grid-cols-[repeat(auto-fit,minmax(300px,1fr))]" style={{
                   display: 'grid',
-                  gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(300px, 1fr))',
                   gap: '20px'
                 }}>
                   {filteredAddresses.map((address, index) => (
@@ -813,9 +811,8 @@ export default function AdreslerimPage() {
                 </h3>
 
                 <form onSubmit={handleSubmit}>
-                  <div style={{
+                  <div className="grid-cols-1 md:grid-cols-2" style={{
                     display: 'grid',
-                    gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
                     gap: '16px',
                     marginBottom: '16px'
                   }}>
@@ -876,9 +873,8 @@ export default function AdreslerimPage() {
                     </div>
                   </div>
 
-                  <div style={{
+                  <div className="grid-cols-1 md:grid-cols-2" style={{
                     display: 'grid',
-                    gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
                     gap: '16px',
                     marginBottom: '16px'
                   }}>
@@ -967,9 +963,8 @@ export default function AdreslerimPage() {
                     />
                   </div>
 
-                  <div style={{
+                  <div className="grid-cols-1 md:grid-cols-2" style={{
                     display: 'grid',
-                    gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
                     gap: '16px',
                     marginBottom: '20px'
                   }}>

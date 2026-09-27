@@ -56,7 +56,7 @@ export default function ProfileForm({
         Profil Bilgilerini Düzenle
       </h3>
       
-      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? '12px' : '16px', marginBottom: isMobile ? '12px' : '16px' }}>
+      <div className="grid-cols-1 md:grid-cols-2" style={{ display: 'grid', gap: isMobile ? '12px' : '16px', marginBottom: isMobile ? '12px' : '16px' }}>
         <div>
           <label style={{ display: 'block', marginBottom: isMobile ? '6px' : '8px', fontWeight: '500', color: '#374151', fontSize: isMobile ? '13px' : '14px' }}>
             Ad
