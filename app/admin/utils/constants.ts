@@ -13,7 +13,8 @@ export const CATEGORY_MAP = {
   'audio-system': 'Ses Sistemi',
   'case': 'Kasa',
   'cooler': 'Soğutucu',
-  'gaming-wheel': 'Gaming Direksiyon'
+  'gaming-wheel': 'Gaming Direksiyon',
+  'steering-wheel': 'Direksiyon'
 } as const;
 
 export const STATUS_MAP = {

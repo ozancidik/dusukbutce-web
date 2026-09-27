@@ -135,6 +135,12 @@ const productSubmissionSchema = new mongoose.Schema({
   powerSupply: { type: String },
   motherboard: { type: String },
   case: { type: String },
+  // Kasa güç kaynağı markası (brand alanıyla karışmaması için ayrı alan)
+  psuBrand: { type: String },
+  // Cep telefonu kayıt türü (Yurtiçi/Yurtdışı)
+  registrationType: { type: String },
+  // Gaming direksiyon / direksiyon uyumluluk (PC/PlayStation/Xbox)
+  compatibility: { type: String },
   // RAM form faktörü (Masaüstü/DIMM vs Notebook/SO-DIMM) — itopya.com'daki
   // "Ram Uyumluluğu" alanına karşılık gelir, farklı ürün gruplarını ayırır.
   ramFormFactor: { type: String },

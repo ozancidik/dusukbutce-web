@@ -82,6 +82,7 @@ export interface Submission {
   condition?: string;
   accessories?: string;
   storageCapacity?: string;
+  manufacturingYear?: string;
   // İşlemci özel alanları
   stokFan?: string;
   // Monitor özel alanları
@@ -112,6 +113,10 @@ export interface Submission {
   powerSupply?: string;
   motherboard?: string;
   case?: string;
+  // Kasa güç kaynağı markası
+  psuBrand?: string;
+  // Cep telefonu kayıt türü
+  registrationType?: string;
   // Gaming direksiyon özel alanları
   compatibility?: string;
   // Direksiyon özel alanları

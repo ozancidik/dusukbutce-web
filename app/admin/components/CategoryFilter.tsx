@@ -31,6 +31,7 @@ export default function CategoryFilter({
     { value: 'xbox', label: 'Xbox' },
     { value: 'nintendo', label: 'Nintendo' },
     { value: 'gaming-wheel', label: 'Gaming Direksiyon' },
+    { value: 'steering-wheel', label: 'Direksiyon' },
     { value: 'gamepad', label: 'Gamepad' },
     { value: 'case', label: 'Kasa' },
     { value: 'cooler', label: 'Soğutucu' },

@@ -60,7 +60,8 @@ export default function SubmissionDetailModal({
       'audio-system': 'Ses Sistemi',
       'case': 'Kasa',
       'cooler': 'Soğutucu',
-      'gaming-wheel': 'Gaming Direksiyon'
+      'gaming-wheel': 'Gaming Direksiyon',
+      'steering-wheel': 'Direksiyon'
     };
     return categoryMap[category] || category;
   };
@@ -502,7 +503,24 @@ export default function SubmissionDetailModal({
               {renderField('Garanti Sticker', submission.warrantySticker)}
               {renderField('Coil Whine', submission.coilWhine)}
               {renderField('Oksidasyon', submission.oxidation)}
-              
+
+              {/* Genel/ortak alanlar — birden fazla kategoride kaydediliyor ama
+                  daha önce burada hiç gösterilmiyordu */}
+              {renderField('Aksesuarlar', submission.accessories)}
+              {renderField('Durum', submission.condition)}
+              {renderField('Üretim Yılı', submission.manufacturingYear)}
+              {renderField('Depolama Kapasitesi', submission.storageCapacity)}
+              {renderField('Watt Değeri', submission.wattValue)}
+              {renderField('Bağlantı', submission.connectivity)}
+              {renderField('Arayüz', submission.interface)}
+              {renderField('Gecikme (Latency)', submission.latency)}
+              {renderField('Kasa', submission.case)}
+              {renderField('Anakart', submission.motherboard)}
+              {renderField('Güç Kaynağı', submission.powerSupply)}
+              {renderField('Güç Kaynağı Markası', submission.psuBrand)}
+              {renderField('Kayıt Türü', submission.registrationType)}
+              {renderField('Uyumluluk', submission.compatibility)}
+
               {/* PlayStation/Xbox alanları */}
               {renderField('Model', submission.model)}
               {renderField('Kapasite', submission.capacity)}
