@@ -25,10 +25,9 @@ export default function PhotocopierImages({ isMobile, formData, handleImageUploa
         📸 Fotoğraflar
       </h2>
       
-      <div style={{
+      <div className="grid-rows-2 md:grid-rows-none" style={{
         display: 'grid',
         gridTemplateColumns: isMobile ? 'repeat(5, 1fr)' : 'repeat(5, 1fr)',
-        gridTemplateRows: isMobile ? 'repeat(2, 1fr)' : 'auto',
         gap: isMobile ? '8px' : '12px',
         marginBottom: '16px'
       }}>
