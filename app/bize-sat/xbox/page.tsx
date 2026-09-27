@@ -221,9 +221,8 @@ export default function XboxPage() {
         {!isLoggedIn && <LoginRequiredCard isMobile={isMobile} returnUrl="/bize-sat/xbox" />}
 
         {/* Form */}
-        <form onSubmit={handleSubmit} style={{
+        <form className="grid-cols-1 md:grid-cols-2" onSubmit={handleSubmit} style={{
           display: 'grid',
-          gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
           gap: isMobile ? '20px' : '24px'
         }}>
           <div>
@@ -412,9 +411,8 @@ export default function XboxPage() {
 
           {/* Kutu, Fatura, Garanti Checkbox'ları */}
           <div style={{ gridColumn: isMobile ? '1' : '1 / -1' }}>
-            <div style={{
+            <div className="grid-cols-1 md:grid-cols-3" style={{
               display: 'grid',
-              gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
               gap: '16px',
               marginTop: '16px'
             }}>
@@ -503,9 +501,8 @@ export default function XboxPage() {
               </div>
             </div>
             {formData.hasInvoice && (
-              <div style={{
+              <div className="grid-cols-1 md:grid-cols-3" style={{
                 display: 'grid',
-                gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
                 gap: '16px',
                 marginTop: '16px'
               }}>

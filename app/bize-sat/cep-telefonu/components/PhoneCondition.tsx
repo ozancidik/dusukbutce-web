@@ -20,9 +20,8 @@ export default function PhoneCondition({ isMobile, formData, onInputChange }: Ph
       }}>
         ✨ Durum Bilgileri
       </h2>
-      <div style={{
+      <div className="grid-cols-1 md:grid-cols-2" style={{
         display: 'grid',
-        gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
         gap: '16px'
       }}>
         <div>
@@ -88,9 +87,8 @@ export default function PhoneCondition({ isMobile, formData, onInputChange }: Ph
           />
         </div>
       </div>
-      <div style={{
+      <div className="grid-cols-1 md:grid-cols-3" style={{
         display: 'grid',
-        gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
         gap: '16px',
         marginTop: '16px'
       }}>
@@ -179,9 +177,8 @@ export default function PhoneCondition({ isMobile, formData, onInputChange }: Ph
         </div>
       </div>
       {formData.hasInvoice && (
-        <div style={{
+        <div className="grid-cols-1 md:grid-cols-3" style={{
           display: 'grid',
-          gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
           gap: '16px',
           marginTop: '16px'
         }}>

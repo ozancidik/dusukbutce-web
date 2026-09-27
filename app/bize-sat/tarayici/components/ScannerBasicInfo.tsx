@@ -24,9 +24,8 @@ export default function ScannerBasicInfo({ isMobile, formData, handleInputChange
       }}>
         📄 Temel Bilgiler
       </h2>
-      <div style={{
+      <div className="grid-cols-1 md:grid-cols-2" style={{
         display: 'grid',
-        gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
         gap: '16px'
       }}>
         <div>

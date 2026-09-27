@@ -290,9 +290,8 @@ export default function GamingWheelPage() {
             }}>
               🎮 Temel Bilgiler
             </h2>
-            <div style={{
+            <div className="grid-cols-1 md:grid-cols-2" style={{
               display: 'grid',
-              gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
               gap: '16px'
             }}>
               <div>
@@ -431,9 +430,8 @@ export default function GamingWheelPage() {
             }}>
               📋 Durum Bilgileri
             </h2>
-            <div style={{
+            <div className="grid-cols-1 md:grid-cols-2" style={{
               display: 'grid',
-              gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
               gap: '16px'
             }}>
               <div>
@@ -498,9 +496,8 @@ export default function GamingWheelPage() {
                 />
               </div>
             </div>
-            <div style={{
+            <div className="grid-cols-1 md:grid-cols-3" style={{
               display: 'grid',
-              gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
               gap: '16px',
               marginTop: '16px'
             }}>
@@ -589,9 +586,8 @@ export default function GamingWheelPage() {
               </div>
             </div>
             {formData.hasInvoice && (
-              <div style={{
+              <div className="grid-cols-1 md:grid-cols-3" style={{
                 display: 'grid',
-                gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
                 gap: '16px',
                 marginTop: '16px'
               }}>
@@ -643,10 +639,9 @@ export default function GamingWheelPage() {
             </h2>
             
             {/* Fotoğraf Grid */}
-            <div style={{
+            <div className="grid-rows-2 md:grid-rows-none" style={{
               display: 'grid',
               gridTemplateColumns: isMobile ? 'repeat(5, 1fr)' : 'repeat(5, 1fr)',
-              gridTemplateRows: isMobile ? 'repeat(2, 1fr)' : 'auto',
               gap: isMobile ? '8px' : '12px',
               marginBottom: '16px'
             }}>
