@@ -381,7 +381,9 @@ export default function GamingWheelPage() {
                   <option value="">Seçin</option>
                   <option value="Bilgisayar">Bilgisayar</option>
                   <option value="Playstation">Playstation</option>
+                  <option value="Xbox">Xbox</option>
                   <option value="Bilgisayar+Playstation">Bilgisayar+Playstation</option>
+                  <option value="Bilgisayar+Xbox">Bilgisayar+Xbox</option>
                 </select>
               </div>
 
