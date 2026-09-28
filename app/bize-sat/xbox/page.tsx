@@ -94,7 +94,7 @@ export default function XboxPage() {
           category: 'xbox',
           brand: 'Microsoft',
           ...formData,
-          cosmeticCondition: formData.cosmeticCondition || 'Mükemmel'
+          cosmeticCondition: formData.cosmeticCondition
         }),
         signal: controller.signal
       });
@@ -308,6 +308,7 @@ export default function XboxPage() {
               Kozmetik Durum
             </label>
             <select
+              required
               name="cosmeticCondition"
               value={formData.cosmeticCondition}
               onChange={(e) => handleInputChange('cosmeticCondition', e.target.value)}

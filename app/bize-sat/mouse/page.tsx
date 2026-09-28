@@ -24,7 +24,7 @@ export default function MousePage() {
     dpi: '',
     description: '',
     clickIssue: '',
-    cosmeticCondition: 'Mükemmel',
+    cosmeticCondition: '',
     hasBox: false,
     hasInvoice: false,
     hasWarranty: false,
@@ -165,7 +165,7 @@ export default function MousePage() {
         body: JSON.stringify({
           ...formData,
           category: 'mouse',
-          cosmeticCondition: formData.cosmeticCondition || 'Mükemmel'
+          cosmeticCondition: formData.cosmeticCondition
         }),
         signal: controller.signal
       });
@@ -192,7 +192,7 @@ export default function MousePage() {
           dpi: '',
           description: '',
           clickIssue: '',
-          cosmeticCondition: 'Mükemmel',
+          cosmeticCondition: '',
           hasBox: false,
           hasInvoice: false,
           hasWarranty: false,
@@ -486,6 +486,7 @@ export default function MousePage() {
                   onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
                   onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
                 >
+                  <option value="">Seçin</option>
                   <option value="Mükemmel">Mükemmel</option>
                   <option value="İyi">İyi</option>
                   <option value="Orta">Orta</option>

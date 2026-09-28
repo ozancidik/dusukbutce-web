@@ -32,7 +32,7 @@ export default function TarayiciPage() {
     description: '',
     adfIncluded: '',
     usageLevel: '',
-    cosmeticCondition: 'Mükemmel',
+    cosmeticCondition: '',
     hasBox: false,
     hasInvoice: false,
     hasWarranty: false,
@@ -196,7 +196,7 @@ export default function TarayiciPage() {
         body: JSON.stringify({
           ...formData,
           category: 'tarayici',
-          cosmeticCondition: formData.cosmeticCondition || 'Mükemmel'
+          cosmeticCondition: formData.cosmeticCondition
         }),
         signal: controller.signal
       });
@@ -225,7 +225,7 @@ export default function TarayiciPage() {
           description: '',
           adfIncluded: '',
           usageLevel: '',
-          cosmeticCondition: 'Mükemmel',
+          cosmeticCondition: '',
           hasBox: false,
           hasInvoice: false,
           hasWarranty: false,

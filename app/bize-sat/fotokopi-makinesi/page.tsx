@@ -34,7 +34,7 @@ export default function FotokopiMakinesiPage() {
     pageCount: '',
     tonerStatus: '',
     adfIncluded: '',
-    cosmeticCondition: 'Mükemmel',
+    cosmeticCondition: '',
     hasBox: false,
     hasInvoice: false,
     hasWarranty: false,
@@ -197,7 +197,7 @@ export default function FotokopiMakinesiPage() {
         body: JSON.stringify({
           ...formData,
           category: 'fotokopi-makinesi',
-          cosmeticCondition: formData.cosmeticCondition || 'Mükemmel'
+          cosmeticCondition: formData.cosmeticCondition
         }),
         signal: controller.signal
       });
@@ -228,7 +228,7 @@ export default function FotokopiMakinesiPage() {
           pageCount: '',
           tonerStatus: '',
           adfIncluded: '',
-          cosmeticCondition: 'Mükemmel',
+          cosmeticCondition: '',
           hasBox: false,
           hasInvoice: false,
           hasWarranty: false,

@@ -25,7 +25,7 @@ export default function GamingWheelPage() {
     pedal: '',
     shifterIncluded: '',
     forceFeedback: '',
-    cosmeticCondition: 'Mükemmel',
+    cosmeticCondition: '',
     hasBox: false,
     hasInvoice: false,
     hasWarranty: false,
@@ -170,7 +170,7 @@ export default function GamingWheelPage() {
         body: JSON.stringify({
           ...formData,
           category: 'gaming-wheel',
-          cosmeticCondition: formData.cosmeticCondition || 'Mükemmel'
+          cosmeticCondition: formData.cosmeticCondition
         }),
         signal: controller.signal
       });
@@ -199,7 +199,7 @@ export default function GamingWheelPage() {
           pedal: '',
           shifterIncluded: '',
           forceFeedback: '',
-          cosmeticCondition: 'Mükemmel',
+          cosmeticCondition: '',
           hasBox: false,
           hasInvoice: false,
           hasWarranty: false,
@@ -468,6 +468,7 @@ export default function GamingWheelPage() {
                   onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
                   onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
                 >
+                  <option value="">Seçin</option>
                   <option value="Mükemmel">Mükemmel</option>
                   <option value="İyi">İyi</option>
                   <option value="Orta">Orta</option>

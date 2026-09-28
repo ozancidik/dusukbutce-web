@@ -111,7 +111,7 @@ export default function GamepadPage() {
           brand: GAMEPAD_BRANDS[formData.model] || 'Diğer',
           ...formData,
           model: formData.model === 'Diğer' ? formData.customModel.trim() || 'Diğer' : formData.model,
-          cosmeticCondition: formData.cosmeticCondition || 'Mükemmel'
+          cosmeticCondition: formData.cosmeticCondition
         }),
         signal: controller.signal
       });
@@ -360,6 +360,7 @@ export default function GamepadPage() {
               Kozmetik Durum
             </label>
             <select
+              required
               name="cosmeticCondition"
               value={formData.cosmeticCondition}
               onChange={(e) => handleInputChange('cosmeticCondition', e.target.value)}

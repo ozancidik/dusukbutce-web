@@ -26,7 +26,7 @@ export default function HeadphonesPage() {
     micWorking: '',
     earPadCondition: '',
     chargingCase: '',
-    cosmeticCondition: 'Mükemmel',
+    cosmeticCondition: '',
     hasBox: false,
     hasInvoice: false,
     hasWarranty: false,
@@ -167,7 +167,7 @@ export default function HeadphonesPage() {
         body: JSON.stringify({
           ...formData,
           category: 'headphones',
-          cosmeticCondition: formData.cosmeticCondition || 'Mükemmel'
+          cosmeticCondition: formData.cosmeticCondition
         }),
         signal: controller.signal
       });
@@ -196,7 +196,7 @@ export default function HeadphonesPage() {
           micWorking: '',
           earPadCondition: '',
           chargingCase: '',
-          cosmeticCondition: 'Mükemmel',
+          cosmeticCondition: '',
           hasBox: false,
           hasInvoice: false,
           hasWarranty: false,
@@ -458,6 +458,7 @@ export default function HeadphonesPage() {
                   onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
                   onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
                 >
+                  <option value="">Seçin</option>
                   <option value="Mükemmel">Mükemmel</option>
                   <option value="İyi">İyi</option>
                   <option value="Orta">Orta</option>

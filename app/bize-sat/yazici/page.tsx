@@ -33,7 +33,7 @@ export default function YaziciPage() {
     description: '',
     pageCount: '',
     tonerStatus: '',
-    cosmeticCondition: 'Mükemmel',
+    cosmeticCondition: '',
     hasBox: false,
     hasInvoice: false,
     hasWarranty: false,
@@ -196,7 +196,7 @@ export default function YaziciPage() {
         body: JSON.stringify({
           ...formData,
           category: 'yazici',
-          cosmeticCondition: formData.cosmeticCondition || 'Mükemmel'
+          cosmeticCondition: formData.cosmeticCondition
         }),
         signal: controller.signal
       });
@@ -226,7 +226,7 @@ export default function YaziciPage() {
           description: '',
           pageCount: '',
           tonerStatus: '',
-          cosmeticCondition: 'Mükemmel',
+          cosmeticCondition: '',
           hasBox: false,
           hasInvoice: false,
           hasWarranty: false,

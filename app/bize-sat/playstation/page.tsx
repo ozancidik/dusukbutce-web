@@ -95,7 +95,7 @@ export default function PlayStationPage() {
         body: JSON.stringify({
           ...formData,
           category: 'playstation',
-          cosmeticCondition: formData.cosmeticCondition || 'Mükemmel'
+          cosmeticCondition: formData.cosmeticCondition
         }),
         signal: controller.signal
       });

@@ -50,6 +50,7 @@ export default function PhoneCondition({ isMobile, formData, onInputChange }: Ph
             onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
             onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
           >
+            <option value="">Seçin</option>
             <option value="Mükemmel">Mükemmel (Sıfır gibi, çizik/hasar yok)</option>
                         <option value="İyi">İyi (Normal kullanım izleri, küçük çizikler)</option>
             <option value="Orta">Orta (Belirgin çizikler, küçük ezikler)</option>
