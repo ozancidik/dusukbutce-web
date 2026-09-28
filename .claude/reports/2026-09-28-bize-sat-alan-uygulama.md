@@ -18,14 +18,21 @@ Eklenen (hepsi opsiyonel, `select`/`text`, mevcut inline stil): telefon `account
 Yeni şema alanları (13): pinDamage, driveHealth, clickIssue, controllers, stickDrift, pedal, shifterIncluded, forceFeedback, accountLock, partReplaced, biometricWorking, pageCount, mountingKit.
 İşlemci sayfasında taslak (localStorage) geri yükleme kodu anahtar anahtar kuruluyordu; yeni anahtarlar eklendi.
 
+## Faz C — bölüm 3 kalan alanlar ve form hataları — `70f03c6`
+- **Yeni opsiyonel alanlar (16 şema alanı):** chargerIncluded, knownIssues, overclocked, moduleKit, missingKeys, micWorking, earPadCondition, chargingCase, pumpIssue, sidePanelCondition, includedFans, jailbreak, firmware, tonerStatus, adfIncluded, usageLevel. Mevcut alanlar yeniden kullanıldı: layout, case, accessories, power, connectivity, type, screenStatus, deadPixelCount, batteryHealth.
+- **Düzeltmeler:** notebook/masaüstü ikinci "Marka" → "İşlemci Markası"; masaüstü disk `SSD(PCIe NVMe)` → `SSD(NVMe)` + RAM'e DDR3; RAM `type` → `ramType` (notebook/mobile ile aynı) ve seçici; SSD `type` seçici (form faktörü); mouse `Bağlantı Tipi` seçici + mükerrer `Arabirim` kaldırıldı; monitör yenileme/çözünürlük/panel ve tablet depolama seçici; soğutucu/ses sistemi `Tip` seçici; PlayStation çift `1TB`; PS/Xbox/gamepad `Durum` → `Kullanım Durumu`; Xbox marka `Microsoft`; gamepad markası modelden türetiliyor + "Diğer" için model adı kutusu; telefon RAM opsiyonel, ekran boyutu kaldırıldı, kozmetik skala 4 kademe (web ile aynı); yazıcı çift `Laser/Lazer`; tarayıcı Türkçe tip değerleri + `USB (sürüm bilinmiyor)`; klavye switch placeholder.
+- Ölçüt dışı bırakılan: "Bit Değeri" etiketi (kodda artık yok), `Diğer` seçilebilen alanlarda ayrıntı kaybı riski (monitör/tablet ekran boyutu bilerek serbest metin bırakıldı).
+- İlk denemede SSD'ye eklediğim `driveFormFactor` mevcut "Tip" alanıyla mükerrer çıktı; geri alındı, mevcut alan seçiciye çevrildi.
+- PS/Xbox/gamepad sayfaları kendi (2px kenarlıklı, `isMobile`'a duyarlı) stilini kullanıyor; o sayfalara eklenen alanlar buna uyarlandı (hesaplanan stil birebir doğrulandı).
+
 ## Doğrulama
 - `tsc` kaynak kodda 0 hata (`.next/types` altındaki iCloud " 3.ts" kopyaları hariç; izlenmiyor).
-- `vitest`: 79/79. Yeni `lib/handleProductSubmission.integration.test.ts` (bellekte MongoDB, `@/lib/email` mock'lu — `.env.local` gerçek SMTP içerdiği için) 18 test: Faz A eşlemeleri, atılan alanların kaydedilmemesi, Faz B'nin 13 kategorisi.
+- `vitest`: 95/95 (Faz C sonrası). Yeni `lib/handleProductSubmission.integration.test.ts` (bellekte MongoDB, `@/lib/email` mock'lu — `.env.local` gerçek SMTP içerdiği için) 34 test: Faz A eşlemeleri, atılan alanların kaydedilmemesi, Faz B'nin 13 kategorisi.
 - Tarayıcıda (izole dev sunucusu, ölü `MONGODB_URI`): 14 sayfa 200, etiketler render oluyor, `cep-telefonu` ve `gaming-direksiyon` görsel kontrol edildi. Form gönderimi tarayıcıdan denenmedi (giriş gerekiyor); kayıt yolu entegrasyon testiyle doğrulandı.
 
 ## Yapılmayanlar / riskler
 - **Yeni alanlar zorunlu değil.** Özellikle `accountLock` (kilitli cihaz satın alınamaz) zorunlu yapılabilir; ayrı karar.
 - **Eski kayıtlar** bu alanlara sahip değil; admin modalı boş alanları gizliyor, sorun yok.
-- Bölüm 3'ün düşük öncelikli kalemleri yapılmadı: klavye eksik tuş, kulaklık tipi/mikrofon/ped, kasa cam/fan, tarayıcı ADF, RAM kit bilgisi, notebook adaptör/arıza notu, ekran kartı bellek tipi, kasa PSU dışı, ses sistemi tipi select'i, mouse/monitör select dönüşümleri, form içi etiket/placeholder hataları (notebook çift "Marka", klavye "Switch Tipi" placeholder, yazıcı "Laser/Lazer" çift seçenek, tarayıcı İngilizce seçenekler vb.).
+- **Yapılmayanlar:** yazıcı `Tip` listesinin teknoloji/boyut/kullanım biçimi olarak ayrıştırılması, ekran kartı bellek tipi, Xbox görsellerinin base64 gönderilmesi, klavye/kulaklık dışındaki bazı serbest metin alanlarının seçiciye çevrilmesi (ekran boyutu vb.).
 - Bölüm 4-5 (kozmetik varsayılan "Mükemmel", doğrulama, 51 ölü admin alanı, kategori adı tutarsızlığı) kapsam dışıydı.
 - Mobile (`dusukbutce-mobile`, `fix/mobile-web-api-senkron`) aynı alan anahtarlarına hizalandı; **web prod'a çıkmadan mobile yayınlanırsa yeni alanlar sunucuda sessizce atılır.**
