@@ -39,7 +39,12 @@ const GENERIC_ROUTE = new Set([
 
 async function submit(body: Record<string, unknown>) {
   const { default: ProductSubmission } = await import('@/models/ProductSubmission');
-  const payload = { brand: 'Marka', model: 'Model', cosmeticCondition: 'İyi', ...body };
+  const payload: Record<string, unknown> = {
+    brand: 'Marka',
+    model: 'Model',
+    cosmeticCondition: 'İyi',
+    ...body,
+  };
   const category = String(payload.category);
   let res: Response;
   if (category === 'notebook') {
