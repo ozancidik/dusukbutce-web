@@ -26,7 +26,10 @@ export default function FotokopiMakinesiPage() {
   const [formData, setFormData] = useState({
     brand: '',
     model: '',
-    type: '',
+    multifunction: '',
+    paperSize: '',
+    usageType: '',
+    printColor: '',
     connectivity: '',
     speed: '',
     resolution: '',
@@ -220,7 +223,10 @@ export default function FotokopiMakinesiPage() {
         setFormData({
           brand: '',
           model: '',
-          type: '',
+          multifunction: '',
+          paperSize: '',
+          usageType: '',
+          printColor: '',
           connectivity: '',
           speed: '',
           resolution: '',

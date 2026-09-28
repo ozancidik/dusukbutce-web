@@ -172,6 +172,9 @@ const productSubmissionSchema = new mongoose.Schema({
   tonerStatus: { type: String }, // Yazıcı/fotokopi toner-kartuş-drum durumu
   adfIncluded: { type: String }, // Fotokopi/tarayıcı ADF dahil mi
   usageLevel: { type: String }, // Tarayıcı kullanım yoğunluğu
+  multifunction: { type: String }, // Yazıcı/fotokopi: çok işlevli mi (Evet/Hayır)
+  paperSize: { type: String }, // Yazıcı/fotokopi: A4/A3
+  usageType: { type: String }, // Yazıcı/fotokopi: kullanım tipi (Ev/Büro/Taşınabilir/Endüstriyel)
   // Gaming direksiyon / direksiyon uyumluluk (PC/PlayStation/Xbox)
   compatibility: { type: String },
   // RAM form faktörü (Masaüstü/DIMM vs Notebook/SO-DIMM) — itopya.com'daki

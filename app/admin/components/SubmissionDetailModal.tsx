@@ -528,6 +528,9 @@ export default function SubmissionDetailModal({
               {renderField('Toner / Kartuş Durumu', submission.tonerStatus)}
               {renderField('ADF / Kaset Dahil', submission.adfIncluded)}
               {renderField('Kullanım Yoğunluğu', submission.usageLevel)}
+              {renderField('Çok İşlevli', submission.multifunction)}
+              {renderField('Kağıt Boyutu', submission.paperSize)}
+              {renderField('Kullanım Tipi', submission.usageType)}
               {renderField('Uyumluluk', submission.compatibility)}
 
               {/* PlayStation/Xbox alanları */}

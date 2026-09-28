@@ -4,7 +4,10 @@ import React from 'react';
 interface PhotocopierTechnicalSpecsProps {
   isMobile: boolean;
   formData: {
-    type: string;
+    multifunction: string;
+    paperSize: string;
+    usageType: string;
+    printColor: string;
     connectivity: string;
     speed: string;
     resolution: string;
@@ -39,12 +42,12 @@ export default function PhotocopierTechnicalSpecs({ isMobile, formData, handleIn
             color: '#374151',
             marginBottom: '6px'
           }}>
-            Makine Tipi *
+            Renk Modu *
           </label>
           <select
             required
-            value={formData.type}
-            onChange={(e) => handleInputChange('type', e.target.value)}
+            value={formData.printColor}
+            onChange={(e) => handleInputChange('printColor', e.target.value)}
             style={{
               width: '100%',
               padding: '12px',
@@ -60,10 +63,95 @@ export default function PhotocopierTechnicalSpecs({ isMobile, formData, handleIn
             <option value="">Seçiniz</option>
             <option value="Mono (Siyah-Beyaz)">Mono (Siyah-Beyaz)</option>
             <option value="Renkli">Renkli</option>
-            <option value="Multifonksiyon">Multifonksiyon</option>
-            <option value="A3 Boyut">A3 Boyut</option>
-            <option value="A4 Boyut">A4 Boyut</option>
-            <option value="Büro Tipi">Büro Tipi</option>
+          </select>
+        </div>
+        <div>
+          <label style={{
+            display: 'block',
+            fontSize: '14px',
+            fontWeight: '500',
+            color: '#374151',
+            marginBottom: '6px'
+          }}>
+            Çok İşlevli mi? (yazıcı + tarayıcı + fotokopi)
+          </label>
+          <select
+            value={formData.multifunction}
+            onChange={(e) => handleInputChange('multifunction', e.target.value)}
+            style={{
+              width: '100%',
+              padding: '12px',
+              border: '1px solid #d1d5db',
+              borderRadius: '8px',
+              fontSize: '14px',
+              outline: 'none',
+              transition: 'border-color 0.2s'
+            }}
+            onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+            onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+          >
+            <option value="">Seçin</option>
+            <option value="Evet">Evet</option>
+            <option value="Hayır">Hayır</option>
+          </select>
+        </div>
+        <div>
+          <label style={{
+            display: 'block',
+            fontSize: '14px',
+            fontWeight: '500',
+            color: '#374151',
+            marginBottom: '6px'
+          }}>
+            Kağıt Boyutu
+          </label>
+          <select
+            value={formData.paperSize}
+            onChange={(e) => handleInputChange('paperSize', e.target.value)}
+            style={{
+              width: '100%',
+              padding: '12px',
+              border: '1px solid #d1d5db',
+              borderRadius: '8px',
+              fontSize: '14px',
+              outline: 'none',
+              transition: 'border-color 0.2s'
+            }}
+            onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+            onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+          >
+            <option value="">Seçin</option>
+            <option value="A4">A4</option>
+            <option value="A3">A3</option>
+          </select>
+        </div>
+        <div>
+          <label style={{
+            display: 'block',
+            fontSize: '14px',
+            fontWeight: '500',
+            color: '#374151',
+            marginBottom: '6px'
+          }}>
+            Kullanım Tipi
+          </label>
+          <select
+            value={formData.usageType}
+            onChange={(e) => handleInputChange('usageType', e.target.value)}
+            style={{
+              width: '100%',
+              padding: '12px',
+              border: '1px solid #d1d5db',
+              borderRadius: '8px',
+              fontSize: '14px',
+              outline: 'none',
+              transition: 'border-color 0.2s'
+            }}
+            onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+            onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+          >
+            <option value="">Seçin</option>
+            <option value="Büro">Büro</option>
             <option value="Endüstriyel">Endüstriyel</option>
             <option value="Taşınabilir">Taşınabilir</option>
           </select>

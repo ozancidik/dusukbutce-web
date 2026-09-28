@@ -181,8 +181,27 @@ describe('düşük öncelikli durum/aksesuar alanları kaydediliyor', () => {
     ['gamepad', { batteryHealth: 'İyi' }],
     ['tablet', { accessories: 'Sadece kalem' }],
     ['audio-system', { power: '60', connectivity: 'Bluetooth', accessories: 'Hiçbiri' }],
-    ['yazici', { tonerStatus: 'Dahil, dolu' }],
-    ['fotokopi-makinesi', { tonerStatus: 'Dahil, boş / az', adfIncluded: 'Evet' }],
+    [
+      'yazici',
+      {
+        tonerStatus: 'Dahil, dolu',
+        type: 'Lazer Yazıcı',
+        multifunction: 'Evet',
+        paperSize: 'A3',
+        usageType: 'Büro',
+      },
+    ],
+    [
+      'fotokopi-makinesi',
+      {
+        tonerStatus: 'Dahil, boş / az',
+        adfIncluded: 'Evet',
+        printColor: 'Renkli',
+        multifunction: 'Hayır',
+        paperSize: 'A4',
+        usageType: 'Endüstriyel',
+      },
+    ],
     ['tarayici', { adfIncluded: 'Hayır', usageLevel: 'Orta' }],
   ];
   it.each(cases)('%s: alanlar veritabanına yazılır', async (category, fields) => {

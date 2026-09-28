@@ -26,6 +26,9 @@ export default function YaziciPage() {
   const [formData, setFormData] = useState({
     brand: '',
     model: '',
+    multifunction: '',
+    paperSize: '',
+    usageType: '',
     type: '',
     printColor: '',
     connectivity: '',
@@ -219,6 +222,9 @@ export default function YaziciPage() {
         setFormData({
           brand: '',
           model: '',
+          multifunction: '',
+          paperSize: '',
+          usageType: '',
           type: '',
           printColor: '',
           connectivity: '',

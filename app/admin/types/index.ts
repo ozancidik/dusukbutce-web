@@ -129,6 +129,9 @@ export interface Submission {
   tonerStatus?: string;
   adfIncluded?: string;
   usageLevel?: string;
+  multifunction?: string;
+  paperSize?: string;
+  usageType?: string;
   pinDamage?: string;
   driveHealth?: string;
   clickIssue?: string;

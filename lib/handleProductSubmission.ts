@@ -43,7 +43,7 @@ export const ALLOWED_FIELDS = [
   // Durum/arıza alanları (bize-sat raporu bölüm 3): fiyatı en çok etkileyen bilgiler
   "pinDamage", "driveHealth", "clickIssue", "controllers", "stickDrift", "pedal", "shifterIncluded", "forceFeedback", "accountLock", "partReplaced", "biometricWorking", "pageCount", "mountingKit",
   // Düşük öncelikli durum/aksesuar alanları (bize-sat raporu bölüm 3)
-  "chargerIncluded", "knownIssues", "overclocked", "moduleKit", "missingKeys", "micWorking", "earPadCondition", "chargingCase", "pumpIssue", "sidePanelCondition", "includedFans", "jailbreak", "firmware", "tonerStatus", "adfIncluded", "usageLevel",
+  "chargerIncluded", "knownIssues", "overclocked", "moduleKit", "missingKeys", "micWorking", "earPadCondition", "chargingCase", "pumpIssue", "sidePanelCondition", "includedFans", "jailbreak", "firmware", "tonerStatus", "adfIncluded", "usageLevel", "multifunction", "paperSize", "usageType",
   // Gaming direksiyon / direksiyon
   "compatibility",
 ] as const;
