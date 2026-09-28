@@ -21,9 +21,9 @@ export default function CasePage() {
     brand: '',
     model: '',
     size: '',
-    material: '',
+    powerSupply: '',
     psuBrand: '',
-    powerSupplyWatt: '',
+    wattValue: '',
     description: '',
     cosmeticCondition: 'Mükemmel',
     hasBox: false,
@@ -190,9 +190,9 @@ export default function CasePage() {
           brand: '',
           model: '',
           size: '',
-          material: '',
+          powerSupply: '',
           psuBrand: '',
-          powerSupplyWatt: '',
+          wattValue: '',
           description: '',
           cosmeticCondition: 'Mükemmel',
           hasBox: false,
@@ -398,8 +398,8 @@ export default function CasePage() {
                     Güç Kaynağı
                   </label>
                   <select
-                    value={formData.material}
-                    onChange={(e) => handleInputChange('material', e.target.value)}
+                    value={formData.powerSupply}
+                    onChange={(e) => handleInputChange('powerSupply', e.target.value)}
                     style={{
                       width: '100%',
                       padding: '12px',
@@ -428,7 +428,7 @@ export default function CasePage() {
                     display: 'block',
                     fontSize: '14px',
                     fontWeight: '500',
-                    color: formData.material === 'Yok' ? '#9ca3af' : '#374151',
+                    color: formData.powerSupply === 'Yok' ? '#9ca3af' : '#374151',
                     marginBottom: '6px'
                   }}>
                     Güç Kaynağı Markası
@@ -438,7 +438,7 @@ export default function CasePage() {
                     value={formData.psuBrand}
                     onChange={(e) => handleInputChange('psuBrand', e.target.value)}
                     placeholder="Örn: Corsair, Seasonic"
-                    disabled={formData.material === 'Yok'}
+                    disabled={formData.powerSupply === 'Yok'}
                     style={{
                       width: '100%',
                       padding: '12px',
@@ -447,12 +447,12 @@ export default function CasePage() {
                       fontSize: '14px',
                       outline: 'none',
                       transition: 'border-color 0.2s',
-                      backgroundColor: formData.material === 'Yok' ? '#f3f4f6' : 'white',
-                      color: formData.material === 'Yok' ? '#9ca3af' : '#374151',
-                      cursor: formData.material === 'Yok' ? 'not-allowed' : 'text'
+                      backgroundColor: formData.powerSupply === 'Yok' ? '#f3f4f6' : 'white',
+                      color: formData.powerSupply === 'Yok' ? '#9ca3af' : '#374151',
+                      cursor: formData.powerSupply === 'Yok' ? 'not-allowed' : 'text'
                     }}
                     onFocus={(e) => {
-                      if (formData.material !== 'Yok') {
+                      if (formData.powerSupply !== 'Yok') {
                         e.target.style.borderColor = '#3b82f6';
                       }
                     }}
@@ -464,17 +464,17 @@ export default function CasePage() {
                     display: 'block',
                     fontSize: '14px',
                     fontWeight: '500',
-                    color: formData.material === 'Yok' ? '#9ca3af' : '#374151',
+                    color: formData.powerSupply === 'Yok' ? '#9ca3af' : '#374151',
                     marginBottom: '6px'
                   }}>
                     Watt Değeri
                   </label>
                   <input
                     type="text"
-                    value={formData.powerSupplyWatt}
-                    onChange={(e) => handleInputChange('powerSupplyWatt', e.target.value)}
+                    value={formData.wattValue}
+                    onChange={(e) => handleInputChange('wattValue', e.target.value)}
                     placeholder="Örn: 550W, 750W"
-                    disabled={formData.material === 'Yok'}
+                    disabled={formData.powerSupply === 'Yok'}
                     style={{
                       width: '100%',
                       padding: '12px',
@@ -483,12 +483,12 @@ export default function CasePage() {
                       fontSize: '14px',
                       outline: 'none',
                       transition: 'border-color 0.2s',
-                      backgroundColor: formData.material === 'Yok' ? '#f3f4f6' : 'white',
-                      color: formData.material === 'Yok' ? '#9ca3af' : '#374151',
-                      cursor: formData.material === 'Yok' ? 'not-allowed' : 'text'
+                      backgroundColor: formData.powerSupply === 'Yok' ? '#f3f4f6' : 'white',
+                      color: formData.powerSupply === 'Yok' ? '#9ca3af' : '#374151',
+                      cursor: formData.powerSupply === 'Yok' ? 'not-allowed' : 'text'
                     }}
                     onFocus={(e) => {
-                      if (formData.material !== 'Yok') {
+                      if (formData.powerSupply !== 'Yok') {
                         e.target.style.borderColor = '#3b82f6';
                       }
                     }}

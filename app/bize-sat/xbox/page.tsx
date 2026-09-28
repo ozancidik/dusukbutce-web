@@ -25,7 +25,6 @@ export default function XboxPage() {
     warrantyDuration: '',
     invoiceDate: '',
     quantity: 1,
-    color: '',
     images: [] as string[],
     description: ''
   });
@@ -125,7 +124,6 @@ export default function XboxPage() {
           warrantyDuration: '',
           invoiceDate: '',
           quantity: 1,
-          color: '',
           images: [],
           description: ''
         });
@@ -382,32 +380,6 @@ export default function XboxPage() {
             />
           </div>
 
-          <div>
-            <label style={{
-              display: 'block',
-              marginBottom: '8px',
-              fontWeight: '600',
-              color: '#374151',
-              fontSize: isMobile ? '14px' : '16px'
-            }}>
-              Renk
-            </label>
-            <input
-              type="text"
-              name="color"
-              value={formData.color}
-              onChange={(e) => handleInputChange('color', e.target.value)}
-              placeholder="Örn: Siyah, Beyaz, Kırmızı"
-              style={{
-                width: '100%',
-                padding: isMobile ? '12px' : '16px',
-                border: '2px solid #e5e7eb',
-                borderRadius: '8px',
-                fontSize: isMobile ? '14px' : '16px',
-                boxSizing: 'border-box'
-              }}
-            />
-          </div>
 
           {/* Kutu, Fatura, Garanti Checkbox'ları */}
           <div style={{ gridColumn: isMobile ? '1' : '1 / -1' }}>

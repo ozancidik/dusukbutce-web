@@ -23,7 +23,6 @@ export default function TabletPage() {
     screenSize: '',
     storage: '',
     connectivity: '',
-    color: '',
     description: '',
     cosmeticCondition: 'Mükemmel',
     hasBox: false,
@@ -187,7 +186,6 @@ export default function TabletPage() {
           screenSize: '',
           storage: '',
           connectivity: '',
-          color: '',
           description: '',
           cosmeticCondition: 'Mükemmel',
           hasBox: false,
@@ -419,34 +417,6 @@ export default function TabletPage() {
                   value={formData.connectivity}
                   onChange={(e) => handleInputChange('connectivity', e.target.value)}
                   placeholder="Örn: WiFi, WiFi+Cellular"
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    outline: 'none',
-                    transition: 'border-color 0.2s'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-                />
-              </div>
-              <div>
-                <label style={{
-                  display: 'block',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  color: '#374151',
-                  marginBottom: '6px'
-                }}>
-                  Renk
-                </label>
-                <input
-                  type="text"
-                  value={formData.color}
-                  onChange={(e) => handleInputChange('color', e.target.value)}
-                  placeholder="Örn: Siyah, Beyaz, Kırmızı"
                   style={{
                     width: '100%',
                     padding: '12px',

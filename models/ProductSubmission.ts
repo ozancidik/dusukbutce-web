@@ -139,6 +139,8 @@ const productSubmissionSchema = new mongoose.Schema({
   psuBrand: { type: String },
   // Cep telefonu kayıt türü (Yurtiçi/Yurtdışı)
   registrationType: { type: String },
+  // Yazıcı baskı rengi (Siyah-Beyaz / Renkli)
+  printColor: { type: String },
   // Gaming direksiyon / direksiyon uyumluluk (PC/PlayStation/Xbox)
   compatibility: { type: String },
   // RAM form faktörü (Masaüstü/DIMM vs Notebook/SO-DIMM) — itopya.com'daki

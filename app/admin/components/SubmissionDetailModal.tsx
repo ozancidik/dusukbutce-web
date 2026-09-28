@@ -519,6 +519,7 @@ export default function SubmissionDetailModal({
               {renderField('Güç Kaynağı', submission.powerSupply)}
               {renderField('Güç Kaynağı Markası', submission.psuBrand)}
               {renderField('Kayıt Türü', submission.registrationType)}
+              {renderField('Baskı Rengi', submission.printColor)}
               {renderField('Uyumluluk', submission.compatibility)}
 
               {/* PlayStation/Xbox alanları */}
@@ -572,7 +573,7 @@ export default function SubmissionDetailModal({
               {/* Klavye alanları */}
               {renderField('Switch Tipi', submission.switchType)}
               {renderField('Klavye Düzeni', submission.layout)}
-              {renderField('Klavye Boyutu', submission.size)}
+              {renderField('Boyut', submission.size)}
               {renderField('Mekanik', submission.mechanical)}
               {renderField('RGB', submission.rgb)}
               {renderField('Kablosuz', submission.wireless)}

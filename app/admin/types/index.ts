@@ -117,6 +117,8 @@ export interface Submission {
   psuBrand?: string;
   // Cep telefonu kayıt türü
   registrationType?: string;
+  // Yazıcı baskı rengi
+  printColor?: string;
   // Gaming direksiyon özel alanları
   compatibility?: string;
   // Direksiyon özel alanları

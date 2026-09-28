@@ -38,6 +38,8 @@ export const ALLOWED_FIELDS = [
   "powerSupply", "motherboard", "case", "psuBrand",
   // Cep telefonu
   "registrationType",
+  // Yazıcı baskı rengi (Siyah-Beyaz / Renkli)
+  "printColor",
   // Gaming direksiyon / direksiyon
   "compatibility",
 ] as const;

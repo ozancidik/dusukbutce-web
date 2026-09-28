@@ -20,7 +20,6 @@ export default function HeadphonesPage() {
   const [formData, setFormData] = useState({
     brand: '',
     model: '',
-    color: '',
     connectivity: '',
     description: '',
     cosmeticCondition: 'Mükemmel',
@@ -187,7 +186,6 @@ export default function HeadphonesPage() {
         setFormData({
           brand: '',
           model: '',
-          color: '',
           connectivity: '',
           description: '',
           cosmeticCondition: 'Mükemmel',
@@ -336,34 +334,6 @@ export default function HeadphonesPage() {
                   value={formData.model}
                   onChange={(e) => handleInputChange('model', e.target.value)}
                   placeholder="Örn: BlackShark V2, Arctis 7, G Pro X"
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    outline: 'none',
-                    transition: 'border-color 0.2s'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-                />
-              </div>
-              <div>
-                <label style={{
-                  display: 'block',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  color: '#374151',
-                  marginBottom: '6px'
-                }}>
-                  Renk
-                </label>
-                <input
-                  type="text"
-                  value={formData.color}
-                  onChange={(e) => handleInputChange('color', e.target.value)}
-                  placeholder="Örn: Siyah, Beyaz, Kırmızı"
                   style={{
                     width: '100%',
                     padding: '12px',

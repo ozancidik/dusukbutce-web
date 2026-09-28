@@ -5,9 +5,8 @@ interface PrinterTechnicalSpecsProps {
   isMobile: boolean;
   formData: {
     type: string;
-    color: string;
-    connectionType: string;
-    printSpeed: string;
+    printColor: string;
+    connectivity: string;
     resolution: string;
     description: string;
   };
@@ -80,8 +79,8 @@ export default function PrinterTechnicalSpecs({ isMobile, formData, handleInputC
             Renk
           </label>
           <select
-            value={formData.color}
-            onChange={(e) => handleInputChange('color', e.target.value)}
+            value={formData.printColor}
+            onChange={(e) => handleInputChange('printColor', e.target.value)}
             style={{
               width: '100%',
               padding: '12px',
@@ -111,8 +110,8 @@ export default function PrinterTechnicalSpecs({ isMobile, formData, handleInputC
             Bağlantı Türü
           </label>
           <select
-            value={formData.connectionType}
-            onChange={(e) => handleInputChange('connectionType', e.target.value)}
+            value={formData.connectivity}
+            onChange={(e) => handleInputChange('connectivity', e.target.value)}
             style={{
               width: '100%',
               padding: '12px',
@@ -134,34 +133,6 @@ export default function PrinterTechnicalSpecs({ isMobile, formData, handleInputC
             <option value="WiFi + Ethernet">WiFi + Ethernet</option>
             <option value="Bluetooth">Bluetooth</option>
           </select>
-        </div>
-        <div>
-          <label style={{
-            display: 'block',
-            fontSize: '14px',
-            fontWeight: '500',
-            color: '#374151',
-            marginBottom: '6px'
-          }}>
-            Yazdırma Hızı
-          </label>
-          <input
-            type="text"
-            value={formData.printSpeed}
-            onChange={(e) => handleInputChange('printSpeed', e.target.value)}
-            placeholder="Örn: 20 sayfa/dk, 25 ppm"
-            style={{
-              width: '100%',
-              padding: '12px',
-              border: '1px solid #d1d5db',
-              borderRadius: '8px',
-              fontSize: '14px',
-              outline: 'none',
-              transition: 'border-color 0.2s'
-            }}
-            onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-            onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-          />
         </div>
         <div>
           <label style={{

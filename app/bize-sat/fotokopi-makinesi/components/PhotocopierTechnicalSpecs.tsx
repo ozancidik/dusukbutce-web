@@ -5,10 +5,9 @@ interface PhotocopierTechnicalSpecsProps {
   isMobile: boolean;
   formData: {
     type: string;
-    connectionType: string;
-    copySpeed: string;
+    connectivity: string;
+    speed: string;
     resolution: string;
-    color: string;
     description: string;
   };
   handleInputChange: (field: string, value: any) => void;
@@ -80,8 +79,8 @@ export default function PhotocopierTechnicalSpecs({ isMobile, formData, handleIn
             Bağlantı Türü
           </label>
           <select
-            value={formData.connectionType}
-            onChange={(e) => handleInputChange('connectionType', e.target.value)}
+            value={formData.connectivity}
+            onChange={(e) => handleInputChange('connectivity', e.target.value)}
             style={{
               width: '100%',
               padding: '12px',
@@ -115,8 +114,8 @@ export default function PhotocopierTechnicalSpecs({ isMobile, formData, handleIn
           </label>
           <input
             type="text"
-            value={formData.copySpeed}
-            onChange={(e) => handleInputChange('copySpeed', e.target.value)}
+            value={formData.speed}
+            onChange={(e) => handleInputChange('speed', e.target.value)}
             placeholder="Örn: 25 sayfa/dk, 35 ppm"
             style={{
               width: '100%',
@@ -146,34 +145,6 @@ export default function PhotocopierTechnicalSpecs({ isMobile, formData, handleIn
             value={formData.resolution}
             onChange={(e) => handleInputChange('resolution', e.target.value)}
             placeholder="Örn: 600x600 dpi, 1200x1200 dpi"
-            style={{
-              width: '100%',
-              padding: '12px',
-              border: '1px solid #d1d5db',
-              borderRadius: '8px',
-              fontSize: '14px',
-              outline: 'none',
-              transition: 'border-color 0.2s'
-            }}
-            onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-            onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-          />
-        </div>
-        <div>
-          <label style={{
-            display: 'block',
-            fontSize: '14px',
-            fontWeight: '500',
-            color: '#374151',
-            marginBottom: '6px'
-          }}>
-            Renk
-          </label>
-          <input
-            type="text"
-            value={formData.color}
-            onChange={(e) => handleInputChange('color', e.target.value)}
-            placeholder="Örn: Siyah, Beyaz, Renkli"
             style={{
               width: '100%',
               padding: '12px',

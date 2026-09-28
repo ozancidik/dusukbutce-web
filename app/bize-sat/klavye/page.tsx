@@ -23,9 +23,7 @@ export default function KeyboardPage() {
     switchType: '',
     layout: '',
     size: '',
-    rgb: '',
     connectivity: '',
-    color: '',
     description: '',
     cosmeticCondition: 'Mükemmel',
     hasBox: false,
@@ -194,9 +192,7 @@ export default function KeyboardPage() {
           switchType: '',
           layout: '',
           size: '',
-          rgb: '',
           connectivity: '',
-          color: '',
           description: '',
           cosmeticCondition: 'Mükemmel',
           hasBox: false,
@@ -459,36 +455,6 @@ export default function KeyboardPage() {
                   color: '#374151',
                   marginBottom: '6px'
                 }}>
-                  RGB
-                </label>
-                <select
-                  value={formData.rgb}
-                  onChange={(e) => handleInputChange('rgb', e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    outline: 'none',
-                    transition: 'border-color 0.2s'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-                >
-                  <option value="">Seçin</option>
-                  <option value="Var">Var</option>
-                  <option value="Yok">Yok</option>
-                </select>
-              </div>
-              <div>
-                <label style={{
-                  display: 'block',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  color: '#374151',
-                  marginBottom: '6px'
-                }}>
                   Bağlantı Tipi
                 </label>
                 <input
@@ -496,34 +462,6 @@ export default function KeyboardPage() {
                   value={formData.connectivity}
                   onChange={(e) => handleInputChange('connectivity', e.target.value)}
                   placeholder="Örn: Kablolu, Kablosuz"
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    outline: 'none',
-                    transition: 'border-color 0.2s'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-                />
-              </div>
-              <div>
-                <label style={{
-                  display: 'block',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  color: '#374151',
-                  marginBottom: '6px'
-                }}>
-                  Renk
-                </label>
-                <input
-                  type="text"
-                  value={formData.color}
-                  onChange={(e) => handleInputChange('color', e.target.value)}
-                  placeholder="Örn: Siyah, Beyaz, Kırmızı"
                   style={{
                     width: '100%',
                     padding: '12px',

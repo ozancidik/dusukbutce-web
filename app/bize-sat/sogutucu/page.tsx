@@ -21,7 +21,7 @@ export default function CoolerPage() {
     brand: '',
     model: '',
     type: '',
-    fanSize: '',
+    size: '',
     description: '',
     cosmeticCondition: 'Mükemmel',
     hasBox: false,
@@ -183,7 +183,7 @@ export default function CoolerPage() {
           brand: '',
           model: '',
           type: '',
-          fanSize: '',
+          size: '',
           description: '',
           cosmeticCondition: 'Mükemmel',
           hasBox: false,
@@ -381,12 +381,12 @@ export default function CoolerPage() {
                   color: '#374151',
                   marginBottom: '6px'
                 }}>
-                  Fan Boyutu
+                  Fan / Radyatör Boyutu
                 </label>
                 <input
                   type="text"
-                  value={formData.fanSize}
-                  onChange={(e) => handleInputChange('fanSize', e.target.value)}
+                  value={formData.size}
+                  onChange={(e) => handleInputChange('size', e.target.value)}
                   placeholder="Örn: 120mm, 240mm, 360mm"
                   style={{
                     width: '100%',
