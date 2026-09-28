@@ -2,6 +2,7 @@
 import { useCallback } from 'react';
 import { getPopupDimensions, getAllowedOrigins, isOriginAllowed, processOAuthUser } from '../utils/oauthUtils';
 import { UserData } from '../utils/storageUtils';
+import { safeReturnUrl } from '@/lib/safeReturnUrl';
 
 interface UseOAuthProps {
   socialLoading: string;
@@ -20,7 +21,7 @@ export const useOAuth = ({ socialLoading, setSocialLoading, setError, redirectEx
     setError("");
     
     try {
-      const returnUrl = new URLSearchParams(window.location.search).get('returnUrl') || '/';
+      const returnUrl = safeReturnUrl(new URLSearchParams(window.location.search).get('returnUrl'));
       const state = encodeURIComponent(JSON.stringify({ 
         random: Math.random().toString(36).substring(7),
         returnUrl: returnUrl
@@ -216,7 +217,7 @@ export const useOAuth = ({ socialLoading, setSocialLoading, setError, redirectEx
     setError("");
     
     try {
-      const returnUrl = new URLSearchParams(window.location.search).get('returnUrl') || '/';
+      const returnUrl = safeReturnUrl(new URLSearchParams(window.location.search).get('returnUrl'));
       const facebookAuthUrl = `/api/auth/facebook?returnUrl=${encodeURIComponent(returnUrl)}`;
       
       const { width, height, left, top } = getPopupDimensions();

@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import connectDB from "@/lib/mongodb";
 import { NextResponse } from "next/server";
 import crypto from "crypto";
+import { safeReturnUrl } from '@/lib/safeReturnUrl';
 
 export async function GET(request: NextRequest) {
   // Base URL belirleme - production ve localhost için ayrı
@@ -62,7 +63,7 @@ export async function GET(request: NextRequest) {
   }
 
   const searchParams = request.nextUrl.searchParams;
-  const returnUrl = searchParams.get('returnUrl') || '/profile';
+  const returnUrl = safeReturnUrl(searchParams.get('returnUrl'), '/profile');
 
   // State'e returnUrl'i ekle; nonce sunucu tarafında üretilir ve callback'te
   // aynı isimli httpOnly cookie ile karşılaştırılır (login-CSRF koruması).

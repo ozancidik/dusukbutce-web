@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import connectDB from "@/lib/mongodb";
 import { NextResponse } from "next/server";
 import crypto from "crypto";
+import { safeReturnUrl } from '@/lib/safeReturnUrl';
 export async function GET(request: NextRequest) {
   // Base URL belirleme - production ve localhost için ayrı
   let baseUrl = process.env.NEXT_PUBLIC_SITE_URL;
@@ -63,7 +64,7 @@ export async function GET(request: NextRequest) {
   if (clientState) {
     try {
       const parsed = JSON.parse(decodeURIComponent(clientState));
-      if (typeof parsed?.returnUrl === 'string') returnUrl = parsed.returnUrl;
+      if (typeof parsed?.returnUrl === 'string') returnUrl = safeReturnUrl(parsed.returnUrl);
     } catch {
       // Geçersiz/ayrıştırılamayan state — varsayılan returnUrl kullanılır.
     }

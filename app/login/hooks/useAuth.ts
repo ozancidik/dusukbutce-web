@@ -2,6 +2,7 @@
 import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUserLoginStatus, validateAndCleanAdminToken } from '../utils/storageUtils';
+import { safeReturnUrl } from '@/lib/safeReturnUrl';
 
 /**
  * Kullanıcı authentication durumunu yöneten hook
@@ -49,7 +50,11 @@ export const useAuth = (
         return;
       }
       if (userLoggedIn === "true" && userEmail && currentPath === '/login') {
-        const returnUrl = new URLSearchParams(window.location.search).get('returnUrl');
+        // Open-redirect koruması: yalnızca aynı-origin yollara yönlendir.
+        const returnUrl = safeReturnUrl(
+          new URLSearchParams(window.location.search).get('returnUrl'),
+          ''
+        );
         
         // Yönlendirme flag'ini set et
         redirectExecutedRef.current = true;
@@ -59,6 +64,9 @@ export const useAuth = (
         window.removeEventListener('localStorageChange', handleStorageChange);
         
         if (returnUrl) {
+          // returnUrl yukarıda safeReturnUrl ile doğrulandı (yalnızca aynı-origin yol);
+          // Semgrep özel doğrulayıcıyı tanımadığı için bastırıldı.
+          // nosemgrep: javascript.browser.security.open-redirect.js-open-redirect
           window.location.href = decodeURIComponent(returnUrl);
         } else {
           window.location.href = "/";

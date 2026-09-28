@@ -3,6 +3,7 @@
 
 import React from 'react';
 import { UserData, saveUserData } from './storageUtils';
+import { safeReturnUrl } from '@/lib/safeReturnUrl';
 
 /**
  * Popup boyutlarını hesaplar (mobil uyumlu)
@@ -98,7 +99,9 @@ export const processOAuthUser = (
   console.log('✅ [processOAuthUser] localStorageChange event tetiklendi');
 
   // Yönlendir
-  const finalUrl = decodeURIComponent(returnUrl);
+  // Open-redirect koruması: returnUrl popup/state üzerinden geldiği için burada da
+  // (yönlendirmenin gerçekleştiği yerde) doğrulanıyor.
+  const finalUrl = decodeURIComponent(safeReturnUrl(returnUrl));
   console.log('🔄 [processOAuthUser] Yönlendiriliyor:', finalUrl);
   console.log('🔄 [processOAuthUser] window.location.href:', window.location.href);
   window.location.href = finalUrl;
