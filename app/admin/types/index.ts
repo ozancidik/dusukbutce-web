@@ -119,6 +119,17 @@ export interface Submission {
   registrationType?: string;
   // Yazıcı baskı rengi
   printColor?: string;
+  pinDamage?: string;
+  driveHealth?: string;
+  clickIssue?: string;
+  controllers?: string;
+  stickDrift?: string;
+  shifterIncluded?: string;
+  accountLock?: string;
+  partReplaced?: string;
+  biometricWorking?: string;
+  pageCount?: string;
+  mountingKit?: string;
   // Gaming direksiyon özel alanları
   compatibility?: string;
   // Direksiyon özel alanları

@@ -4,6 +4,7 @@ import React from 'react';
 interface PrinterConditionProps {
   isMobile: boolean;
   formData: {
+    pageCount: string;
     cosmeticCondition: string;
     quantity: number;
     hasBox: boolean;
@@ -64,6 +65,34 @@ export default function PrinterCondition({ isMobile, formData, handleInputChange
             <option value="Orta">Orta</option>
             <option value="Kötü">Kötü</option>
           </select>
+        </div>
+        <div>
+          <label style={{
+            display: 'block',
+            fontSize: '14px',
+            fontWeight: '500',
+            color: '#374151',
+            marginBottom: '6px'
+          }}>
+            Sayfa Sayacı (Toplam Baskı)
+          </label>
+          <input
+            type="text"
+            value={formData.pageCount}
+            onChange={(e) => handleInputChange('pageCount', e.target.value)}
+            placeholder="Örn: 25000"
+            style={{
+              width: '100%',
+              padding: '12px',
+              border: '1px solid #d1d5db',
+              borderRadius: '8px',
+              fontSize: '14px',
+              outline: 'none',
+              transition: 'border-color 0.2s'
+            }}
+            onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+            onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+          />
         </div>
         <div>
           <label style={{

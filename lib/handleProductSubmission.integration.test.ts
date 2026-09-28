@@ -78,3 +78,43 @@ describe('bize-sat alanları kaydediliyor', () => {
     expect(doc).toMatchObject({ size: '360mm' });
   });
 });
+
+describe('durum/arıza alanları (rapor bölüm 3) kaydediliyor', () => {
+  const cases: Array<[string, string, Record<string, string>]> = [
+    [
+      'cep-telefonu',
+      'telefon',
+      {
+        accountLock: 'Kapalı',
+        partReplaced: 'Hayır',
+        biometricWorking: 'Evet',
+        batteryHealth: '91',
+      },
+    ],
+    ['tablet', 'tablet', { accountLock: 'Açık', batteryHealth: '89' }],
+    ['islemci', 'işlemci', { pinDamage: 'Evet', socket: 'AM4' }],
+    ['ssd', 'ssd', { driveHealth: '%98, 12 TB yazılmış' }],
+    ['mouse', 'mouse', { clickIssue: 'Evet' }],
+    ['playstation', 'playstation', { controllers: '2', stickDrift: 'Hayır' }],
+    ['gamepad', 'gamepad', { stickDrift: 'Evet' }],
+    [
+      'gaming-wheel',
+      'direksiyon',
+      {
+        pedal: 'Evet',
+        shifterIncluded: 'Hayır',
+        forceFeedback: 'Desteklemiyor',
+        compatibility: 'Bilgisayar+Xbox',
+      },
+    ],
+    ['yazici', 'yazıcı', { pageCount: '25000', printColor: 'Renkli' }],
+    ['fotokopi-makinesi', 'fotokopi', { pageCount: '120000' }],
+    ['cooler', 'soğutucu', { mountingKit: 'Eksik var', size: '360mm' }],
+    ['monitor', 'monitör', { screenStatus: 'Sorunsuz', deadPixelCount: '0' }],
+    ['notebook', 'notebook', { screenStatus: 'Hafif çizik / leke', deadPixelCount: '2' }],
+  ];
+  it.each(cases)('%s (%s): alanlar veritabanına yazılır', async (category, _ad, fields) => {
+    const doc = await submit({ category, ...fields });
+    expect(doc).toMatchObject(fields);
+  });
+});

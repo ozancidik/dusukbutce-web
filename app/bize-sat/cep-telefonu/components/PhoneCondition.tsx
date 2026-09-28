@@ -65,6 +65,98 @@ export default function PhoneCondition({ isMobile, formData, onInputChange }: Ph
             color: '#374151',
             marginBottom: '6px'
           }}>
+            Hesap Kilidi (iCloud / Google)
+          </label>
+          <select
+            value={formData.accountLock}
+            onChange={(e) => onInputChange('accountLock', e.target.value)}
+            style={{
+              width: '100%',
+              padding: '12px',
+              border: '1px solid #d1d5db',
+              borderRadius: '8px',
+              fontSize: '14px',
+              outline: 'none',
+              transition: 'border-color 0.2s'
+            }}
+            onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+            onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+          >
+            <option value="">Seçin</option>
+            <option value="Kapalı">Kapalı</option>
+            <option value="Açık">Açık</option>
+          </select>
+        </div>
+        <div>
+          <label style={{
+            display: 'block',
+            fontSize: '14px',
+            fontWeight: '500',
+            color: '#374151',
+            marginBottom: '6px'
+          }}>
+            Ekran / Parça Değişimi Yapıldı mı?
+          </label>
+          <select
+            value={formData.partReplaced}
+            onChange={(e) => onInputChange('partReplaced', e.target.value)}
+            style={{
+              width: '100%',
+              padding: '12px',
+              border: '1px solid #d1d5db',
+              borderRadius: '8px',
+              fontSize: '14px',
+              outline: 'none',
+              transition: 'border-color 0.2s'
+            }}
+            onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+            onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+          >
+            <option value="">Seçin</option>
+            <option value="Hayır">Hayır</option>
+            <option value="Evet, orijinal parça">Evet, orijinal parça</option>
+            <option value="Evet, yan sanayi parça">Evet, yan sanayi parça</option>
+          </select>
+        </div>
+        <div>
+          <label style={{
+            display: 'block',
+            fontSize: '14px',
+            fontWeight: '500',
+            color: '#374151',
+            marginBottom: '6px'
+          }}>
+            Face ID / Touch ID Çalışıyor mu?
+          </label>
+          <select
+            value={formData.biometricWorking}
+            onChange={(e) => onInputChange('biometricWorking', e.target.value)}
+            style={{
+              width: '100%',
+              padding: '12px',
+              border: '1px solid #d1d5db',
+              borderRadius: '8px',
+              fontSize: '14px',
+              outline: 'none',
+              transition: 'border-color 0.2s'
+            }}
+            onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+            onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+          >
+            <option value="">Seçin</option>
+            <option value="Evet">Evet</option>
+            <option value="Hayır">Hayır</option>
+            <option value="Cihazda yok">Cihazda yok</option>
+          </select>
+        </div>
+        <div>
+          <label style={{
+            display: 'block',
+            fontSize: '14px',
+            fontWeight: '500',
+            color: '#374151',
+            marginBottom: '6px'
+          }}>
             Adet *
           </label>
           <input

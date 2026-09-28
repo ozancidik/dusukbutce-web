@@ -22,6 +22,8 @@ export default function ProcessorPage() {
     model: '',
     stokFan: '',
     description: '',
+    pinDamage: '',
+    socket: '',
     cosmeticCondition: 'Mükemmel',
     hasBox: false,
     hasInvoice: false,
@@ -53,6 +55,8 @@ export default function ProcessorPage() {
           model: parsedData.model || '',
           stokFan: parsedData.stokFan || '',
           description: parsedData.description || '',
+          pinDamage: parsedData.pinDamage || '',
+          socket: parsedData.socket || '',
           cosmeticCondition: parsedData.cosmeticCondition || 'Mükemmel',
           hasBox: parsedData.hasBox || false,
           hasInvoice: parsedData.hasInvoice || false,
@@ -212,6 +216,8 @@ export default function ProcessorPage() {
           model: '',
           stokFan: '',
           description: '',
+          pinDamage: '',
+          socket: '',
           cosmeticCondition: 'Mükemmel',
           hasBox: false,
           hasInvoice: false,
@@ -508,6 +514,64 @@ export default function ProcessorPage() {
                   <option value="Orta">Orta</option>
                   <option value="Kötü">Kötü</option>
                 </select>
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Soket Pinlerinde Eğiklik / Hasar Var mı?
+                </label>
+                <select
+                  value={formData.pinDamage}
+                  onChange={(e) => handleInputChange('pinDamage', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                >
+                  <option value="">Seçin</option>
+                  <option value="Hayır">Hayır</option>
+                  <option value="Evet">Evet</option>
+                </select>
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Soket
+                </label>
+                <input
+                  type="text"
+                  value={formData.socket}
+                  onChange={(e) => handleInputChange('socket', e.target.value)}
+                  placeholder="Örn: AM4, LGA1700"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                />
               </div>
               <div>
                 <label style={{

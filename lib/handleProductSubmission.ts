@@ -40,6 +40,8 @@ export const ALLOWED_FIELDS = [
   "registrationType",
   // Yazıcı baskı rengi (Siyah-Beyaz / Renkli)
   "printColor",
+  // Durum/arıza alanları (bize-sat raporu bölüm 3): fiyatı en çok etkileyen bilgiler
+  "pinDamage", "driveHealth", "clickIssue", "controllers", "stickDrift", "pedal", "shifterIncluded", "forceFeedback", "accountLock", "partReplaced", "biometricWorking", "pageCount", "mountingKit",
   // Gaming direksiyon / direksiyon
   "compatibility",
 ] as const;

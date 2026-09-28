@@ -24,6 +24,7 @@ export default function MousePage() {
     connectivity: '',
     dpi: '',
     description: '',
+    clickIssue: '',
     cosmeticCondition: 'Mükemmel',
     hasBox: false,
     hasInvoice: false,
@@ -192,6 +193,7 @@ export default function MousePage() {
           connectivity: '',
           dpi: '',
           description: '',
+          clickIssue: '',
           cosmeticCondition: 'Mükemmel',
           hasBox: false,
           hasInvoice: false,
@@ -514,6 +516,36 @@ export default function MousePage() {
                   <option value="İyi">İyi</option>
                   <option value="Orta">Orta</option>
                   <option value="Kötü">Kötü</option>
+                </select>
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Çift Tıklama / Tık Sorunu Var mı?
+                </label>
+                <select
+                  value={formData.clickIssue}
+                  onChange={(e) => handleInputChange('clickIssue', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                >
+                  <option value="">Seçin</option>
+                  <option value="Hayır">Hayır</option>
+                  <option value="Evet">Evet</option>
                 </select>
               </div>
               <div>

@@ -19,6 +19,8 @@ export default function PlayStationPage() {
     brand: 'Sony',
     model: '',
     condition: '',
+    controllers: '',
+    stickDrift: '',
     cosmeticCondition: '',
     accessories: '',
     hasBox: false,
@@ -117,6 +119,8 @@ export default function PlayStationPage() {
           brand: 'Sony',
           model: '',
           condition: '',
+          controllers: '',
+          stickDrift: '',
           cosmeticCondition: '',
           accessories: '',
           hasBox: false,
@@ -390,6 +394,68 @@ export default function PlayStationPage() {
               <option value="İyi">İyi (Hafif çizikler)</option>
               <option value="Orta">Orta (Görünür çizikler)</option>
               <option value="Kötü">Kötü (Çok çizikli)</option>
+            </select>
+          </div>
+          <div>
+            <label style={{
+              display: 'block',
+              fontSize: '14px',
+              fontWeight: '500',
+              color: '#374151',
+              marginBottom: '6px'
+            }}>
+              Kol Sayısı
+            </label>
+            <select
+              value={formData.controllers}
+              onChange={(e) => handleInputChange('controllers', e.target.value)}
+              style={{
+                width: '100%',
+                padding: '12px',
+                border: '1px solid #d1d5db',
+                borderRadius: '8px',
+                fontSize: '14px',
+                outline: 'none',
+                transition: 'border-color 0.2s'
+              }}
+              onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+              onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+            >
+              <option value="">Seçin</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+            </select>
+          </div>
+          <div>
+            <label style={{
+              display: 'block',
+              fontSize: '14px',
+              fontWeight: '500',
+              color: '#374151',
+              marginBottom: '6px'
+            }}>
+              Kolda Stick Drift Var mı?
+            </label>
+            <select
+              value={formData.stickDrift}
+              onChange={(e) => handleInputChange('stickDrift', e.target.value)}
+              style={{
+                width: '100%',
+                padding: '12px',
+                border: '1px solid #d1d5db',
+                borderRadius: '8px',
+                fontSize: '14px',
+                outline: 'none',
+                transition: 'border-color 0.2s'
+              }}
+              onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+              onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+            >
+              <option value="">Seçin</option>
+              <option value="Hayır">Hayır</option>
+              <option value="Evet">Evet</option>
             </select>
           </div>
 

@@ -76,7 +76,7 @@ export default function PrinterTechnicalSpecs({ isMobile, formData, handleInputC
             color: '#374151',
             marginBottom: '6px'
           }}>
-            Renk
+            Baskı Rengi
           </label>
           <select
             value={formData.printColor}

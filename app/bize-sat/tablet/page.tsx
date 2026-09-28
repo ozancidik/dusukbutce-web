@@ -24,6 +24,8 @@ export default function TabletPage() {
     storage: '',
     connectivity: '',
     description: '',
+    accountLock: '',
+    batteryHealth: '',
     cosmeticCondition: 'Mükemmel',
     hasBox: false,
     hasInvoice: false,
@@ -187,6 +189,8 @@ export default function TabletPage() {
           storage: '',
           connectivity: '',
           description: '',
+          accountLock: '',
+          batteryHealth: '',
           cosmeticCondition: 'Mükemmel',
           hasBox: false,
           hasInvoice: false,
@@ -510,6 +514,64 @@ export default function TabletPage() {
                   <option value="Orta">Orta</option>
                   <option value="Kötü">Kötü</option>
                 </select>
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Hesap Kilidi (iCloud / Google)
+                </label>
+                <select
+                  value={formData.accountLock}
+                  onChange={(e) => handleInputChange('accountLock', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                >
+                  <option value="">Seçin</option>
+                  <option value="Kapalı">Kapalı</option>
+                  <option value="Açık">Açık</option>
+                </select>
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Pil Sağlığı (%)
+                </label>
+                <input
+                  type="text"
+                  value={formData.batteryHealth}
+                  onChange={(e) => handleInputChange('batteryHealth', e.target.value)}
+                  placeholder="Örn: 89"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                />
               </div>
               <div>
                 <label style={{

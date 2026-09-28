@@ -23,6 +23,7 @@ export default function CoolerPage() {
     type: '',
     size: '',
     description: '',
+    mountingKit: '',
     cosmeticCondition: 'Mükemmel',
     hasBox: false,
     hasInvoice: false,
@@ -185,6 +186,7 @@ export default function CoolerPage() {
           type: '',
           size: '',
           description: '',
+          mountingKit: '',
           cosmeticCondition: 'Mükemmel',
           hasBox: false,
           hasInvoice: false,
@@ -481,6 +483,36 @@ export default function CoolerPage() {
                   <option value="İyi">İyi</option>
                   <option value="Orta">Orta</option>
                   <option value="Kötü">Kötü</option>
+                </select>
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Montaj Aparatları / Soket Kitleri Dahil mi?
+                </label>
+                <select
+                  value={formData.mountingKit}
+                  onChange={(e) => handleInputChange('mountingKit', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                >
+                  <option value="">Seçin</option>
+                  <option value="Evet, tam">Evet, tam</option>
+                  <option value="Eksik var">Eksik var</option>
                 </select>
               </div>
               <div>

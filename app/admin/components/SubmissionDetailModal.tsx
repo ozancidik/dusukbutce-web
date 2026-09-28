@@ -520,6 +520,19 @@ export default function SubmissionDetailModal({
               {renderField('Güç Kaynağı Markası', submission.psuBrand)}
               {renderField('Kayıt Türü', submission.registrationType)}
               {renderField('Baskı Rengi', submission.printColor)}
+
+              {/* Durum/arıza alanları — fiyatı en çok etkileyen bilgiler */}
+              {renderField('Hesap Kilidi', submission.accountLock, true)}
+              {renderField('Parça Değişimi', submission.partReplaced)}
+              {renderField('Face ID / Touch ID', submission.biometricWorking)}
+              {renderField('Pin Hasarı', submission.pinDamage, true)}
+              {renderField('Disk Sağlığı / Yazılan Veri', submission.driveHealth)}
+              {renderField('Tık Sorunu', submission.clickIssue)}
+              {renderField('Kol Sayısı', submission.controllers)}
+              {renderField('Stick Drift', submission.stickDrift)}
+              {renderField('Vites Kolu Dahil', submission.shifterIncluded)}
+              {renderField('Sayfa Sayacı', submission.pageCount)}
+              {renderField('Montaj Aparatları', submission.mountingKit)}
               {renderField('Uyumluluk', submission.compatibility)}
 
               {/* PlayStation/Xbox alanları */}
@@ -637,7 +650,7 @@ export default function SubmissionDetailModal({
               {/* Gaming Direksiyon alanları */}
               {renderField('Platform', submission.platform)}
               {renderField('Force Feedback', submission.forceFeedback)}
-              {renderField('Pedal', submission.pedal)}
+              {renderField('Pedal Seti Dahil', submission.pedal)}
               {renderField('Kablosuz', submission.wireless)}
               {renderField('Bluetooth', submission.bluetooth)}
               {renderField('Pil Ömrü', submission.batteryLife)}

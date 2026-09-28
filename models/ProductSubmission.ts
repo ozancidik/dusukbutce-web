@@ -141,6 +141,20 @@ const productSubmissionSchema = new mongoose.Schema({
   registrationType: { type: String },
   // Yazıcı baskı rengi (Siyah-Beyaz / Renkli)
   printColor: { type: String },
+  // Durum/arıza alanları (bize-sat raporu bölüm 3)
+  pinDamage: { type: String }, // İşlemci: soket pinlerinde eğiklik/hasar (Hayır/Evet)
+  driveHealth: { type: String }, // SSD sağlık yüzdesi / yazılan veri
+  clickIssue: { type: String }, // Mouse çift tıklama / tık sorunu (Hayır/Evet)
+  controllers: { type: String }, // PlayStation/Xbox kol sayısı
+  stickDrift: { type: String }, // Kol/gamepad stick drift (Hayır/Evet)
+  pedal: { type: String }, // Direksiyon: pedal seti dahil mi (Evet/Hayır)
+  shifterIncluded: { type: String }, // Direksiyon: vites kolu dahil mi (Evet/Hayır)
+  forceFeedback: { type: String }, // Direksiyon: force feedback (Evet/Hayır/Desteklemiyor)
+  accountLock: { type: String }, // Telefon/tablet hesap kilidi (Kapalı/Açık)
+  partReplaced: { type: String }, // Telefon ekran/parça değişimi
+  biometricWorking: { type: String }, // Telefon Face ID / Touch ID çalışıyor mu
+  pageCount: { type: String }, // Yazıcı/fotokopi sayfa sayacı
+  mountingKit: { type: String }, // Soğutucu montaj aparatları dahil mi
   // Gaming direksiyon / direksiyon uyumluluk (PC/PlayStation/Xbox)
   compatibility: { type: String },
   // RAM form faktörü (Masaüstü/DIMM vs Notebook/SO-DIMM) — itopya.com'daki
