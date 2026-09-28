@@ -38,9 +38,31 @@ export const ALLOWED_FIELDS = [
   "powerSupply", "motherboard", "case", "psuBrand",
   // Cep telefonu
   "registrationType",
+  // Yazıcı baskı rengi (Siyah-Beyaz / Renkli)
+  "printColor",
+  // Durum/arıza alanları (bize-sat raporu bölüm 3): fiyatı en çok etkileyen bilgiler
+  "pinDamage", "driveHealth", "clickIssue", "controllers", "stickDrift", "pedal", "shifterIncluded", "forceFeedback", "accountLock", "partReplaced", "biometricWorking", "pageCount", "mountingKit",
+  // Düşük öncelikli durum/aksesuar alanları (bize-sat raporu bölüm 3)
+  "chargerIncluded", "knownIssues", "overclocked", "moduleKit", "missingKeys", "micWorking", "earPadCondition", "chargingCase", "pumpIssue", "sidePanelCondition", "includedFans", "jailbreak", "firmware", "tonerStatus", "adfIncluded", "usageLevel", "multifunction", "paperSize", "usageType",
   // Gaming direksiyon / direksiyon
   "compatibility",
 ] as const;
+
+/**
+ * Client body'sinden yalnızca izin verilen ürün alanlarını alır.
+ * Garanti/fatura işareti kapalıysa eski süre/tarih de atılır (form bayrağı
+ * kapatıldığında önceden girilmiş değer body'de kalabiliyor).
+ * Üç kayıt yolu (ortak handler, /api/submissions, notebook) da bunu kullanır.
+ */
+export function pickSubmissionFields(body: Record<string, unknown>): Record<string, unknown> {
+  const data: Record<string, unknown> = {};
+  for (const key of ALLOWED_FIELDS) {
+    if (body[key] !== undefined) data[key] = body[key];
+  }
+  if (data.hasWarranty !== true) delete data.warrantyDuration;
+  if (data.hasInvoice !== true) delete data.invoiceDate;
+  return data;
+}
 
 export async function handleProductSubmission(request: Request, source: string) {
   try {
@@ -59,10 +81,7 @@ export async function handleProductSubmission(request: Request, source: string) 
     await connectDB();
 
     // Sadece izin verilen ürün alanlarını al.
-    const data: Record<string, unknown> = {};
-    for (const key of ALLOWED_FIELDS) {
-      if (body[key] !== undefined) data[key] = body[key];
-    }
+    const data = pickSubmissionFields(body);
 
     const submissionNumber = await generateSubmissionNumber();
 

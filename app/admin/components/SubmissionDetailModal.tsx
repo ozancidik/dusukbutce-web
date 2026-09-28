@@ -2,6 +2,7 @@
 import React from 'react';
 import { Submission } from '../types';
 
+import { getCategoryLabel } from '@/lib/categories';
 interface SubmissionDetailModalProps {
   submission: Submission | null;
   isOpen: boolean;
@@ -44,27 +45,7 @@ export default function SubmissionDetailModal({
     });
   };
 
-  const getCategoryDisplayName = (category: string) => {
-    const categoryMap: { [key: string]: string } = {
-      'graphics-card': 'Ekran Kartı',
-      'notebook': 'Dizüstü Bilgisayar',
-      'desktop': 'Masaüstü Bilgisayar',
-      'processor': 'İşlemci',
-      'monitor': 'Monitör',
-      'keyboard': 'Klavye',
-      'mouse': 'Fare',
-      'headphones': 'Kulaklık',
-      'ram': 'RAM',
-      'ssd': 'SSD',
-      'tablet': 'Tablet',
-      'audio-system': 'Ses Sistemi',
-      'case': 'Kasa',
-      'cooler': 'Soğutucu',
-      'gaming-wheel': 'Gaming Direksiyon',
-      'steering-wheel': 'Direksiyon'
-    };
-    return categoryMap[category] || category;
-  };
+  const getCategoryDisplayName = (category: string) => getCategoryLabel(category);
 
   const renderField = (label: string, value: any, isImportant = false) => {
     if (!value || value === '' || value === 'undefined') return null;
@@ -519,6 +500,37 @@ export default function SubmissionDetailModal({
               {renderField('Güç Kaynağı', submission.powerSupply)}
               {renderField('Güç Kaynağı Markası', submission.psuBrand)}
               {renderField('Kayıt Türü', submission.registrationType)}
+              {renderField('Baskı Rengi', submission.printColor)}
+
+              {/* Durum/arıza alanları — fiyatı en çok etkileyen bilgiler */}
+              {renderField('Hesap Kilidi', submission.accountLock, true)}
+              {renderField('Parça Değişimi', submission.partReplaced)}
+              {renderField('Face ID / Touch ID', submission.biometricWorking)}
+              {renderField('Pin Hasarı', submission.pinDamage, true)}
+              {renderField('Disk Sağlığı / Yazılan Veri', submission.driveHealth)}
+              {renderField('Tık Sorunu', submission.clickIssue)}
+              {renderField('Kol Sayısı', submission.controllers)}
+              {renderField('Stick Drift', submission.stickDrift)}
+              {renderField('Vites Kolu Dahil', submission.shifterIncluded)}
+              {renderField('Sayfa Sayacı', submission.pageCount)}
+              {renderField('Montaj Aparatları', submission.mountingKit)}
+              {renderField('Şarj Adaptörü Dahil', submission.chargerIncluded)}
+              {renderField('Bilinen Arıza / Sorun', submission.knownIssues, true)}
+              {renderField('Overclock / Delid', submission.overclocked)}
+              {renderField('Kit / Modül Sayısı', submission.moduleKit)}
+              {renderField('Eksik Tuş', submission.missingKeys)}
+              {renderField('Mikrofon', submission.micWorking)}
+              {renderField('Kulak Pedi Durumu', submission.earPadCondition)}
+              {renderField('Şarj Kutusu Dahil', submission.chargingCase)}
+              {renderField('Pompa Sesi / Sızıntı', submission.pumpIssue)}
+              {renderField('Yan Panel Durumu', submission.sidePanelCondition)}
+              {renderField('Dahil Fanlar', submission.includedFans)}
+              {renderField('Toner / Kartuş Durumu', submission.tonerStatus)}
+              {renderField('ADF / Kaset Dahil', submission.adfIncluded)}
+              {renderField('Kullanım Yoğunluğu', submission.usageLevel)}
+              {renderField('Çok İşlevli', submission.multifunction)}
+              {renderField('Kağıt Boyutu', submission.paperSize)}
+              {renderField('Kullanım Tipi', submission.usageType)}
               {renderField('Uyumluluk', submission.compatibility)}
 
               {/* PlayStation/Xbox alanları */}
@@ -526,121 +538,51 @@ export default function SubmissionDetailModal({
               {renderField('Kapasite', submission.capacity)}
               {renderField('Firmware', submission.firmware)}
               {renderField('Jailbreak', submission.jailbreak)}
-              {renderField('Oyunlar', submission.games)}
-              {renderField('Kontrolcü', submission.controller)}
-              {renderField('Kablo', submission.cable)}
-              {renderField('Adaptör', submission.adapter)}
               
               {/* İşlemci alanları */}
               {renderField('Stok Fan', submission.stokFan)}
               {renderField('Cache (Önbellek)', submission.cache)}
               {renderField('Soket', submission.socket)}
-              {renderField('Çekirdek Sayısı', submission.coreCount)}
-              {renderField('Thread Sayısı', submission.threadCount)}
-              {renderField('Temel Frekans', submission.baseFrequency)}
-              {renderField('Boost Frekans', submission.boostFrequency)}
-              {renderField('TDP', submission.tdp)}
-              {renderField('Üretim Süreci', submission.process)}
               {renderField('Cache', submission.cache)}
               
               {/* RAM alanları */}
               {renderField('Kapasite', submission.capacity)}
               {renderField('Hız', submission.speed)}
-              {renderField('Timing', submission.timing)}
-              {renderField('Voltaj', submission.voltage)}
-              {renderField('Soğutucu', submission.cooler)}
               {renderField('Uyumluluk', submission.ramFormFactor)}
               
               {/* SSD alanları */}
               {renderField('Kapasite', submission.capacity)}
-              {renderField('Okuma Hızı', submission.readSpeed)}
-              {renderField('Yazma Hızı', submission.writeSpeed)}
-              {renderField('IOPS', submission.iops)}
-              {renderField('TBW', submission.tbw)}
-              {renderField('MTBF', submission.mtbf)}
               
               {/* Monitör alanları */}
               {renderField('Çözünürlük', submission.resolution)}
               {renderField('Panel Tipi', submission.panelType)}
-              {renderField('Renk Gamut', submission.colorGamut)}
-              {renderField('Parlaklık', submission.brightness)}
-              {renderField('Kontrast', submission.contrast)}
-              {renderField('Görüş Açısı', submission.viewingAngle)}
               {renderField('Yanıt Süresi', submission.responseTime)}
-              {renderField('G-Sync/FreeSync', submission.sync)}
               
               {/* Klavye alanları */}
               {renderField('Switch Tipi', submission.switchType)}
               {renderField('Klavye Düzeni', submission.layout)}
-              {renderField('Klavye Boyutu', submission.size)}
-              {renderField('Mekanik', submission.mechanical)}
-              {renderField('RGB', submission.rgb)}
-              {renderField('Kablosuz', submission.wireless)}
-              {renderField('Bluetooth', submission.bluetooth)}
-              {renderField('Pil Ömrü', submission.batteryLife)}
+              {renderField('Boyut', submission.size)}
               
               {/* Mouse alanları */}
               {renderField('DPI', submission.dpi)}
-              {renderField('Polling Rate', submission.pollingRate)}
-              {renderField('Sensor', submission.sensor)}
-              {renderField('Kablosuz', submission.wireless)}
-              {renderField('Bluetooth', submission.bluetooth)}
-              {renderField('Pil Ömrü', submission.batteryLife)}
               
-              {/* Kulaklık alanları */}
-              {renderField('Driver Boyutu', submission.driverSize)}
-              {renderField('Frekans Aralığı', submission.frequencyRange)}
-              {renderField('Empedans', submission.impedance)}
-              {renderField('Ses Basıncı', submission.soundPressure)}
-              {renderField('Kablosuz', submission.wireless)}
-              {renderField('Bluetooth', submission.bluetooth)}
-              {renderField('Pil Ömrü', submission.batteryLife)}
-              {renderField('Mikrofon', submission.microphone)}
               
               {/* Tablet alanları */}
-              {renderField('İşletim Sistemi', submission.operatingSystem)}
-              {renderField('Pil Ömrü', submission.batteryLife)}
-              {renderField('Kamera', submission.camera)}
               {renderField('Depolama', submission.storage)}
               {renderField('RAM', submission.ram)}
-              {renderField('Kablosuz', submission.wireless)}
-              {renderField('Bluetooth', submission.bluetooth)}
-              {renderField('GPS', submission.gps)}
               
               {/* Ses Sistemi alanları */}
               {renderField('Güç', submission.power)}
-              {renderField('Frekans Aralığı', submission.frequencyRange)}
-              {renderField('Empedans', submission.impedance)}
-              {renderField('Kablosuz', submission.wireless)}
-              {renderField('Bluetooth', submission.bluetooth)}
-              {renderField('Pil Ömrü', submission.batteryLife)}
-              {renderField('Mikrofon', submission.microphone)}
-              {renderField('USB', submission.usb)}
               
               {/* Kasa alanları */}
-              {renderField('Form Faktörü', submission.formFactor)}
-              {renderField('Materyal', submission.material)}
-              {renderField('Fan Sayısı', submission.fanCount)}
-              {renderField('RGB', submission.rgb)}
-              {renderField('USB Portları', submission.usbPorts)}
               {renderField('Güç Kaynağı', submission.powerSupply)}
               
               {/* Soğutucu alanları */}
               {renderField('Tip', submission.type)}
-              {renderField('Soket Uyumluluğu', submission.socketCompatibility)}
-              {renderField('TDP', submission.tdp)}
-              {renderField('Fan Boyutu', submission.fanSize)}
-              {renderField('RGB', submission.rgb)}
-              {renderField('Sıvı Soğutma', submission.liquidCooling)}
               
               {/* Gaming Direksiyon alanları */}
-              {renderField('Platform', submission.platform)}
               {renderField('Force Feedback', submission.forceFeedback)}
-              {renderField('Pedal', submission.pedal)}
-              {renderField('Kablosuz', submission.wireless)}
-              {renderField('Bluetooth', submission.bluetooth)}
-              {renderField('Pil Ömrü', submission.batteryLife)}
-              {renderField('USB', submission.usb)}
+              {renderField('Pedal Seti Dahil', submission.pedal)}
             </div>
           )}
 

@@ -37,7 +37,12 @@ export default function NotebookPage() {
     refreshRate: '',
     batteryHealth: '',
     description: '',
-    cosmeticCondition: 'Mükemmel',
+    screenStatus: '',
+    deadPixelCount: '',
+    chargerIncluded: '',
+    layout: '',
+    knownIssues: '',
+    cosmeticCondition: '',
     hasBox: false,
     hasInvoice: false,
     hasWarranty: false,
@@ -175,7 +180,12 @@ export default function NotebookPage() {
           refreshRate: '',
           batteryHealth: '',
           description: '',
-          cosmeticCondition: 'Mükemmel',
+          screenStatus: '',
+          deadPixelCount: '',
+          chargerIncluded: '',
+          layout: '',
+          knownIssues: '',
+          cosmeticCondition: '',
           hasBox: false,
           hasInvoice: false,
           hasWarranty: false,
@@ -395,7 +405,7 @@ export default function NotebookPage() {
                     color: '#374151',
                     marginBottom: '6px'
                   }}>
-                    Marka
+                    İşlemci Markası
                   </label>
                   <select
                     value={formData.processorBrand}
@@ -859,11 +869,162 @@ export default function NotebookPage() {
                   onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
                   onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
                 >
+                  <option value="">Seçin</option>
                   <option value="Mükemmel">Mükemmel</option>
                   <option value="İyi">İyi</option>
                   <option value="Orta">Orta</option>
                   <option value="Kötü">Kötü</option>
                 </select>
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Şarj Adaptörü Dahil mi?
+                </label>
+                <select
+                  value={formData.chargerIncluded}
+                  onChange={(e) => handleInputChange('chargerIncluded', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                >
+                  <option value="">Seçin</option>
+                  <option value="Evet">Evet</option>
+                  <option value="Hayır">Hayır</option>
+                </select>
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Klavye Düzeni
+                </label>
+                <select
+                  value={formData.layout}
+                  onChange={(e) => handleInputChange('layout', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                >
+                  <option value="">Seçin</option>
+                  <option value="TR-Q">TR-Q</option>
+                  <option value="TR-F">TR-F</option>
+                  <option value="US">US</option>
+                  <option value="Diğer">Diğer</option>
+                </select>
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Bilinen Arıza / Sorun
+                </label>
+                <input
+                  type="text"
+                  value={formData.knownIssues}
+                  onChange={(e) => handleInputChange('knownIssues', e.target.value)}
+                  placeholder="Örn: menteşe gevşek, batarya şişkin (yoksa boş bırakın)"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                />
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Ekran Durumu
+                </label>
+                <select
+                  value={formData.screenStatus}
+                  onChange={(e) => handleInputChange('screenStatus', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                >
+                  <option value="">Seçin</option>
+                  <option value="Sorunsuz">Sorunsuz</option>
+                  <option value="Hafif çizik / leke">Hafif çizik / leke</option>
+                  <option value="Belirgin çizik / leke">Belirgin çizik / leke</option>
+                  <option value="Kırık / çatlak">Kırık / çatlak</option>
+                </select>
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Ölü / Sıkışmış Piksel Sayısı
+                </label>
+                <input
+                  type="text"
+                  value={formData.deadPixelCount}
+                  onChange={(e) => handleInputChange('deadPixelCount', e.target.value)}
+                  placeholder="Yoksa 0"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                />
               </div>
               <div>
                 <label style={{

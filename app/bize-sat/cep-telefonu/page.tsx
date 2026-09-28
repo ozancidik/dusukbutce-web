@@ -28,11 +28,12 @@ export default function CepTelefonuPage() {
     storage: '',
     ram: '',
     batteryHealth: '',
-    screenSize: '',
-    color: '',
     registrationType: '',
     description: '',
-    cosmeticCondition: 'Mükemmel',
+    accountLock: '',
+    partReplaced: '',
+    biometricWorking: '',
+    cosmeticCondition: '',
     hasBox: false,
     hasInvoice: false,
     hasWarranty: false,
@@ -180,7 +181,7 @@ export default function CepTelefonuPage() {
         body: JSON.stringify({
           ...formData,
           category: 'cep-telefonu',
-          cosmeticCondition: formData.cosmeticCondition || 'Mükemmel'
+          cosmeticCondition: formData.cosmeticCondition
         }),
         signal: controller.signal
       });
@@ -206,11 +207,12 @@ export default function CepTelefonuPage() {
           storage: '',
           ram: '',
           batteryHealth: '',
-          screenSize: '',
-          color: '',
           registrationType: '',
           description: '',
-          cosmeticCondition: 'Mükemmel',
+          accountLock: '',
+          partReplaced: '',
+          biometricWorking: '',
+          cosmeticCondition: '',
           hasBox: false,
           hasInvoice: false,
           hasWarranty: false,

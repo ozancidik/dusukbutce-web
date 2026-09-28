@@ -31,7 +31,9 @@ export default function DesktopPage() {
     powerSupply: '',
     motherboard: '',
     description: '',
-    cosmeticCondition: 'Mükemmel',
+    case: '',
+    knownIssues: '',
+    cosmeticCondition: '',
     hasBox: false,
     hasInvoice: false,
     hasWarranty: false,
@@ -172,7 +174,7 @@ export default function DesktopPage() {
         body: JSON.stringify({
           ...formData,
           category: 'desktop',
-          cosmeticCondition: formData.cosmeticCondition || 'Mükemmel'
+          cosmeticCondition: formData.cosmeticCondition
         }),
         signal: controller.signal
       });
@@ -206,7 +208,9 @@ export default function DesktopPage() {
           powerSupply: '',
           motherboard: '',
           description: '',
-          cosmeticCondition: 'Mükemmel',
+          case: '',
+          knownIssues: '',
+          cosmeticCondition: '',
           hasBox: false,
           hasInvoice: false,
           hasWarranty: false,
@@ -426,7 +430,7 @@ export default function DesktopPage() {
                     color: '#374151',
                     marginBottom: '6px'
                   }}>
-                    Marka
+                    İşlemci Markası
                   </label>
                   <select
                     value={formData.processorBrand}
@@ -572,6 +576,7 @@ export default function DesktopPage() {
                     <option value="">Seçiniz</option>
                     <option value="DDR4">DDR4</option>
                     <option value="DDR5">DDR5</option>
+                    <option value="DDR3">DDR3</option>
                   </select>
                 </div>
               </div>
@@ -635,10 +640,10 @@ export default function DesktopPage() {
                   >
                     <option value="">Seçiniz</option>
                     <option value="SSD(SATA)">SSD(SATA)</option>
-                    <option value="SSD(PCIe NVMe)">SSD(PCIe NVMe)</option>
+                    <option value="SSD(NVMe)">SSD(NVMe)</option>
                     <option value="HDD">HDD</option>
                     <option value="SSD(SATA)+HDD">SSD(SATA)+HDD</option>
-                    <option value="SSD(PCIe NVMe)+HDD">SSD(PCIe NVMe)+HDD</option>
+                    <option value="SSD(NVMe)+HDD">SSD(NVMe)+HDD</option>
                   </select>
                 </div>
               </div>
@@ -773,11 +778,68 @@ export default function DesktopPage() {
                   onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
                   onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
                 >
+                  <option value="">Seçin</option>
                   <option value="Mükemmel">Mükemmel</option>
                   <option value="İyi">İyi</option>
                   <option value="Orta">Orta</option>
                   <option value="Kötü">Kötü</option>
                 </select>
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Kasa (Model)
+                </label>
+                <input
+                  type="text"
+                  value={formData.case}
+                  onChange={(e) => handleInputChange('case', e.target.value)}
+                  placeholder="Örn: NZXT H510"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                />
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Bilinen Arıza / Sorun
+                </label>
+                <input
+                  type="text"
+                  value={formData.knownIssues}
+                  onChange={(e) => handleInputChange('knownIssues', e.target.value)}
+                  placeholder="Yoksa boş bırakın"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                />
               </div>
               <div>
                 <label style={{

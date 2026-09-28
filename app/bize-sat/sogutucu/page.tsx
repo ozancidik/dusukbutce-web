@@ -21,9 +21,11 @@ export default function CoolerPage() {
     brand: '',
     model: '',
     type: '',
-    fanSize: '',
+    size: '',
     description: '',
-    cosmeticCondition: 'Mükemmel',
+    mountingKit: '',
+    pumpIssue: '',
+    cosmeticCondition: '',
     hasBox: false,
     hasInvoice: false,
     hasWarranty: false,
@@ -159,7 +161,7 @@ export default function CoolerPage() {
         body: JSON.stringify({
           ...formData,
           category: 'cooler',
-          cosmeticCondition: formData.cosmeticCondition || 'Mükemmel'
+          cosmeticCondition: formData.cosmeticCondition
         }),
         signal: controller.signal
       });
@@ -183,9 +185,11 @@ export default function CoolerPage() {
           brand: '',
           model: '',
           type: '',
-          fanSize: '',
+          size: '',
           description: '',
-          cosmeticCondition: 'Mükemmel',
+          mountingKit: '',
+          pumpIssue: '',
+          cosmeticCondition: '',
           hasBox: false,
           hasInvoice: false,
           hasWarranty: false,
@@ -354,12 +358,10 @@ export default function CoolerPage() {
                 }}>
                   Tip *
                 </label>
-                <input
-                  type="text"
+                <select
                   required
                   value={formData.type}
                   onChange={(e) => handleInputChange('type', e.target.value)}
-                  placeholder="Örn: Hava Soğutucu, Sıvı Soğutucu"
                   style={{
                     width: '100%',
                     padding: '12px',
@@ -371,7 +373,11 @@ export default function CoolerPage() {
                   }}
                   onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
                   onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-                />
+                >
+                  <option value="">Seçin</option>
+                  <option value="Hava Soğutucu">Hava Soğutucu</option>
+                  <option value="Sıvı Soğutucu (AIO)">Sıvı Soğutucu (AIO)</option>
+                </select>
               </div>
               <div>
                 <label style={{
@@ -381,12 +387,12 @@ export default function CoolerPage() {
                   color: '#374151',
                   marginBottom: '6px'
                 }}>
-                  Fan Boyutu
+                  Fan / Radyatör Boyutu
                 </label>
                 <input
                   type="text"
-                  value={formData.fanSize}
-                  onChange={(e) => handleInputChange('fanSize', e.target.value)}
+                  value={formData.size}
+                  onChange={(e) => handleInputChange('size', e.target.value)}
                   placeholder="Örn: 120mm, 240mm, 360mm"
                   style={{
                     width: '100%',
@@ -477,10 +483,72 @@ export default function CoolerPage() {
                   onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
                   onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
                 >
+                  <option value="">Seçin</option>
                   <option value="Mükemmel">Mükemmel</option>
                   <option value="İyi">İyi</option>
                   <option value="Orta">Orta</option>
                   <option value="Kötü">Kötü</option>
+                </select>
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Sıvı Soğutucu: Pompa Sesi / Sızıntı Var mı?
+                </label>
+                <select
+                  value={formData.pumpIssue}
+                  onChange={(e) => handleInputChange('pumpIssue', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                >
+                  <option value="">Seçin</option>
+                  <option value="Hayır">Hayır</option>
+                  <option value="Evet">Evet</option>
+                  <option value="Hava soğutucu">Hava soğutucu</option>
+                </select>
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Montaj Aparatları / Soket Kitleri Dahil mi?
+                </label>
+                <select
+                  value={formData.mountingKit}
+                  onChange={(e) => handleInputChange('mountingKit', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                >
+                  <option value="">Seçin</option>
+                  <option value="Evet, tam">Evet, tam</option>
+                  <option value="Eksik var">Eksik var</option>
                 </select>
               </div>
               <div>

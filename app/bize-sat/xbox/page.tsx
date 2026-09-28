@@ -17,6 +17,8 @@ export default function XboxPage() {
   const [formData, setFormData] = useState({
     model: '',
     condition: '',
+    controllers: '',
+    stickDrift: '',
     cosmeticCondition: '',
     accessories: '',
     hasBox: false,
@@ -25,7 +27,6 @@ export default function XboxPage() {
     warrantyDuration: '',
     invoiceDate: '',
     quantity: 1,
-    color: '',
     images: [] as string[],
     description: ''
   });
@@ -91,9 +92,9 @@ export default function XboxPage() {
         },
         body: JSON.stringify({
           category: 'xbox',
-          brand: 'xbox',
+          brand: 'Microsoft',
           ...formData,
-          cosmeticCondition: formData.cosmeticCondition || 'Mükemmel'
+          cosmeticCondition: formData.cosmeticCondition
         }),
         signal: controller.signal
       });
@@ -117,6 +118,8 @@ export default function XboxPage() {
         setFormData({
           model: '',
           condition: '',
+          controllers: '',
+          stickDrift: '',
           cosmeticCondition: '',
           accessories: '',
           hasBox: false,
@@ -125,7 +128,6 @@ export default function XboxPage() {
           warrantyDuration: '',
           invoiceDate: '',
           quantity: 1,
-          color: '',
           images: [],
           description: ''
         });
@@ -269,7 +271,7 @@ export default function XboxPage() {
               color: '#374151',
               fontSize: isMobile ? '14px' : '16px'
             }}>
-              Durum *
+              Kullanım Durumu *
             </label>
             <select
               name="condition"
@@ -306,6 +308,7 @@ export default function XboxPage() {
               Kozmetik Durum
             </label>
             <select
+              required
               name="cosmeticCondition"
               value={formData.cosmeticCondition}
               onChange={(e) => handleInputChange('cosmeticCondition', e.target.value)}
@@ -325,6 +328,64 @@ export default function XboxPage() {
               <option value="İyi">İyi (Hafif kullanım izleri)</option>
               <option value="Orta">Orta (Görünür çizikler)</option>
               <option value="Kötü">Kötü (Çok çizikli)</option>
+            </select>
+          </div>
+          <div>
+            <label style={{
+              display: 'block',
+              marginBottom: '8px',
+              fontWeight: '600',
+              color: '#374151',
+              fontSize: isMobile ? '14px' : '16px'
+            }}>
+              Kol Sayısı
+            </label>
+            <select
+              value={formData.controllers}
+              onChange={(e) => handleInputChange('controllers', e.target.value)}
+              style={{
+                width: '100%',
+                padding: isMobile ? '12px' : '16px',
+                border: '2px solid #e5e7eb',
+                borderRadius: '8px',
+                fontSize: isMobile ? '14px' : '16px',
+                backgroundColor: 'white',
+                boxSizing: 'border-box'
+              }}
+            >
+              <option value="">Seçin</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+            </select>
+          </div>
+          <div>
+            <label style={{
+              display: 'block',
+              marginBottom: '8px',
+              fontWeight: '600',
+              color: '#374151',
+              fontSize: isMobile ? '14px' : '16px'
+            }}>
+              Kolda Stick Drift Var mı?
+            </label>
+            <select
+              value={formData.stickDrift}
+              onChange={(e) => handleInputChange('stickDrift', e.target.value)}
+              style={{
+                width: '100%',
+                padding: isMobile ? '12px' : '16px',
+                border: '2px solid #e5e7eb',
+                borderRadius: '8px',
+                fontSize: isMobile ? '14px' : '16px',
+                backgroundColor: 'white',
+                boxSizing: 'border-box'
+              }}
+            >
+              <option value="">Seçin</option>
+              <option value="Hayır">Hayır</option>
+              <option value="Evet">Evet</option>
             </select>
           </div>
 
@@ -382,32 +443,6 @@ export default function XboxPage() {
             />
           </div>
 
-          <div>
-            <label style={{
-              display: 'block',
-              marginBottom: '8px',
-              fontWeight: '600',
-              color: '#374151',
-              fontSize: isMobile ? '14px' : '16px'
-            }}>
-              Renk
-            </label>
-            <input
-              type="text"
-              name="color"
-              value={formData.color}
-              onChange={(e) => handleInputChange('color', e.target.value)}
-              placeholder="Örn: Siyah, Beyaz, Kırmızı"
-              style={{
-                width: '100%',
-                padding: isMobile ? '12px' : '16px',
-                border: '2px solid #e5e7eb',
-                borderRadius: '8px',
-                fontSize: isMobile ? '14px' : '16px',
-                boxSizing: 'border-box'
-              }}
-            />
-          </div>
 
           {/* Kutu, Fatura, Garanti Checkbox'ları */}
           <div style={{ gridColumn: isMobile ? '1' : '1 / -1' }}>

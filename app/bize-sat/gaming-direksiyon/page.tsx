@@ -22,7 +22,10 @@ export default function GamingWheelPage() {
     model: '',
     compatibility: '',
     description: '',
-    cosmeticCondition: 'Mükemmel',
+    pedal: '',
+    shifterIncluded: '',
+    forceFeedback: '',
+    cosmeticCondition: '',
     hasBox: false,
     hasInvoice: false,
     hasWarranty: false,
@@ -167,7 +170,7 @@ export default function GamingWheelPage() {
         body: JSON.stringify({
           ...formData,
           category: 'gaming-wheel',
-          cosmeticCondition: formData.cosmeticCondition || 'Mükemmel'
+          cosmeticCondition: formData.cosmeticCondition
         }),
         signal: controller.signal
       });
@@ -193,7 +196,10 @@ export default function GamingWheelPage() {
           model: '',
           compatibility: '',
           description: '',
-          cosmeticCondition: 'Mükemmel',
+          pedal: '',
+          shifterIncluded: '',
+          forceFeedback: '',
+          cosmeticCondition: '',
           hasBox: false,
           hasInvoice: false,
           hasWarranty: false,
@@ -381,7 +387,9 @@ export default function GamingWheelPage() {
                   <option value="">Seçin</option>
                   <option value="Bilgisayar">Bilgisayar</option>
                   <option value="Playstation">Playstation</option>
+                  <option value="Xbox">Xbox</option>
                   <option value="Bilgisayar+Playstation">Bilgisayar+Playstation</option>
+                  <option value="Bilgisayar+Xbox">Bilgisayar+Xbox</option>
                 </select>
               </div>
 
@@ -460,10 +468,102 @@ export default function GamingWheelPage() {
                   onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
                   onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
                 >
+                  <option value="">Seçin</option>
                   <option value="Mükemmel">Mükemmel</option>
                   <option value="İyi">İyi</option>
                   <option value="Orta">Orta</option>
                   <option value="Kötü">Kötü</option>
+                </select>
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Pedal Seti Dahil mi?
+                </label>
+                <select
+                  value={formData.pedal}
+                  onChange={(e) => handleInputChange('pedal', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                >
+                  <option value="">Seçin</option>
+                  <option value="Evet">Evet</option>
+                  <option value="Hayır">Hayır</option>
+                </select>
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Vites Kolu Dahil mi?
+                </label>
+                <select
+                  value={formData.shifterIncluded}
+                  onChange={(e) => handleInputChange('shifterIncluded', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                >
+                  <option value="">Seçin</option>
+                  <option value="Evet">Evet</option>
+                  <option value="Hayır">Hayır</option>
+                </select>
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Force Feedback Çalışıyor mu?
+                </label>
+                <select
+                  value={formData.forceFeedback}
+                  onChange={(e) => handleInputChange('forceFeedback', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                >
+                  <option value="">Seçin</option>
+                  <option value="Evet">Evet</option>
+                  <option value="Hayır">Hayır</option>
+                  <option value="Desteklemiyor">Desteklemiyor</option>
                 </select>
               </div>
               <div>

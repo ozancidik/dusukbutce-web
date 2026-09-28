@@ -19,6 +19,10 @@ export default function PlayStationPage() {
     brand: 'Sony',
     model: '',
     condition: '',
+    controllers: '',
+    stickDrift: '',
+    jailbreak: '',
+    firmware: '',
     cosmeticCondition: '',
     accessories: '',
     hasBox: false,
@@ -91,7 +95,7 @@ export default function PlayStationPage() {
         body: JSON.stringify({
           ...formData,
           category: 'playstation',
-          cosmeticCondition: formData.cosmeticCondition || 'Mükemmel'
+          cosmeticCondition: formData.cosmeticCondition
         }),
         signal: controller.signal
       });
@@ -117,6 +121,10 @@ export default function PlayStationPage() {
           brand: 'Sony',
           model: '',
           condition: '',
+          controllers: '',
+          stickDrift: '',
+          jailbreak: '',
+          firmware: '',
           cosmeticCondition: '',
           accessories: '',
           hasBox: false,
@@ -333,7 +341,7 @@ export default function PlayStationPage() {
               color: '#374151',
               fontSize: isMobile ? '14px' : '16px'
             }}>
-              Durum *
+              Kullanım Durumu *
             </label>
             <select
               name="condition"
@@ -392,6 +400,118 @@ export default function PlayStationPage() {
               <option value="Kötü">Kötü (Çok çizikli)</option>
             </select>
           </div>
+          <div>
+            <label style={{
+              display: 'block',
+              marginBottom: '8px',
+              fontWeight: '600',
+              color: '#374151',
+              fontSize: isMobile ? '14px' : '16px'
+            }}>
+              Jailbreak / Modlu mu?
+            </label>
+            <select
+              value={formData.jailbreak}
+              onChange={(e) => handleInputChange('jailbreak', e.target.value)}
+              style={{
+                width: '100%',
+                padding: isMobile ? '12px' : '16px',
+                border: '2px solid #e5e7eb',
+                borderRadius: '8px',
+                fontSize: isMobile ? '14px' : '16px',
+                backgroundColor: 'white',
+                boxSizing: 'border-box'
+              }}
+            >
+              <option value="">Seçin</option>
+              <option value="Hayır">Hayır</option>
+              <option value="Evet">Evet</option>
+            </select>
+          </div>
+          <div>
+            <label style={{
+              display: 'block',
+              marginBottom: '8px',
+              fontWeight: '600',
+              color: '#374151',
+              fontSize: isMobile ? '14px' : '16px'
+            }}>
+              Firmware Sürümü
+            </label>
+            <input
+              type="text"
+              value={formData.firmware}
+              onChange={(e) => handleInputChange('firmware', e.target.value)}
+              placeholder="Bilmiyorsanız boş bırakın"
+              style={{
+                width: '100%',
+                padding: isMobile ? '12px' : '16px',
+                border: '2px solid #e5e7eb',
+                borderRadius: '8px',
+                fontSize: isMobile ? '14px' : '16px',
+                backgroundColor: 'white',
+                boxSizing: 'border-box'
+              }}
+            />
+          </div>
+          <div>
+            <label style={{
+              display: 'block',
+              marginBottom: '8px',
+              fontWeight: '600',
+              color: '#374151',
+              fontSize: isMobile ? '14px' : '16px'
+            }}>
+              Kol Sayısı
+            </label>
+            <select
+              value={formData.controllers}
+              onChange={(e) => handleInputChange('controllers', e.target.value)}
+              style={{
+                width: '100%',
+                padding: isMobile ? '12px' : '16px',
+                border: '2px solid #e5e7eb',
+                borderRadius: '8px',
+                fontSize: isMobile ? '14px' : '16px',
+                backgroundColor: 'white',
+                boxSizing: 'border-box'
+              }}
+            >
+              <option value="">Seçin</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+            </select>
+          </div>
+          <div>
+            <label style={{
+              display: 'block',
+              marginBottom: '8px',
+              fontWeight: '600',
+              color: '#374151',
+              fontSize: isMobile ? '14px' : '16px'
+            }}>
+              Kolda Stick Drift Var mı?
+            </label>
+            <select
+              value={formData.stickDrift}
+              onChange={(e) => handleInputChange('stickDrift', e.target.value)}
+              style={{
+                width: '100%',
+                padding: isMobile ? '12px' : '16px',
+                border: '2px solid #e5e7eb',
+                borderRadius: '8px',
+                fontSize: isMobile ? '14px' : '16px',
+                backgroundColor: 'white',
+                boxSizing: 'border-box'
+              }}
+            >
+              <option value="">Seçin</option>
+              <option value="Hayır">Hayır</option>
+              <option value="Evet">Evet</option>
+            </select>
+          </div>
 
           <div>
             <label style={{
@@ -448,10 +568,9 @@ export default function PlayStationPage() {
             >
               <option value="">Depolama kapasitesi seçin</option>
               <option value="825GB">825GB (PS5 Standart)</option>
-              <option value="1TB">1TB</option>
+              <option value="1TB">1TB (PS5 / PS4 Pro)</option>
               <option value="2TB">2TB</option>
               <option value="500GB">500GB (PS4)</option>
-              <option value="1TB">1TB (PS4 Pro)</option>
               <option value="Bilinmiyor">Bilinmiyor</option>
             </select>
           </div>

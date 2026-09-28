@@ -14,6 +14,7 @@ import { useAdminState } from './hooks/useAdminState';
 import { fetchSubmissions, submitAction, deleteAllSubmissions, deleteSingleSubmission, formatDate } from './utils/api';
 import { Submission } from './types';
 
+import { SUBMISSION_CATEGORIES, normalizeCategory } from '@/lib/categories';
 export default function AdminPage() {
   const {
     // Data
@@ -204,7 +205,7 @@ export default function AdminPage() {
   // Filtrelenmiş submission'ları hesapla
   const filteredSubmissions = selectedCategory === 'all' 
     ? submissions 
-    : submissions.filter(submission => submission.category === selectedCategory);
+    : submissions.filter(submission => normalizeCategory(submission.category) === selectedCategory);
 
 
   const handleAction = (submission: Submission, action: 'offer' | 'listing' | 'reject' | 'delivery_completed' | 'confirm_payment' | 'approve_cancellation' | 'reject_cancellation') => {
@@ -912,21 +913,9 @@ export default function AdminPage() {
               }}
             >
               <option value="all">Tüm Kategoriler</option>
-              <option value="notebook">Dizüstü Bilgisayar</option>
-              <option value="desktop">Masaüstü Bilgisayar</option>
-              <option value="graphics-card">Ekran Kartı</option>
-              <option value="processor">İşlemci</option>
-              <option value="monitor">Monitör</option>
-              <option value="keyboard">Klavye</option>
-              <option value="mouse">Fare</option>
-              <option value="headphones">Kulaklık</option>
-              <option value="ram">RAM</option>
-              <option value="ssd">SSD</option>
-              <option value="tablet">Tablet</option>
-              <option value="audio-system">Ses Sistemi</option>
-              <option value="case">Kasa</option>
-              <option value="cooler">Soğutucu</option>
-              <option value="gaming-wheel">Gaming Direksiyon</option>
+              {SUBMISSION_CATEGORIES.map((c) => (
+                <option key={c.id} value={c.id}>{c.label}</option>
+              ))}
             </select>
             <span style={{
               fontSize: isMobile ? '12px' : '14px',

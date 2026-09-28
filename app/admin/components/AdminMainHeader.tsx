@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { SUBMISSION_CATEGORIES } from '@/lib/categories';
 interface AdminMainHeaderProps {
   isMobile: boolean;
   filteredSubmissions: any[];
@@ -102,24 +103,9 @@ export default function AdminMainHeader({
             }}
           >
             <option value="all">Tüm Kategoriler</option>
-            <option value="notebook">Notebook</option>
-            <option value="graphics-card">Ekran Kartı</option>
-            <option value="processor">İşlemci</option>
-            <option value="ram">RAM</option>
-            <option value="ssd">SSD</option>
-            <option value="monitor">Monitor</option>
-            <option value="mouse">Mouse</option>
-            <option value="keyboard">Klavye</option>
-            <option value="case">Kasa</option>
-            <option value="desktop">Masaüstü</option>
-            <option value="gaming-wheel">Gaming Direksiyon</option>
-            <option value="steering-wheel">Direksiyon</option>
-            <option value="xbox">Xbox</option>
-            <option value="playstation">PlayStation</option>
-            <option value="tablet">Tablet</option>
-            <option value="headphones">Kulaklık</option>
-            <option value="audio-system">Ses Sistemi</option>
-            <option value="cooler">Soğutucu</option>
+            {SUBMISSION_CATEGORIES.map((c) => (
+              <option key={c.id} value={c.id}>{c.label}</option>
+            ))}
           </select>
 
           {/* Tümünü Sil Butonu */}

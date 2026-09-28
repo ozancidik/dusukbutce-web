@@ -4,10 +4,12 @@ import React from 'react';
 interface PrinterTechnicalSpecsProps {
   isMobile: boolean;
   formData: {
+    multifunction: string;
+    paperSize: string;
+    usageType: string;
     type: string;
-    color: string;
-    connectionType: string;
-    printSpeed: string;
+    printColor: string;
+    connectivity: string;
     resolution: string;
     description: string;
   };
@@ -40,7 +42,7 @@ export default function PrinterTechnicalSpecs({ isMobile, formData, handleInputC
             color: '#374151',
             marginBottom: '6px'
           }}>
-            Yazıcı Tipi *
+            Yazıcı Teknolojisi *
           </label>
           <select
             required
@@ -59,14 +61,12 @@ export default function PrinterTechnicalSpecs({ isMobile, formData, handleInputC
             onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
           >
             <option value="">Seçiniz</option>
-            <option value="Laser Yazıcı">Laser Yazıcı</option>
-            <option value="Mürekkep Püskürtmeli">Mürekkep Püskürtmeli</option>
             <option value="Lazer Yazıcı">Lazer Yazıcı</option>
-            <option value="Multifonksiyon">Multifonksiyon</option>
-            <option value="A3 Yazıcı">A3 Yazıcı</option>
-            <option value="A4 Yazıcı">A4 Yazıcı</option>
-            <option value="Taşınabilir">Taşınabilir</option>
-            <option value="Büro Tipi">Büro Tipi</option>
+            <option value="Mürekkep Püskürtmeli">Mürekkep Püskürtmeli</option>
+            <option value="Mürekkep Tanklı">Mürekkep Tanklı</option>
+            <option value="Nokta Vuruşlu">Nokta Vuruşlu</option>
+            <option value="Termal">Termal</option>
+            <option value="Diğer">Diğer</option>
           </select>
         </div>
         <div>
@@ -77,11 +77,102 @@ export default function PrinterTechnicalSpecs({ isMobile, formData, handleInputC
             color: '#374151',
             marginBottom: '6px'
           }}>
-            Renk
+            Çok İşlevli mi? (yazıcı + tarayıcı + fotokopi)
           </label>
           <select
-            value={formData.color}
-            onChange={(e) => handleInputChange('color', e.target.value)}
+            value={formData.multifunction}
+            onChange={(e) => handleInputChange('multifunction', e.target.value)}
+            style={{
+              width: '100%',
+              padding: '12px',
+              border: '1px solid #d1d5db',
+              borderRadius: '8px',
+              fontSize: '14px',
+              outline: 'none',
+              transition: 'border-color 0.2s'
+            }}
+            onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+            onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+          >
+            <option value="">Seçin</option>
+            <option value="Evet">Evet</option>
+            <option value="Hayır">Hayır</option>
+          </select>
+        </div>
+        <div>
+          <label style={{
+            display: 'block',
+            fontSize: '14px',
+            fontWeight: '500',
+            color: '#374151',
+            marginBottom: '6px'
+          }}>
+            Kağıt Boyutu
+          </label>
+          <select
+            value={formData.paperSize}
+            onChange={(e) => handleInputChange('paperSize', e.target.value)}
+            style={{
+              width: '100%',
+              padding: '12px',
+              border: '1px solid #d1d5db',
+              borderRadius: '8px',
+              fontSize: '14px',
+              outline: 'none',
+              transition: 'border-color 0.2s'
+            }}
+            onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+            onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+          >
+            <option value="">Seçin</option>
+            <option value="A4">A4</option>
+            <option value="A3">A3</option>
+          </select>
+        </div>
+        <div>
+          <label style={{
+            display: 'block',
+            fontSize: '14px',
+            fontWeight: '500',
+            color: '#374151',
+            marginBottom: '6px'
+          }}>
+            Kullanım Tipi
+          </label>
+          <select
+            value={formData.usageType}
+            onChange={(e) => handleInputChange('usageType', e.target.value)}
+            style={{
+              width: '100%',
+              padding: '12px',
+              border: '1px solid #d1d5db',
+              borderRadius: '8px',
+              fontSize: '14px',
+              outline: 'none',
+              transition: 'border-color 0.2s'
+            }}
+            onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+            onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+          >
+            <option value="">Seçin</option>
+            <option value="Ev / Küçük ofis">Ev / Küçük ofis</option>
+            <option value="Büro">Büro</option>
+            <option value="Taşınabilir">Taşınabilir</option>
+          </select>
+        </div>
+        <div>
+          <label style={{
+            display: 'block',
+            fontSize: '14px',
+            fontWeight: '500',
+            color: '#374151',
+            marginBottom: '6px'
+          }}>
+            Baskı Rengi
+          </label>
+          <select
+            value={formData.printColor}
+            onChange={(e) => handleInputChange('printColor', e.target.value)}
             style={{
               width: '100%',
               padding: '12px',
@@ -111,8 +202,8 @@ export default function PrinterTechnicalSpecs({ isMobile, formData, handleInputC
             Bağlantı Türü
           </label>
           <select
-            value={formData.connectionType}
-            onChange={(e) => handleInputChange('connectionType', e.target.value)}
+            value={formData.connectivity}
+            onChange={(e) => handleInputChange('connectivity', e.target.value)}
             style={{
               width: '100%',
               padding: '12px',
@@ -134,34 +225,6 @@ export default function PrinterTechnicalSpecs({ isMobile, formData, handleInputC
             <option value="WiFi + Ethernet">WiFi + Ethernet</option>
             <option value="Bluetooth">Bluetooth</option>
           </select>
-        </div>
-        <div>
-          <label style={{
-            display: 'block',
-            fontSize: '14px',
-            fontWeight: '500',
-            color: '#374151',
-            marginBottom: '6px'
-          }}>
-            Yazdırma Hızı
-          </label>
-          <input
-            type="text"
-            value={formData.printSpeed}
-            onChange={(e) => handleInputChange('printSpeed', e.target.value)}
-            placeholder="Örn: 20 sayfa/dk, 25 ppm"
-            style={{
-              width: '100%',
-              padding: '12px',
-              border: '1px solid #d1d5db',
-              borderRadius: '8px',
-              fontSize: '14px',
-              outline: 'none',
-              transition: 'border-color 0.2s'
-            }}
-            onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-            onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-          />
         </div>
         <div>
           <label style={{
