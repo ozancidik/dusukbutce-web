@@ -36,12 +36,22 @@ Yeni şema alanları (13): pinDamage, driveHealth, clickIssue, controllers, stic
 - **Xbox base64 maddesi geçersiz:** 23 sayfanın 23'ü `uploadImage` (URL) kullanıyor. `formHelpers.ts`'teki hiç import edilmeyen base64 `handleImageUpload`/`removeImage`/`validateForm` silindi.
 - **Yapılmadı (bilinçli):** stok/urunler admin sayfalarındaki ürün kataloğu kategori listeleri (ayrı alan), site geneli ölü kod adayları (aşağıda), mevcut DB kayıtlarının kategori/kozmetik taşınması.
 
-### Silinmeyen ölü kod adayları (75 dosya, import grafiğine göre; onay bekliyor)
-`app/admin` (17: fiyat/gorsel/kategori components), `app/components` (10: header/*), `app/favoriler` (7), `app/iletisim` (5), `app/karsilastir` (7), `app/satin-al` (7), `app/sifre-sifirla` (5), `app/tekliflerim` (7), `app/teknik-servis` (5), `app/login.tsx`, `app/products.tsx`, `app/register.tsx`, `app/register/components`, `models/NotebookSubmission.ts`. Analizin yanlış pozitifi olabilir; silmeden önce `next build` ve elle bakış gerekir.
+### Site geneli ölü kod silindi (`9c673e7`, 75 dosya)
+Önceki turda listelenen adaylar silindi: admin fiyat/gorsel/kategori components, `components/header/*`, favoriler, iletisim, karsilastir, satin-al/notebook, sifre-sifirla, tekliflerim, teknik-servis alt bileşenleri, kök `login.tsx`/`products.tsx`/`register.tsx`, `register/components/SocialLoginButtons` (gerçeği `login/components/`'ta), `models/NotebookSubmission.ts`. Doğrulama: import grafiği + ikinci bağımsız yol-anması taraması (6 yanlış alarm elendi: alt metin, URL metni, admin'in kendi `../types`'ı); tsc temiz; vitest 106/106; **CI ile aynı sahte ortamla yerel `next build` başarılı**.
+
+### Tarayıcı testi (izole Mongo + gerçek oturum)
+Ortam: Docker `mongo:7` (127.0.0.1), projenin `scripts/seed-e2e.js` seed kullanıcıları, `GMAIL_USER`/`GMAIL_APP_PASSWORD`/`BLOB_READ_WRITE_TOKEN` sahte değerlerle (prod DB'ye, gerçek posta kutusuna ve blob deposuna erişim yok). Test sonunda sunucu ve konteyner silindi.
+- **Giriş**: normal ve admin hesabı çalışıyor; admin `/admin`'e yönleniyor.
+- **Mouse** (ortak handler): kozmetik boşken gönderim tarayıcı doğrulamasıyla engellendi; garanti işaretlenip süre seçilip **işaret kaldırılınca `warrantyDuration` DB'de yok**; tüm alanlar (bağlantı, DPI, tık sorunu) kaydedildi.
+- **Cep telefonu** (`/api/submissions`): RAM boş (opsiyonel) gönderildi; `registrationType`, hesap kilidi, parça değişimi, Face ID, pil kaydedildi; `screenSize`/`color` kaydedilmedi.
+- **Admin**: filtrede 4 yeni kategori doğru etiketle; filtre seçilince yalnızca telefon kaydı kaldı; kayıt "Cep Telefonu" etiketiyle görünüyor (ham id yok); detay modalında Hesap Kilidi/Parça Değişimi/Face ID/Kayıt Türü var.
+- **Open-redirect (#22)**: `//evil…` ve mutlak URL `returnUrl`'ları yok sayılıp `/`'a düşüyor, `/bize-sat/mouse` izleniyor.
+- Denenmedi: notebook ve diğer kategorilerin tarayıcıdan gerçek gönderimi (entegrasyon testleriyle kapsanıyor), yazıcı/fotokopi formu gönderimi.
+- **Olay**: ilk gönderimde `sendNewSubmissionNotificationToAdmin` kendi transporter'ını parola uzunluk kontrolü olmadan kuruyor; 4 karakterlik sahte parola kullanıldı ve Gmail SMTP'ye gerçek `GMAIL_USER` adına sahte parolayla giriş denendi (`EAUTH`, reddedildi; e-posta gitmedi, gerçek parola kullanılmadı). Sonraki turlarda `GMAIL_USER` da sahte adrese çevrildi. Not: `lib/email.ts:266-280`'deki bu transporter `getTransporter()`'daki kontrolü atlıyor (ayrı iş).
 
 ## Doğrulama
 - `tsc` kaynak kodda 0 hata (`.next/types` altındaki iCloud " 3.ts" kopyaları hariç; izlenmiyor).
-- `vitest`: 106/106 (Faz D sonrası). Yeni `lib/handleProductSubmission.integration.test.ts` (bellekte MongoDB, `@/lib/email` mock'lu — `.env.local` gerçek SMTP içerdiği için) 34 test: Faz A eşlemeleri, atılan alanların kaydedilmemesi, Faz B'nin 13 kategorisi.
+- `vitest`: 106/106 (Faz D + ölü kod sonrası). Yeni `lib/handleProductSubmission.integration.test.ts` (bellekte MongoDB, `@/lib/email` mock'lu — `.env.local` gerçek SMTP içerdiği için) 34 test: Faz A eşlemeleri, atılan alanların kaydedilmemesi, Faz B'nin 13 kategorisi.
 - Tarayıcıda (izole dev sunucusu, ölü `MONGODB_URI`): 14 sayfa 200, etiketler render oluyor, `cep-telefonu` ve `gaming-direksiyon` görsel kontrol edildi. Form gönderimi tarayıcıdan denenmedi (giriş gerekiyor); kayıt yolu entegrasyon testiyle doğrulandı.
 
 ## Yapılmayanlar / riskler
