@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { safeReturnUrl } from "@/lib/safeReturnUrl";
 import { useAuth } from "./hooks/useAuth";
 import { useOAuth } from "./hooks/useOAuth";
 import { useLoginForm } from "./hooks/useLoginForm";
@@ -111,7 +112,7 @@ export default function LoginPage() {
               sessionStorage.setItem("adminToken", tokenFromUrl);
             }
             
-            const returnUrl = urlParams.get('returnUrl') || '/';
+            const returnUrl = safeReturnUrl(urlParams.get('returnUrl'));
             window.history.replaceState({}, '', '/login');
             
             window.dispatchEvent(new Event('localStorageChange'));

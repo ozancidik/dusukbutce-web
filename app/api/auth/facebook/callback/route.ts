@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import jwt from 'jsonwebtoken';
 import { authCookieString } from '@/lib/cookies';
 import { upsertOAuthUser } from '@/lib/oauthUser';
+import { safeReturnUrl } from '@/lib/safeReturnUrl';
 
 export async function GET(request: NextRequest) {
   // Base URL belirleme - production ve localhost için ayrı
@@ -116,7 +117,7 @@ export async function GET(request: NextRequest) {
   if (state) {
     try {
       const stateData = JSON.parse(decodeURIComponent(state));
-      returnUrl = stateData.returnUrl || '/profile';
+      returnUrl = safeReturnUrl(stateData.returnUrl, '/profile');
       stateNonce = stateData.nonce;
     } catch (e) {
       console.error('State parse error:', e);
