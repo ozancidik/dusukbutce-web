@@ -96,18 +96,14 @@ export interface Submission {
   latency?: string;
   ramFormFactor?: string;
   // SSD özel alanları
-  readSpeed?: string;
-  writeSpeed?: string;
   // Mouse özel alanları
   connectivity?: string;
   color?: string;
   // Klavye özel alanları
   switchType?: string;
   layout?: string;
-  rgb?: string;
   // Kasa özel alanları
   size?: string;
-  material?: string;
   powerSupplyWatt?: string;
   // Masaüstü özel alanları
   powerSupply?: string;
@@ -147,7 +143,6 @@ export interface Submission {
   // Gaming direksiyon özel alanları
   compatibility?: string;
   // Direksiyon özel alanları
-  platform?: string;
   // Xbox özel alanları
   customerResponse?: {
     action: 'accepted' | 'rejected';
@@ -158,63 +153,21 @@ export interface Submission {
   // PlayStation/Xbox alanları
   firmware?: string;
   jailbreak?: string;
-  games?: string;
-  controller?: string;
-  cable?: string;
-  adapter?: string;
   // İşlemci alanları
   socket?: string;
-  coreCount?: string;
-  threadCount?: string;
-  baseFrequency?: string;
-  boostFrequency?: string;
-  tdp?: string;
-  process?: string;
   cache?: string;
   // RAM alanları
-  timing?: string;
-  voltage?: string;
-  cooler?: string;
   // SSD alanları
-  iops?: string;
-  tbw?: string;
-  mtbf?: string;
   // Monitör alanları
-  colorGamut?: string;
-  brightness?: string;
-  contrast?: string;
-  viewingAngle?: string;
-  sync?: string;
   // Klavye alanları
-  mechanical?: string;
-  wireless?: string;
-  bluetooth?: string;
-  batteryLife?: string;
   // Mouse alanları
   dpi?: string;
-  pollingRate?: string;
-  sensor?: string;
   // Kulaklık alanları
-  driverSize?: string;
-  frequencyRange?: string;
-  impedance?: string;
-  soundPressure?: string;
-  microphone?: string;
   // Tablet alanları
-  operatingSystem?: string;
-  camera?: string;
-  gps?: string;
   // Ses Sistemi alanları
   power?: string;
-  usb?: string;
   // Kasa alanları
-  formFactor?: string;
-  fanCount?: string;
-  usbPorts?: string;
   // Soğutucu alanları
-  socketCompatibility?: string;
-  fanSize?: string;
-  liquidCooling?: string;
   // Gaming Direksiyon alanları
   forceFeedback?: string;
   pedal?: string;
