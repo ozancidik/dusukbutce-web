@@ -45,21 +45,22 @@
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
     "@playwright/test": "^1.63.0",
+    "@storybook/addon-a11y": "^10.6.0",
+    "@storybook/addon-docs": "^10.6.0",
+    "@storybook/addon-onboarding": "^10.6.0",
+    "@storybook/nextjs": "^10.6.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
+    "@usebruno/cli": "^4.2.0",
     "mongodb-memory-server": "^11.2.0",
     "msw": "^2.15.0",
     "playwright": "^1.62.1",
     "prettier": "3.9.9",
+    "storybook": "^10.6.0",
     "tailwindcss": "^4",
     "typescript": "^5",
-    "vitest": "^4.1.11",
-    "storybook": "^10.6.0",
-    "@storybook/nextjs": "^10.6.0",
-    "@storybook/addon-a11y": "^10.6.0",
-    "@storybook/addon-docs": "^10.6.0",
-    "@storybook/addon-onboarding": "^10.6.0"
+    "vitest": "^4.1.11"
   }
 }
