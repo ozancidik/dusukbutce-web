@@ -12,13 +12,17 @@
     "start": "next start -p 3000",
     "dev:build": "next build && next start -p 3000",
     "lint": "next lint",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "seed:e2e": "tsx scripts/seed-e2e.js",
     "setup": "npm install",
     "run:dev": "npm run setup && npm run dev",
-    "crawl-audit": "node scripts/crawl-audit.mjs"
+    "crawl-audit": "node scripts/crawl-audit.mjs",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@sentry/nextjs": "^10.1.0",
@@ -39,15 +43,23 @@
     "vercel": "^48.0.0"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
     "mongodb-memory-server": "^11.2.0",
+    "msw": "^2.15.0",
     "playwright": "^1.62.1",
+    "prettier": "3.9.9",
     "tailwindcss": "^4",
     "typescript": "^5",
-    "vitest": "^4.1.11"
+    "vitest": "^4.1.11",
+    "storybook": "^10.6.0",
+    "@storybook/nextjs": "^10.6.0",
+    "@storybook/addon-a11y": "^10.6.0",
+    "@storybook/addon-docs": "^10.6.0",
+    "@storybook/addon-onboarding": "^10.6.0"
   }
 }

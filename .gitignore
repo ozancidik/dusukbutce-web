@@ -52,3 +52,6 @@ yarn-error.log*
 playwright-report/
 test-results/
 tests/.auth/
+
+*storybook.log
+storybook-static
