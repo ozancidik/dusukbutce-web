@@ -1,0 +1,28 @@
+meta {
+  name: Send Contact Message
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/contact
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Test Kullanıcı",
+    "email": "test@example.com",
+    "subject": "Bruno test mesajı",
+    "message": "Bu, Bruno koleksiyonunun çalıştığını doğrulamak için gönderilen bir test mesajıdır."
+  }
+}
+
+docs {
+  Public — iletişim formu. name/email/subject/message zorunlu, hepsi trim
+  edilip kaydediliyor. Rate limit: 15 dakikada 5 istek (checkRateLimit).
+
+  DİKKAT: prod'a karşı çalıştırırsan gerçek bir e-posta bildirimi
+  (sendContactNotification) tetiklenir — sık çalıştırma.
+}

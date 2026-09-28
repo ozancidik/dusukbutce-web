@@ -1,0 +1,16 @@
+meta {
+  name: Get Listings
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/listings
+  body: none
+  auth: none
+}
+
+docs {
+  Public — satılık ilanları döner. Ana sayfa slider'ının ve /satilik-ilanlar
+  sayfasının kullandığı uç. Kimlik doğrulama gerekmez.
+}

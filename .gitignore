@@ -55,3 +55,6 @@ tests/.auth/
 
 *storybook.log
 storybook-static
+
+# Bruno: gerçek prod kimlik bilgileri içerebilecek yerel ortam dosyaları
+bruno/**/environments/prod*.bru
