@@ -6,6 +6,20 @@ import SubmissionPopup from '../../../components/SubmissionPopup';
 import LoginRequiredCard from '../components/LoginRequiredCard';
 import { uploadImage } from '@/lib/uploadImage';
 
+const GAMEPAD_BRANDS: Record<string, string> = {
+  'PlayStation DualSense': 'Sony',
+  'PlayStation DualShock 4': 'Sony',
+  'Xbox Elite Controller': 'Microsoft',
+  'Xbox Wireless Controller': 'Microsoft',
+  'Nintendo Switch Pro Controller': 'Nintendo',
+  'Nintendo Joy-Con': 'Nintendo',
+  'Steam Controller': 'Valve',
+  'Logitech Gamepad': 'Logitech',
+  'Razer Gamepad': 'Razer',
+  'Thrustmaster Joystick': 'Thrustmaster',
+  'Saitek Joystick': 'Saitek',
+};
+
 export default function GamepadPage() {
   const [isMobile, setIsMobile] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -15,9 +29,11 @@ export default function GamepadPage() {
   const [popupMessage, setPopupMessage] = useState('');
   const [submissionNumber, setSubmissionNumber] = useState('');
   const [formData, setFormData] = useState({
+    customModel: '',
     model: '',
     condition: '',
     stickDrift: '',
+    batteryHealth: '',
     cosmeticCondition: '',
     accessories: '',
     hasBox: false,
@@ -92,8 +108,9 @@ export default function GamepadPage() {
         },
         body: JSON.stringify({
           category: 'gamepad',
-          brand: 'Gamepad',
+          brand: GAMEPAD_BRANDS[formData.model] || 'Diğer',
           ...formData,
+          model: formData.model === 'Diğer' ? formData.customModel.trim() || 'Diğer' : formData.model,
           cosmeticCondition: formData.cosmeticCondition || 'Mükemmel'
         }),
         signal: controller.signal
@@ -116,9 +133,11 @@ export default function GamepadPage() {
         localStorage.removeItem('gamepadFormData');
         
         setFormData({
+          customModel: '',
           model: '',
           condition: '',
           stickDrift: '',
+          batteryHealth: '',
           cosmeticCondition: '',
           accessories: '',
           hasBox: false,
@@ -266,6 +285,35 @@ export default function GamepadPage() {
               <option value="Diğer">Diğer</option>
             </select>
           </div>
+          {formData.model === 'Diğer' && (
+            <div>
+              <label style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontWeight: '600',
+                color: '#374151',
+                fontSize: isMobile ? '14px' : '16px'
+              }}>
+                Model Adı *
+              </label>
+              <input
+                type="text"
+                required
+                value={formData.customModel}
+                onChange={(e) => handleInputChange('customModel', e.target.value)}
+                placeholder="Gamepad / joystick modelini yazın"
+                style={{
+                  width: '100%',
+                  padding: isMobile ? '12px' : '16px',
+                  border: '2px solid #e5e7eb',
+                  borderRadius: '8px',
+                  fontSize: isMobile ? '14px' : '16px',
+                  backgroundColor: 'white',
+                  boxSizing: 'border-box'
+                }}
+              />
+            </div>
+          )}
 
           <div>
             <label style={{
@@ -275,7 +323,7 @@ export default function GamepadPage() {
               color: '#374151',
               fontSize: isMobile ? '14px' : '16px'
             }}>
-              Durum *
+              Kullanım Durumu *
             </label>
             <select
               name="condition"
@@ -336,10 +384,39 @@ export default function GamepadPage() {
           <div>
             <label style={{
               display: 'block',
-              fontSize: '14px',
-              fontWeight: '500',
+              marginBottom: '8px',
+              fontWeight: '600',
               color: '#374151',
-              marginBottom: '6px'
+              fontSize: isMobile ? '14px' : '16px'
+            }}>
+              Pil Durumu
+            </label>
+            <select
+              value={formData.batteryHealth}
+              onChange={(e) => handleInputChange('batteryHealth', e.target.value)}
+              style={{
+                width: '100%',
+                padding: isMobile ? '12px' : '16px',
+                border: '2px solid #e5e7eb',
+                borderRadius: '8px',
+                fontSize: isMobile ? '14px' : '16px',
+                backgroundColor: 'white',
+                boxSizing: 'border-box'
+              }}
+            >
+              <option value="">Seçin</option>
+              <option value="İyi">İyi</option>
+              <option value="Zayıf">Zayıf</option>
+              <option value="Kablolu / pilsiz">Kablolu / pilsiz</option>
+            </select>
+          </div>
+          <div>
+            <label style={{
+              display: 'block',
+              marginBottom: '8px',
+              fontWeight: '600',
+              color: '#374151',
+              fontSize: isMobile ? '14px' : '16px'
             }}>
               Stick Drift Var mı?
             </label>
@@ -348,15 +425,13 @@ export default function GamepadPage() {
               onChange={(e) => handleInputChange('stickDrift', e.target.value)}
               style={{
                 width: '100%',
-                padding: '12px',
-                border: '1px solid #d1d5db',
+                padding: isMobile ? '12px' : '16px',
+                border: '2px solid #e5e7eb',
                 borderRadius: '8px',
-                fontSize: '14px',
-                outline: 'none',
-                transition: 'border-color 0.2s'
+                fontSize: isMobile ? '14px' : '16px',
+                backgroundColor: 'white',
+                boxSizing: 'border-box'
               }}
-              onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-              onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
             >
               <option value="">Seçin</option>
               <option value="Hayır">Hayır</option>

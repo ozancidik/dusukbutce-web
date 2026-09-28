@@ -26,6 +26,9 @@ export default function TabletPage() {
     description: '',
     accountLock: '',
     batteryHealth: '',
+    accessories: '',
+    screenStatus: '',
+    deadPixelCount: '',
     cosmeticCondition: 'Mükemmel',
     hasBox: false,
     hasInvoice: false,
@@ -191,6 +194,9 @@ export default function TabletPage() {
           description: '',
           accountLock: '',
           batteryHealth: '',
+          accessories: '',
+          screenStatus: '',
+          deadPixelCount: '',
           cosmeticCondition: 'Mükemmel',
           hasBox: false,
           hasInvoice: false,
@@ -388,11 +394,9 @@ export default function TabletPage() {
                 }}>
                   Depolama
                 </label>
-                <input
-                  type="text"
+                <select
                   value={formData.storage}
                   onChange={(e) => handleInputChange('storage', e.target.value)}
-                  placeholder="Örn: 128GB, 256GB, 512GB"
                   style={{
                     width: '100%',
                     padding: '12px',
@@ -404,7 +408,16 @@ export default function TabletPage() {
                   }}
                   onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
                   onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-                />
+                >
+                  <option value="">Seçin</option>
+                  <option value="32GB">32GB</option>
+                  <option value="64GB">64GB</option>
+                  <option value="128GB">128GB</option>
+                  <option value="256GB">256GB</option>
+                  <option value="512GB">512GB</option>
+                  <option value="1TB">1TB</option>
+                  <option value="2TB">2TB</option>
+                </select>
               </div>
               <div>
                 <label style={{
@@ -514,6 +527,98 @@ export default function TabletPage() {
                   <option value="Orta">Orta</option>
                   <option value="Kötü">Kötü</option>
                 </select>
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Kalem / Klavye Dahil mi?
+                </label>
+                <select
+                  value={formData.accessories}
+                  onChange={(e) => handleInputChange('accessories', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                >
+                  <option value="">Seçin</option>
+                  <option value="Kalem ve klavye dahil">Kalem ve klavye dahil</option>
+                  <option value="Sadece kalem">Sadece kalem</option>
+                  <option value="Sadece klavye">Sadece klavye</option>
+                  <option value="Hiçbiri">Hiçbiri</option>
+                </select>
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Ekran Durumu
+                </label>
+                <select
+                  value={formData.screenStatus}
+                  onChange={(e) => handleInputChange('screenStatus', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                >
+                  <option value="">Seçin</option>
+                  <option value="Sorunsuz">Sorunsuz</option>
+                  <option value="Hafif çizik / leke">Hafif çizik / leke</option>
+                  <option value="Belirgin çizik / leke">Belirgin çizik / leke</option>
+                  <option value="Kırık / çatlak">Kırık / çatlak</option>
+                </select>
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Ölü / Sıkışmış Piksel Sayısı
+                </label>
+                <input
+                  type="text"
+                  value={formData.deadPixelCount}
+                  onChange={(e) => handleInputChange('deadPixelCount', e.target.value)}
+                  placeholder="Yoksa 0"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                />
               </div>
               <div>
                 <label style={{

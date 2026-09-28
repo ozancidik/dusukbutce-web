@@ -21,6 +21,8 @@ export default function PlayStationPage() {
     condition: '',
     controllers: '',
     stickDrift: '',
+    jailbreak: '',
+    firmware: '',
     cosmeticCondition: '',
     accessories: '',
     hasBox: false,
@@ -121,6 +123,8 @@ export default function PlayStationPage() {
           condition: '',
           controllers: '',
           stickDrift: '',
+          jailbreak: '',
+          firmware: '',
           cosmeticCondition: '',
           accessories: '',
           hasBox: false,
@@ -337,7 +341,7 @@ export default function PlayStationPage() {
               color: '#374151',
               fontSize: isMobile ? '14px' : '16px'
             }}>
-              Durum *
+              Kullanım Durumu *
             </label>
             <select
               name="condition"
@@ -399,10 +403,64 @@ export default function PlayStationPage() {
           <div>
             <label style={{
               display: 'block',
-              fontSize: '14px',
-              fontWeight: '500',
+              marginBottom: '8px',
+              fontWeight: '600',
               color: '#374151',
-              marginBottom: '6px'
+              fontSize: isMobile ? '14px' : '16px'
+            }}>
+              Jailbreak / Modlu mu?
+            </label>
+            <select
+              value={formData.jailbreak}
+              onChange={(e) => handleInputChange('jailbreak', e.target.value)}
+              style={{
+                width: '100%',
+                padding: isMobile ? '12px' : '16px',
+                border: '2px solid #e5e7eb',
+                borderRadius: '8px',
+                fontSize: isMobile ? '14px' : '16px',
+                backgroundColor: 'white',
+                boxSizing: 'border-box'
+              }}
+            >
+              <option value="">Seçin</option>
+              <option value="Hayır">Hayır</option>
+              <option value="Evet">Evet</option>
+            </select>
+          </div>
+          <div>
+            <label style={{
+              display: 'block',
+              marginBottom: '8px',
+              fontWeight: '600',
+              color: '#374151',
+              fontSize: isMobile ? '14px' : '16px'
+            }}>
+              Firmware Sürümü
+            </label>
+            <input
+              type="text"
+              value={formData.firmware}
+              onChange={(e) => handleInputChange('firmware', e.target.value)}
+              placeholder="Bilmiyorsanız boş bırakın"
+              style={{
+                width: '100%',
+                padding: isMobile ? '12px' : '16px',
+                border: '2px solid #e5e7eb',
+                borderRadius: '8px',
+                fontSize: isMobile ? '14px' : '16px',
+                backgroundColor: 'white',
+                boxSizing: 'border-box'
+              }}
+            />
+          </div>
+          <div>
+            <label style={{
+              display: 'block',
+              marginBottom: '8px',
+              fontWeight: '600',
+              color: '#374151',
+              fontSize: isMobile ? '14px' : '16px'
             }}>
               Kol Sayısı
             </label>
@@ -411,15 +469,13 @@ export default function PlayStationPage() {
               onChange={(e) => handleInputChange('controllers', e.target.value)}
               style={{
                 width: '100%',
-                padding: '12px',
-                border: '1px solid #d1d5db',
+                padding: isMobile ? '12px' : '16px',
+                border: '2px solid #e5e7eb',
                 borderRadius: '8px',
-                fontSize: '14px',
-                outline: 'none',
-                transition: 'border-color 0.2s'
+                fontSize: isMobile ? '14px' : '16px',
+                backgroundColor: 'white',
+                boxSizing: 'border-box'
               }}
-              onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-              onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
             >
               <option value="">Seçin</option>
               <option value="1">1</option>
@@ -431,10 +487,10 @@ export default function PlayStationPage() {
           <div>
             <label style={{
               display: 'block',
-              fontSize: '14px',
-              fontWeight: '500',
+              marginBottom: '8px',
+              fontWeight: '600',
               color: '#374151',
-              marginBottom: '6px'
+              fontSize: isMobile ? '14px' : '16px'
             }}>
               Kolda Stick Drift Var mı?
             </label>
@@ -443,15 +499,13 @@ export default function PlayStationPage() {
               onChange={(e) => handleInputChange('stickDrift', e.target.value)}
               style={{
                 width: '100%',
-                padding: '12px',
-                border: '1px solid #d1d5db',
+                padding: isMobile ? '12px' : '16px',
+                border: '2px solid #e5e7eb',
                 borderRadius: '8px',
-                fontSize: '14px',
-                outline: 'none',
-                transition: 'border-color 0.2s'
+                fontSize: isMobile ? '14px' : '16px',
+                backgroundColor: 'white',
+                boxSizing: 'border-box'
               }}
-              onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-              onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
             >
               <option value="">Seçin</option>
               <option value="Hayır">Hayır</option>
@@ -514,10 +568,9 @@ export default function PlayStationPage() {
             >
               <option value="">Depolama kapasitesi seçin</option>
               <option value="825GB">825GB (PS5 Standart)</option>
-              <option value="1TB">1TB</option>
+              <option value="1TB">1TB (PS5 / PS4 Pro)</option>
               <option value="2TB">2TB</option>
               <option value="500GB">500GB (PS4)</option>
-              <option value="1TB">1TB (PS4 Pro)</option>
               <option value="Bilinmiyor">Bilinmiyor</option>
             </select>
           </div>

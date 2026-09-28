@@ -58,7 +58,6 @@ export default function PrinterTechnicalSpecs({ isMobile, formData, handleInputC
             onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
           >
             <option value="">Seçiniz</option>
-            <option value="Laser Yazıcı">Laser Yazıcı</option>
             <option value="Mürekkep Püskürtmeli">Mürekkep Püskürtmeli</option>
             <option value="Lazer Yazıcı">Lazer Yazıcı</option>
             <option value="Multifonksiyon">Multifonksiyon</option>

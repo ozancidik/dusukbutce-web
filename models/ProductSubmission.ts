@@ -155,6 +155,23 @@ const productSubmissionSchema = new mongoose.Schema({
   biometricWorking: { type: String }, // Telefon Face ID / Touch ID çalışıyor mu
   pageCount: { type: String }, // Yazıcı/fotokopi sayfa sayacı
   mountingKit: { type: String }, // Soğutucu montaj aparatları dahil mi
+  // Düşük öncelikli durum/aksesuar alanları (bize-sat raporu bölüm 3)
+  chargerIncluded: { type: String }, // Notebook şarj adaptörü dahil mi
+  knownIssues: { type: String }, // Notebook/masaüstü bilinen arıza
+  overclocked: { type: String }, // İşlemci overclock/delid
+  moduleKit: { type: String }, // RAM kit / modül sayısı
+  missingKeys: { type: String }, // Klavye eksik tuş
+  micWorking: { type: String }, // Kulaklık mikrofon
+  earPadCondition: { type: String }, // Kulaklık kulak pedi
+  chargingCase: { type: String }, // TWS şarj kutusu
+  pumpIssue: { type: String }, // Sıvı soğutucu pompa/sızıntı
+  sidePanelCondition: { type: String }, // Kasa yan panel
+  includedFans: { type: String }, // Kasa dahil fanlar
+  jailbreak: { type: String }, // PlayStation jailbreak/modlu
+  firmware: { type: String }, // PlayStation firmware
+  tonerStatus: { type: String }, // Yazıcı/fotokopi toner-kartuş-drum durumu
+  adfIncluded: { type: String }, // Fotokopi/tarayıcı ADF dahil mi
+  usageLevel: { type: String }, // Tarayıcı kullanım yoğunluğu
   // Gaming direksiyon / direksiyon uyumluluk (PC/PlayStation/Xbox)
   compatibility: { type: String },
   // RAM form faktörü (Masaüstü/DIMM vs Notebook/SO-DIMM) — itopya.com'daki

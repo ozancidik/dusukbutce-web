@@ -29,6 +29,7 @@ export default function MonitorPage() {
     description: '',
     screenStatus: '',
     deadPixelCount: '',
+    accessories: '',
     cosmeticCondition: 'Mükemmel',
     hasBox: false,
     hasInvoice: false,
@@ -209,6 +210,7 @@ export default function MonitorPage() {
           description: '',
           screenStatus: '',
           deadPixelCount: '',
+          accessories: '',
           cosmeticCondition: 'Mükemmel',
           hasBox: false,
           hasInvoice: false,
@@ -426,11 +428,9 @@ export default function MonitorPage() {
                 }}>
                   Çözünürlük
                 </label>
-                <input
-                  type="text"
+                <select
                   value={formData.resolution}
                   onChange={(e) => handleInputChange('resolution', e.target.value)}
-                  placeholder="Örn: 1920x1080, 2560x1440"
                   style={{
                     width: '100%',
                     padding: '12px',
@@ -442,7 +442,15 @@ export default function MonitorPage() {
                   }}
                   onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
                   onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-                />
+                >
+                  <option value="">Seçin</option>
+                  <option value="1366x768 (HD)">1366x768 (HD)</option>
+                  <option value="1920x1080 (Full HD)">1920x1080 (Full HD)</option>
+                  <option value="2560x1440 (2K / QHD)">2560x1440 (2K / QHD)</option>
+                  <option value="3440x1440 (Ultrawide QHD)">3440x1440 (Ultrawide QHD)</option>
+                  <option value="3840x2160 (4K / UHD)">3840x2160 (4K / UHD)</option>
+                  <option value="Diğer">Diğer</option>
+                </select>
               </div>
               <div>
                 <label style={{
@@ -454,11 +462,9 @@ export default function MonitorPage() {
                 }}>
                   Yenileme Hızı
                 </label>
-                <input
-                  type="text"
+                <select
                   value={formData.refreshRate}
                   onChange={(e) => handleInputChange('refreshRate', e.target.value)}
-                  placeholder="Örn: 60Hz, 144Hz, 240Hz"
                   style={{
                     width: '100%',
                     padding: '12px',
@@ -470,7 +476,19 @@ export default function MonitorPage() {
                   }}
                   onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
                   onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-                />
+                >
+                  <option value="">Seçin</option>
+                  <option value="60 Hz">60 Hz</option>
+                  <option value="75 Hz">75 Hz</option>
+                  <option value="100 Hz">100 Hz</option>
+                  <option value="120 Hz">120 Hz</option>
+                  <option value="144 Hz">144 Hz</option>
+                  <option value="165 Hz">165 Hz</option>
+                  <option value="180 Hz">180 Hz</option>
+                  <option value="240 Hz">240 Hz</option>
+                  <option value="360 Hz">360 Hz</option>
+                  <option value="Diğer">Diğer</option>
+                </select>
               </div>
               <div>
                 <label style={{
@@ -482,11 +500,9 @@ export default function MonitorPage() {
                 }}>
                   Panel Tipi
                 </label>
-                <input
-                  type="text"
+                <select
                   value={formData.panelType}
                   onChange={(e) => handleInputChange('panelType', e.target.value)}
-                  placeholder="Örn: IPS, VA, TN"
                   style={{
                     width: '100%',
                     padding: '12px',
@@ -498,7 +514,14 @@ export default function MonitorPage() {
                   }}
                   onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
                   onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-                />
+                >
+                  <option value="">Seçin</option>
+                  <option value="IPS">IPS</option>
+                  <option value="VA">VA</option>
+                  <option value="TN">TN</option>
+                  <option value="OLED">OLED</option>
+                  <option value="Diğer">Diğer</option>
+                </select>
               </div>
               <div>
                 <label style={{
@@ -635,6 +658,38 @@ export default function MonitorPage() {
                   <option value="İyi">İyi</option>
                   <option value="Orta">Orta</option>
                   <option value="Kötü">Kötü</option>
+                </select>
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Stand / Kablolar Dahil mi?
+                </label>
+                <select
+                  value={formData.accessories}
+                  onChange={(e) => handleInputChange('accessories', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                >
+                  <option value="">Seçin</option>
+                  <option value="Stand ve kablolar dahil">Stand ve kablolar dahil</option>
+                  <option value="Sadece stand">Sadece stand</option>
+                  <option value="Sadece kablolar">Sadece kablolar</option>
+                  <option value="Hiçbiri">Hiçbiri</option>
                 </select>
               </div>
               <div>

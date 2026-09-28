@@ -404,13 +404,11 @@ export default function SsdPage() {
                   color: '#374151',
                   marginBottom: '6px'
                 }}>
-                  Tip
+                  Form Faktörü
                 </label>
-                <input
-                  type="text"
+                <select
                   value={formData.type}
                   onChange={(e) => handleInputChange('type', e.target.value)}
-                  placeholder="Örn: M2, SATA"
                   style={{
                     width: '100%',
                     padding: '12px',
@@ -422,7 +420,12 @@ export default function SsdPage() {
                   }}
                   onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
                   onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-                />
+                >
+                  <option value="">Seçin</option>
+                  <option value="M.2 NVMe">M.2 NVMe</option>
+                  <option value="M.2 SATA">M.2 SATA</option>
+                  <option value="2.5 inç SATA">2.5 inç SATA</option>
+                </select>
               </div>
               <div>
                 <label style={{

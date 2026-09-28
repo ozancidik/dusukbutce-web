@@ -22,6 +22,9 @@ export default function AudioSystemPage() {
     model: '',
     type: '',
     description: '',
+    power: '',
+    connectivity: '',
+    accessories: '',
     cosmeticCondition: 'Mükemmel',
     hasBox: false,
     hasInvoice: false,
@@ -183,6 +186,9 @@ export default function AudioSystemPage() {
           model: '',
           type: '',
           description: '',
+          power: '',
+          connectivity: '',
+          accessories: '',
           cosmeticCondition: 'Mükemmel',
           hasBox: false,
           hasInvoice: false,
@@ -352,12 +358,10 @@ export default function AudioSystemPage() {
                 }}>
                   Tip *
                 </label>
-                <input
-                  type="text"
+                <select
                   required
                   value={formData.type}
                   onChange={(e) => handleInputChange('type', e.target.value)}
-                  placeholder="Örn: Bluetooth Speaker, Soundbar, 5.1 System..."
                   style={{
                     width: '100%',
                     padding: '12px',
@@ -369,7 +373,14 @@ export default function AudioSystemPage() {
                   }}
                   onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
                   onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-                />
+                >
+                  <option value="">Seçin</option>
+                  <option value="Bluetooth Hoparlör">Bluetooth Hoparlör</option>
+                  <option value="Soundbar">Soundbar</option>
+                  <option value="2.1 Sistem">2.1 Sistem</option>
+                  <option value="5.1 Sistem">5.1 Sistem</option>
+                  <option value="Diğer">Diğer</option>
+                </select>
               </div>
 
               <div>
@@ -451,6 +462,97 @@ export default function AudioSystemPage() {
                   <option value="İyi">İyi</option>
                   <option value="Orta">Orta</option>
                   <option value="Kötü">Kötü</option>
+                </select>
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Güç (W)
+                </label>
+                <input
+                  type="text"
+                  value={formData.power}
+                  onChange={(e) => handleInputChange('power', e.target.value)}
+                  placeholder="Örn: 60"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                />
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Bağlantı
+                </label>
+                <select
+                  value={formData.connectivity}
+                  onChange={(e) => handleInputChange('connectivity', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                >
+                  <option value="">Seçin</option>
+                  <option value="Kablolu">Kablolu</option>
+                  <option value="Kablosuz">Kablosuz</option>
+                  <option value="Bluetooth">Bluetooth</option>
+                </select>
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Kumanda / Kablolar Dahil mi?
+                </label>
+                <select
+                  value={formData.accessories}
+                  onChange={(e) => handleInputChange('accessories', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                >
+                  <option value="">Seçin</option>
+                  <option value="Kumanda ve kablolar dahil">Kumanda ve kablolar dahil</option>
+                  <option value="Sadece kablolar">Sadece kablolar</option>
+                  <option value="Sadece kumanda">Sadece kumanda</option>
+                  <option value="Hiçbiri">Hiçbiri</option>
                 </select>
               </div>
               <div>

@@ -5,6 +5,7 @@ interface PrinterConditionProps {
   isMobile: boolean;
   formData: {
     pageCount: string;
+    tonerStatus: string;
     cosmeticCondition: string;
     quantity: number;
     hasBox: boolean;
@@ -64,6 +65,37 @@ export default function PrinterCondition({ isMobile, formData, handleInputChange
             <option value="İyi">İyi</option>
             <option value="Orta">Orta</option>
             <option value="Kötü">Kötü</option>
+          </select>
+        </div>
+        <div>
+          <label style={{
+            display: 'block',
+            fontSize: '14px',
+            fontWeight: '500',
+            color: '#374151',
+            marginBottom: '6px'
+          }}>
+            Toner / Kartuş Durumu
+          </label>
+          <select
+            value={formData.tonerStatus}
+            onChange={(e) => handleInputChange('tonerStatus', e.target.value)}
+            style={{
+              width: '100%',
+              padding: '12px',
+              border: '1px solid #d1d5db',
+              borderRadius: '8px',
+              fontSize: '14px',
+              outline: 'none',
+              transition: 'border-color 0.2s'
+            }}
+            onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+            onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+          >
+            <option value="">Seçin</option>
+            <option value="Dahil, dolu">Dahil, dolu</option>
+            <option value="Dahil, boş / az">Dahil, boş / az</option>
+            <option value="Dahil değil">Dahil değil</option>
           </select>
         </div>
         <div>

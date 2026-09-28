@@ -533,6 +533,20 @@ export default function SubmissionDetailModal({
               {renderField('Vites Kolu Dahil', submission.shifterIncluded)}
               {renderField('Sayfa Sayacı', submission.pageCount)}
               {renderField('Montaj Aparatları', submission.mountingKit)}
+              {renderField('Şarj Adaptörü Dahil', submission.chargerIncluded)}
+              {renderField('Bilinen Arıza / Sorun', submission.knownIssues, true)}
+              {renderField('Overclock / Delid', submission.overclocked)}
+              {renderField('Kit / Modül Sayısı', submission.moduleKit)}
+              {renderField('Eksik Tuş', submission.missingKeys)}
+              {renderField('Mikrofon', submission.micWorking)}
+              {renderField('Kulak Pedi Durumu', submission.earPadCondition)}
+              {renderField('Şarj Kutusu Dahil', submission.chargingCase)}
+              {renderField('Pompa Sesi / Sızıntı', submission.pumpIssue)}
+              {renderField('Yan Panel Durumu', submission.sidePanelCondition)}
+              {renderField('Dahil Fanlar', submission.includedFans)}
+              {renderField('Toner / Kartuş Durumu', submission.tonerStatus)}
+              {renderField('ADF / Kaset Dahil', submission.adfIncluded)}
+              {renderField('Kullanım Yoğunluğu', submission.usageLevel)}
               {renderField('Uyumluluk', submission.compatibility)}
 
               {/* PlayStation/Xbox alanları */}

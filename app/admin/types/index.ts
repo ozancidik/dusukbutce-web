@@ -119,6 +119,20 @@ export interface Submission {
   registrationType?: string;
   // Yazıcı baskı rengi
   printColor?: string;
+  chargerIncluded?: string;
+  knownIssues?: string;
+  overclocked?: string;
+  moduleKit?: string;
+  missingKeys?: string;
+  micWorking?: string;
+  earPadCondition?: string;
+  chargingCase?: string;
+  pumpIssue?: string;
+  sidePanelCondition?: string;
+  includedFans?: string;
+  tonerStatus?: string;
+  adfIncluded?: string;
+  usageLevel?: string;
   pinDamage?: string;
   driveHealth?: string;
   clickIssue?: string;

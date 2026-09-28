@@ -118,3 +118,36 @@ describe('durum/arıza alanları (rapor bölüm 3) kaydediliyor', () => {
     expect(doc).toMatchObject(fields);
   });
 });
+
+describe('düşük öncelikli durum/aksesuar alanları kaydediliyor', () => {
+  const cases: Array<[string, Record<string, string>]> = [
+    ['notebook', { chargerIncluded: 'Evet', layout: 'TR-Q', knownIssues: 'menteşe gevşek' }],
+    ['desktop', { case: 'NZXT H510', knownIssues: 'yok' }],
+    ['processor', { overclocked: 'Hayır' }],
+    ['ram', { moduleKit: '2x8GB', ramType: 'DDR4', ramFormFactor: 'DIMM' }],
+    ['monitor', { accessories: 'Stand ve kablolar dahil' }],
+    ['keyboard', { missingKeys: 'Hayır' }],
+    [
+      'headphones',
+      {
+        type: 'TWS (kablosuz kulak içi)',
+        micWorking: 'Evet',
+        earPadCondition: 'İyi',
+        chargingCase: 'Evet',
+      },
+    ],
+    ['cooler', { pumpIssue: 'Hava soğutucu' }],
+    ['case', { sidePanelCondition: 'Sağlam', includedFans: '3 adet 120mm' }],
+    ['playstation', { jailbreak: 'Hayır', firmware: '9.00' }],
+    ['gamepad', { batteryHealth: 'İyi' }],
+    ['tablet', { accessories: 'Sadece kalem' }],
+    ['audio-system', { power: '60', connectivity: 'Bluetooth', accessories: 'Hiçbiri' }],
+    ['yazici', { tonerStatus: 'Dahil, dolu' }],
+    ['fotokopi-makinesi', { tonerStatus: 'Dahil, boş / az', adfIncluded: 'Evet' }],
+    ['tarayici', { adfIncluded: 'Hayır', usageLevel: 'Orta' }],
+  ];
+  it.each(cases)('%s: alanlar veritabanına yazılır', async (category, fields) => {
+    const doc = await submit({ category, ...fields });
+    expect(doc).toMatchObject(fields);
+  });
+});

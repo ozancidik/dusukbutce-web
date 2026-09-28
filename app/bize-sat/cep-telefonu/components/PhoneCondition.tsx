@@ -51,10 +51,9 @@ export default function PhoneCondition({ isMobile, formData, onInputChange }: Ph
             onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
           >
             <option value="Mükemmel">Mükemmel (Sıfır gibi, çizik/hasar yok)</option>
-            <option value="Çok İyi">Çok İyi (Çok hafif kullanım izleri)</option>
-            <option value="İyi">İyi (Normal kullanım izleri, küçük çizikler)</option>
-            <option value="Kabul Edilebilir">Kabul Edilebilir (Belirgin çizikler, küçük ezikler)</option>
-            <option value="Hasarlı">Hasarlı (Çalışır durumda ancak büyük kozmetik kusurlar)</option>
+                        <option value="İyi">İyi (Normal kullanım izleri, küçük çizikler)</option>
+            <option value="Orta">Orta (Belirgin çizikler, küçük ezikler)</option>
+            <option value="Kötü">Kötü (Çalışır durumda ancak büyük kozmetik kusurlar)</option>
           </select>
         </div>
         <div>

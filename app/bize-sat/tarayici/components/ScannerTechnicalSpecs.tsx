@@ -61,9 +61,9 @@ export default function ScannerTechnicalSpecs({ isMobile, formData, handleInputC
             <option value="Sheet-fed (Sayfa Beslemeli)">Sheet-fed (Sayfa Beslemeli)</option>
             <option value="Handheld (El Tipi)">Handheld (El Tipi)</option>
             <option value="Drum (Tambur)">Drum (Tambur)</option>
-            <option value="Film">Film</option>
-            <option value="Slide">Slide</option>
-            <option value="Document">Document</option>
+            <option value="Film Tarayıcı">Film Tarayıcı</option>
+            <option value="Slayt Tarayıcı">Slayt Tarayıcı</option>
+            <option value="Doküman Tarayıcı">Doküman Tarayıcı</option>
             <option value="Diğer">Diğer</option>
           </select>
         </div>
@@ -93,7 +93,7 @@ export default function ScannerTechnicalSpecs({ isMobile, formData, handleInputC
             onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
           >
             <option value="">Seçiniz</option>
-            <option value="USB">USB</option>
+            <option value="USB">USB (sürüm bilinmiyor)</option>
             <option value="USB 2.0">USB 2.0</option>
             <option value="USB 3.0">USB 3.0</option>
             <option value="USB-C">USB-C</option>

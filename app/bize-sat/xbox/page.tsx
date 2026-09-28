@@ -92,7 +92,7 @@ export default function XboxPage() {
         },
         body: JSON.stringify({
           category: 'xbox',
-          brand: 'xbox',
+          brand: 'Microsoft',
           ...formData,
           cosmeticCondition: formData.cosmeticCondition || 'Mükemmel'
         }),
@@ -271,7 +271,7 @@ export default function XboxPage() {
               color: '#374151',
               fontSize: isMobile ? '14px' : '16px'
             }}>
-              Durum *
+              Kullanım Durumu *
             </label>
             <select
               name="condition"
@@ -332,10 +332,10 @@ export default function XboxPage() {
           <div>
             <label style={{
               display: 'block',
-              fontSize: '14px',
-              fontWeight: '500',
+              marginBottom: '8px',
+              fontWeight: '600',
               color: '#374151',
-              marginBottom: '6px'
+              fontSize: isMobile ? '14px' : '16px'
             }}>
               Kol Sayısı
             </label>
@@ -344,15 +344,13 @@ export default function XboxPage() {
               onChange={(e) => handleInputChange('controllers', e.target.value)}
               style={{
                 width: '100%',
-                padding: '12px',
-                border: '1px solid #d1d5db',
+                padding: isMobile ? '12px' : '16px',
+                border: '2px solid #e5e7eb',
                 borderRadius: '8px',
-                fontSize: '14px',
-                outline: 'none',
-                transition: 'border-color 0.2s'
+                fontSize: isMobile ? '14px' : '16px',
+                backgroundColor: 'white',
+                boxSizing: 'border-box'
               }}
-              onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-              onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
             >
               <option value="">Seçin</option>
               <option value="1">1</option>
@@ -364,10 +362,10 @@ export default function XboxPage() {
           <div>
             <label style={{
               display: 'block',
-              fontSize: '14px',
-              fontWeight: '500',
+              marginBottom: '8px',
+              fontWeight: '600',
               color: '#374151',
-              marginBottom: '6px'
+              fontSize: isMobile ? '14px' : '16px'
             }}>
               Kolda Stick Drift Var mı?
             </label>
@@ -376,15 +374,13 @@ export default function XboxPage() {
               onChange={(e) => handleInputChange('stickDrift', e.target.value)}
               style={{
                 width: '100%',
-                padding: '12px',
-                border: '1px solid #d1d5db',
+                padding: isMobile ? '12px' : '16px',
+                border: '2px solid #e5e7eb',
                 borderRadius: '8px',
-                fontSize: '14px',
-                outline: 'none',
-                transition: 'border-color 0.2s'
+                fontSize: isMobile ? '14px' : '16px',
+                backgroundColor: 'white',
+                boxSizing: 'border-box'
               }}
-              onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-              onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
             >
               <option value="">Seçin</option>
               <option value="Hayır">Hayır</option>
