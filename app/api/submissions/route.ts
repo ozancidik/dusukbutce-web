@@ -5,7 +5,7 @@ import connectDB from "@/lib/mongodb";
 import User from "@/models/User";
 import { sendNewSubmissionNotificationToAdmin } from '@/lib/email';
 import { getVerifiedUser, getVerifiedUserId } from '@/lib/auth';
-import { ALLOWED_FIELDS } from '@/lib/handleProductSubmission';
+import { pickSubmissionFields } from '@/lib/handleProductSubmission';
 import { generateSubmissionNumber } from '@/lib/numberGenerator';
 import { validateBody, submissionSchema } from '@/lib/validate';
 
@@ -49,10 +49,7 @@ export async function POST(request: NextRequest) {
     // Sadece izin verilen ürün alanlarını al — offer/listing/rejectionReason/
     // customerResponse/orderNumber gibi admin-only iş akışı alanları client
     // body'sinden kabul edilmez (bkz. lib/handleProductSubmission.ts).
-    const data: Record<string, unknown> = {};
-    for (const key of ALLOWED_FIELDS) {
-      if (body[key] !== undefined) data[key] = body[key];
-    }
+    const data = pickSubmissionFields(body);
 
     const submissionNumber = await generateSubmissionNumber();
 

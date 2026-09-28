@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
+import { NextRequest } from 'next/server';
 
 // .env.local gerçek SMTP bilgisi içeriyor — bu testte ASLA e-posta gitmemeli.
 vi.mock('@/lib/email', () => ({
@@ -24,17 +25,50 @@ afterAll(async () => {
   await mongod.stop();
 });
 
+// Gerçek trafik yolu: bize-sat sayfaları kategoriye göre üç farklı kayıt koduna gidiyor.
+const GENERIC_ROUTE = new Set([
+  'cep-telefonu',
+  'fotokopi-makinesi',
+  'gamepad',
+  'desktop',
+  'playstation',
+  'xbox',
+  'tarayici',
+  'yazici',
+]);
+
 async function submit(body: Record<string, unknown>) {
-  const { handleProductSubmission } = await import('@/lib/handleProductSubmission');
   const { default: ProductSubmission } = await import('@/models/ProductSubmission');
-  const res = await handleProductSubmission(
-    new Request('http://localhost/api/submissions', {
-      method: 'POST',
-      body: JSON.stringify({ brand: 'Marka', model: 'Model', cosmeticCondition: 'İyi', ...body }),
-    }),
-    'test'
-  );
-  expect(res.status).toBe(200);
+  const payload = { brand: 'Marka', model: 'Model', cosmeticCondition: 'İyi', ...body };
+  const category = String(payload.category);
+  let res: Response;
+  if (category === 'notebook') {
+    const { POST } = await import('@/app/api/notebook-submissions/route');
+    res = await POST(
+      new NextRequest('http://localhost/api/notebook-submissions', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      })
+    );
+  } else if (GENERIC_ROUTE.has(category)) {
+    const { POST } = await import('@/app/api/submissions/route');
+    res = await POST(
+      new NextRequest('http://localhost/api/submissions', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      })
+    );
+  } else {
+    const { handleProductSubmission } = await import('@/lib/handleProductSubmission');
+    res = await handleProductSubmission(
+      new Request('http://localhost/api/x-submissions', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      }),
+      'test'
+    );
+  }
+  expect([200, 201]).toContain(res.status);
   const { id } = await res.json();
   return ProductSubmission.findById(id).lean<Record<string, unknown>>();
 }
@@ -150,4 +184,34 @@ describe('düşük öncelikli durum/aksesuar alanları kaydediliyor', () => {
     const doc = await submit({ category, ...fields });
     expect(doc).toMatchObject(fields);
   });
+});
+
+describe('garanti/fatura kapalıyken eski süre/tarih kaydedilmez (üç kayıt yolu)', () => {
+  it.each(['mouse', 'yazici', 'notebook'])(
+    '%s: hasWarranty/hasInvoice false ise süre ve tarih atılır',
+    async (category) => {
+      const doc = await submit({
+        category,
+        hasWarranty: false,
+        warrantyDuration: '2 yıl',
+        hasInvoice: false,
+        invoiceDate: '2024-01-01',
+      });
+      expect(doc).not.toHaveProperty('warrantyDuration');
+      expect(doc).not.toHaveProperty('invoiceDate');
+    }
+  );
+  it.each(['mouse', 'yazici', 'notebook'])(
+    '%s: hasWarranty/hasInvoice true ise korunur',
+    async (category) => {
+      const doc = await submit({
+        category,
+        hasWarranty: true,
+        warrantyDuration: '2 yıl',
+        hasInvoice: true,
+        invoiceDate: '2024-01-01',
+      });
+      expect(doc).toMatchObject({ warrantyDuration: '2 yıl', invoiceDate: '2024-01-01' });
+    }
+  );
 });
