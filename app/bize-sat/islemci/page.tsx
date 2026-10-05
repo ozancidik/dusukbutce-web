@@ -22,7 +22,10 @@ export default function ProcessorPage() {
     model: '',
     stokFan: '',
     description: '',
-    cosmeticCondition: 'Mükemmel',
+    pinDamage: '',
+    socket: '',
+    overclocked: '',
+    cosmeticCondition: '',
     hasBox: false,
     hasInvoice: false,
     hasWarranty: false,
@@ -53,7 +56,10 @@ export default function ProcessorPage() {
           model: parsedData.model || '',
           stokFan: parsedData.stokFan || '',
           description: parsedData.description || '',
-          cosmeticCondition: parsedData.cosmeticCondition || 'Mükemmel',
+          pinDamage: parsedData.pinDamage || '',
+          socket: parsedData.socket || '',
+          overclocked: parsedData.overclocked || '',
+          cosmeticCondition: parsedData.cosmeticCondition || '',
           hasBox: parsedData.hasBox || false,
           hasInvoice: parsedData.hasInvoice || false,
           hasWarranty: parsedData.hasWarranty || false,
@@ -186,7 +192,7 @@ export default function ProcessorPage() {
         body: JSON.stringify({
           ...formData,
           category: 'processor',
-          cosmeticCondition: formData.cosmeticCondition || 'Mükemmel'
+          cosmeticCondition: formData.cosmeticCondition
         }),
         signal: controller.signal
       });
@@ -212,7 +218,10 @@ export default function ProcessorPage() {
           model: '',
           stokFan: '',
           description: '',
-          cosmeticCondition: 'Mükemmel',
+          pinDamage: '',
+          socket: '',
+          overclocked: '',
+          cosmeticCondition: '',
           hasBox: false,
           hasInvoice: false,
           hasWarranty: false,
@@ -503,11 +512,100 @@ export default function ProcessorPage() {
                   onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
                   onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
                 >
+                  <option value="">Seçin</option>
                   <option value="Mükemmel">Mükemmel</option>
                   <option value="İyi">İyi</option>
                   <option value="Orta">Orta</option>
                   <option value="Kötü">Kötü</option>
                 </select>
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Overclock / Delid Yapıldı mı?
+                </label>
+                <select
+                  value={formData.overclocked}
+                  onChange={(e) => handleInputChange('overclocked', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                >
+                  <option value="">Seçin</option>
+                  <option value="Hayır">Hayır</option>
+                  <option value="Evet">Evet</option>
+                </select>
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Soket Pinlerinde Eğiklik / Hasar Var mı?
+                </label>
+                <select
+                  value={formData.pinDamage}
+                  onChange={(e) => handleInputChange('pinDamage', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                >
+                  <option value="">Seçin</option>
+                  <option value="Hayır">Hayır</option>
+                  <option value="Evet">Evet</option>
+                </select>
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Soket
+                </label>
+                <input
+                  type="text"
+                  value={formData.socket}
+                  onChange={(e) => handleInputChange('socket', e.target.value)}
+                  placeholder="Örn: AM4, LGA1700"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                />
               </div>
               <div>
                 <label style={{

@@ -8,7 +8,7 @@ import { getVerifiedUserId } from '@/lib/auth';
 import { AdminAuthError, ensureAdminRequest, ensureFullAdminRequest, handleAdminAuthError } from '@/app/api/admin/utils/requireAdmin';
 import { generateSubmissionNumber } from '@/lib/numberGenerator';
 import { validateBody, submissionSchema } from '@/lib/validate';
-import { ALLOWED_FIELDS } from '@/lib/handleProductSubmission';
+import { pickSubmissionFields } from '@/lib/handleProductSubmission';
 
 export async function POST(request: NextRequest) {
   try {
@@ -59,10 +59,7 @@ export async function POST(request: NextRequest) {
     // Sadece izin verilen ürün alanlarını al — offer/payment/listing/
     // rejectionReason/customerResponse gibi admin-only iş akışı alanları
     // client body'sinden kabul edilmez (bkz. lib/handleProductSubmission.ts).
-    const data: Record<string, unknown> = {};
-    for (const key of ALLOWED_FIELDS) {
-      if (body[key] !== undefined) data[key] = body[key];
-    }
+    const data = pickSubmissionFields(body);
 
     // Create submission with category and additional fields
     const submission = new ProductSubmission({

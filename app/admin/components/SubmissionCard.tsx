@@ -2,6 +2,7 @@
 import React from 'react';
 import { Submission } from '../types';
 
+import { getCategoryLabel } from '@/lib/categories';
 interface SubmissionCardProps {
   submission: Submission;
   isMobile: boolean;
@@ -41,27 +42,7 @@ export default function SubmissionCard({
     }
   };
 
-  const getCategoryDisplayName = (category: string) => {
-    const categoryMap: { [key: string]: string } = {
-      'graphics-card': 'Ekran Kartı',
-      'notebook': 'Dizüstü Bilgisayar',
-      'desktop': 'Masaüstü Bilgisayar',
-      'processor': 'İşlemci',
-      'monitor': 'Monitör',
-      'keyboard': 'Klavye',
-      'mouse': 'Fare',
-      'headphones': 'Kulaklık',
-      'ram': 'RAM',
-      'ssd': 'SSD',
-      'tablet': 'Tablet',
-      'audio-system': 'Ses Sistemi',
-      'case': 'Kasa',
-      'cooler': 'Soğutucu',
-      'gaming-wheel': 'Gaming Direksiyon',
-      'steering-wheel': 'Direksiyon'
-    };
-    return categoryMap[category] || category;
-  };
+  const getCategoryDisplayName = (category: string) => getCategoryLabel(category);
 
   const statusInfo = getStatusInfo(submission.status);
   const canCreateListing = submission.status === 'delivery_confirmed';

@@ -26,13 +26,17 @@ export default function YaziciPage() {
   const [formData, setFormData] = useState({
     brand: '',
     model: '',
+    multifunction: '',
+    paperSize: '',
+    usageType: '',
     type: '',
-    color: '',
-    connectionType: '',
-    printSpeed: '',
+    printColor: '',
+    connectivity: '',
     resolution: '',
     description: '',
-    cosmeticCondition: 'Mükemmel',
+    pageCount: '',
+    tonerStatus: '',
+    cosmeticCondition: '',
     hasBox: false,
     hasInvoice: false,
     hasWarranty: false,
@@ -195,7 +199,7 @@ export default function YaziciPage() {
         body: JSON.stringify({
           ...formData,
           category: 'yazici',
-          cosmeticCondition: formData.cosmeticCondition || 'Mükemmel'
+          cosmeticCondition: formData.cosmeticCondition
         }),
         signal: controller.signal
       });
@@ -218,13 +222,17 @@ export default function YaziciPage() {
         setFormData({
           brand: '',
           model: '',
+          multifunction: '',
+          paperSize: '',
+          usageType: '',
           type: '',
-          color: '',
-          connectionType: '',
-          printSpeed: '',
+          printColor: '',
+          connectivity: '',
           resolution: '',
           description: '',
-          cosmeticCondition: 'Mükemmel',
+          pageCount: '',
+          tonerStatus: '',
+          cosmeticCondition: '',
           hasBox: false,
           hasInvoice: false,
           hasWarranty: false,

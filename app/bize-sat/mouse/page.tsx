@@ -20,12 +20,11 @@ export default function MousePage() {
   const [formData, setFormData] = useState({
     brand: '',
     model: '',
-    interface: '',
     connectivity: '',
-    color: '',
     dpi: '',
     description: '',
-    cosmeticCondition: 'Mükemmel',
+    clickIssue: '',
+    cosmeticCondition: '',
     hasBox: false,
     hasInvoice: false,
     hasWarranty: false,
@@ -166,7 +165,7 @@ export default function MousePage() {
         body: JSON.stringify({
           ...formData,
           category: 'mouse',
-          cosmeticCondition: formData.cosmeticCondition || 'Mükemmel'
+          cosmeticCondition: formData.cosmeticCondition
         }),
         signal: controller.signal
       });
@@ -189,12 +188,11 @@ export default function MousePage() {
         setFormData({
           brand: '',
           model: '',
-          interface: '',
           connectivity: '',
-          color: '',
           dpi: '',
           description: '',
-          cosmeticCondition: 'Mükemmel',
+          clickIssue: '',
+          cosmeticCondition: '',
           hasBox: false,
           hasInvoice: false,
           hasWarranty: false,
@@ -363,11 +361,9 @@ export default function MousePage() {
                 }}>
                   Bağlantı Tipi
                 </label>
-                <input
-                  type="text"
+                <select
                   value={formData.connectivity}
                   onChange={(e) => handleInputChange('connectivity', e.target.value)}
-                  placeholder="Örn: Kablolu, Kablosuz"
                   style={{
                     width: '100%',
                     padding: '12px',
@@ -379,35 +375,13 @@ export default function MousePage() {
                   }}
                   onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
                   onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-                />
-              </div>
-              <div>
-                <label style={{
-                  display: 'block',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  color: '#374151',
-                  marginBottom: '6px'
-                }}>
-                  Arabirim
-                </label>
-                <input
-                  type="text"
-                  value={formData.interface}
-                  onChange={(e) => handleInputChange('interface', e.target.value)}
-                  placeholder="Örn: USB, Bluetooth, Wireless, USB Type C"
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    outline: 'none',
-                    transition: 'border-color 0.2s'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-                />
+                >
+                  <option value="">Seçin</option>
+                  <option value="USB Kablolu">USB Kablolu</option>
+                  <option value="2.4GHz Kablosuz">2.4GHz Kablosuz</option>
+                  <option value="Bluetooth">Bluetooth</option>
+                  <option value="2.4GHz + Bluetooth">2.4GHz + Bluetooth</option>
+                </select>
               </div>
               <div>
                 <label style={{
@@ -424,34 +398,6 @@ export default function MousePage() {
                   value={formData.dpi}
                   onChange={(e) => handleInputChange('dpi', e.target.value)}
                   placeholder="Örn: 16000, 26000"
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    outline: 'none',
-                    transition: 'border-color 0.2s'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-                />
-              </div>
-              <div>
-                <label style={{
-                  display: 'block',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  color: '#374151',
-                  marginBottom: '6px'
-                }}>
-                  Renk
-                </label>
-                <input
-                  type="text"
-                  value={formData.color}
-                  onChange={(e) => handleInputChange('color', e.target.value)}
-                  placeholder="Örn: Siyah, Beyaz, Kırmızı"
                   style={{
                     width: '100%',
                     padding: '12px',
@@ -540,10 +486,41 @@ export default function MousePage() {
                   onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
                   onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
                 >
+                  <option value="">Seçin</option>
                   <option value="Mükemmel">Mükemmel</option>
                   <option value="İyi">İyi</option>
                   <option value="Orta">Orta</option>
                   <option value="Kötü">Kötü</option>
+                </select>
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Çift Tıklama / Tık Sorunu Var mı?
+                </label>
+                <select
+                  value={formData.clickIssue}
+                  onChange={(e) => handleInputChange('clickIssue', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                >
+                  <option value="">Seçin</option>
+                  <option value="Hayır">Hayır</option>
+                  <option value="Evet">Evet</option>
                 </select>
               </div>
               <div>

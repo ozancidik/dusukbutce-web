@@ -22,11 +22,10 @@ export default function SsdPage() {
     model: '',
     capacity: '',
     type: '',
-    readSpeed: '',
-    writeSpeed: '',
     interface: '',
     description: '',
-    cosmeticCondition: 'Mükemmel',
+    driveHealth: '',
+    cosmeticCondition: '',
     hasBox: false,
     hasInvoice: false,
     hasWarranty: false,
@@ -162,7 +161,7 @@ export default function SsdPage() {
         body: JSON.stringify({
           ...formData,
           category: 'ssd',
-          cosmeticCondition: formData.cosmeticCondition || 'Mükemmel'
+          cosmeticCondition: formData.cosmeticCondition
         }),
         signal: controller.signal
       });
@@ -187,11 +186,10 @@ export default function SsdPage() {
           model: '',
           capacity: '',
           type: '',
-          readSpeed: '',
-          writeSpeed: '',
           interface: '',
           description: '',
-          cosmeticCondition: 'Mükemmel',
+          driveHealth: '',
+          cosmeticCondition: '',
           hasBox: false,
           hasInvoice: false,
           hasWarranty: false,
@@ -406,13 +404,11 @@ export default function SsdPage() {
                   color: '#374151',
                   marginBottom: '6px'
                 }}>
-                  Tip
+                  Form Faktörü
                 </label>
-                <input
-                  type="text"
+                <select
                   value={formData.type}
                   onChange={(e) => handleInputChange('type', e.target.value)}
-                  placeholder="Örn: M2, SATA"
                   style={{
                     width: '100%',
                     padding: '12px',
@@ -424,63 +420,12 @@ export default function SsdPage() {
                   }}
                   onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
                   onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-                />
-              </div>
-              <div>
-                <label style={{
-                  display: 'block',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  color: '#374151',
-                  marginBottom: '6px'
-                }}>
-                  Okuma Hızı
-                </label>
-                <input
-                  type="text"
-                  value={formData.readSpeed}
-                  onChange={(e) => handleInputChange('readSpeed', e.target.value)}
-                  placeholder="Örn: 3500 MB/s"
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    outline: 'none',
-                    transition: 'border-color 0.2s'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-                />
-              </div>
-              <div>
-                <label style={{
-                  display: 'block',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  color: '#374151',
-                  marginBottom: '6px'
-                }}>
-                  Yazma Hızı
-                </label>
-                <input
-                  type="text"
-                  value={formData.writeSpeed}
-                  onChange={(e) => handleInputChange('writeSpeed', e.target.value)}
-                  placeholder="Örn: 3000 MB/s"
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    outline: 'none',
-                    transition: 'border-color 0.2s'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-                />
+                >
+                  <option value="">Seçin</option>
+                  <option value="M.2 NVMe">M.2 NVMe</option>
+                  <option value="M.2 SATA">M.2 SATA</option>
+                  <option value="2.5 inç SATA">2.5 inç SATA</option>
+                </select>
               </div>
               <div>
                 <label style={{
@@ -586,11 +531,40 @@ export default function SsdPage() {
                   onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
                   onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
                 >
+                  <option value="">Seçin</option>
                   <option value="Mükemmel">Mükemmel</option>
                   <option value="İyi">İyi</option>
                   <option value="Orta">Orta</option>
                   <option value="Kötü">Kötü</option>
                 </select>
+              </div>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  marginBottom: '6px'
+                }}>
+                  Sağlık Durumu / Yazılan Veri
+                </label>
+                <input
+                  type="text"
+                  value={formData.driveHealth}
+                  onChange={(e) => handleInputChange('driveHealth', e.target.value)}
+                  placeholder="Örn: %98 sağlık, 12 TB yazılmış (CrystalDiskInfo)"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                />
               </div>
               <div>
                 <label style={{

@@ -139,6 +139,42 @@ const productSubmissionSchema = new mongoose.Schema({
   psuBrand: { type: String },
   // Cep telefonu kayıt türü (Yurtiçi/Yurtdışı)
   registrationType: { type: String },
+  // Yazıcı baskı rengi (Siyah-Beyaz / Renkli)
+  printColor: { type: String },
+  // Durum/arıza alanları (bize-sat raporu bölüm 3)
+  pinDamage: { type: String }, // İşlemci: soket pinlerinde eğiklik/hasar (Hayır/Evet)
+  driveHealth: { type: String }, // SSD sağlık yüzdesi / yazılan veri
+  clickIssue: { type: String }, // Mouse çift tıklama / tık sorunu (Hayır/Evet)
+  controllers: { type: String }, // PlayStation/Xbox kol sayısı
+  stickDrift: { type: String }, // Kol/gamepad stick drift (Hayır/Evet)
+  pedal: { type: String }, // Direksiyon: pedal seti dahil mi (Evet/Hayır)
+  shifterIncluded: { type: String }, // Direksiyon: vites kolu dahil mi (Evet/Hayır)
+  forceFeedback: { type: String }, // Direksiyon: force feedback (Evet/Hayır/Desteklemiyor)
+  accountLock: { type: String }, // Telefon/tablet hesap kilidi (Kapalı/Açık)
+  partReplaced: { type: String }, // Telefon ekran/parça değişimi
+  biometricWorking: { type: String }, // Telefon Face ID / Touch ID çalışıyor mu
+  pageCount: { type: String }, // Yazıcı/fotokopi sayfa sayacı
+  mountingKit: { type: String }, // Soğutucu montaj aparatları dahil mi
+  // Düşük öncelikli durum/aksesuar alanları (bize-sat raporu bölüm 3)
+  chargerIncluded: { type: String }, // Notebook şarj adaptörü dahil mi
+  knownIssues: { type: String }, // Notebook/masaüstü bilinen arıza
+  overclocked: { type: String }, // İşlemci overclock/delid
+  moduleKit: { type: String }, // RAM kit / modül sayısı
+  missingKeys: { type: String }, // Klavye eksik tuş
+  micWorking: { type: String }, // Kulaklık mikrofon
+  earPadCondition: { type: String }, // Kulaklık kulak pedi
+  chargingCase: { type: String }, // TWS şarj kutusu
+  pumpIssue: { type: String }, // Sıvı soğutucu pompa/sızıntı
+  sidePanelCondition: { type: String }, // Kasa yan panel
+  includedFans: { type: String }, // Kasa dahil fanlar
+  jailbreak: { type: String }, // PlayStation jailbreak/modlu
+  firmware: { type: String }, // PlayStation firmware
+  tonerStatus: { type: String }, // Yazıcı/fotokopi toner-kartuş-drum durumu
+  adfIncluded: { type: String }, // Fotokopi/tarayıcı ADF dahil mi
+  usageLevel: { type: String }, // Tarayıcı kullanım yoğunluğu
+  multifunction: { type: String }, // Yazıcı/fotokopi: çok işlevli mi (Evet/Hayır)
+  paperSize: { type: String }, // Yazıcı/fotokopi: A4/A3
+  usageType: { type: String }, // Yazıcı/fotokopi: kullanım tipi (Ev/Büro/Taşınabilir/Endüstriyel)
   // Gaming direksiyon / direksiyon uyumluluk (PC/PlayStation/Xbox)
   compatibility: { type: String },
   // RAM form faktörü (Masaüstü/DIMM vs Notebook/SO-DIMM) — itopya.com'daki

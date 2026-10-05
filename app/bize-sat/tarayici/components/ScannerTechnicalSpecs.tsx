@@ -5,9 +5,8 @@ interface ScannerTechnicalSpecsProps {
   isMobile: boolean;
   formData: {
     type: string;
-    connectionType: string;
+    connectivity: string;
     resolution: string;
-    scanSpeed: string;
     description: string;
   };
   handleInputChange: (field: string, value: any) => void;
@@ -62,9 +61,9 @@ export default function ScannerTechnicalSpecs({ isMobile, formData, handleInputC
             <option value="Sheet-fed (Sayfa Beslemeli)">Sheet-fed (Sayfa Beslemeli)</option>
             <option value="Handheld (El Tipi)">Handheld (El Tipi)</option>
             <option value="Drum (Tambur)">Drum (Tambur)</option>
-            <option value="Film">Film</option>
-            <option value="Slide">Slide</option>
-            <option value="Document">Document</option>
+            <option value="Film Tarayıcı">Film Tarayıcı</option>
+            <option value="Slayt Tarayıcı">Slayt Tarayıcı</option>
+            <option value="Doküman Tarayıcı">Doküman Tarayıcı</option>
             <option value="Diğer">Diğer</option>
           </select>
         </div>
@@ -79,8 +78,8 @@ export default function ScannerTechnicalSpecs({ isMobile, formData, handleInputC
             Bağlantı Türü
           </label>
           <select
-            value={formData.connectionType}
-            onChange={(e) => handleInputChange('connectionType', e.target.value)}
+            value={formData.connectivity}
+            onChange={(e) => handleInputChange('connectivity', e.target.value)}
             style={{
               width: '100%',
               padding: '12px',
@@ -94,7 +93,7 @@ export default function ScannerTechnicalSpecs({ isMobile, formData, handleInputC
             onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
           >
             <option value="">Seçiniz</option>
-            <option value="USB">USB</option>
+            <option value="USB">USB (sürüm bilinmiyor)</option>
             <option value="USB 2.0">USB 2.0</option>
             <option value="USB 3.0">USB 3.0</option>
             <option value="USB-C">USB-C</option>
@@ -120,34 +119,6 @@ export default function ScannerTechnicalSpecs({ isMobile, formData, handleInputC
             value={formData.resolution}
             onChange={(e) => handleInputChange('resolution', e.target.value)}
             placeholder="Örn: 2400x4800 dpi, 4800x9600 dpi"
-            style={{
-              width: '100%',
-              padding: '12px',
-              border: '1px solid #d1d5db',
-              borderRadius: '8px',
-              fontSize: '14px',
-              outline: 'none',
-              transition: 'border-color 0.2s'
-            }}
-            onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-            onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-          />
-        </div>
-        <div>
-          <label style={{
-            display: 'block',
-            fontSize: '14px',
-            fontWeight: '500',
-            color: '#374151',
-            marginBottom: '6px'
-          }}>
-            Tarama Hızı
-          </label>
-          <input
-            type="text"
-            value={formData.scanSpeed}
-            onChange={(e) => handleInputChange('scanSpeed', e.target.value)}
-            placeholder="Örn: 25 sayfa/dk, 50 ppm"
             style={{
               width: '100%',
               padding: '12px',

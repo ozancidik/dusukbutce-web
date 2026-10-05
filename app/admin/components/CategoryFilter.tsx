@@ -1,6 +1,7 @@
 "use client";
 import React from 'react';
 
+import { SUBMISSION_CATEGORIES } from '@/lib/categories';
 interface CategoryFilterProps {
   isMobile: boolean;
   selectedCategory: string;
@@ -16,26 +17,7 @@ export default function CategoryFilter({
 }: CategoryFilterProps) {
   const categories = [
     { value: 'all', label: 'Tüm Kategoriler' },
-    { value: 'notebook', label: 'Dizüstü Bilgisayar' },
-    { value: 'desktop', label: 'Masaüstü Bilgisayar' },
-    { value: 'monitor', label: 'Monitör' },
-    { value: 'graphics-card', label: 'Ekran Kartı' },
-    { value: 'processor', label: 'İşlemci' },
-    { value: 'ram', label: 'RAM' },
-    { value: 'ssd', label: 'SSD' },
-    { value: 'keyboard', label: 'Klavye' },
-    { value: 'mouse', label: 'Mouse' },
-    { value: 'headphones', label: 'Kulaklık' },
-    { value: 'tablet', label: 'Tablet' },
-    { value: 'playstation', label: 'PlayStation' },
-    { value: 'xbox', label: 'Xbox' },
-    { value: 'nintendo', label: 'Nintendo' },
-    { value: 'gaming-wheel', label: 'Gaming Direksiyon' },
-    { value: 'steering-wheel', label: 'Direksiyon' },
-    { value: 'gamepad', label: 'Gamepad' },
-    { value: 'case', label: 'Kasa' },
-    { value: 'cooler', label: 'Soğutucu' },
-    { value: 'audio-system', label: 'Ses Sistemi' }
+    ...SUBMISSION_CATEGORIES.map((c) => ({ value: c.id, label: c.label })),
   ];
 
   return (
