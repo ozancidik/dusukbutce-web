@@ -8,6 +8,9 @@ import nodemailer from 'nodemailer';
 
 const ENV_KEYS = ['GMAIL_USER', 'GMAIL_APP_PASSWORD'] as const;
 const saved: Record<string, string | undefined> = {};
+// Sahte değerler koddan üretilir (sır tarayıcılarında sabit parola örüntüsü yanlış alarm veriyor).
+const FAKE_PASS = 'x'.repeat(16);
+const FAKE_PASS_SPACED = ['x'.repeat(4), 'x'.repeat(4), 'x'.repeat(4), 'x'.repeat(4)].join(' ');
 
 beforeEach(() => {
   for (const k of ENV_KEYS) saved[k] = process.env[k];
@@ -37,9 +40,9 @@ describe('getMailCredentials', () => {
 
   it('boşluklu uygulama parolası temizlenir ve varsayılan kullanıcı atanır', async () => {
     delete process.env.GMAIL_USER;
-    process.env.GMAIL_APP_PASSWORD = 'abcd efgh ijkl mnop';
+    process.env.GMAIL_APP_PASSWORD = FAKE_PASS_SPACED;
     const { getMailCredentials } = await import('./email');
-    expect(getMailCredentials()).toEqual({ user: 'info@dusukbutce.com', pass: 'abcdefghijklmnop' });
+    expect(getMailCredentials()).toEqual({ user: 'info@dusukbutce.com', pass: FAKE_PASS });
   });
 });
 
@@ -54,7 +57,7 @@ describe('createMailTransporter', () => {
 
   it('geçerli kimlik bilgisinde ek seçenekler korunur', async () => {
     process.env.GMAIL_USER = 'izole-test@example.invalid';
-    process.env.GMAIL_APP_PASSWORD = 'abcdefghijklmnop';
+    process.env.GMAIL_APP_PASSWORD = FAKE_PASS;
     const spy = vi.spyOn(nodemailer, 'createTransport');
     const { createMailTransporter } = await import('./email');
     expect(createMailTransporter({ connectionTimeout: 1234 })).not.toBeNull();
@@ -62,7 +65,7 @@ describe('createMailTransporter', () => {
       expect.objectContaining({
         service: 'gmail',
         connectionTimeout: 1234,
-        auth: { user: 'izole-test@example.invalid', pass: 'abcdefghijklmnop' },
+        auth: { user: 'izole-test@example.invalid', pass: FAKE_PASS },
       })
     );
   });
