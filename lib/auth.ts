@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import { NextResponse } from "next/server";
 import { AUTH_COOKIE } from "@/lib/cookies";
 
 /**
@@ -67,4 +68,29 @@ export function getVerifiedUser(request: Request): VerifiedUser | null {
 /** Yalnızca doğrulanmış userId'yi döndüren kısayol (yoksa null). */
 export function getVerifiedUserId(request: Request): string | null {
   return getVerifiedUser(request)?.userId ?? null;
+}
+
+/**
+ * Yönetici yetkisi gerektiren uçlar için: kimlik doğrulanmamışsa 401, doğrulanmış
+ * ama admin değilse 403 döner; yetkiliyse null (devam et). İmza `getVerifiedUser`
+ * ile doğrulanır; cookie veya Bearer kabul edilir.
+ *
+ *   const denied = requireAdmin(request);
+ *   if (denied) return denied;
+ */
+export function requireAdmin(request: Request): NextResponse | null {
+  const user = getVerifiedUser(request);
+  if (!user) {
+    return NextResponse.json(
+      { success: false, message: "Kimlik doğrulama gerekli" },
+      { status: 401 }
+    );
+  }
+  if (!user.isAdmin) {
+    return NextResponse.json(
+      { success: false, message: "Admin yetkisi gerekli" },
+      { status: 403 }
+    );
+  }
+  return null;
 }
