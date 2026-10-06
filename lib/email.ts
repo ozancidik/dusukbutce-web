@@ -47,6 +47,38 @@ function getBaseUrl(): string {
   return 'http://localhost:3000';
 }
 
+// Gmail SMTP kimlik bilgisi doğrulaması — TÜM transporter'lar buradan geçer.
+// Eskiden 14 ayrı createTransport çağrısının yalnızca biri parolayı doğruluyordu;
+// diğerleri tanımsız/kısa parolayla da Gmail'e giriş denemesi yapıyordu.
+export function getMailCredentials(): { user: string; pass: string } | null {
+  const user = process.env.GMAIL_USER || 'info@dusukbutce.com';
+  const raw = process.env.GMAIL_APP_PASSWORD;
+  if (!raw) {
+    console.error('❌ GMAIL_APP_PASSWORD environment değişkeni tanımlı değil!');
+    return null;
+  }
+  // Gmail uygulama parolaları boşluklu gösterilir; boşlukları temizle
+  const pass = raw.replace(/\s+/g, '').trim();
+  if (pass.length < 16) {
+    console.error('❌ GMAIL_APP_PASSWORD geçersiz! (çok kısa veya boş)');
+    return null;
+  }
+  return { user, pass };
+}
+
+// Geçerli kimlik bilgisi yoksa null döner; çağıran `return false` ile çıkmalı.
+export function createMailTransporter(
+  extra: Record<string, unknown> = {}
+): nodemailer.Transporter | null {
+  const creds = getMailCredentials();
+  if (!creds) return null;
+  return nodemailer.createTransport({
+    service: 'gmail',
+    auth: { user: creds.user, pass: creds.pass },
+    ...extra,
+  });
+}
+
 // Transporter cache - her seferinde yeni transporter oluşturmamak için
 let cachedTransporter: nodemailer.Transporter | null = null;
 
@@ -55,36 +87,16 @@ function getTransporter(): nodemailer.Transporter | null {
     return cachedTransporter;
   }
 
-  const gmailUser = process.env.GMAIL_USER || 'info@dusukbutce.com';
-  let gmailPassword = process.env.GMAIL_APP_PASSWORD;
-  
-  if (!gmailPassword) {
-    console.error('❌ GMAIL_APP_PASSWORD environment değişkeni tanımlı değil!');
-    return null;
-  }
-  
-  // Boşlukları temizle
-  gmailPassword = gmailPassword.replace(/\s+/g, '').trim();
-  
-  if (!gmailPassword || gmailPassword.length < 16) {
-    console.error('❌ GMAIL_APP_PASSWORD geçersiz! (çok kısa veya boş)');
-    return null;
-  }
-
-  cachedTransporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: gmailUser,
-      pass: gmailPassword
-    },
+  const isProd = process.env.NODE_ENV === 'production';
+  cachedTransporter = createMailTransporter({
     // Production ortamında daha uzun timeout'lar (Vercel serverless için)
-    connectionTimeout: process.env.NODE_ENV === 'production' ? 30000 : 10000,
-    greetingTimeout: process.env.NODE_ENV === 'production' ? 30000 : 10000,
-    socketTimeout: process.env.NODE_ENV === 'production' ? 30000 : 10000,
+    connectionTimeout: isProd ? 30000 : 10000,
+    greetingTimeout: isProd ? 30000 : 10000,
+    socketTimeout: isProd ? 30000 : 10000,
     // Retry mekanizması
     pool: true,
     maxConnections: 1,
-    maxMessages: 3
+    maxMessages: 3,
   });
 
   return cachedTransporter;
@@ -273,13 +285,8 @@ export async function sendContactNotification(data: EmailData) {
     }
     
     // Gmail SMTP transporter oluştur
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: gmailUser,
-        pass: gmailPassword
-      }
-    });
+    const transporter = createMailTransporter();
+    if (!transporter) return false;
 
     // E-posta içeriği
     const mailOptions = {
@@ -350,13 +357,8 @@ export async function sendContactNotification(data: EmailData) {
 // Müşteri teklifi kabul ettiğinde admin'e gönderilecek mail
 export async function sendCustomerAcceptEmailToAdmin(customerEmail: string, customerName: string, productName: string, offerAmount: number | string, adminEmail: string = 'ozancidik@gmail.com') {
   try {
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_APP_PASSWORD
-      }
-    });
+    const transporter = createMailTransporter();
+    if (!transporter) return false;
 
     // Offer amount'u number'a çevir ve formatla
     const formattedAmount = Number(offerAmount).toLocaleString('tr-TR');
@@ -414,13 +416,8 @@ export async function sendCustomerAcceptEmailToAdmin(customerEmail: string, cust
 // Müşteri teklifi reddettiğinde admin'e gönderilecek mail
 export async function sendCustomerRejectEmailToAdmin(customerEmail: string, customerName: string, productName: string, offerAmount: number | string, reason?: string, adminEmail: string = 'ozancidik@gmail.com') {
   try {
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_APP_PASSWORD
-      }
-    });
+    const transporter = createMailTransporter();
+    if (!transporter) return false;
 
     // Offer amount'u number'a çevir ve formatla
     const formattedAmount = Number(offerAmount).toLocaleString('tr-TR');
@@ -485,13 +482,8 @@ export async function sendCustomerRejectEmailToAdmin(customerEmail: string, cust
 // Admin teklifi kabul ettiğinde müşteriye gönderilecek mail
 export async function sendAdminAcceptEmailToCustomer(customerEmail: string, customerName: string, productName: string, offerAmount: number | string) {
   try {
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_APP_PASSWORD
-      }
-    });
+    const transporter = createMailTransporter();
+    if (!transporter) return false;
 
     // Offer amount'u number'a çevir ve formatla
     const formattedAmount = Number(offerAmount).toLocaleString('tr-TR');
@@ -555,13 +547,8 @@ export async function sendAdminAcceptEmailToCustomer(customerEmail: string, cust
 // Admin ödemeyi onayladığında müşteriye gönderilecek mail
 export async function sendPaymentConfirmationEmail(customerEmail: string, customerName: string, productName: string, amount: number | string, method?: string) {
   try {
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_APP_PASSWORD
-      }
-    });
+    const transporter = createMailTransporter();
+    if (!transporter) return false;
 
     const formattedAmount = Number(amount).toLocaleString('tr-TR');
 
@@ -624,13 +611,8 @@ export async function sendPaymentConfirmationEmail(customerEmail: string, custom
 // Müşteri talebinin iptalini istediğinde admin'e gönderilecek mail
 export async function sendCancellationRequestEmailToAdmin(customerEmail: string, customerName: string, productName: string, reason: string | undefined, adminEmail: string = 'ozancidik@gmail.com') {
   try {
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_APP_PASSWORD
-      }
-    });
+    const transporter = createMailTransporter();
+    if (!transporter) return false;
 
     const mailOptions = {
       from: 'info@dusukbutce.com',
@@ -686,13 +668,8 @@ export async function sendCancellationRequestEmailToAdmin(customerEmail: string,
 // Admin iptal talebini onayladığında müşteriye gönderilecek mail
 export async function sendCancellationApprovedEmailToCustomer(customerEmail: string, customerName: string, productName: string, adminNote?: string) {
   try {
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_APP_PASSWORD
-      }
-    });
+    const transporter = createMailTransporter();
+    if (!transporter) return false;
 
     const mailOptions = {
       from: 'info@dusukbutce.com',
@@ -751,13 +728,8 @@ export async function sendCancellationApprovedEmailToCustomer(customerEmail: str
 // Admin iptal talebini reddettiğinde müşteriye gönderilecek mail
 export async function sendCancellationRejectedEmailToCustomer(customerEmail: string, customerName: string, productName: string, adminNote?: string) {
   try {
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_APP_PASSWORD
-      }
-    });
+    const transporter = createMailTransporter();
+    if (!transporter) return false;
 
     const mailOptions = {
       from: 'info@dusukbutce.com',
@@ -816,13 +788,8 @@ export async function sendCancellationRejectedEmailToCustomer(customerEmail: str
 // Admin teklifi reddettiğinde müşteriye gönderilecek mail
 export async function sendAdminRejectEmailToCustomer(customerEmail: string, customerName: string, productName: string, reason?: string) {
   try {
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_APP_PASSWORD
-      }
-    });
+    const transporter = createMailTransporter();
+    if (!transporter) return false;
 
     const mailOptions = {
       from: 'info@dusukbutce.com',
@@ -881,13 +848,8 @@ export async function sendAdminRejectEmailToCustomer(customerEmail: string, cust
 export async function sendOfferEmail(customerEmail: string, customerName: string, productName: string, offerAmount: number | string, notes?: string) {
   try {
     // Gmail SMTP transporter oluştur
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_APP_PASSWORD
-      }
-    });
+    const transporter = createMailTransporter();
+    if (!transporter) return false;
 
     // Offer amount'u number'a çevir ve formatla
     const formattedAmount = Number(offerAmount).toLocaleString('tr-TR');
@@ -1009,13 +971,8 @@ export async function sendOfferEmail(customerEmail: string, customerName: string
 // Yeni teklif formu gönderildiğinde admin'e bilgilendirme maili
 export async function sendNewSubmissionNotificationToAdmin(submissionData: any) {
   try {
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_APP_PASSWORD
-      }
-    });
+    const transporter = createMailTransporter();
+    if (!transporter) return false;
 
     const productName = `${submissionData.brand || ''} ${submissionData.model || ''}`.trim() || 'Bilinmeyen Ürün';
     
@@ -1125,13 +1082,8 @@ export async function sendEmailVerificationEmail(email: string, verificationToke
       return false;
     }
     
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: gmailUser,
-        pass: gmailPassword.trim() // Boşlukları temizle
-      }
-    });
+    const transporter = createMailTransporter();
+    if (!transporter) return false;
 
     const mailOptions = {
       from: {
@@ -1217,17 +1169,8 @@ export async function sendEmailChangeVerificationEmail(email: string, verificati
     console.log('📧 Gmail User:', gmailUser);
     console.log('📧 Gmail Password Length:', gmailPassword.length);
     
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: gmailUser,
-        pass: gmailPassword
-      },
-      // Connection timeout ayarları
-      connectionTimeout: 10000,
-      greetingTimeout: 10000,
-      socketTimeout: 10000
-    });
+    const transporter = createMailTransporter({ connectionTimeout: 10000, greetingTimeout: 10000, socketTimeout: 10000 });
+    if (!transporter) return false;
     
     // Bağlantıyı test et
     try {
