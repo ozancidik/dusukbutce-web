@@ -63,3 +63,23 @@ describe('checkRateLimit', () => {
     expect(checkRateLimit(req, { name, limit: 2, windowMs: 60_000 })?.status).toBe(429);
   });
 });
+
+describe('checkRateLimit identifier', () => {
+  const opts = { name: 'identifier-test', limit: 2, windowMs: 60_000 };
+
+  it('sayacı IP yerine identifier ile ayırır (aynı IP, farklı kullanıcı)', () => {
+    const req = makeRequest('7.7.7.7');
+    expect(checkRateLimit(req, { ...opts, identifier: 'kullanici-a' })).toBeNull();
+    expect(checkRateLimit(req, { ...opts, identifier: 'kullanici-a' })).toBeNull();
+    expect(checkRateLimit(req, { ...opts, identifier: 'kullanici-a' })?.status).toBe(429);
+    // Aynı IP'den başka kullanıcının hakkı etkilenmez
+    expect(checkRateLimit(req, { ...opts, identifier: 'kullanici-b' })).toBeNull();
+  });
+
+  it("aynı kullanıcı farklı IP'den de aynı sayaca düşer", () => {
+    const o = { ...opts, name: 'identifier-test-2', identifier: 'kullanici-c' };
+    expect(checkRateLimit(makeRequest('1.1.1.1'), o)).toBeNull();
+    expect(checkRateLimit(makeRequest('2.2.2.2'), o)).toBeNull();
+    expect(checkRateLimit(makeRequest('3.3.3.3'), o)?.status).toBe(429);
+  });
+});

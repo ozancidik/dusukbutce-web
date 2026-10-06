@@ -46,6 +46,8 @@ export interface RateLimitOptions {
   limit: number;
   /** Pencere süresi (ms). */
   windowMs: number;
+  /** Sayaç anahtarı; verilmezse istemci IP'si (ör. kullanıcı başına limit için userId). */
+  identifier?: string;
 }
 
 /**
@@ -56,12 +58,12 @@ export interface RateLimitOptions {
  */
 export function checkRateLimit(
   request: Request,
-  { name, limit, windowMs }: RateLimitOptions
+  { name, limit, windowMs, identifier }: RateLimitOptions
 ): NextResponse | null {
   const now = Date.now();
   cleanup(now, windowMs);
 
-  const key = `${name}:${getClientIp(request)}`;
+  const key = `${name}:${identifier ?? getClientIp(request)}`;
   const entry = store.get(key) ?? { timestamps: [] };
 
   // Pencere dışına düşen eski istekleri at.
