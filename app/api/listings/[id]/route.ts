@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import ProductSubmission from "@/models/ProductSubmission";
 import mongoose from "mongoose";
+import { requireAdmin } from "@/lib/auth";
 
 export async function GET(
   _request: NextRequest,
@@ -32,14 +33,21 @@ export async function GET(
 }
 
 export async function PATCH(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Yalnızca yönetici düzenleyebilir (eskiden herkes herhangi bir kaydı değiştirebiliyordu).
+  const denied = requireAdmin(request);
+  if (denied) return denied;
+
   try {
     await connectDB();
 
     const { id } = await params;
-    const body = await _request.json();
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json({ error: "Geçersiz ilan ID" }, { status: 400 });
+    }
+    const body = await request.json();
     const updated = await ProductSubmission.findByIdAndUpdate(id, body, { new: true });
 
     if (!updated) {
@@ -54,13 +62,20 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Yalnızca yönetici silebilir (eskiden herkes herhangi bir kaydı silebiliyordu).
+  const denied = requireAdmin(request);
+  if (denied) return denied;
+
   try {
     await connectDB();
 
     const { id } = await params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json({ error: "Geçersiz ilan ID" }, { status: 400 });
+    }
     const deleted = await ProductSubmission.findByIdAndDelete(id);
 
     if (!deleted) {

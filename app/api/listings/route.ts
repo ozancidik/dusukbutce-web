@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import ProductSubmission from "@/models/ProductSubmission";
+import { requireAdmin } from "@/lib/auth";
 
 export async function GET(request: NextRequest) {
   try {
@@ -20,6 +21,11 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  // Yalnızca yönetici ilan oluşturabilir (eskiden kimlik kontrolü yoktu ve body'deki
+  // her alan doğrudan DB'ye yazılıyordu).
+  const denied = requireAdmin(request);
+  if (denied) return denied;
+
   try {
     await connectDB();
     
